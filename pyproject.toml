@@ -6,7 +6,8 @@ authors = ["kannibalox <kannibalox@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pyrobase = {path = "../pyrobase"}
+pyrobase = "^1.0.0"
+Tempita = "^0.5.2"
 
 [tool.poetry.dev-dependencies]
 

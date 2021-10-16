@@ -11,10 +11,22 @@ develop = false
 type = "directory"
 url = "../pyrobase"
 
+[[package]]
+name = "tempita"
+version = "0.5.2"
+description = "A very small text templating language"
+category = "main"
+optional = false
+python-versions = "*"
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8016d5b6e3e380f03e0dbfbbc60d43be6890de65cc99720f353c3100002f664c"
+content-hash = "d1a9b96b4b58dbbcc612f9ca65ce016f0246c1314e95f3e222f27709a8ba4345"
 
 [metadata.files]
 pyrobase = []
+tempita = [
+    {file = "Tempita-0.5.2-py3-none-any.whl", hash = "sha256:f4554840cb59c6b4a5df4fad27eea4e3cb47ca7089bfeefb5890ff1bb8af2117"},
+    {file = "Tempita-0.5.2.tar.gz", hash = "sha256:cacecf0baa674d356641f1d406b8bff1d756d739c46b869a54de515d08e6fc9c"},
+]
