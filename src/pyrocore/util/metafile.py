@@ -31,8 +31,7 @@ import pprint
 import fnmatch
 import hashlib
 
-import six
-from six.moves import urllib
+import urllib
 
 from pyrobase import bencode
 from pyrobase.parts import Bunch
@@ -107,7 +106,7 @@ class MaskingPrettyPrinter(pprint.PrettyPrinter):
     def format(self, obj, context, maxlevels, level):  # pylint: disable=arguments-differ
         """ Mask obj if it looks like an URL, then pass it to the super class.
         """
-        if isinstance(obj, six.string_types) and "://" in fmt.to_unicode(obj):
+        if isinstance(obj, str) and "://" in fmt.to_unicode(obj):
             obj = mask_keys(obj)
         return pprint.PrettyPrinter.format(self, obj, context, maxlevels, level)
 
@@ -121,15 +120,15 @@ def check_info(info):
         raise ValueError("bad metainfo - not a dictionary")
 
     pieces = info.get("pieces")
-    if not isinstance(pieces, six.binary_type) or len(pieces) % 20 != 0:
+    if not isinstance(pieces, bytes) or len(pieces) % 20 != 0:
         raise ValueError("bad metainfo - bad pieces key")
 
     piece_size = info.get("piece length")
-    if not isinstance(piece_size, six.integer_types) or piece_size <= 0:
+    if not isinstance(piece_size, int) or piece_size <= 0:
         raise ValueError("bad metainfo - illegal piece length")
 
     name = info.get("name")
-    if not isinstance(name, six.string_types):
+    if not isinstance(name, str):
         raise ValueError("bad metainfo - bad name (type is %r)" % type(name).__name__)
     if not ALLOWED_ROOT_NAME.match(name):
         raise ValueError("name %s disallowed for security reasons" % name)
@@ -139,7 +138,7 @@ def check_info(info):
 
     if "length" in info:
         length = info.get("length")
-        if not isinstance(length, six.integer_types) or length < 0:
+        if not isinstance(length, int) or length < 0:
             raise ValueError("bad metainfo - bad length")
     else:
         files = info.get("files")
@@ -151,7 +150,7 @@ def check_info(info):
                 raise ValueError("bad metainfo - bad file value")
 
             length = item.get("length")
-            if not isinstance(length, six.integer_types) or length < 0:
+            if not isinstance(length, int) or length < 0:
                 raise ValueError("bad metainfo - bad length")
 
             path = item.get("path")
@@ -159,7 +158,7 @@ def check_info(info):
                 raise ValueError("bad metainfo - bad path")
 
             for part in path:
-                if not isinstance(part, six.text_type):
+                if not isinstance(part, str):
                     raise ValueError("bad metainfo - bad path dir")
                 part = fmt.to_unicode(part)
                 if part == '..':
@@ -181,7 +180,7 @@ def check_meta(meta):
     """
     if not isinstance(meta, dict):
         raise ValueError("bad metadata - not a dictionary")
-    if not isinstance(meta.get("announce"), six.string_types):
+    if not isinstance(meta.get("announce"), str):
         raise ValueError("bad announce URL - not a string")
     check_info(meta.get("info"))
 
@@ -232,7 +231,7 @@ def sanitize(meta, diagnostics=False):
 
     def sane_encoding(field, text):
         "Transcoding helper."
-        if isinstance(text, six.text_type):
+        if isinstance(text, str):
             return text.encode("utf-8")
         for encoding in ('utf-8', meta.get('encoding', None), 'cp1252'):
             if encoding:
@@ -705,8 +704,6 @@ class Metafile(object):
         metainfo = bencode.bread(self.filename)
         bad_encodings = []
         bad_fields = []
-        if six.PY2: #PY3 knows it's data
-            metainfo, bad_encodings, bad_fields = sanitize(metainfo, diagnostics=True)
         announce = metainfo['announce']
         info = metainfo['info']
         infohash = hashlib.sha1(bencode.bencode(info))

@@ -29,8 +29,6 @@ import textwrap
 import logging.config
 from optparse import OptionParser
 
-from six.moves import input
-import six
 import pkg_resources
 
 from pyrocore import error, config
@@ -78,75 +76,16 @@ class ScriptBase(object):
         logging.getLogger().debug("Logging config read from '%s'" % logging_cfg)
 
 
-    def _get_pkg_meta(self):
-        """ Try to find package metadata.
-        """
-        logger = logging.getLogger('pyrocore.scripts.base.version_info')
-        pkg_info = None
-        warnings = []
-
-        for info_ext, info_name in (('.dist-info', 'METADATA'), ('.egg-info', 'PKG-INFO')):
-            try:
-                # Development setup
-                pkg_path = os.path.join(
-                    __file__.split(__name__.replace('.', os.sep))[0],  # containing path
-                    __name__.split(".")[0]  # package name
-                )
-                if os.path.exists(pkg_path + info_ext):
-                    pkg_path += info_ext
-                else:
-                    globbed_paths = glob.glob(pkg_path + "-*-py%d.%d" % sys.version_info[:2] + info_ext)
-                    if len(globbed_paths) == 1:
-                        pkg_path = globbed_paths[0]
-                    elif globbed_paths:
-                        warnings.append("Found {} release-specific candidate versions in *{}"
-                                        .format(len(globbed_paths), info_ext))
-                        pkg_path = None
-                    else:
-                        globbed_paths = glob.glob(pkg_path + "-*" + info_ext)
-                        if len(globbed_paths) == 1:
-                            pkg_path = globbed_paths[0]
-                        else:
-                            warnings.append("Found {} candidate versions in *{}"
-                                            .format(len(globbed_paths), info_ext))
-                            pkg_path = None
-                if pkg_path:
-                    with open(os.path.join(pkg_path, info_name)) as handle:
-                        pkg_info = handle.read()
-                    break
-            except IOError:
-                continue
-
-        if not pkg_info:
-            logger.warn("Software version cannot be determined! ({})".format(', '.join(warnings)))
-
-        return pkg_info or "Version: 0.0.0\n"
-
-
     def __init__(self):
         """ Initialize CLI.
         """
         self.startup = time.time()
         self.LOG = pymagic.get_class_logger(self)
 
-        # Get version number
-        self.version = self.VERSION
-        if not self.version:
-            # Take version from package
-            provider = pkg_resources.get_provider(__name__)
-            pkg_meta = (provider.get_metadata("PKG-INFO")
-                        or provider.get_metadata("METADATA")
-                        or self._get_pkg_meta())
-            pkg_dict = dict(line.split(": ", 1)
-                for line in pkg_meta.splitlines()
-                if ": " in line
-            )
-            self.version = pkg_dict.get("Version", "DEV")
-
         where = os.path.commonprefix([__file__, os.path.realpath(sys.argv[0]), sys.prefix])
         where = re.sub('^' + os.path.expanduser('~') + os.sep, '~' + os.sep, where + os.sep).rstrip(os.sep)
         self.version_info = '{}{}{} on Python {}'.format(
-           self.version, ' from ' if where else '', where, sys.version.split()[0])
+           '', ' from ' if where else '', where, sys.version.split()[0])
 
         self.args = None
         self.options = None
@@ -275,7 +214,7 @@ class ScriptBase(object):
                 try:
                     msg = str(exc)
                 except UnicodeError:
-                    msg = six.text_type(exc, "UTF-8")
+                    msg = str(exc, "UTF-8")
                 self.LOG.error(msg)
                 sys.exit(error.EX_SOFTWARE)
             except KeyboardInterrupt as exc:

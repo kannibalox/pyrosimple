@@ -29,8 +29,6 @@ import logging
 import operator
 from collections import namedtuple
 
-import six
-
 from pyrobase.parts import Bunch
 from pyrocore import config, error
 from pyrocore.util import os, xmlrpc, load_config, traits, fmt, matching
@@ -175,7 +173,7 @@ class RtorrentItem(engine.TorrentProxy):
         try:
             return self._fields[name]
         except KeyError:
-            if isinstance(name, six.integer_types):
+            if isinstance(name, int):
                 name = "custom_%d" % name
 
             if name == "done":
@@ -700,15 +698,12 @@ class RtorrentEngine(engine.TorrentEngine):
             self.startup = int(self._rpc.startup_time() or time.time())
         else:
             self._session_dir = self._rpc.session.path()
-            if not self._session_dir:
-                raise error.UserError("You need a session directory, read"
-                    " https://pyrocore.readthedocs.io/en/latest/setup.html")
-            if not os.path.exists(self._session_dir):
-                raise error.UserError("Non-existing session directory %r" % self._session_dir)
             self._download_dir = os.path.expanduser(self._rpc.directory.default())
-            if not os.path.exists(self._download_dir):
-                raise error.UserError("Non-existing download directory %r" % self._download_dir)
-            self.startup = os.path.getmtime(os.path.join(self._session_dir, "rtorrent.lock"))
+            lockfile = os.path.join(self._session_dir, "rtorrent.lock")
+            if os.path.exists(lockfile):
+                self.startup = os.path.getmtime(lockfile)
+            else:
+                self.startup = time.time()
 
         # Return connection
         self.LOG.debug(repr(self))
@@ -755,7 +750,7 @@ class RtorrentEngine(engine.TorrentEngine):
 
         if view is None:
             view = engine.TorrentView(self, "default")
-        elif isinstance(view, six.string_types):
+        elif isinstance(view, str):
             view = engine.TorrentView(self, self._resolve_viewname(view))
         else:
             view.viewname = self._resolve_viewname(view.viewname)

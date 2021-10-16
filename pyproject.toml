@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pyrocore"
+version = "1.0.0"
+description = ""
+authors = ["kannibalox <kannibalox@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyrobase = {path = "../pyrobase"}
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+rtxmlrpc = "pyrocore.scripts.rtxmlrpc:run"
+rtcontrol = "pyrocore.scripts.rtcontrol:run"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

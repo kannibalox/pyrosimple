@@ -23,7 +23,7 @@ import sys
 import time
 import socket
 
-from six.moves import xmlrpc_client as xmlrpclib
+from xmlrpc import client as xmlrpclib
 from pyrobase.io import xmlrpc2scgi
 
 from pyrocore import config, error

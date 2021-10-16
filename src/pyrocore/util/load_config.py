@@ -26,8 +26,8 @@ import re
 import glob
 import errno
 
-import six
-from six.moves import configparser as ConfigParser
+import io
+import configparser as ConfigParser
 
 from pyrocore import config, error
 from pyrocore.util import os, pymagic
@@ -106,7 +106,7 @@ class ConfigLoader(object):
 
         # Validate announce URLs
         for key, val in namespace["announce"].items():
-            if isinstance(val, six.string_types):
+            if isinstance(val, str):
                 namespace["announce"][key] = val.split()
 
         # Re-escape output formats
@@ -114,17 +114,17 @@ class ConfigLoader(object):
 
         # Create objects from module specs
         for factory in ("engine",):
-            if isinstance(namespace[factory], six.string_types):
+            if isinstance(namespace[factory], str):
                 namespace[factory] = pymagic.import_name(namespace[factory])() if namespace[factory] else None
 
         # Do some standard type conversions
         for key in namespace:
             # Split lists
-            if key.endswith("_list") and isinstance(namespace[key], six.string_types):
+            if key.endswith("_list") and isinstance(namespace[key], str):
                 namespace[key] = [i.strip() for i in namespace[key].replace(',', ' ').split()]
 
             # Resolve factory and callback handler lists
-            elif any(key.endswith(i) for i in ("_factories", "_callbacks")) and isinstance(namespace[key], six.string_types):
+            elif any(key.endswith(i) for i in ("_factories", "_callbacks")) and isinstance(namespace[key], str):
                 namespace[key] = [pymagic.import_name(i.strip()) for i in namespace[key].replace(',', ' ').split()]
 
         # Update config values again
@@ -137,7 +137,7 @@ class ConfigLoader(object):
         # Isolate global values
         global_vars = dict((key, val)
             for key, val in namespace.items()
-            if isinstance(val, six.string_types)
+            if isinstance(val, str)
         )
 
         # Copy all sections
@@ -183,10 +183,7 @@ class ConfigLoader(object):
 
             ini_file = ConfigParser.SafeConfigParser()
             ini_file.optionxform = str # case-sensitive option names
-            if six.PY2:
-                ini_file.readfp(six.StringIO(defaults), "<defaults>")
-            else:
-                ini_file.read_file(six.StringIO(defaults.decode('utf-8')), "<defaults>")
+            ini_file.read_file(io.StringIO(defaults.decode('utf-8')), "<defaults>")
             self._set_from_ini(namespace, ini_file)
 
 

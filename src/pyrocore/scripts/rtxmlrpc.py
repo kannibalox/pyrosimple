@@ -34,8 +34,7 @@ try:
 except ImportError:
     requests = None
 
-from six.moves import xmlrpc_client
-import six
+from xmlrpc import client as xmlrpc_client
 
 from pyrobase import bencode
 from pyrobase.parts import Bunch

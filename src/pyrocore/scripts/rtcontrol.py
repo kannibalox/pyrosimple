@@ -30,7 +30,6 @@ from pyrocore import config, error
 from pyrocore.util import os, fmt, osmagic, pymagic, matching, xmlrpc
 from pyrocore.scripts.base import ScriptBase, ScriptBaseWithConfig, PromptDecorator
 from pyrocore.torrent import engine, formatting
-import six
 
 
 def print_help_fields():
@@ -106,7 +105,7 @@ class FieldStatistics(object):
         # Calculate average if possible
         if self.size:
             result.update(
-                (key, '' if isinstance(val, six.string_types) else val / self.size)
+                (key, '' if isinstance(val, str) else val / self.size)
                 for key, val in list(self.total.items())
             )
 
@@ -730,7 +729,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
             for item in matches:
                 cmds = [[output_formatter(i, namespace=dict(item=item)) for i in k] for k in template_cmds]
-                cmds = [[i.decode('utf-8') if isinstance(i, six.binary_type) else i for i in k] for k in cmds]
+                cmds = [[i.decode('utf-8') if isinstance(i, bytes) else i for i in k] for k in cmds]
 
                 if self.options.dry_run:
                     self.LOG.info("Would call command(s) %r" % (cmds,))

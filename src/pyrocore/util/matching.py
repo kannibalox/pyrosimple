@@ -23,8 +23,6 @@ import shlex
 import fnmatch
 import operator
 
-import six
-
 from pyrocore import error, config
 from pyrocore.util import fmt, pymagic
 
@@ -106,7 +104,7 @@ class CompoundFilterAll(CompoundFilterBase):
     """
 
     def __str__(self):
-        return u' '.join(six.text_type(i) for i in self)
+        return u' '.join(str(i) for i in self)
 
     def pre_filter(self):
         """ Return rTorrent condition to speed up data transfer.
@@ -163,11 +161,11 @@ class NegateFilter(Filter):
 
     def __str__(self):
         if isinstance(self._inner, FieldFilter):
-            return six.text_type("%s=!%s" % tuple(six.text_type(self._inner).split('=', 1)))
+            return str("%s=!%s" % tuple(str(self._inner).split('=', 1)))
         elif isinstance(self._inner, CompoundFilterBase):
-            return u"[ NOT [ %s ] ]" %  six.text_type(self._inner)
+            return u"[ NOT [ %s ] ]" %  str(self._inner)
         else:
-            return u"[ NOT %s ]" %  six.text_type(self._inner)
+            return u"[ NOT %s ]" %  str(self._inner)
 
     def pre_filter(self):
         """ Return rTorrent condition to speed up data transfer.
@@ -798,9 +796,9 @@ class ConditionParser(object):
             @type conditions: list or str
         """
         conditions_text = conditions
-        if isinstance(conditions, six.binary_type):
+        if isinstance(conditions, bytes):
             conditions = shlex.split(conditions.decode('utf-8'))
-        elif isinstance(conditions, six.text_type):
+        elif isinstance(conditions, str):
             conditions = shlex.split(conditions)
         else:
             # Not a string, assume parsed tree
