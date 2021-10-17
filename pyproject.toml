@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pyrocore"
+name = "pyrosimple"
 version = "1.0.0"
 description = ""
 authors = ["kannibalox <kannibalox@gmail.com>"]
@@ -13,10 +13,10 @@ Tempita = "^0.5.2"
 black = "^21.9-beta.0"
 
 [tool.poetry.scripts]
-rtxmlrpc = "pyrocore.scripts.rtxmlrpc:run"
-rtcontrol = "pyrocore.scripts.rtcontrol:run"
-lstor = "pyrocore.scripts.lstor:run"
-mktor = "pyrocore.scripts.mktor:run"
+rtxmlrpc = "pyrosimple.scripts.rtxmlrpc:run"
+rtcontrol = "pyrosimple.scripts.rtcontrol:run"
+lstor = "pyrosimple.scripts.lstor:run"
+mktor = "pyrosimple.scripts.mktor:run"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

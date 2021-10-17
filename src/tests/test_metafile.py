@@ -26,7 +26,7 @@ import copy
 import operator
 from functools import reduce  # forward compatibility for Python 3
 
-from pyrocore.util.metafile import * #@UnusedWildImport
+from pyrosimple.util.metafile import * #@UnusedWildImport
 from pyrobase.bencode import bread
 
 log = logging.getLogger(__name__)

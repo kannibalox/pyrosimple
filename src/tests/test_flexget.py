@@ -23,8 +23,8 @@ import logging
 
 ''' TODO: unbreak this
 
-from pyrocore.util import os
-from pyrocore.flexget import FLEXGET_BOOTSTRAP
+from pyrosimple.util import os
+from pyrosimple.flexget import FLEXGET_BOOTSTRAP
 import tests
 
 log = logging.getLogger(__name__)
@@ -159,11 +159,11 @@ if os.path.exists(os.path.expanduser(FLEXGET_BOOTSTRAP)) and load_flexget_tests(
                 assert count == expected, "Expected %s rejects, got %d" % (expected, count)
 
 
-    # TODO: For meaningful tests, pyrocore must get mock support (specifically for xmlrpc)
+    # TODO: For meaningful tests, pyrosimple must get mock support (specifically for xmlrpc)
     class TestRtorrentUnavailable(FlexGetBase):
-        """Tests that can run without pyrocore installed."""
+        """Tests that can run without pyrosimple installed."""
 
-        # Note we enforce an error here if pyrocore is installed, so we can test
+        # Note we enforce an error here if pyrosimple is installed, so we can test
         # that disabling the plugin causes no unwanted calls (they'd raise).
         __tmp__ = True
         __yaml__ = """

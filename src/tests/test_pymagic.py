@@ -21,7 +21,7 @@
 import logging
 import unittest
 
-from pyrocore.util import pymagic
+from pyrosimple.util import pymagic
 
 log = logging.getLogger(__name__)
 log.trace("module loaded")
@@ -30,32 +30,32 @@ log.trace("module loaded")
 class ImportTest(unittest.TestCase):
 
     def test_import_name(self):
-        docstr = pymagic.import_name("pyrocore", "__doc__")
+        docstr = pymagic.import_name("pyrosimple", "__doc__")
         assert "Core Package" in docstr
 
-        docstr = pymagic.import_name("pyrocore.util", "__doc__")
+        docstr = pymagic.import_name("pyrosimple.util", "__doc__")
         assert "Utility Modules" in docstr
 
 
     def test_import_fail(self):
         try:
-            pymagic.import_name("pyrocore.does_not_exit", "__doc__")
+            pymagic.import_name("pyrosimple.does_not_exit", "__doc__")
         except ImportError as exc:
-            assert "pyrocore.does_not_exit" in str(exc), str(exc)
+            assert "pyrosimple.does_not_exit" in str(exc), str(exc)
         else:
             assert False, "Import MUST fail!"
 
 
     def test_import_colon(self):
-        docstr = pymagic.import_name("pyrocore:__doc__")
+        docstr = pymagic.import_name("pyrosimple:__doc__")
         assert "Core Package" in docstr
 
 
     def test_import_missing_colon(self):
         try:
-            pymagic.import_name("pyrocore")
+            pymagic.import_name("pyrosimple")
         except ValueError as exc:
-            assert "pyrocore" in str(exc), str(exc)
+            assert "pyrosimple" in str(exc), str(exc)
         else:
             assert False, "Import MUST fail!"
 

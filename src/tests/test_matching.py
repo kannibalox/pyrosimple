@@ -25,7 +25,7 @@ import unittest
 import six
 
 from pyrobase.parts import Bunch
-from pyrocore.util import matching
+from pyrosimple.util import matching
 
 log = logging.getLogger(__name__)
 log.trace("module loaded")

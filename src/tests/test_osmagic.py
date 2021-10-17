@@ -21,7 +21,7 @@
 import logging
 import unittest
 
-from pyrocore.util import osmagic
+from pyrosimple.util import osmagic
 
 log = logging.getLogger(__name__)
 log.trace("module loaded")

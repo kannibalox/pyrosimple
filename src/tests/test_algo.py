@@ -21,7 +21,7 @@
 import logging
 import unittest
 
-from pyrocore.util import algo
+from pyrosimple.util import algo
 
 log = logging.getLogger(__name__)
 log.trace("module loaded")

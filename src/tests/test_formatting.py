@@ -21,7 +21,7 @@
 import logging
 import unittest
 
-from pyrocore.torrent import formatting
+from pyrosimple.torrent import formatting
 
 log = logging.getLogger(__name__)
 log.trace("module loaded")
