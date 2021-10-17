@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import re
 import random
 
-from pyrobase import bencode
+import bencode
 from pyrocore import config
 from pyrocore.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrocore.util import metafile, os

@@ -27,7 +27,7 @@ from collections import defaultdict
 
 from six import iteritems
 from pyrobase import logutil
-from pyrobase.parts import Bunch
+from pyrocore.util.parts import Bunch
 
 from pyrocore import config, error
 from pyrocore.util import os, pymagic, osmagic, matching

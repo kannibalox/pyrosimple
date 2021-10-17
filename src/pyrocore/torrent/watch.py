@@ -27,7 +27,7 @@ import logging
 import asyncore
 
 from pyrobase import logutil
-from pyrobase.parts import Bunch
+from pyrocore.util.parts import Bunch
 from pyrocore import error
 from pyrocore import config as configuration
 from pyrocore.util import os, fmt, xmlrpc, pymagic, metafile, traits

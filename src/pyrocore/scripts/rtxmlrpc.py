@@ -36,8 +36,8 @@ except ImportError:
 
 from xmlrpc import client as xmlrpc_client
 
-from pyrobase import bencode
-from pyrobase.parts import Bunch
+import bencode
+from pyrocore.util.parts import Bunch
 
 from pyrocore import config, error
 from pyrocore.util import fmt, xmlrpc

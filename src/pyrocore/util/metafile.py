@@ -30,11 +30,11 @@ import errno
 import pprint
 import fnmatch
 import hashlib
-
 import urllib
 
-from pyrobase import bencode
-from pyrobase.parts import Bunch
+import bencode
+
+from pyrocore.util.parts import Bunch
 from pyrocore import config, error
 from pyrocore.util import os, fmt, pymagic
 
@@ -350,7 +350,7 @@ def add_fast_resume(meta, datapath):
 def info_hash(metadata):
     """ Return info hash as a string.
     """
-    return hashlib.sha1(bencode.bencode(metadata['info'])).hexdigest().upper()
+    return hashlib.sha1(bencode.encode(metadata['info'])).hexdigest().upper()
 
 
 def data_size(metadata):
@@ -376,12 +376,12 @@ def checked_open(filename, log=None, quiet=False):
     """
     with open(filename, "rb") as handle:
         raw_data = handle.read()
-    data = bencode.bdecode(raw_data)
+    data = bencode.decode(raw_data)
 
     # pylint: disable=
     try:
         check_meta(data)
-        if raw_data != bencode.bencode(data):
+        if raw_data != bencode.encode(data):
             raise ValueError("Bad bencoded data - dict keys out of order?") 
     except ValueError as exc:
         if log:
@@ -671,7 +671,8 @@ class Metafile(object):
 
             # Write metafile to disk
             self.LOG.debug("Writing %r..." % (output_name,))
-            bencode.bwrite(output_name, meta)
+            with open(output_name, 'wb') as fh:
+                fh.write(bencode.encode(meta))
 
         return meta
 
@@ -701,12 +702,13 @@ class Metafile(object):
         """ List torrent info & contents. Returns a list of formatted lines.
         """
         # Assemble data
-        metainfo = bencode.bread(self.filename)
+        with open(self.filename, 'rb') as fh:
+            metainfo = bencode.decode(fh.read())
         bad_encodings = []
         bad_fields = []
         announce = metainfo['announce']
         info = metainfo['info']
-        infohash = hashlib.sha1(bencode.bencode(info))
+        infohash = hashlib.sha1(bencode.encode(info))
 
         total_size = data_size(metainfo)
         piece_length = info['piece length']

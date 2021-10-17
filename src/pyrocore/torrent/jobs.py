@@ -26,7 +26,7 @@ except ImportError:
 import requests
 from requests.exceptions import RequestException
 
-from pyrobase.parts import Bunch
+from pyrocore.util.parts import Bunch
 from pyrocore import error
 from pyrocore import config as config_ini
 from pyrocore.util import fmt, xmlrpc, pymagic, stats

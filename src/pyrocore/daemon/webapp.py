@@ -34,7 +34,7 @@ from webob.dec import wsgify
 
 import six
 
-from pyrobase.parts import Bunch
+from pyrocore.util.parts import Bunch
 from pyrocore import config, error
 from pyrocore.util import pymagic, xmlrpc, stats
 

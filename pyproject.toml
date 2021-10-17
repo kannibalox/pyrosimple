@@ -6,14 +6,16 @@ authors = ["kannibalox <kannibalox@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pyrobase = "^1.0.0"
 Tempita = "^0.5.2"
+"bencode.py" = "^4.0.0"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
 rtxmlrpc = "pyrocore.scripts.rtxmlrpc:run"
 rtcontrol = "pyrocore.scripts.rtcontrol:run"
+lstor = "pyrocore.scripts.lstor:run"
+mktor = "pyrocore.scripts.mktor:run"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

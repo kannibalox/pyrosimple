@@ -26,7 +26,7 @@ import hashlib
 
 from six.moves import urllib
 
-from pyrobase import bencode
+import bencode
 from pyrocore.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrocore import config, error
 from pyrocore.util import os, metafile

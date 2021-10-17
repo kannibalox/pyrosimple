@@ -24,7 +24,7 @@ import time
 import socket
 
 from xmlrpc import client as xmlrpclib
-from pyrobase.io import xmlrpc2scgi
+from pyrocore.io import xmlrpc2scgi
 
 from pyrocore import config, error
 from pyrocore.util import os, fmt, pymagic

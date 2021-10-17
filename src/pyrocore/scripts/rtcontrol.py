@@ -25,7 +25,7 @@ import shlex
 import logging
 import subprocess
 
-from pyrobase.parts import Bunch, DefaultBunch
+from pyrocore.util.parts import Bunch, DefaultBunch
 from pyrocore import config, error
 from pyrocore.util import os, fmt, osmagic, pymagic, matching, xmlrpc
 from pyrocore.scripts.base import ScriptBase, ScriptBaseWithConfig, PromptDecorator

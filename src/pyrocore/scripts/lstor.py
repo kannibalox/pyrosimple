@@ -22,7 +22,7 @@
 import pprint
 import hashlib
 
-from pyrobase import bencode
+import bencode
 from pyrocore.scripts.base import ScriptBase
 from pyrocore.util import fmt, metafile
 

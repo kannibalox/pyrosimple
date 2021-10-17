@@ -29,7 +29,7 @@ import logging
 import operator
 from collections import namedtuple
 
-from pyrobase.parts import Bunch
+from pyrocore.util.parts import Bunch
 from pyrocore import config, error
 from pyrocore.util import os, xmlrpc, load_config, traits, fmt, matching
 from pyrocore.torrent import engine

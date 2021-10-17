@@ -21,7 +21,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 from __future__ import absolute_import
 
-from pyrobase.parts import Bunch
+from pyrocore.util.parts import Bunch
 
 
 def lookup_announce_alias(name):

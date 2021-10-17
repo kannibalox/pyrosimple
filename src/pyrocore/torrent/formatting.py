@@ -25,7 +25,7 @@ import json
 import operator
 
 from pyrobase import templating
-from pyrobase.parts import Bunch
+from pyrocore.util.parts import Bunch
 
 from pyrocore import error, config
 from pyrocore.torrent import engine
