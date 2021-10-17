@@ -436,7 +436,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         for name in emit_fields[:]:
             name = name.decode()
             if name not in engine.FieldDefinition.FIELDS:
-                self.LOG.warn("Omitted unknown name '%s' from statistics and output format sorting" % name.decode())
+                self.LOG.warn("Omitted unknown name '%s' from statistics and output format sorting" % name)
             else:
                 result.append(name)
 
