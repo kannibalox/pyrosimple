@@ -24,7 +24,7 @@ import sys
 import json
 import operator
 
-from pyrobase import templating
+from pyrocore.util import templating
 from pyrocore.util.parts import Bunch
 
 from pyrocore import error, config

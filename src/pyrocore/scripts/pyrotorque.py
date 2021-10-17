@@ -26,7 +26,7 @@ import asyncore
 from collections import defaultdict
 
 from six import iteritems
-from pyrobase import logutil
+from pyrocore.util import logutil
 from pyrocore.util.parts import Bunch
 
 from pyrocore import config, error

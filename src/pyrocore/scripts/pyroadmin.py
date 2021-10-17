@@ -32,10 +32,9 @@ from six.moves import StringIO, urllib
 from six.moves import xmlrpc_client as xmlrpclib
 import six
 
-from pyrobase import fmt
 from pyrocore.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrocore import config, error
-from pyrocore.util import os, load_config, metafile, matching
+from pyrocore.util import os, load_config, metafile, matching, fmt
 
 
 class AdminTool(ScriptBaseWithConfig):

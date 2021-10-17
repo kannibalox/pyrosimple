@@ -26,11 +26,10 @@ import time
 import logging
 import asyncore
 
-from pyrobase import logutil
 from pyrocore.util.parts import Bunch
 from pyrocore import error
 from pyrocore import config as configuration
-from pyrocore.util import os, fmt, xmlrpc, pymagic, metafile, traits
+from pyrocore.util import os, fmt, xmlrpc, pymagic, metafile, traits, logutil
 from pyrocore.torrent import matching, formatting
 from pyrocore.scripts.base import ScriptBase, ScriptBaseWithConfig
 
