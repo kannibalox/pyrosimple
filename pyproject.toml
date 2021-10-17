@@ -12,8 +12,6 @@ Tempita = "^0.5.2"
 [tool.poetry.group.dev.dependencies]
 black = "^21.9-beta.0"
 
-[tool.poetry.dev-dependencies]
-
 [tool.poetry.scripts]
 rtxmlrpc = "pyrocore.scripts.rtxmlrpc:run"
 rtcontrol = "pyrocore.scripts.rtcontrol:run"
