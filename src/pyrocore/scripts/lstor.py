@@ -18,7 +18,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
 import json
 
 import pprint
@@ -107,7 +106,9 @@ class MetafileLister(ScriptBase):
                             )  # bogus pylint: disable=E1101
                         )
                     else:
-                        data["info"]["pieces"] = data["info"]["pieces"].decode("latin1")
+                        data["info"]["pieces"] = data["info"]["pieces"].decode(
+                            "latin1"
+                        )  # TODO: Find something better
 
                     listing = json.dumps(data, indent=2)
                 elif self.options.output:
