@@ -19,10 +19,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+import json
+
 import pprint
 import hashlib
 
 import bencode
+
 from pyrocore.scripts.base import ScriptBase
 from pyrocore.util import fmt, metafile
 
@@ -87,9 +90,10 @@ class MetafileLister(ScriptBase):
                         data["info"]["pieces"] = "<%d piece hashes>" % (
                             len(data["info"]["pieces"]) / len(hashlib.sha1().digest()) # bogus pylint: disable=E1101
                         )
+                    else:
+                        data["info"]["pieces"] = data["info"]["pieces"].decode("latin1")
 
-                    pprinter = (pprint.PrettyPrinter if self.options.reveal else metafile.MaskingPrettyPrinter)()
-                    listing = pprinter.pformat(data)
+                    listing = json.dumps(data, indent=2)
                 elif self.options.output:
                     def splitter(fields):
                         "Yield single names for a list of comma-separated strings."
@@ -116,13 +120,13 @@ class MetafileLister(ScriptBase):
                         listing = '\t'.join(values)
                 else:
                     listing = '\n'.join(torrent.listing(masked=not self.options.reveal))
-            except (ValueError, KeyError, bencode.BencodeError) as exc:
+            except (ValueError, KeyError, bencode.BencodeDecodeError) as exc:
                 if self.options.debug:
                     raise
                 self.LOG.warning("Bad metafile %r (%s: %s)" % (filename, type(exc).__name__, exc))
             else:
                 if listing is not None:
-                    print(fmt.to_utf8(listing))
+                    print(listing)
 
 
 def run(): #pragma: no cover
