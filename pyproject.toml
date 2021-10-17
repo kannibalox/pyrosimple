@@ -9,6 +9,9 @@ python = "^3.9"
 Tempita = "^0.5.2"
 "bencode.py" = "^4.0.0"
 
+[tool.poetry.group.dev.dependencies]
+black = "^21.9-beta.0"
+
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
