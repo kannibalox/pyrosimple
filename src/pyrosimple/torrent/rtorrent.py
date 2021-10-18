@@ -251,7 +251,11 @@ class RtorrentItem(engine.TorrentProxy):
             path = self.fetch("directory")
             if path and not self._fields["is_multi_file"]:
                 path = os.path.join(path, self._fields["name"])
-        return os.path.expanduser(fmt.to_unicode(path))
+        path = os.path.expanduser(path)
+        if self._fields["is_multi_file"]:
+            return path + '/'
+        else:
+            return path
 
     def announce_urls(self, default=[]):  # pylint: disable=dangerous-default-value
         """Get a list of all announce URLs.
