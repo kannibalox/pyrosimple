@@ -310,7 +310,7 @@ class TorrentProxy(object):
             try:
                 return FieldDefinition.FIELDS[name]
             except KeyError:
-                field = OnDemandField(fmt.to_unicode, name, "custom attribute %r" % name.split('_', 1)[1],
+                field = OnDemandField(str, name, "custom attribute %r" % name.split('_', 1)[1],
                     matcher=matching.PatternFilter)
                 setattr(cls, name, field) # add field to all proxy objects
 
@@ -453,7 +453,7 @@ class TorrentProxy(object):
 
     # Basic fields
     hash = ConstantField(str, "hash", "info hash", matcher=matching.PatternFilter)
-    name = ConstantField(fmt.to_unicode, "name", "name (file or root directory)", matcher=matching.PatternFilter)
+    name = ConstantField(str, "name", "name (file or root directory)", matcher=matching.PatternFilter)
     size = ConstantField(int, "size", "data size", matcher=matching.ByteSizeFilter)
     prio = OnDemandField(int, "prio", "priority (0=off, 1=low, 2=normal, 3=high)", matcher=matching.FloatFilter,
         formatter=lambda val: "X- +"[val])
@@ -462,7 +462,7 @@ class TorrentProxy(object):
     alias = ConstantField(config.map_announce2alias, "alias", "tracker alias or domain",
         matcher=matching.PatternFilter, accessor=lambda o: o._memoize("alias", getattr, o, "tracker"))
         #matcher=matching.PatternFilter, accessor=operator.attrgetter("tracker"))
-    message = OnDemandField(fmt.to_unicode, "message", "current tracker message", matcher=matching.PatternFilter)
+    message = OnDemandField(str, "message", "current tracker message", matcher=matching.PatternFilter)
 
     # State
     is_private = ConstantField(bool, "is_private", "private flag set (no DHT/PEX)?", matcher=matching.BoolFilter,
@@ -510,15 +510,15 @@ class TorrentProxy(object):
             * d.directory_base.set means set path PLUS basename together for a multi item (thus allowing a rename)
             * only d.directory.set behaves consistently for single+multi, regarding the end result in d.base_path
     """
-    directory = OnDemandField(fmt.to_unicode, "directory", "directory containing download data", matcher=matching.PatternFilter)
-    path = DynamicField(fmt.to_unicode, "path", "path to download data", matcher=matching.PatternFilter,
+    directory = OnDemandField(str, "directory", "directory containing download data", matcher=matching.PatternFilter)
+    path = DynamicField(str, "path", "path to download data", matcher=matching.PatternFilter,
         accessor=lambda o: o.datapath())
-    realpath = DynamicField(fmt.to_unicode, "realpath", "real path to download data", matcher=matching.PatternFilter,
+    realpath = DynamicField(str, "realpath", "real path to download data", matcher=matching.PatternFilter,
         accessor=lambda o: os.path.realpath(o.datapath()))
-    metafile = ConstantField(fmt.to_unicode, "metafile", "path to torrent file", matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(fmt.to_unicode(o._fields["metafile"])))
-    sessionfile = ConstantField(fmt.to_unicode, "sessionfile", "path to session file", matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(fmt.to_unicode(o.fetch("session_file"))))
+    metafile = ConstantField(str, "metafile", "path to torrent file", matcher=matching.PatternFilter,
+        accessor=lambda o: os.path.expanduser(str(o._fields["metafile"])))
+    sessionfile = ConstantField(str, "sessionfile", "path to session file", matcher=matching.PatternFilter,
+        accessor=lambda o: os.path.expanduser(str(o.fetch("session_file"))))
     files = OnDemandField(list, "files", "list of files in this item",
         matcher=matching.FilesFilter, formatter=_fmt_files)
     fno = OnDemandField(int, "fno", "number of files in this item", matcher=matching.FloatFilter, engine_name="size_files")
