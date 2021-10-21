@@ -5,7 +5,7 @@ description = ""
 authors = ["kannibalox <kannibalox@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.7"
 Tempita = "^0.5.2"
 "bencode.py" = "^4.0.0"
 
