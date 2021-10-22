@@ -17,27 +17,13 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import absolute_import
 
 import logging
 
 log = logging.getLogger(__name__)
 
 
-try:
-    from itertools import product # @UnusedImport pylint: disable=E0611
-except ImportError:
-    def product(*args, **kwds):
-        """ product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
-            product(range(2), repeat=3) --> 000 001 010 011 100 101 110 111
-        """
-        pools = map(tuple, args) * kwds.get('repeat', 1)
-        result = [[]]
-        for pool in pools:
-            result = [x+[y] for x in result for y in pool]
-        for prod in result:
-            yield tuple(prod)
-
+from itertools import product # @UnusedImport pylint: disable=E0611
 
 def flatten(nested, containers=(list, tuple)):
     """ Flatten a nested list in-place and return it.

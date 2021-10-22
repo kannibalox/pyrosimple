@@ -26,10 +26,7 @@ import pipes
 import socket
 import subprocess
 
-try:
-    from urllib.error import URLError
-except ImportError:
-    from urllib2 import URLError
+from urllib.error import URLError
 
 from urllib import parse as urlparse
 from xmlrpc import client as xmlrpclib
