@@ -156,35 +156,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.sched.add_cron_job(params.handler.run, **params.schedule)
 
 
-    def _init_wsgi_server(self):
-        """ Set up WSGI HTTP server.
-        """
-        self.wsgi_server = None
-
-        if self.httpd.active:
-            # Only import dependencies when server is active
-            from waitress.server import WSGIServer
-            from pyrosimple.daemon import webapp
-
-            # Set up WSGI stack
-            wsgi_app = webapp.make_app(self.httpd)
-#            try:
-#                import wsgilog
-#            except ImportError:
-#                self.LOG.info("'wsgilog' middleware not installed")
-#            else:
-#                wsgi_app = wsgilog.WsgiLog(wsgi_app, **self.httpd.wsgilog)
-
-            ##logging.getLogger('waitress').setLevel(logging.DEBUG)
-            self.LOG.debug("Waitress config: %r" % self.httpd.waitress)
-            self.wsgi_server = WSGIServer(wsgi_app, **self.httpd.waitress)
-            self.LOG.info("Started web server at %s://%s:%d/" % (
-                self.httpd.waitress.url_scheme,
-                self.wsgi_server.get_server_name(self.wsgi_server.effective_host),
-                int(self.wsgi_server.effective_port),
-            ))
-
-
     def _run_forever(self):
         """ Run configured jobs until termination request.
         """
@@ -280,8 +251,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         from apscheduler.scheduler import Scheduler
         self.sched = Scheduler(config.torque)
 
-        self._init_wsgi_server()
-
         # Run services
         self.sched.start()
         try:
@@ -290,9 +259,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self._run_forever()
         finally:
             self.sched.shutdown()
-            if self.wsgi_server:
-                self.wsgi_server.task_dispatcher.shutdown()
-                self.wsgi_server = None
 
             if self.options.pid_file:
                 try:
