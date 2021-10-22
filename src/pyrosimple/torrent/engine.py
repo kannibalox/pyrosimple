@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 import re
 import time
 import operator
+from typing import Dict, Any, Set
 from collections import defaultdict
 
 from pyrosimple import config, error
@@ -38,7 +39,7 @@ def untyped(val):
     return val
 
 
-def ratio_float(intval):
+def ratio_float(intval: float) -> float:
     """ Convert scaled integer ratio to a normalized float.
     """
     return intval / 1000.0
@@ -133,7 +134,7 @@ def _fmt_duration(duration):
     return fmt.human_duration(duration, 0, 2, True)
 
 
-def _fmt_tags(tagset):
+def _fmt_tags(tagset: Set[str]) -> str:
     """ Convert set of strings to sorted space-separated list as a string.
     """
     return ' '.join(sorted(tagset))
@@ -208,7 +209,7 @@ def detect_traits(item):
 class FieldDefinition(object):
     """ Download item field.
     """
-    FIELDS = {}
+    FIELDS: Dict[str, Any] = {}
 
     @classmethod
     def lookup(cls, name):
