@@ -5,12 +5,18 @@ description = ""
 authors = ["kannibalox <kannibalox@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = "~3.7"
 Tempita = "^0.5.2"
 "bencode.py" = "^4.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^21.9-beta.0"
+mypy = "^0.910"
+pylint = "^2.11.1"
+
+
+[tool.poetry.group.extras.dependencies]
+prompt-toolkit = "^3.0.21"
 
 [tool.poetry.scripts]
 rtxmlrpc = "pyrosimple.scripts.rtxmlrpc:run"
