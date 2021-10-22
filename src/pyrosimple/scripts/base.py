@@ -29,8 +29,6 @@ import textwrap
 import logging.config
 from optparse import OptionParser
 
-import pkg_resources
-
 from pyrosimple import error, config
 from pyrosimple.util import os, fmt, pymagic, load_config
 

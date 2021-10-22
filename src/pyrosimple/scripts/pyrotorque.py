@@ -25,10 +25,10 @@ import signal
 import asyncore
 from collections import defaultdict
 
-from six import iteritems
+import iteritems
+
 from pyrosimple.util import logutil
 from pyrosimple.util.parts import Bunch
-
 from pyrosimple import config, error
 from pyrosimple.util import os, pymagic, osmagic, matching
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig

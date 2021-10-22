@@ -27,7 +27,6 @@ import glob
 import logging
 import tempfile
 import textwrap
-from pprint import pformat
 
 try:
     import requests
@@ -92,7 +91,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def add_options(self):
         """ Add program options.
         """
-        super(RtorrentXmlRpc, self).add_options()
+        super().add_options()
 
         # basic options
         self.add_bool_option("-r", "--repr", help="show Python pretty-printed response")
