@@ -154,7 +154,7 @@ class MetafileCreator(ScriptBaseWithConfig):
         meta = torrent.create(datapath, self.args[1:],
             progress=None if self.options.quiet else metafile.console_progress(),
             root_name=self.options.root_name, private=self.options.private, no_date=self.options.no_date,
-            comment=self.options.comment, created_by="PyroScope %s" % self.version, callback=callback
+            comment=self.options.comment, created_by="PyroScope", callback=callback
         )
 
         # Create second metafile with fast-resume?

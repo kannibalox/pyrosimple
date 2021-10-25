@@ -195,7 +195,7 @@ def clean_meta(meta, including_info=False, logger=None):
     """
     modified = set()
 
-    for key in meta.keys():
+    for key in list(meta.keys()):
         if [key] not in METAFILE_STD_KEYS:
             if logger:
                 logger("Removing key %r..." % (key,))
@@ -203,7 +203,7 @@ def clean_meta(meta, including_info=False, logger=None):
             modified.add(key)
 
     if including_info:
-        for key in meta["info"].keys():
+        for key in list(meta["info"].keys()):
             if ["info", key] not in METAFILE_STD_KEYS:
                 if logger:
                     logger("Removing key %r..." % ("info." + key,))
@@ -211,7 +211,7 @@ def clean_meta(meta, including_info=False, logger=None):
                 modified.add("info." + key)
 
         for idx, entry in enumerate(meta["info"].get("files", [])):
-            for key in entry.keys():
+            for key in list(entry.keys()):
                 if ["info", "files", key] not in METAFILE_STD_KEYS:
                     if logger:
                         logger("Removing key %r from file #%d..." % (key, idx + 1))
