@@ -18,15 +18,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json
-
-import pprint
 import hashlib
+import json
 
 import bencode
 
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import fmt, metafile
+from pyrosimple.util import metafile
 
 
 class MetafileLister(ScriptBase):
@@ -105,12 +103,14 @@ class MetafileLister(ScriptBase):
                                 hashlib.sha1().digest()
                             )  # bogus pylint: disable=E1101
                         )
-                    else:
-                        data["info"]["pieces"] = data["info"]["pieces"].decode(
-                            "latin1"
-                        )  # TODO: Find something better
 
-                    listing = json.dumps(data, indent=2)
+                    class BencodeJSONEncoder(json.JSONEncoder):
+                        def default(self, o):
+                            if isinstance(o, bytes):
+                                return o.hex().upper()
+                            return super().default(o)
+
+                    listing = BencodeJSONEncoder(indent=2).encode(data)
                 elif self.options.output:
 
                     def splitter(fields):
