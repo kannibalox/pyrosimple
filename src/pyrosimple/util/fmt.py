@@ -218,6 +218,6 @@ def xmlrpc_result_to_string(result, pretty=False):
     elif isinstance(result, str) or isinstance(result, bytes):
         return to_unicode(result)
     elif hasattr(result, "__iter__"):
-        return '\n'.join(i if isinstance(i, string_types) else pformat(i) for i in result)
+        return '\n'.join(i if isinstance(i, str) else pformat(i) for i in result)
     else:
         return repr(result)
