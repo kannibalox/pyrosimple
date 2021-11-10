@@ -76,7 +76,7 @@ class MetafileLister(ScriptBase):
                 try:
                     data = metafile.checked_open(
                         filename,
-                        log=self.LOG if (self.options.skip_validation and not self.options.raw) else None,
+                        log=self.LOG if self.options.skip_validation else None,
                         quiet=(
                             self.options.quiet
                             and (self.options.output or self.options.raw)
