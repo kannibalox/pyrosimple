@@ -13,6 +13,7 @@ Tempita = "^0.5.2"
 rtxmlrpc = "pyrosimple.scripts.rtxmlrpc:run"
 rtcontrol = "pyrosimple.scripts.rtcontrol:run"
 lstor = "pyrosimple.scripts.lstor:run"
+chtor = "pyrosimple.scripts.chtor:run"
 mktor = "pyrosimple.scripts.mktor:run"
 
 [build-system]
