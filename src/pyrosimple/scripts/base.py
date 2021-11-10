@@ -21,7 +21,6 @@
 
 import re
 import sys
-import glob
 import time
 import errno
 import random
@@ -30,7 +29,7 @@ import logging.config
 from optparse import OptionParser
 
 from pyrosimple import error, config
-from pyrosimple.util import os, fmt, pymagic, load_config
+from pyrosimple.util import os, pymagic, load_config
 
 
 class ScriptBase(object):
