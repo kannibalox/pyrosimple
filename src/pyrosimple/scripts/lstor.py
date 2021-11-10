@@ -67,7 +67,7 @@ class MetafileLister(ScriptBase):
 
         for idx, filename in enumerate(self.args):
             torrent = metafile.Metafile(filename)
-            if idx and not self.options.output:
+            if idx and not self.options.output and not self.options.raw:
                 print()
                 print("~" * 79)
 
