@@ -673,7 +673,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         def output_formatter(templ, namespace=None):
             "Output formatting helper"
             full_ns = dict(
-                version=self.version,
+                version=None,
                 proxy=config.engine.open(),
                 view=view,
                 query=matcher,
