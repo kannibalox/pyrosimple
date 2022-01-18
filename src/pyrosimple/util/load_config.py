@@ -19,19 +19,18 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import with_statement
-from __future__ import absolute_import
 
 import re
 import glob
 import errno
+import importlib
 
 import io
+import sys
 import configparser as ConfigParser
 
 from pyrosimple import config, error
 from pyrosimple.util import os, pymagic
-
 
 def validate(key, val):
     """ Validate a configuration value.
@@ -205,6 +204,9 @@ class ConfigLoader(object):
         """
         if config_file and os.path.isfile(config_file):
             self.LOG.debug("Loading %r..." % (config_file,))
+            p = importlib.import_module('pyrosimple')
+            sys.modules['pyrocore'] = p
+            sys.modules['pyrobase'] = p
             exec(compile(open(config_file).read(), config_file, 'exec'),  # pylint: disable=exec-used
                  vars(config), namespace)
         else:

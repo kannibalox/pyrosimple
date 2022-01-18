@@ -43,6 +43,10 @@ def import_name(module_spec, name=None):
         @return: Requested object.
         @rtype: object
     """
+    # Hijack requests for pyrocore
+    if 'pyrocore' in module_spec or 'pyrobase' in module_spec:
+        module_spec = module_spec.replace('pyrocore', 'pyrosimple')
+        module_spec = module_spec.replace('pyrobase', 'pyrosimple')
     # Load module
     module_name = module_spec
     if name is None:
