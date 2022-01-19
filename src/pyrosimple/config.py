@@ -19,14 +19,12 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import absolute_import
 
 from pyrosimple.util.parts import Bunch
 
 
 def lookup_announce_alias(name):
-    """ Get canonical alias name and announce URL list for the given alias.
-    """
+    """Get canonical alias name and announce URL list for the given alias."""
     for alias, urls in announce.items():
         if alias.lower() == name.lower():
             return alias, urls
@@ -35,8 +33,7 @@ def lookup_announce_alias(name):
 
 
 def map_announce2alias(url):
-    """ Get tracker alias for announce URL, and if none is defined, the 2nd level domain.
-    """
+    """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
     import urllib
 
     # Try to find an exact alias URL match and return its label
@@ -46,7 +43,9 @@ def map_announce2alias(url):
 
     # Try to find an alias URL prefix and return its label
     parts = urllib.parse.urlparse(url)
-    server = urllib.parse.urlunparse((parts.scheme, parts.netloc, "/", None, None, None))
+    server = urllib.parse.urlunparse(
+        (parts.scheme, parts.netloc, "/", None, None, None)
+    )
 
     for alias, urls in announce.items():
         if any(i.startswith(server) for i in urls):
@@ -54,12 +53,13 @@ def map_announce2alias(url):
 
     # Return 2nd level domain name if no alias found
     try:
-        return '.'.join(parts.netloc.split(':')[0].split('.')[-2:])
+        return ".".join(parts.netloc.split(":")[0].split(".")[-2:])
     except IndexError:
         return parts.netloc
 
+
 # Remember predefined names
-_PREDEFINED = tuple(_ for _ in globals() if not _.startswith('_'))
+_PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))
 
 # Set some defaults to shut up pydev / pylint;
 # these later get overwritten by loading the config

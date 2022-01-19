@@ -32,9 +32,9 @@ import configparser as ConfigParser
 from pyrosimple import config, error
 from pyrosimple.util import os, pymagic
 
+
 def validate(key, val):
-    """ Validate a configuration value.
-    """
+    """Validate a configuration value."""
     if val and val.startswith("~/"):
         return os.path.expanduser(val)
     if key == "output_header_frequency":
@@ -45,61 +45,62 @@ def validate(key, val):
     return val
 
 
-def walk_resources(package_or_requirement, resource_name, recurse=True, base=''):
-    """ Yield paths of files in the given resource directory, all paths start with '/'.
-    """
-    base = base.rstrip('/') + '/'
-    resource_base = (resource_name.rstrip('/') + '/' + base.strip('/')).rstrip('/')
+def walk_resources(package_or_requirement, resource_name, recurse=True, base=""):
+    """Yield paths of files in the given resource directory, all paths start with '/'."""
+    base = base.rstrip("/") + "/"
+    resource_base = (resource_name.rstrip("/") + "/" + base.strip("/")).rstrip("/")
 
     # Create default configuration files
     for filename in pymagic.resource_listdir(package_or_requirement, resource_base):
         # Skip hidden and other trashy names
-        if filename.startswith('.') or any(filename.endswith(i) for i in (".pyc", ".pyo", "~")):
+        if filename.startswith(".") or any(
+            filename.endswith(i) for i in (".pyc", ".pyo", "~")
+        ):
             continue
 
         # Handle subdirectories
-        if pymagic.resource_isdir(package_or_requirement, resource_base + '/' + filename):
+        if pymagic.resource_isdir(
+            package_or_requirement, resource_base + "/" + filename
+        ):
             if recurse:
-                for i in walk_resources(package_or_requirement, resource_name, recurse, base=base + filename):
+                for i in walk_resources(
+                    package_or_requirement, resource_name, recurse, base=base + filename
+                ):
                     yield i
         else:
             yield base + filename
 
 
 class ConfigLoader(object):
-    """ Populates this module's dictionary with the user-defined configuration values.
-    """
+    """Populates this module's dictionary with the user-defined configuration values."""
+
     CONFIG_INI = "config.ini"
     CONFIG_PY = "config.py"
     INTERPOLATION_ESCAPE = re.compile(r"(?<!%)%[^%(]")
 
-
     def __init__(self, config_dir=None):
-        """ Create loader instance.
-        """
-        self.config_dir = config_dir or os.path.join(os.path.expanduser("~"), ".pyroscope")
+        """Create loader instance."""
+        self.config_dir = config_dir or os.path.join(
+            os.path.expanduser("~"), ".pyroscope"
+        )
         self.LOG = pymagic.get_class_logger(self)
         self._loaded = False
 
-
     def _update_config(self, namespace):  # pylint: disable=no-self-use
-        """ Inject the items from the given dict into the configuration.
-        """
+        """Inject the items from the given dict into the configuration."""
         for key, val in namespace.items():
             setattr(config, key, val)
 
-
     def _interpolation_escape(self, namespace):
-        """ Re-escape interpolation strings.
-        """
+        """Re-escape interpolation strings."""
         for key, val in namespace.items():
-            if '%' in val:
-                namespace[key] = self.INTERPOLATION_ESCAPE.sub(lambda match: '%' + match.group(0), val)
-
+            if "%" in val:
+                namespace[key] = self.INTERPOLATION_ESCAPE.sub(
+                    lambda match: "%" + match.group(0), val
+                )
 
     def _validate_namespace(self, namespace):
-        """ Validate the given namespace. This method is idempotent!
-        """
+        """Validate the given namespace. This method is idempotent!"""
         # Update config values (so other code can access them in the bootstrap phase)
         self._update_config(namespace)
 
@@ -114,29 +115,37 @@ class ConfigLoader(object):
         # Create objects from module specs
         for factory in ("engine",):
             if isinstance(namespace[factory], str):
-                namespace[factory] = pymagic.import_name(namespace[factory])() if namespace[factory] else None
+                namespace[factory] = (
+                    pymagic.import_name(namespace[factory])()
+                    if namespace[factory]
+                    else None
+                )
 
         # Do some standard type conversions
         for key in namespace:
             # Split lists
             if key.endswith("_list") and isinstance(namespace[key], str):
-                namespace[key] = [i.strip() for i in namespace[key].replace(',', ' ').split()]
+                namespace[key] = [
+                    i.strip() for i in namespace[key].replace(",", " ").split()
+                ]
 
             # Resolve factory and callback handler lists
-            elif any(key.endswith(i) for i in ("_factories", "_callbacks")) and isinstance(namespace[key], str):
-                namespace[key] = [pymagic.import_name(i.strip()) for i in namespace[key].replace(',', ' ').split()]
+            elif any(
+                key.endswith(i) for i in ("_factories", "_callbacks")
+            ) and isinstance(namespace[key], str):
+                namespace[key] = [
+                    pymagic.import_name(i.strip())
+                    for i in namespace[key].replace(",", " ").split()
+                ]
 
         # Update config values again
         self._update_config(namespace)
 
-
     def _set_from_ini(self, namespace, ini_file):
-        """ Copy values from loaded INI file to namespace.
-        """
+        """Copy values from loaded INI file to namespace."""
         # Isolate global values
-        global_vars = dict((key, val)
-            for key, val in namespace.items()
-            if isinstance(val, str)
+        global_vars = dict(
+            (key, val) for key, val in namespace.items() if isinstance(val, str)
         )
 
         # Copy all sections
@@ -153,69 +162,73 @@ class ConfigLoader(object):
             # Interpolate and validate all values
             if section == "FORMATS":
                 self._interpolation_escape(raw_vars)
-            raw_vars.update(dict(
-                (key, validate(key, val))
-                for key, val in ini_file.items(section, vars=raw_vars)
-            ))
+            raw_vars.update(
+                dict(
+                    (key, validate(key, val))
+                    for key, val in ini_file.items(section, vars=raw_vars)
+                )
+            )
 
         # Update global values
         namespace.update(global_vars)
 
-
     def _set_defaults(self, namespace, optional_cfg_files):
-        """ Set default values in the given dict.
-        """
+        """Set default values in the given dict."""
         # Add current configuration directory
         namespace["config_dir"] = self.config_dir
 
         # Load defaults
         for idx, cfg_file in enumerate([self.CONFIG_INI] + optional_cfg_files):
-            if any(i in cfg_file for i in set('/' + os.sep)):
-                continue # skip any non-plain filenames
+            if any(i in cfg_file for i in set("/" + os.sep)):
+                continue  # skip any non-plain filenames
 
             try:
-                defaults = pymagic.resource_string("pyrosimple", "data/config/" + cfg_file) #@UndefinedVariable
+                defaults = pymagic.resource_string(
+                    "pyrosimple", "data/config/" + cfg_file
+                )  # @UndefinedVariable
             except IOError as exc:
                 if idx and exc.errno == errno.ENOENT:
                     continue
                 raise
 
             ini_file = ConfigParser.SafeConfigParser()
-            ini_file.optionxform = str # case-sensitive option names
-            ini_file.read_file(io.StringIO(defaults.decode('utf-8')), "<defaults>")
+            ini_file.optionxform = str  # case-sensitive option names
+            ini_file.read_file(io.StringIO(defaults.decode("utf-8")), "<defaults>")
             self._set_from_ini(namespace, ini_file)
 
-
     def _load_ini(self, namespace, config_file):
-        """ Load INI style configuration.
-        """
+        """Load INI style configuration."""
         self.LOG.debug("Loading %r..." % (config_file,))
         ini_file = ConfigParser.SafeConfigParser()
-        ini_file.optionxform = str # case-sensitive option names
+        ini_file.optionxform = str  # case-sensitive option names
         if ini_file.read(config_file):
             self._set_from_ini(namespace, ini_file)
         else:
-            self.LOG.warning("Configuration file %r not found,"
-                             " use the command 'pyroadmin --create-config' to create it!" % (config_file,))
-
+            self.LOG.warning(
+                "Configuration file %r not found,"
+                " use the command 'pyroadmin --create-config' to create it!"
+                % (config_file,)
+            )
 
     def _load_py(self, namespace, config_file):
-        """ Load scripted configuration.
-        """
+        """Load scripted configuration."""
         if config_file and os.path.isfile(config_file):
             self.LOG.debug("Loading %r..." % (config_file,))
-            p = importlib.import_module('pyrosimple')
-            sys.modules['pyrocore'] = p
-            sys.modules['pyrobase'] = p
-            exec(compile(open(config_file).read(), config_file, 'exec'),  # pylint: disable=exec-used
-                 vars(config), namespace)
+            p = importlib.import_module("pyrosimple")
+            sys.modules["pyrocore"] = p
+            sys.modules["pyrobase"] = p
+            exec(
+                compile(
+                    open(config_file).read(), config_file, "exec"
+                ),  # pylint: disable=exec-used
+                vars(config),
+                namespace,
+            )
         else:
             self.LOG.warning("Configuration file %r not found!" % (config_file,))
 
-
     def load(self, optional_cfg_files=None):
-        """ Actually load the configuation from either the default location or the given directory.
-        """
+        """Actually load the configuation from either the default location or the given directory."""
         optional_cfg_files = optional_cfg_files or []
 
         # Guard against coding errors
@@ -248,20 +261,30 @@ class ConfigLoader(object):
         # Ready to go...
         self._loaded = True
 
-
     def create(self, remove_all_rc_files=False):
-        """ Create default configuration files at either the default location or the given directory.
-        """
+        """Create default configuration files at either the default location or the given directory."""
         # Check and create configuration directory
         if os.path.exists(self.config_dir):
-            self.LOG.debug("Configuration directory %r already exists!" % (self.config_dir,))
+            self.LOG.debug(
+                "Configuration directory %r already exists!" % (self.config_dir,)
+            )
         else:
             os.mkdir(self.config_dir)
 
         if remove_all_rc_files:
-            for subdir in ('.', 'rtorrent.d'):
-                config_files = list(glob.glob(os.path.join(os.path.abspath(self.config_dir), subdir, '*.rc')))
-                config_files += list(glob.glob(os.path.join(os.path.abspath(self.config_dir), subdir, '*.rc.default')))
+            for subdir in (".", "rtorrent.d"):
+                config_files = list(
+                    glob.glob(
+                        os.path.join(os.path.abspath(self.config_dir), subdir, "*.rc")
+                    )
+                )
+                config_files += list(
+                    glob.glob(
+                        os.path.join(
+                            os.path.abspath(self.config_dir), subdir, "*.rc.default"
+                        )
+                    )
+                )
                 for config_file in config_files:
                     self.LOG.info("Removing %r!" % (config_file,))
                     os.remove(config_file)
@@ -281,7 +304,7 @@ class ConfigLoader(object):
             if os.path.exists(config_file):
                 self.LOG.debug("Configuration file %r already exists!" % (config_file,))
             else:
-                config_trail.append('')
+                config_trail.append("")
             for i in config_trail:
                 with open(config_file + i, "wb") as handle:
                     handle.write(text)

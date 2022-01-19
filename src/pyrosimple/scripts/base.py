@@ -33,8 +33,8 @@ from pyrosimple.util import os, pymagic, load_config
 
 
 class ScriptBase(object):
-    """ Base class for command line interfaces.
-    """
+    """Base class for command line interfaces."""
+
     # logging configuration
     LOGGING_CFG = "~/.pyroscope/logging.%s.ini"
 
@@ -53,15 +53,15 @@ class ScriptBase(object):
     # Can be made explicit in derived classes (for external tools)
     VERSION = None
 
-
     @classmethod
     def setup(cls, cron_cfg="cron"):
-        """ Set up the runtime environment.
-        """
+        """Set up the runtime environment."""
         random.seed()
         logging_cfg = cls.LOGGING_CFG
         if "%s" in logging_cfg:
-            logging_cfg = logging_cfg % (cron_cfg if "--cron" in sys.argv[1:] else "scripts",)
+            logging_cfg = logging_cfg % (
+                cron_cfg if "--cron" in sys.argv[1:] else "scripts",
+            )
         logging_cfg = os.path.expanduser(logging_cfg)
 
         if os.path.exists(logging_cfg):
@@ -72,68 +72,78 @@ class ScriptBase(object):
 
         logging.getLogger().debug("Logging config read from '%s'" % logging_cfg)
 
-
     def __init__(self):
-        """ Initialize CLI.
-        """
+        """Initialize CLI."""
         self.startup = time.time()
         self.LOG = pymagic.get_class_logger(self)
 
-        where = os.path.commonprefix([__file__, os.path.realpath(sys.argv[0]), sys.prefix])
-        where = re.sub('^' + os.path.expanduser('~') + os.sep, '~' + os.sep, where + os.sep).rstrip(os.sep)
-        self.version_info = '{}{}{} on Python {}'.format(
-           '', ' from ' if where else '', where, sys.version.split()[0])
+        where = os.path.commonprefix(
+            [__file__, os.path.realpath(sys.argv[0]), sys.prefix]
+        )
+        where = re.sub(
+            "^" + os.path.expanduser("~") + os.sep, "~" + os.sep, where + os.sep
+        ).rstrip(os.sep)
+        self.version_info = "{}{}{} on Python {}".format(
+            "", " from " if where else "", where, sys.version.split()[0]
+        )
 
         self.args = None
         self.options = None
         self.return_code = 0
         self.parser = OptionParser(
             "%prog [options] " + self.ARGS_HELP + "\n\n"
-            "%prog " + self.version_info + ('\n' + self.COPYRIGHT if self.COPYRIGHT else "") + "\n\n"
-            + textwrap.dedent(self.__doc__.rstrip()).lstrip('\n')
-            + '\n'.join(self.ADDITIONAL_HELP)
+            "%prog "
+            + self.version_info
+            + ("\n" + self.COPYRIGHT if self.COPYRIGHT else "")
+            + "\n\n"
+            + textwrap.dedent(self.__doc__.rstrip()).lstrip("\n")
+            + "\n".join(self.ADDITIONAL_HELP)
             + "\n\nFor more details, see the full documentation at"
             + "\n\n    https://pyrosimple.readthedocs.io/",
-            version="%prog " + self.version_info)
-
+            version="%prog " + self.version_info,
+        )
 
     def add_bool_option(self, *args, **kwargs):
-        """ Add a boolean option.
+        """Add a boolean option.
 
-            @keyword help: Option description.
+        @keyword help: Option description.
         """
-        dest = [o for o in args if o.startswith("--")][0].replace("--", "").replace("-", "_")
-        self.parser.add_option(dest=dest, action="store_true", default=False,
-            help=kwargs['help'], *args)
-
+        dest = (
+            [o for o in args if o.startswith("--")][0]
+            .replace("--", "")
+            .replace("-", "_")
+        )
+        self.parser.add_option(
+            dest=dest, action="store_true", default=False, help=kwargs["help"], *args
+        )
 
     def add_value_option(self, *args, **kwargs):
-        """ Add a value option.
+        """Add a value option.
 
-            @keyword dest: Destination attribute, derived from long option name if not given.
-            @keyword action: How to handle the option.
-            @keyword help: Option description.
-            @keyword default: If given, add this value to the help string.
+        @keyword dest: Destination attribute, derived from long option name if not given.
+        @keyword action: How to handle the option.
+        @keyword help: Option description.
+        @keyword default: If given, add this value to the help string.
         """
-        kwargs['metavar'] = args[-1]
-        if 'dest' not in kwargs:
-            kwargs['dest'] = [o for o in args if o.startswith("--")][0].replace("--", "").replace("-", "_")
-        if 'default' in kwargs and kwargs['default']:
-            kwargs['help'] += " [%s]" % kwargs['default']
+        kwargs["metavar"] = args[-1]
+        if "dest" not in kwargs:
+            kwargs["dest"] = (
+                [o for o in args if o.startswith("--")][0]
+                .replace("--", "")
+                .replace("-", "_")
+            )
+        if "default" in kwargs and kwargs["default"]:
+            kwargs["help"] += " [%s]" % kwargs["default"]
         self.parser.add_option(*args[:-1], **kwargs)
 
-
     def get_options(self):
-        """ Get program options.
-        """
-        self.add_bool_option("-q", "--quiet",
-            help="omit informational logging")
-        self.add_bool_option("-v", "--verbose",
-            help="increase informational logging")
-        self.add_bool_option("--debug",
-            help="always show stack-traces for errors")
-        self.add_bool_option("--cron",
-            help="run in cron mode (with different logging configuration)")
+        """Get program options."""
+        self.add_bool_option("-q", "--quiet", help="omit informational logging")
+        self.add_bool_option("-v", "--verbose", help="increase informational logging")
+        self.add_bool_option("--debug", help="always show stack-traces for errors")
+        self.add_bool_option(
+            "--cron", help="run in cron mode (with different logging configuration)"
+        )
 
         # Template method to add options of derived class
         self.add_options()
@@ -156,44 +166,39 @@ class ScriptBase(object):
         elif self.options.verbose:
             logging.getLogger().setLevel(logging.DEBUG)
 
-        self.LOG.debug("Options: %s" % ", ".join("%s=%r" % i for i in sorted(vars(self.options).items())))
-
+        self.LOG.debug(
+            "Options: %s"
+            % ", ".join("%s=%r" % i for i in sorted(vars(self.options).items()))
+        )
 
     def handle_completion(self):
-        """ Handle shell completion stuff.
-        """
+        """Handle shell completion stuff."""
         # We don't want these in the help, so handle them explicitely
         if len(sys.argv) > 1 and sys.argv[1].startswith("--help-completion-"):
-            handler = getattr(self, sys.argv[1][2:].replace('-', '_'), None)
+            handler = getattr(self, sys.argv[1][2:].replace("-", "_"), None)
             if handler:
-                print('\n'.join(sorted(handler())))
+                print("\n".join(sorted(handler())))
                 self.STD_LOG_LEVEL = logging.DEBUG
                 sys.exit(error.EX_OK)
 
-
     def help_completion_options(self):
-        """ Return options of this command.
-        """
+        """Return options of this command."""
         for opt in self.parser.option_list:
             for lopt in opt._long_opts:
                 yield lopt
 
-
     def fatal(self, msg, exc=None):
-        """ Exit on a fatal error.
-        """
+        """Exit on a fatal error."""
         if exc is not None:
             self.LOG.fatal("%s (%s)" % (msg, exc))
             if self.options.debug:
-                return # let the caller re-raise it
+                return  # let the caller re-raise it
         else:
             self.LOG.fatal(msg)
         sys.exit(error.EX_SOFTWARE)
 
-
     def run(self):
-        """ The main program skeleton.
-        """
+        """The main program skeleton."""
         log_total = True
 
         try:
@@ -237,7 +242,7 @@ class ScriptBase(object):
                             try:
                                 handler.flush = lambda *_: None
                             except AttributeError:
-                                pass # skip special handlers
+                                pass  # skip special handlers
 
                     log_total = False
                     sys.exit(error.EX_IOERR)
@@ -247,114 +252,127 @@ class ScriptBase(object):
             # Shut down
             if log_total and self.options:  ## No time logging on --version and such
                 running_time = time.time() - self.startup
-                self.LOG.log(self.STD_LOG_LEVEL, "Total time: %.3f seconds." % running_time)
+                self.LOG.log(
+                    self.STD_LOG_LEVEL, "Total time: %.3f seconds." % running_time
+                )
             logging.shutdown()
 
         # Special exit code?
         if self.return_code:
             sys.exit(self.return_code)
 
-
     def add_options(self):
-        """ Add program options.
-        """
-
+        """Add program options."""
 
     def mainloop(self):
-        """ The main loop.
-        """
+        """The main loop."""
         raise NotImplementedError()
 
 
 class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
-    """ CLI tool with configuration support.
-    """
-    CONFIG_DIR_DEFAULT = '~/.pyroscope'
+    """CLI tool with configuration support."""
+
+    CONFIG_DIR_DEFAULT = "~/.pyroscope"
     OPTIONAL_CFG_FILES = []
 
-
     def add_options(self):
-        """ Add configuration options.
-        """
+        """Add configuration options."""
         super(ScriptBaseWithConfig, self).add_options()
 
-        self.add_value_option("--config-dir", "DIR",
-            help="configuration directory [{}]".format(os.environ.get('PYRO_CONFIG_DIR', self.CONFIG_DIR_DEFAULT)))
-        self.add_value_option("--config-file", "PATH",
-            action="append", default=[],
-            help="additional config file(s) to read")
-        self.add_value_option("-D", "--define", "KEY=VAL [-D ...]",
-            default=[], action="append", dest="defines",
-            help="override configuration attributes")
-
+        self.add_value_option(
+            "--config-dir",
+            "DIR",
+            help="configuration directory [{}]".format(
+                os.environ.get("PYRO_CONFIG_DIR", self.CONFIG_DIR_DEFAULT)
+            ),
+        )
+        self.add_value_option(
+            "--config-file",
+            "PATH",
+            action="append",
+            default=[],
+            help="additional config file(s) to read",
+        )
+        self.add_value_option(
+            "-D",
+            "--define",
+            "KEY=VAL [-D ...]",
+            default=[],
+            action="append",
+            dest="defines",
+            help="override configuration attributes",
+        )
 
     def get_options(self):
-        """ Get program options.
-        """
+        """Get program options."""
         super(ScriptBaseWithConfig, self).get_options()
 
-        self.config_dir = os.path.abspath(os.path.expanduser(self.options.config_dir
-            or os.environ.get('PYRO_CONFIG_DIR', None)
-            or self.CONFIG_DIR_DEFAULT))
-        load_config.ConfigLoader(self.config_dir).load(self.OPTIONAL_CFG_FILES + self.options.config_file)
+        self.config_dir = os.path.abspath(
+            os.path.expanduser(
+                self.options.config_dir
+                or os.environ.get("PYRO_CONFIG_DIR", None)
+                or self.CONFIG_DIR_DEFAULT
+            )
+        )
+        load_config.ConfigLoader(self.config_dir).load(
+            self.OPTIONAL_CFG_FILES + self.options.config_file
+        )
         if self.options.debug:
             config.debug = True
 
         for key_val in self.options.defines:
             try:
-                key, val = key_val.split('=', 1)
+                key, val = key_val.split("=", 1)
             except ValueError as exc:
                 raise error.UserError("Bad config override %r (%s)" % (key_val, exc))
             else:
                 setattr(config, key, load_config.validate(key, val))
 
-
     def check_for_connection(self):
-        """ Scan arguments for a `@name` one.
-        """
+        """Scan arguments for a `@name` one."""
         for idx, arg in enumerate(self.args):
-            if arg.startswith('@'):
+            if arg.startswith("@"):
                 if arg[1:] not in config.connections:
                     self.parser.error("Undefined connection '{}'!".format(arg[1:]))
                 config.scgi_url = config.connections[arg[1:]]
-                self.LOG.debug("Switched to connection %s (%s)", arg[1:], config.scgi_url)
+                self.LOG.debug(
+                    "Switched to connection %s (%s)", arg[1:], config.scgi_url
+                )
                 del self.args[idx]
                 break
 
 
 class PromptDecorator(object):
-    """ Decorator for interactive commands.
-    """
+    """Decorator for interactive commands."""
 
     # Return code for Q)uit choice
     QUIT_RC = error.EX_TEMPFAIL
 
-
     def __init__(self, script_obj):
-        """ Initialize with containing tool object.
-        """
+        """Initialize with containing tool object."""
         self.script = script_obj
 
-
     def add_options(self):
-        """ Add program options, must be called in script's addOptions().
-        """
+        """Add program options, must be called in script's addOptions()."""
         # These options need to be conflict-free to the containing
         # script, i.e. avoid short options if possible.
-        self.script.add_bool_option("-i", "--interactive",
-            help="interactive mode (prompt before changing things)")
-        self.script.add_bool_option("--yes",
-            help="positively answer all prompts (e.g. --delete --yes)")
-
+        self.script.add_bool_option(
+            "-i",
+            "--interactive",
+            help="interactive mode (prompt before changing things)",
+        )
+        self.script.add_bool_option(
+            "--yes", help="positively answer all prompts (e.g. --delete --yes)"
+        )
 
     def ask_bool(self, question, default=True):
-        """ Ask the user for Y)es / N)o / Q)uit.
+        """Ask the user for Y)es / N)o / Q)uit.
 
-            If "Q" ist entered, this method will exit with RC=3.
-            Else, the user's choice is returned.
+        If "Q" ist entered, this method will exit with RC=3.
+        Else, the user's choice is returned.
 
-            Note that the options --non-interactive and --defaults
-            also influence the outcome.
+        Note that the options --non-interactive and --defaults
+        also influence the outcome.
         """
         if self.script.options.yes:
             return True
@@ -362,24 +380,27 @@ class PromptDecorator(object):
             return default
         else:
             # Let the user decide
-            choice = '*'
+            choice = "*"
             while choice not in "YNAQ":
-                choice = input(u"%s? [%s)es, %s)o, a)ll yes, q)uit]: " % (
-                    question, "yY"[int(default)], "Nn"[int(default)],
-                ))
+                choice = input(
+                    u"%s? [%s)es, %s)o, a)ll yes, q)uit]: "
+                    % (
+                        question,
+                        "yY"[int(default)],
+                        "Nn"[int(default)],
+                    )
+                )
                 choice = choice[:1].upper() or "NY"[int(default)]
 
-            if choice == 'Q':
+            if choice == "Q":
                 self.quit()
-            if choice == 'A':
+            if choice == "A":
                 self.script.options.yes = True
-                choice = 'Y'
+                choice = "Y"
 
-            return choice == 'Y'
-
+            return choice == "Y"
 
     def quit(self):
-        """ Exit the program due to user's choices.
-        """
+        """Exit the program due to user's choices."""
         self.script.LOG.warn("Abort due to user choice!")
         sys.exit(self.QUIT_RC)

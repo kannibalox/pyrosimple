@@ -17,9 +17,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import with_statement
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import re
 import sys
@@ -40,7 +37,9 @@ from pyrosimple.util import os, fmt, pymagic
 
 
 # Allowed characters in a metafile filename or path
-ALLOWED_ROOT_NAME = re.compile(r"^[^/\\.~][^/\\]*$") # cannot be absolute or ~user, and cannot have path parts
+ALLOWED_ROOT_NAME = re.compile(
+    r"^[^/\\.~][^/\\]*$"
+)  # cannot be absolute or ~user, and cannot have path parts
 ALLOWED_PATH_NAME = re.compile(r"^(?:~\d+)?[^/\\~][^/\\]*$")
 
 # Character sequences considered secret (roughly, any path part or query parameter
@@ -48,35 +47,39 @@ ALLOWED_PATH_NAME = re.compile(r"^(?:~\d+)?[^/\\~][^/\\]*$")
 PASSKEY_RE = re.compile(r"(?<=[/=])[-_0-9a-zA-Z]{5,64}={0,3}(?=[/&]|$)")
 
 # Non-secret exemptions
-PASSKEY_OK = ("announce", "TrackerServlet",)
+PASSKEY_OK = (
+    "announce",
+    "TrackerServlet",
+)
 
 # List of all standard keys in a metafile
-_i = None
-METAFILE_STD_KEYS = [_i.split('.') for _i in (
-    "announce",
-    "announce-list", # BEP-0012
-    "comment",
-    "created by",
-    "creation date",
-    "encoding",
-    "info",
-    "info.length",
-    "info.name",
-    "info.piece length",
-    "info.pieces",
-    "info.private",
-    "info.files",
-    "info.files.length",
-    "info.files.path",
-)]
-
-del _i
+METAFILE_STD_KEYS = [
+    _i.split(".")
+    for _i in (
+        "announce",
+        "announce-list",  # BEP-0012
+        "comment",
+        "created by",
+        "creation date",
+        "encoding",
+        "info",
+        "info.length",
+        "info.name",
+        "info.piece length",
+        "info.pieces",
+        "info.private",
+        "info.files",
+        "info.files.length",
+        "info.files.path",
+    )
+]
 
 
 def console_progress():
-    """ Return a progress indicator for consoles if
-        stdout is a tty.
+    """Return a progress indicator for consoles if
+    stdout is a tty.
     """
+
     def progress(totalhashed, totalsize):
         "Helper"
         msg = " " * 30
@@ -91,30 +94,30 @@ def console_progress():
         return None
 
 
-def mask_keys(announce_url):
-    """ Mask any passkeys (hex sequences) in an announce URL.
-    """
+def mask_keys(announce_url: str):
+    """Mask any passkeys (hex sequences) in an announce URL."""
     return PASSKEY_RE.sub(
         lambda m: m.group() if m.group() in PASSKEY_OK else u"*" * len(m.group()),
-        announce_url)
+        announce_url,
+    )
 
 
 class MaskingPrettyPrinter(pprint.PrettyPrinter):
-    """ A PrettyPrinter that masks strings in the object tree.
-    """
+    """A PrettyPrinter that masks strings in the object tree."""
 
-    def format(self, obj, context, maxlevels, level):  # pylint: disable=arguments-differ
-        """ Mask obj if it looks like an URL, then pass it to the super class.
-        """
+    def format(
+        self, obj, context, maxlevels, level
+    ):  # pylint: disable=arguments-differ
+        """Mask obj if it looks like an URL, then pass it to the super class."""
         if isinstance(obj, str) and "://" in fmt.to_unicode(obj):
             obj = mask_keys(obj)
         return pprint.PrettyPrinter.format(self, obj, context, maxlevels, level)
 
 
 def check_info(info):
-    """ Validate info dict.
+    """Validate info dict.
 
-        Raise ValueError if validation fails.
+    Raise ValueError if validation fails.
     """
     if not isinstance(info, dict):
         raise ValueError("bad metainfo - not a dictionary")
@@ -161,8 +164,11 @@ def check_info(info):
                 if not isinstance(part, str):
                     raise ValueError("bad metainfo - bad path dir")
                 part = fmt.to_unicode(part)
-                if part == '..':
-                    raise ValueError("relative path in %s disallowed for security reasons" % '/'.join(path))
+                if part == "..":
+                    raise ValueError(
+                        "relative path in %s disallowed for security reasons"
+                        % "/".join(path)
+                    )
                 if part and not ALLOWED_PATH_NAME.match(part):
                     raise ValueError("path %s disallowed for security reasons" % part)
 
@@ -174,9 +180,9 @@ def check_info(info):
 
 
 def check_meta(meta):
-    """ Validate meta dict.
+    """Validate meta dict.
 
-        Raise ValueError if validation fails.
+    Raise ValueError if validation fails.
     """
     if not isinstance(meta, dict):
         raise ValueError("bad metadata - not a dictionary")
@@ -188,10 +194,10 @@ def check_meta(meta):
 
 
 def clean_meta(meta, including_info=False, logger=None):
-    """ Clean meta dict. Optionally log changes using the given logger.
+    """Clean meta dict. Optionally log changes using the given logger.
 
-        @param logger: If given, a callable accepting a string message.
-        @return: Set of keys removed from C{meta}.
+    @param logger: If given, a callable accepting a string message.
+    @return: Set of keys removed from C{meta}.
     """
     modified = set()
 
@@ -225,19 +231,18 @@ def clean_meta(meta, including_info=False, logger=None):
 
 
 def sanitize(meta, diagnostics=False):
-    """ Try to fix common problems, especially transcode non-standard string encodings.
-    """
+    """Try to fix common problems, especially transcode non-standard string encodings."""
     bad_encodings, bad_fields = set(), set()
 
     def sane_encoding(field, text):
         "Transcoding helper."
         if isinstance(text, str):
             return text.encode("utf-8")
-        for encoding in ('utf-8', meta.get('encoding', None), 'cp1252'):
+        for encoding in ("utf-8", meta.get("encoding", None), "cp1252"):
             if encoding:
                 try:
                     u8_text = text.decode(encoding).encode("utf-8")
-                    if encoding != 'utf-8':
+                    if encoding != "utf-8":
                         bad_encodings.add(encoding)
                         bad_fields.add(field)
                     return u8_text
@@ -245,38 +250,38 @@ def sanitize(meta, diagnostics=False):
                     continue
         else:
             # Broken beyond anything reasonable
-            bad_encodings.add('UNKNOWN/EXOTIC')
+            bad_encodings.add("UNKNOWN/EXOTIC")
             bad_fields.add(field)
-            return str(text, 'utf-8', 'replace').replace('\ufffd', '_').encode("utf-8")
+            return str(text, "utf-8", "replace").replace("\ufffd", "_").encode("utf-8")
 
     # Go through all string fields and check them
     for field in ("comment", "created by"):
         if field in meta:
             meta[field] = sane_encoding(field, meta[field])
 
-    meta["info"]["name"] = sane_encoding('info name', meta["info"]["name"])
+    meta["info"]["name"] = sane_encoding("info name", meta["info"]["name"])
 
     for entry in meta["info"].get("files", []):
-        entry["path"] = [sane_encoding('file path', i) for i in entry["path"]]
+        entry["path"] = [sane_encoding("file path", i) for i in entry["path"]]
 
     return (meta, bad_encodings, bad_fields) if diagnostics else meta
 
 
 def assign_fields(meta, assignments):
-    """ Takes a list of C{key=value} strings and assigns them to the
-        given metafile. If you want to set nested keys (e.g. "info.source"),
-        you have to use a dot as a separator. For exotic keys *containing*
-        a dot, double that dot ("dotted..key").
+    """Takes a list of C{key=value} strings and assigns them to the
+    given metafile. If you want to set nested keys (e.g. "info.source"),
+    you have to use a dot as a separator. For exotic keys *containing*
+    a dot, double that dot ("dotted..key").
 
-        Numeric values starting with "+" or "-" are converted to integers.
+    Numeric values starting with "+" or "-" are converted to integers.
 
-        If just a key name is given (no '='), the field is removed.
+    If just a key name is given (no '='), the field is removed.
     """
     for assignment in assignments:
         assignment = fmt.to_unicode(assignment)
         try:
-            if '=' in assignment:
-                field, val = assignment.split('=', 1)
+            if "=" in assignment:
+                field, val = assignment.split("=", 1)
             else:
                 field, val = assignment, None
 
@@ -285,7 +290,9 @@ def assign_fields(meta, assignments):
 
             # TODO: Allow numerical indices, and "+" for append
             namespace = meta
-            keypath = [i.replace('\0', '.') for i in field.replace('..', '\0').split('.')]
+            keypath = [
+                i.replace("\0", ".") for i in field.replace("..", "\0").split(".")
+            ]
             for key in keypath[:-1]:
                 # Create missing dicts as we go...
                 namespace = namespace.setdefault(fmt.to_utf8(key), {})
@@ -303,18 +310,19 @@ def assign_fields(meta, assignments):
 
 
 def add_fast_resume(meta, datapath):
-    """ Add fast resume data to a metafile dict.
-    """
+    """Add fast resume data to a metafile dict."""
     # Get list of files
     files = meta["info"].get("files", None)
     single = files is None
     if single:
         if os.path.isdir(datapath):
             datapath = os.path.join(datapath, meta["info"]["name"])
-        files = [Bunch(
-            path=[os.path.abspath(datapath)],
-            length=meta["info"]["length"],
-        )]
+        files = [
+            Bunch(
+                path=[os.path.abspath(datapath)],
+                length=meta["info"]["length"],
+            )
+        ]
 
     # Prepare resume data
     resume = meta.setdefault("libtorrent_resume", {})
@@ -331,48 +339,55 @@ def add_fast_resume(meta, datapath):
 
         # Check file size
         if os.path.getsize(filepath) != fileinfo["length"]:
-            raise OSError(errno.EINVAL, "File size mismatch for %r [is %d, expected %d]" % (
-                filepath, os.path.getsize(filepath), fileinfo["length"],
-            ))
+            raise OSError(
+                errno.EINVAL,
+                "File size mismatch for %r [is %d, expected %d]"
+                % (
+                    filepath,
+                    os.path.getsize(filepath),
+                    fileinfo["length"],
+                ),
+            )
 
         # Add resume data for this file
-        resume["files"].append(dict(
-            priority=1,
-            mtime=int(os.path.getmtime(filepath)),
-            completed=(offset+fileinfo["length"]+piece_length-1) // piece_length
-                     - offset // piece_length,
-        ))
+        resume["files"].append(
+            dict(
+                priority=1,
+                mtime=int(os.path.getmtime(filepath)),
+                completed=(offset + fileinfo["length"] + piece_length - 1)
+                // piece_length
+                - offset // piece_length,
+            )
+        )
         offset += fileinfo["length"]
 
     return meta
 
 
 def info_hash(metadata):
-    """ Return info hash as a string.
-    """
-    return hashlib.sha1(bencode.encode(metadata['info'])).hexdigest().upper()
+    """Return info hash as a string."""
+    return hashlib.sha1(bencode.encode(metadata["info"])).hexdigest().upper()
 
 
 def data_size(metadata):
-    """ Calculate the size of a torrent based on parsed metadata.
-    """
-    info = metadata['info']
+    """Calculate the size of a torrent based on parsed metadata."""
+    info = metadata["info"]
 
-    if 'length' in info:
+    if "length" in info:
         # Single file
-        total_size = info['length']
+        total_size = info["length"]
     else:
         # Directory structure
-        total_size = sum([f['length'] for f in info['files']])
+        total_size = sum([f["length"] for f in info["files"]])
 
     return total_size
 
 
 def checked_open(filename, log=None, quiet=False):
-    """ Open and validate the given metafile.
-        Optionally provide diagnostics on the passed logger, for
-        invalid metafiles, which then just cause a warning but no exception.
-        "quiet" can supress that warning.
+    """Open and validate the given metafile.
+    Optionally provide diagnostics on the passed logger, for
+    invalid metafiles, which then just cause a warning but no exception.
+    "quiet" can supress that warning.
     """
     with open(filename, "rb") as handle:
         raw_data = handle.read()
@@ -382,7 +397,7 @@ def checked_open(filename, log=None, quiet=False):
     try:
         check_meta(data)
         if raw_data != bencode.encode(data):
-            raise ValueError("Bad bencoded data - dict keys out of order?") 
+            raise ValueError("Bad bencoded data - dict keys out of order?")
     except ValueError as exc:
         if log:
             # Warn about it, unless it's a quiet value query
@@ -395,37 +410,41 @@ def checked_open(filename, log=None, quiet=False):
 
 
 class Metafile(object):
-    """ A torrent metafile.
-    """
+    """A torrent metafile."""
 
     # Patterns of names to ignore
     IGNORE_GLOB = [
-        "core", "CVS", ".*", "*~", "*.swp", "*.tmp", "*.bak",
-        "[Tt]humbs.db", "[Dd]esktop.ini", "ehthumbs_vista.db",
+        "core",
+        "CVS",
+        ".*",
+        "*~",
+        "*.swp",
+        "*.tmp",
+        "*.bak",
+        "[Tt]humbs.db",
+        "[Dd]esktop.ini",
+        "ehthumbs_vista.db",
     ]
 
-
     def __init__(self, filename, datapath=None):
-        """ Initialize metafile.
-        """
+        """Initialize metafile."""
         self.filename = filename
         self.progress = None
         self.datapath = datapath
         self.ignore = self.IGNORE_GLOB[:]
         self.LOG = pymagic.get_class_logger(self)
 
-
     def _get_datapath(self):
-        """ Get a valid datapath, else raise an exception.
-        """
+        """Get a valid datapath, else raise an exception."""
         if self._datapath is None:
-            raise OSError(errno.ENOENT, "You didn't provide any datapath for %r" % self.filename)
+            raise OSError(
+                errno.ENOENT, "You didn't provide any datapath for %r" % self.filename
+            )
 
         return self._datapath
 
     def _set_datapath(self, datapath):
-        """ Set a datapath.
-        """
+        """Set a datapath."""
         if datapath:
             self._datapath = datapath.rstrip(os.sep)
             self._fifo = int(stat.S_ISFIFO(os.stat(self.datapath).st_mode))
@@ -435,10 +454,8 @@ class Metafile(object):
 
     datapath = property(_get_datapath, _set_datapath)
 
-
     def walk(self):
-        """ Generate paths in "self.datapath".
-        """
+        """Generate paths in "self.datapath"."""
         # FIFO?
         if self._fifo:
             if self._fifo > 1:
@@ -448,8 +465,8 @@ class Metafile(object):
             # Read paths relative to directory containing the FIFO
             with open(self.datapath, "r") as fifo:
                 while True:
-                    relpath = fifo.readline().rstrip('\n')
-                    if not relpath: # EOF?
+                    relpath = fifo.readline().rstrip("\n")
+                    if not relpath:  # EOF?
                         break
                     self.LOG.debug("Read relative path %r from FIFO..." % (relpath,))
                     yield os.path.join(os.path.dirname(self.datapath), relpath)
@@ -459,7 +476,9 @@ class Metafile(object):
         # Directory?
         elif os.path.isdir(self.datapath):
             # Walk the directory tree
-            for dirpath, dirnames, filenames in os.walk(self.datapath): #, followlinks=True):
+            for dirpath, dirnames, filenames in os.walk(
+                self.datapath
+            ):  # , followlinks=True):
                 # Don't scan blacklisted directories
                 for bad in dirnames[:]:
                     if any(fnmatch.fnmatch(bad, pattern) for pattern in self.ignore):
@@ -467,8 +486,10 @@ class Metafile(object):
 
                 # Yield all filenames that aren't blacklisted
                 for filename in filenames:
-                    if not any(fnmatch.fnmatch(filename, pattern) for pattern in self.ignore):
-                        #yield os.path.join(dirpath[len(self.datapath)+1:], filename)
+                    if not any(
+                        fnmatch.fnmatch(filename, pattern) for pattern in self.ignore
+                    ):
+                        # yield os.path.join(dirpath[len(self.datapath)+1:], filename)
                         yield os.path.join(dirpath, filename)
 
         # Single file
@@ -476,18 +497,12 @@ class Metafile(object):
             # Yield the filename
             yield self.datapath
 
-
     def _calc_size(self):
-        """ Get total size of "self.datapath".
-        """
-        return sum(os.path.getsize(filename)
-            for filename in self.walk()
-        )
-
+        """Get total size of "self.datapath"."""
+        return sum(os.path.getsize(filename) for filename in self.walk())
 
     def _make_info(self, piece_size, progress, walker, piece_callback=None):
-        """ Create info dict.
-        """
+        """Create info dict."""
         # These collect the file descriptions and piece hashes
         file_list = []
         pieces = []
@@ -506,11 +521,20 @@ class Metafile(object):
         for filename in walker:
             # Assemble file info
             filesize = os.path.getsize(filename)
-            filepath = filename[len(os.path.dirname(self.datapath) if self._fifo else self.datapath):].lstrip(os.sep)
-            file_list.append({
-                "length": filesize,
-                "path": [x for x in fmt.to_unicode(filepath).replace(os.sep, '/').split('/')],
-            })
+            filepath = filename[
+                len(os.path.dirname(self.datapath) if self._fifo else self.datapath) :
+            ].lstrip(os.sep)
+            file_list.append(
+                {
+                    "length": filesize,
+                    "path": [
+                        x
+                        for x in fmt.to_unicode(filepath)
+                        .replace(os.sep, "/")
+                        .split("/")
+                    ],
+                }
+            )
             self.LOG.debug("Hashing %r, size %d..." % (filename, filesize))
 
             # Open file and hash it
@@ -520,14 +544,14 @@ class Metafile(object):
                 while fileoffset < filesize:
                     # Read rest of piece or file, whatever is smaller
                     chunk = handle.read(min(filesize - fileoffset, piece_size - done))
-                    sha1sum.update(chunk) # bogus pylint: disable=E1101
+                    sha1sum.update(chunk)  # bogus pylint: disable=E1101
                     done += len(chunk)
                     fileoffset += len(chunk)
                     totalhashed += len(chunk)
 
                     # Piece is done
                     if done == piece_size:
-                        pieces.append(sha1sum.digest()) # bogus pylint: disable=E1101
+                        pieces.append(sha1sum.digest())  # bogus pylint: disable=E1101
                         if piece_callback:
                             piece_callback(filename, pieces[-1])
 
@@ -543,7 +567,7 @@ class Metafile(object):
 
         # Add hash of partial last piece
         if done > 0:
-            pieces.append(sha1sum.digest()) # bogus pylint: disable=E1103
+            pieces.append(sha1sum.digest())  # bogus pylint: disable=E1103
             if piece_callback:
                 piece_callback(filename, pieces[-1])
 
@@ -561,17 +585,20 @@ class Metafile(object):
             metainfo["length"] = totalhashed
 
         hashing_secs = time.time() - hashing_secs
-        self.LOG.info("Hashing of %s took %.1f secs (%s/s)" % (
-            fmt.human_size(totalhashed).strip(), hashing_secs, fmt.human_size(totalhashed / hashing_secs).strip(),
-        ))
+        self.LOG.info(
+            "Hashing of %s took %.1f secs (%s/s)"
+            % (
+                fmt.human_size(totalhashed).strip(),
+                hashing_secs,
+                fmt.human_size(totalhashed / hashing_secs).strip(),
+            )
+        )
 
         # Return validated info dict
         return check_info(metainfo), totalhashed
 
-
     def _make_meta(self, tracker_url, root_name, private, progress):
-        """ Create torrent dict.
-        """
+        """Create torrent dict."""
         # Calculate piece size
         if self._fifo:
             # TODO we need to add a (command line) param, probably for total data size
@@ -588,10 +615,12 @@ class Metafile(object):
         piece_size = 2 ** piece_size_exp
 
         # Build info hash
-        info, totalhashed = self._make_info(piece_size, progress, self.walk() if self._fifo else sorted(self.walk()))
+        info, totalhashed = self._make_info(
+            piece_size, progress, self.walk() if self._fifo else sorted(self.walk())
+        )
 
         # Enforce unique hash per tracker
-        info["x_cross_seed"] = hashlib.md5(tracker_url.encode('utf-8')).hexdigest()
+        info["x_cross_seed"] = hashlib.md5(tracker_url.encode("utf-8")).hexdigest()
 
         # Set private flag
         if private:
@@ -607,23 +636,31 @@ class Metafile(object):
             "announce": tracker_url.strip(),
         }
 
-        #XXX meta["encoding"] = "UTF-8"
+        # XXX meta["encoding"] = "UTF-8"
 
         # Return validated meta dict
         return check_meta(meta), totalhashed
 
-
-    def create(self, datapath, tracker_urls, comment=None, root_name=None,
-                     created_by=None, private=False, no_date=False, progress=None,
-                     callback=None):
-        """ Create a metafile with the path given on object creation.
-            Returns the last metafile dict that was written (as an object, not bencoded).
+    def create(
+        self,
+        datapath,
+        tracker_urls,
+        comment=None,
+        root_name=None,
+        created_by=None,
+        private=False,
+        no_date=False,
+        progress=None,
+        callback=None,
+    ):
+        """Create a metafile with the path given on object creation.
+        Returns the last metafile dict that was written (as an object, not bencoded).
         """
         if datapath:
             self.datapath = datapath
 
         try:
-            tracker_urls = ['' + tracker_urls]
+            tracker_urls = ["" + tracker_urls]
         except TypeError:
             tracker_urls = list(tracker_urls)
         multi_mode = len(tracker_urls) > 1
@@ -633,13 +670,21 @@ class Metafile(object):
             # Lookup announce URLs from config file
             try:
                 if urllib.parse.urlparse(tracker_url).scheme:
-                    tracker_alias = urllib.parse.urlparse(tracker_url).netloc.split(':')[0].split('.')
+                    tracker_alias = (
+                        urllib.parse.urlparse(tracker_url)
+                        .netloc.split(":")[0]
+                        .split(".")
+                    )
                     tracker_alias = tracker_alias[-2 if len(tracker_alias) > 1 else 0]
                 else:
-                    tracker_alias, tracker_url = config.lookup_announce_alias(tracker_url)
+                    tracker_alias, tracker_url = config.lookup_announce_alias(
+                        tracker_url
+                    )
                     tracker_url = tracker_url[0]
             except (KeyError, IndexError):
-                raise error.UserError("Bad tracker URL %r, or unknown alias!" % (tracker_url,))
+                raise error.UserError(
+                    "Bad tracker URL %r, or unknown alias!" % (tracker_url,)
+                )
 
             # Determine metafile name
             output_name = self.filename
@@ -647,16 +692,23 @@ class Metafile(object):
                 # Add 2nd level of announce URL domain to metafile name
                 output_name = list(os.path.splitext(output_name))
                 try:
-                    output_name[1:1] = '-' + tracker_alias
+                    output_name[1:1] = "-" + tracker_alias
                 except (IndexError,):
-                    self.LOG.error("Malformed announce URL %r, skipping!" % (tracker_url,))
+                    self.LOG.error(
+                        "Malformed announce URL %r, skipping!" % (tracker_url,)
+                    )
                     continue
-                output_name = ''.join(output_name)
+                output_name = "".join(output_name)
 
             # Hash the data
-            self.LOG.info("Creating %r for %s %r..." % (
-                output_name, "filenames read from" if self._fifo else "data in", self.datapath,
-            ))
+            self.LOG.info(
+                "Creating %r for %s %r..."
+                % (
+                    output_name,
+                    "filenames read from" if self._fifo else "data in",
+                    self.datapath,
+                )
+            )
             meta, _ = self._make_meta(tracker_url, root_name, private, progress)
 
             # Add optional fields
@@ -671,67 +723,91 @@ class Metafile(object):
 
             # Write metafile to disk
             self.LOG.debug("Writing %r..." % (output_name,))
-            with open(output_name, 'wb') as fh:
+            with open(output_name, "wb") as fh:
                 fh.write(bencode.encode(meta))
 
         return meta
 
-
     def check(self, metainfo, datapath, progress=None):
-        """ Check piece hashes of a metafile against the given datapath.
-        """
+        """Check piece hashes of a metafile against the given datapath."""
         if datapath:
             self.datapath = datapath
 
         def check_piece(filename, piece):
             "Callback for new piece"
-            if piece != metainfo["info"]["pieces"][check_piece.piece_index:check_piece.piece_index+20]:
-                self.LOG.warn("Piece #%d: Hashes differ in file %r" % (check_piece.piece_index//20, filename))
+            if (
+                piece
+                != metainfo["info"]["pieces"][
+                    check_piece.piece_index : check_piece.piece_index + 20
+                ]
+            ):
+                self.LOG.warn(
+                    "Piece #%d: Hashes differ in file %r"
+                    % (check_piece.piece_index // 20, filename)
+                )
             check_piece.piece_index += 20
+
         check_piece.piece_index = 0
 
-        datameta, _ = self._make_info(int(metainfo["info"]["piece length"]), progress,
-            [datapath] if "length" in metainfo["info"] else
-            (os.path.join(*([datapath] + i["path"])) for i in metainfo["info"]["files"]),
-            piece_callback=check_piece
+        datameta, _ = self._make_info(
+            int(metainfo["info"]["piece length"]),
+            progress,
+            [datapath]
+            if "length" in metainfo["info"]
+            else (
+                os.path.join(*([datapath] + i["path"]))
+                for i in metainfo["info"]["files"]
+            ),
+            piece_callback=check_piece,
         )
         return datameta["pieces"] == metainfo["info"]["pieces"]
 
-
     def listing(self, masked=True):
-        """ List torrent info & contents. Returns a list of formatted lines.
-        """
+        """List torrent info & contents. Returns a list of formatted lines."""
         # Assemble data
-        with open(self.filename, 'rb') as fh:
+        with open(self.filename, "rb") as fh:
             metainfo = bencode.decode(fh.read())
         bad_encodings = []
         bad_fields = []
-        announce = metainfo['announce']
-        info = metainfo['info']
+        announce = metainfo["announce"]
+        info = metainfo["info"]
         infohash = hashlib.sha1(bencode.encode(info))
 
         total_size = data_size(metainfo)
-        piece_length = info['piece length']
+        piece_length = info["piece length"]
         piece_number, last_piece_length = divmod(total_size, piece_length)
 
         # Build result
         result = [
             "NAME %s" % (os.path.basename(fmt.to_unicode(self.filename))),
-            "SIZE %s (%i * %s + %s)" % (
+            "SIZE %s (%i * %s + %s)"
+            % (
                 fmt.human_size(total_size).strip(),
-                piece_number, fmt.human_size(piece_length).strip(),
+                piece_number,
+                fmt.human_size(piece_length).strip(),
                 fmt.human_size(last_piece_length).strip(),
             ),
-            "META %s (pieces %s %.1f%%)" % (
+            "META %s (pieces %s %.1f%%)"
+            % (
                 fmt.human_size(os.path.getsize(self.filename)).strip(),
                 fmt.human_size(len(info["pieces"])).strip(),
                 100.0 * len(info["pieces"]) / os.path.getsize(self.filename),
             ),
             "HASH %s" % (infohash.hexdigest().upper()),
             "URL  %s" % (mask_keys if masked else str)(announce),
-            "PRV  %s" % ("YES (DHT/PEX disabled)" if info.get("private") else "NO (DHT/PEX enabled)"),
-            "TIME %s" % ("N/A" if "creation date" not in metainfo else
-                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(metainfo["creation date"]))
+            "PRV  %s"
+            % (
+                "YES (DHT/PEX disabled)"
+                if info.get("private")
+                else "NO (DHT/PEX enabled)"
+            ),
+            "TIME %s"
+            % (
+                "N/A"
+                if "creation date" not in metainfo
+                else time.strftime(
+                    "%Y-%m-%d %H:%M:%S", time.localtime(metainfo["creation date"])
+                )
             ),
         ]
 
@@ -739,39 +815,51 @@ class Metafile(object):
             if key in metainfo:
                 result.append("%s %s" % (label, metainfo.get(key, "N/A")))
 
-        result.extend([
-            "",
-            "FILE LISTING%s" % ("" if 'length' in info else " [%d file(s)]" % len(info['files']),),
-        ])
-        if 'length' in info:
+        result.extend(
+            [
+                "",
+                "FILE LISTING%s"
+                % ("" if "length" in info else " [%d file(s)]" % len(info["files"]),),
+            ]
+        )
+        if "length" in info:
             # Single file
-            result.append("%-69s%9s" % (
-                    fmt.to_unicode(info['name']),
+            result.append(
+                "%-69s%9s"
+                % (
+                    fmt.to_unicode(info["name"]),
                     fmt.human_size(total_size),
-            ))
+                )
+            )
         else:
             # Directory structure
-            result.append("%s/" % fmt.to_unicode(info['name']))
+            result.append("%s/" % fmt.to_unicode(info["name"]))
             oldpaths = [None] * 99
-            for entry in info['files']:
+            for entry in info["files"]:
                 # Remove crap that certain PHP software puts in paths
                 entry_path = [fmt.to_unicode(i) for i in entry["path"] if i]
 
                 for idx, item in enumerate(entry_path[:-1]):
                     if item != oldpaths[idx]:
-                        result.append("%s%s/" % (' ' * (4*(idx+1)), item))
+                        result.append("%s%s/" % (" " * (4 * (idx + 1)), item))
                         oldpaths[idx] = item
-                result.append("%-69s%9s" % (
-                    ' ' * (4*len(entry_path)) + entry_path[-1],
-                    fmt.human_size(entry['length']),
-                ))
+                result.append(
+                    "%-69s%9s"
+                    % (
+                        " " * (4 * len(entry_path)) + entry_path[-1],
+                        fmt.human_size(entry["length"]),
+                    )
+                )
 
         if bad_encodings:
-            result.extend([
-                "",
-                "WARNING: Bad encoding(s) {} in these fields: {}"
-                .format(', '.join(sorted(bad_encodings)), ', '.join(sorted(bad_fields))),
-                "Use the --raw option to inspect these encoding issues.",
-            ])
+            result.extend(
+                [
+                    "",
+                    "WARNING: Bad encoding(s) {} in these fields: {}".format(
+                        ", ".join(sorted(bad_encodings)), ", ".join(sorted(bad_fields))
+                    ),
+                    "Use the --raw option to inspect these encoding issues.",
+                ]
+            )
 
         return result

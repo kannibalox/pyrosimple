@@ -21,8 +21,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import with_statement
-from __future__ import absolute_import
 
 from collections import namedtuple
 
@@ -31,7 +29,7 @@ from pyrosimple import config as config_ini
 from pyrosimple.torrent import engine, matching
 
 
-SweepRule = namedtuple('SweepRule', 'ruleset name prio order filter')
+SweepRule = namedtuple("SweepRule", "ruleset name prio order filter")
 
 
 def parse_cond(text):
@@ -44,34 +42,43 @@ class DiskSpaceManager(object):
 
     def __init__(self, config=None, rulesets=None):
         self.config = config or config_ini
-        self.active_rulesets = rulesets or [x.strip() for x in self.config.sweep['default_rules'].split(',')]
+        self.active_rulesets = rulesets or [
+            x.strip() for x in self.config.sweep["default_rules"].split(",")
+        ]
         self.rules = []
-        self.default_order = self.config.sweep['default_order']
-        self.protected = parse_cond(self.config.sweep['filter_protected'])
+        self.default_order = self.config.sweep["default_order"]
+        self.protected = parse_cond(self.config.sweep["filter_protected"])
 
         self._load_rules()
 
     def _load_rules(self):
         """Load rule definitions from config."""
         for ruleset in self.active_rulesets:
-            section_name = 'sweep_rules_' + ruleset.lower()
+            section_name = "sweep_rules_" + ruleset.lower()
             try:
                 ruledefs = getattr(self.config, section_name)
             except AttributeError:
-                raise error.UserError("There is no [{}] section in your configuration"
-                                      .format(section_name.upper()))
+                raise error.UserError(
+                    "There is no [{}] section in your configuration".format(
+                        section_name.upper()
+                    )
+                )
             for ruledef, filtercond in ruledefs.items():
-                if ruledef.endswith('.filter'):
-                    rulename = ruledef.rsplit('.', 1)[0]
-                    rule = SweepRule(ruleset, rulename,
-                                     int(ruledefs.get(rulename + '.prio', '999')),
-                                     ruledefs.get(rulename + '.order', self.default_order),
-                                     parse_cond(filtercond))
+                if ruledef.endswith(".filter"):
+                    rulename = ruledef.rsplit(".", 1)[0]
+                    rule = SweepRule(
+                        ruleset,
+                        rulename,
+                        int(ruledefs.get(rulename + ".prio", "999")),
+                        ruledefs.get(rulename + ".order", self.default_order),
+                        parse_cond(filtercond),
+                    )
                     self.rules.append(rule)
 
         self.rules.sort(key=lambda x: (x.prio, x.name))
 
         return self.rules
+
 
 #    test "$1" = "--aggressive" && { shift; activity=5i; } || activity=4h
 #        $DRY ~/bin/rtcontrol -/1 --cull active=+$activity [ NOT [ $PROTECTED ] ] \

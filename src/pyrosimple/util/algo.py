@@ -23,12 +23,9 @@ import logging
 log = logging.getLogger(__name__)
 
 
-from itertools import product # @UnusedImport pylint: disable=E0611
-
 def flatten(nested, containers=(list, tuple)):
-    """ Flatten a nested list in-place and return it.
-    """
-    flat = list(nested) # handle iterators / generators
+    """Flatten a nested list in-place and return it."""
+    flat = list(nested)  # handle iterators / generators
     i = 0
     while i < len(flat):
         while isinstance(flat[i], containers):
@@ -40,7 +37,7 @@ def flatten(nested, containers=(list, tuple)):
                 i -= 1
                 break
             else:
-                flat[i:i + 1] = (flat[i])
+                flat[i : i + 1] = flat[i]
 
         # 'i'th element is scalar, proceed
         i += 1
@@ -49,24 +46,21 @@ def flatten(nested, containers=(list, tuple)):
 
 
 class AttributeMapping(object):
-    """ Wrap an object's dict so that it can be accessed by the mapping protocol.
-    """
+    """Wrap an object's dict so that it can be accessed by the mapping protocol."""
 
     def __init__(self, obj, defaults=None):
-        """ Store object we want to map, and any default values.
+        """Store object we want to map, and any default values.
 
-            @param obj: the wrapped object
-            @type obj: object
-            @param defaults: default values
-            @type defaults: dict
+        @param obj: the wrapped object
+        @type obj: object
+        @param defaults: default values
+        @type defaults: dict
         """
         self.obj = obj
         self.defaults = defaults or {}
 
-
     def __getitem__(self, key):
-        """ Return object attribute named C{key}.
-        """
+        """Return object attribute named C{key}."""
         ##print "GETITEM", key, self.defaults
         try:
             return getattr(self.obj, key)

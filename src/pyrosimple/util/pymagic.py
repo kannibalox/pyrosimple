@@ -27,33 +27,42 @@ from pyrosimple.util.proxies import LazyProxy
 
 
 # Create aliases to make pydev / pylint happy
-resource_isdir = pkg_resources.resource_isdir # @UndefinedVariable pylint: disable=E1101
-resource_listdir = pkg_resources.resource_listdir # @UndefinedVariable pylint: disable=E1101
-resource_string = pkg_resources.resource_string # @UndefinedVariable pylint: disable=E1101
+resource_isdir = (
+    pkg_resources.resource_isdir
+)  # @UndefinedVariable pylint: disable=E1101
+resource_listdir = (
+    pkg_resources.resource_listdir
+)  # @UndefinedVariable pylint: disable=E1101
+resource_string = (
+    pkg_resources.resource_string
+)  # @UndefinedVariable pylint: disable=E1101
 
 
 def import_name(module_spec, name=None):
-    """ Import identifier C{name} from module C{module_spec}.
+    """Import identifier C{name} from module C{module_spec}.
 
-        If name is omitted, C{module_spec} must contain the name after the
-        module path, delimited by a colon (like a setuptools entry-point).
+    If name is omitted, C{module_spec} must contain the name after the
+    module path, delimited by a colon (like a setuptools entry-point).
 
-        @param module_spec: Fully qualified module name, e.g. C{x.y.z}.
-        @param name: Name to import from C{module_spec}.
-        @return: Requested object.
-        @rtype: object
+    @param module_spec: Fully qualified module name, e.g. C{x.y.z}.
+    @param name: Name to import from C{module_spec}.
+    @return: Requested object.
+    @rtype: object
     """
     # Hijack requests for pyrocore
-    if 'pyrocore' in module_spec or 'pyrobase' in module_spec:
-        module_spec = module_spec.replace('pyrocore', 'pyrosimple')
-        module_spec = module_spec.replace('pyrobase', 'pyrosimple')
+    if "pyrocore" in module_spec or "pyrobase" in module_spec:
+        module_spec = module_spec.replace("pyrocore", "pyrosimple")
+        module_spec = module_spec.replace("pyrobase", "pyrosimple")
     # Load module
     module_name = module_spec
     if name is None:
         try:
-            module_name, name = module_spec.split(':', 1)
+            module_name, name = module_spec.split(":", 1)
         except ValueError:
-            raise ValueError("Missing object specifier in %r (syntax: 'package.module:object.attr')" % (module_spec,))
+            raise ValueError(
+                "Missing object specifier in %r (syntax: 'package.module:object.attr')"
+                % (module_spec,)
+            )
 
     try:
         module = __import__(module_name, globals(), {}, [name])
@@ -62,23 +71,22 @@ def import_name(module_spec, name=None):
 
     # Resolve the requested name
     result = module
-    for attr in name.split('.'):
+    for attr in name.split("."):
         result = getattr(result, attr)
 
     return result
 
 
 def get_class_logger(obj):
-    """ Get a logger specific for the given object's class.
-    """
-    return logging.getLogger(obj.__class__.__module__ + '.' + obj.__class__.__name__)
+    """Get a logger specific for the given object's class."""
+    return logging.getLogger(obj.__class__.__module__ + "." + obj.__class__.__name__)
 
 
 def get_lazy_logger(name):
-    """ Return a logger proxy that is lazily initialized.
+    """Return a logger proxy that is lazily initialized.
 
-        This avoids the problems associated with module-level loggers being created
-        early (on import), *before* the logging system is properly initialized.
+    This avoids the problems associated with module-level loggers being created
+    early (on import), *before* the logging system is properly initialized.
     """
     return LazyProxy(lambda n=name: logging.getLogger(n))
 
@@ -90,7 +98,7 @@ class JSONEncoder(json.JSONEncoder):
         """Support more object types."""
         if isinstance(o, set):
             return list(sorted(o))
-        elif hasattr(o, 'as_dict'):
+        elif hasattr(o, "as_dict"):
             return o.as_dict()
         else:
             return super(JSONEncoder, self).default(o)

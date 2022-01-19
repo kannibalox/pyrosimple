@@ -30,8 +30,7 @@ from pyrosimple.util import fmt, xmlrpc, pymagic, stats
 
 
 def _flux_engine_data(engine):
-    """ Return rTorrent data set for pushing to InfluxDB.
-    """
+    """Return rTorrent data set for pushing to InfluxDB."""
     data = stats.engine_data(engine)
 
     # Make it flat
@@ -51,64 +50,63 @@ def _flux_engine_data(engine):
 
 
 class EngineStats(object):
-    """ rTorrent connection statistics logger.
-    """
+    """rTorrent connection statistics logger."""
 
     def __init__(self, config=None):
-        """ Set up statistics logger.
-        """
+        """Set up statistics logger."""
         self.config = config or Bunch()
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug("Statistics logger created with config %r" % self.config)
 
-
     def run(self):
-        """ Statistics logger job callback.
-        """
+        """Statistics logger job callback."""
         try:
             proxy = config_ini.engine.open()
-            self.LOG.info("Stats for %s - up %s, %s" % (
-                config_ini.engine.engine_id,
-                fmt.human_duration(proxy.system.time() - config_ini.engine.startup, 0, 2, True).strip(),
-                proxy
-            ))
+            self.LOG.info(
+                "Stats for %s - up %s, %s"
+                % (
+                    config_ini.engine.engine_id,
+                    fmt.human_duration(
+                        proxy.system.time() - config_ini.engine.startup, 0, 2, True
+                    ).strip(),
+                    proxy,
+                )
+            )
         except (error.LoggableError, xmlrpc.ERRORS) as exc:
             self.LOG.warn(str(exc))
 
 
 class InfluxDBStats(object):
-    """ Push rTorrent and host statistics to InfluxDB.
-    """
+    """Push rTorrent and host statistics to InfluxDB."""
 
     def __init__(self, config=None):
-        """ Set up InfluxDB logger.
-        """
+        """Set up InfluxDB logger."""
         self.config = config or Bunch()
         self.influxdb = Bunch(config_ini.influxdb)
-        self.influxdb.timeout = float(self.influxdb.timeout or '0.250')
+        self.influxdb.timeout = float(self.influxdb.timeout or "0.250")
 
         self.LOG = pymagic.get_class_logger(self)
-        if 'log_level' in self.config:
+        if "log_level" in self.config:
             self.LOG.setLevel(config.log_level)
         self.LOG.debug("InfluxDB statistics feed created with config %r" % self.config)
 
-
     def _influxdb_url(self):
-        """ Return REST API URL to access time series.
-        """
-        url = "{0}/db/{1}/series".format(self.influxdb.url.rstrip('/'), self.config.dbname)
+        """Return REST API URL to access time series."""
+        url = "{0}/db/{1}/series".format(
+            self.influxdb.url.rstrip("/"), self.config.dbname
+        )
 
         if self.influxdb.user and self.influxdb.password:
             url += "?u={0}&p={1}".format(self.influxdb.user, self.influxdb.password)
 
         return url
 
-
     def _push_data(self):
-        """ Push stats data to InfluxDB.
-        """
+        """Push stats data to InfluxDB."""
         if not (self.config.series or self.config.series_host):
-            self.LOG.info("Misconfigured InfluxDB job, neither 'series' nor 'series_host' is set!")
+            self.LOG.info(
+                "Misconfigured InfluxDB job, neither 'series' nor 'series_host' is set!"
+            )
             return
 
         # Assemble data
@@ -118,25 +116,29 @@ class InfluxDBStats(object):
             try:
                 config_ini.engine.open()
                 data, views = _flux_engine_data(config_ini.engine)
-                fluxdata.append(dict(
-                    name=self.config.series,
-                    columns=data.keys(),
-                    points=[data.values()]
-                ))
-                fluxdata.append(dict(
-                    name=self.config.series + '_views',
-                    columns=views.keys(),
-                    points=[views.values()]
-                ))
+                fluxdata.append(
+                    dict(
+                        name=self.config.series,
+                        columns=data.keys(),
+                        points=[data.values()],
+                    )
+                )
+                fluxdata.append(
+                    dict(
+                        name=self.config.series + "_views",
+                        columns=views.keys(),
+                        points=[views.values()],
+                    )
+                )
             except (error.LoggableError, xmlrpc.ERRORS) as exc:
                 self.LOG.warn("InfluxDB stats: {0}".format(exc))
 
-#        if self.config.series_host:
-#            fluxdata.append(dict(
-#                name = self.config.series_host,
-#                columns = .keys(),
-#                points = [.values()]
-#            ))
+        #        if self.config.series_host:
+        #            fluxdata.append(dict(
+        #                name = self.config.series_host,
+        #                columns = .keys(),
+        #                points = [.values()]
+        #            ))
 
         if not fluxdata:
             self.LOG.debug("InfluxDB stats: no data (previous errors?)")
@@ -145,7 +147,7 @@ class InfluxDBStats(object):
         # Encode into InfluxDB data packet
         fluxurl = self._influxdb_url()
         fluxjson = json.dumps(fluxdata)
-        self.LOG.debug("POST to {0} with {1}".format(fluxurl.split('?')[0], fluxjson))
+        self.LOG.debug("POST to {0} with {1}".format(fluxurl.split("?")[0], fluxjson))
 
         # Push it!
         try:
@@ -154,17 +156,15 @@ class InfluxDBStats(object):
         except RequestException as exc:
             self.LOG.info("InfluxDB POST error: {0}".format(exc))
 
-
     def run(self):
-        """ Statistics feed job callback.
-        """
+        """Statistics feed job callback."""
         self._push_data()
 
 
 def module_test():
-    """ Quick test using…
+    """Quick test using…
 
-            python -m pyrosimple.torrent.jobs
+    python -m pyrosimple.torrent.jobs
     """
     import pprint
     from pyrosimple import connect

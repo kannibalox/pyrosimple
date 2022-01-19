@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import absolute_import
 
 import re
 import logging
@@ -30,14 +29,32 @@ log = logging.getLogger(__name__)
 
 # Sets of of extensions / kinds
 KIND_AUDIO = set(("flac", "mp3", "ogg", "wav", "dts", "ac3", "alac", "wma"))
-KIND_VIDEO = set(("avi", "mkv", "m4v", "vob", "mp4", "mpg", "mpeg", "m2ts", "ts", "ogv", "wmv"))
+KIND_VIDEO = set(
+    ("avi", "mkv", "m4v", "vob", "mp4", "mpg", "mpeg", "m2ts", "ts", "ogv", "wmv")
+)
 KIND_IMAGE = set(("jpg", "png", "gif", "tif", "bmp", "svg"))
-KIND_DOCS = set(("chm", "pdf", "cbr", "cbz", "odt", "ods", "doc", "xls", "ppt", "epub", "mobi", "azw3", "djvu"))
+KIND_DOCS = set(
+    (
+        "chm",
+        "pdf",
+        "cbr",
+        "cbz",
+        "odt",
+        "ods",
+        "doc",
+        "xls",
+        "ppt",
+        "epub",
+        "mobi",
+        "azw3",
+        "djvu",
+    )
+)
 KIND_ARCHIVE = set(("rar", "zip", "tgz", "bz2", "iso", "bin"))
 
 # Regex matchers for names
 _i = _k = None
-_VIDEO_EXT = '|'.join(re.escape('.' + _i) for _i in KIND_VIDEO)
+_VIDEO_EXT = "|".join(re.escape("." + _i) for _i in KIND_VIDEO)
 _TV_TRAIL = (
     r"(?:[._ ](?P<release_tags>PREAIR|READNFO))?"
     r"(?:[._ ](?P<release>REPACK|PROPER|REAL|REALPROPER|INTERNAL))?"
@@ -52,93 +69,117 @@ _TV_TRAIL = (
 )
 _DEFINITELY_TV = [".%s." % _i.lower() for _i in ("HDTV", "PDTV", "DSR")]
 
-TV_PATTERNS = [(_k, re.compile(_i, re.I)) for _k, _i in (
-    ("Normal TV Episodes",
-        r"^(?P<show>.+?)[._ ]S?(?P<season>\d{1,2})[xE](?P<episode>\d{2}(?:-?E\d{2})?)"
-        r"(?:[._ ](?P<title>.+?[a-zA-Z]{1,2}.+?))?"
-        + _TV_TRAIL
-    ),
-    ("Normal TV Episodes (all-numeric season+episode)",
-        r"^(?P<show>.+?)[._ ](?P<season>\d)(?P<episode>\d{2})"
-        r"(?:[._ ](?P<title>.+?[a-zA-Z]{1,2}.+?))?"
-        + _TV_TRAIL
-    ),
-    ("Daily Shows",
-        r"^(?P<show>.+?)[._ ](?P<date>\d{4}\.\d{2}\.\d{2})"
-        r"(?:[._ ](?P<title>.+?[a-zA-Z]{1,2}.+?))?"
-        + _TV_TRAIL
-    ),
-    ("Full Seasons",
-        r"^(?P<show>.+?)[._ ]S?(?P<season>\d{1,2})" + _TV_TRAIL
-    ),
-    ("Mini Series",
-        r"^(?P<show>.+?)"
-        r"(?:[._ ](?:Part(?P<part>\d+?)|Pilot)){1,2}"
-        #         (?P<year>\d{4})| creates false positives for movies!
-        r"(?:[._ ](?P<title>.+?[a-z]{1,2}.+?))??"
-        + _TV_TRAIL
-    ),
-    ("Mini Series (Roman numerals)",
-        r"^(?P<show>.+?)"
-        r"(?:[._ ]Pa?r?t[._ ](?P<part>[ivxIVX]{1,3}?))"
-        r"(?:[._ ](?P<title>.+?[a-z]{1,2}.+?))??"
-        + _TV_TRAIL
-    ),
-)]
+TV_PATTERNS = [
+    (_k, re.compile(_i, re.I))
+    for _k, _i in (
+        (
+            "Normal TV Episodes",
+            r"^(?P<show>.+?)[._ ]S?(?P<season>\d{1,2})[xE](?P<episode>\d{2}(?:-?E\d{2})?)"
+            r"(?:[._ ](?P<title>.+?[a-zA-Z]{1,2}.+?))?" + _TV_TRAIL,
+        ),
+        (
+            "Normal TV Episodes (all-numeric season+episode)",
+            r"^(?P<show>.+?)[._ ](?P<season>\d)(?P<episode>\d{2})"
+            r"(?:[._ ](?P<title>.+?[a-zA-Z]{1,2}.+?))?" + _TV_TRAIL,
+        ),
+        (
+            "Daily Shows",
+            r"^(?P<show>.+?)[._ ](?P<date>\d{4}\.\d{2}\.\d{2})"
+            r"(?:[._ ](?P<title>.+?[a-zA-Z]{1,2}.+?))?" + _TV_TRAIL,
+        ),
+        ("Full Seasons", r"^(?P<show>.+?)[._ ]S?(?P<season>\d{1,2})" + _TV_TRAIL),
+        (
+            "Mini Series",
+            r"^(?P<show>.+?)" r"(?:[._ ](?:Part(?P<part>\d+?)|Pilot)){1,2}"
+            #         (?P<year>\d{4})| creates false positives for movies!
+            r"(?:[._ ](?P<title>.+?[a-z]{1,2}.+?))??" + _TV_TRAIL,
+        ),
+        (
+            "Mini Series (Roman numerals)",
+            r"^(?P<show>.+?)"
+            r"(?:[._ ]Pa?r?t[._ ](?P<part>[ivxIVX]{1,3}?))"
+            r"(?:[._ ](?P<title>.+?[a-z]{1,2}.+?))??" + _TV_TRAIL,
+        ),
+    )
+]
 
-MOVIE_PATTERNS = [(_k, re.compile(_i, re.I)) for _k, _i in (
-    ("Scene tagged movie",
-        r"^(?P<title>.+?)[. ][\[(]?(?P<year>\d{4})[)\]]?"
-        r"(?:[._ ](?P<release>UNRATED|REPACK|INTERNAL|MULTI|PROPER|LIMITED|RERiP))*"
-        r"(?:[._ ](?P<format>480p|576p|720p|1080p|1080i|2160p))?"
-        r"(?:[._ ](?P<source>BDRip|BRRip|HDRip|DVDRip|PAL|NTSC))"
-        r"(?:[._ ](?P<sound1>MP3|AC3|AAC|FLAC|DTS(?:-HD)?))?"
-        r"(?:[._ ](?P<codec1>xvid|divx|avc|x264|hevc|h265))?"
-        r"(?:[._ ](?P<sound2>MP3|AC3|AAC|FLAC|DTS(?:-HD)?))?"
-        #r"(?:[._ ](?P<channels>6ch))?"
-        r"(?:[-.](?P<group>.+?))?"
-        r"(?P<extension>" + _VIDEO_EXT + ")?$"
-    ),
-    ("Blu-ray movie",
-        r"^(?P<title>.+?)[. ][\[(]?(?P<year>\d{4})[)\]]?"
-        r"(?:[._ ](?P<release>UNRATED|REPACK|INTERNAL|MULTI|PROPER|LIMITED|RERiP))*"
-        r"(?:[._ ](?P<format0>720p|1080p|1080i|2160p))?"
-        r"(?:[._ ](?P<source>Blu-ray|BluRay|BD25|BD50))"
-        r"(?:[._ ](?P<format>720p|1080p|1080i|2160p))?"
-        r"(?:[._ ](?P<codec1>avc|x264|hevc|h265))?"
-        r"(?:[._ ](?P<sound>AC3|AAC|FLAC|DTS(?:-HD)?))*"
-        r"(?:[._ ](?P<channels>6ch|MA.5.1))?"
-        r"(?:[._ ](?P<codec2>avc|x264|hevc|h265))?"
-        r"(?:[-.](?P<group>.+?))?"
-        r"(?P<extension>" + _VIDEO_EXT + ")?$"
-    ),
-)]
+MOVIE_PATTERNS = [
+    (_k, re.compile(_i, re.I))
+    for _k, _i in (
+        (
+            "Scene tagged movie",
+            r"^(?P<title>.+?)[. ][\[(]?(?P<year>\d{4})[)\]]?"
+            r"(?:[._ ](?P<release>UNRATED|REPACK|INTERNAL|MULTI|PROPER|LIMITED|RERiP))*"
+            r"(?:[._ ](?P<format>480p|576p|720p|1080p|1080i|2160p))?"
+            r"(?:[._ ](?P<source>BDRip|BRRip|HDRip|DVDRip|PAL|NTSC))"
+            r"(?:[._ ](?P<sound1>MP3|AC3|AAC|FLAC|DTS(?:-HD)?))?"
+            r"(?:[._ ](?P<codec1>xvid|divx|avc|x264|hevc|h265))?"
+            r"(?:[._ ](?P<sound2>MP3|AC3|AAC|FLAC|DTS(?:-HD)?))?"
+            # r"(?:[._ ](?P<channels>6ch))?"
+            r"(?:[-.](?P<group>.+?))?" r"(?P<extension>" + _VIDEO_EXT + ")?$",
+        ),
+        (
+            "Blu-ray movie",
+            r"^(?P<title>.+?)[. ][\[(]?(?P<year>\d{4})[)\]]?"
+            r"(?:[._ ](?P<release>UNRATED|REPACK|INTERNAL|MULTI|PROPER|LIMITED|RERiP))*"
+            r"(?:[._ ](?P<format0>720p|1080p|1080i|2160p))?"
+            r"(?:[._ ](?P<source>Blu-ray|BluRay|BD25|BD50))"
+            r"(?:[._ ](?P<format>720p|1080p|1080i|2160p))?"
+            r"(?:[._ ](?P<codec1>avc|x264|hevc|h265))?"
+            r"(?:[._ ](?P<sound>AC3|AAC|FLAC|DTS(?:-HD)?))*"
+            r"(?:[._ ](?P<channels>6ch|MA.5.1))?"
+            r"(?:[._ ](?P<codec2>avc|x264|hevc|h265))?"
+            r"(?:[-.](?P<group>.+?))?"
+            r"(?P<extension>" + _VIDEO_EXT + ")?$",
+        ),
+    )
+]
 
-BAD_TITLE_WORDS = set((
-    "bdrip", "brrip", "hdrip", "dvdrip", "ntsc",
-    "hdtv", "dvd-r", "dvdr", "dvd5", "dvd9", "web-dl",
-    "blu-ray", "bluray", "bd25", "bd50",
-    "480p", "576p", "720p", "1080p", "2160p",
-    "mp3", "ac3", "dts",
-))
+BAD_TITLE_WORDS = set(
+    (
+        "bdrip",
+        "brrip",
+        "hdrip",
+        "dvdrip",
+        "ntsc",
+        "hdtv",
+        "dvd-r",
+        "dvdr",
+        "dvd5",
+        "dvd9",
+        "web-dl",
+        "blu-ray",
+        "bluray",
+        "bd25",
+        "bd50",
+        "480p",
+        "576p",
+        "720p",
+        "1080p",
+        "2160p",
+        "mp3",
+        "ac3",
+        "dts",
+    )
+)
 
 del _k, _i
 
 
 def get_filetypes(filelist, path=None, size=os.path.getsize):
-    """ Get a sorted list of file types and their weight in percent
-        from an iterable of file names.
+    """Get a sorted list of file types and their weight in percent
+    from an iterable of file names.
 
-        @return: List of weighted file extensions (no '.'), sorted in descending order
-        @rtype: list of (weight, filetype)
+    @return: List of weighted file extensions (no '.'), sorted in descending order
+    @rtype: list of (weight, filetype)
     """
     path = path or (lambda _: _)
 
     # Get total size for each file extension
     histo = defaultdict(int)
     for entry in filelist:
-        ext = os.path.splitext(path(entry))[1].lstrip('.').lower()
-        if ext and ext[0] == 'r' and ext[1:].isdigit():
+        ext = os.path.splitext(path(entry))[1].lstrip(".").lower()
+        if ext and ext[0] == "r" and ext[1:].isdigit():
             ext = "rar"
         elif ext == "jpeg":
             ext = "jpg"
@@ -150,20 +191,22 @@ def get_filetypes(filelist, path=None, size=os.path.getsize):
     total = sum(histo.values())
     if total:
         for ext, val in histo.items():
-            histo[ext] = int(val * 100.0 / total + .499)
+            histo[ext] = int(val * 100.0 / total + 0.499)
 
     return sorted(zip(histo.values(), histo.keys()), reverse=True)
 
 
 def name_trait(name, add_info=False):
-    """ Determine content type from name.
-    """
+    """Determine content type from name."""
     kind, info = None, {}
 
     # Anything to check against?
     if name and not name.startswith("VTS_"):
         lower_name = name.lower()
-        trait_patterns = (("tv", TV_PATTERNS, "show"), ("movie", MOVIE_PATTERNS, "title"))
+        trait_patterns = (
+            ("tv", TV_PATTERNS, "show"),
+            ("movie", MOVIE_PATTERNS, "title"),
+        )
 
         # TV check
         if any(i in lower_name for i in _DEFINITELY_TV):
@@ -171,14 +214,17 @@ def name_trait(name, add_info=False):
             trait_patterns = trait_patterns[:1]
 
         # Regex checks
-        re_name = '.'.join([i.lstrip('[(').rstrip(')]') for i in name.split(' .')])
+        re_name = ".".join([i.lstrip("[(").rstrip(")]") for i in name.split(" .")])
         for trait, patterns, title_group in trait_patterns:
             matched, patname = None, None
 
             for patname, pattern in patterns:
                 matched = pattern.match(re_name)
                 ##print matched, patname, re_name; print "   ", pattern.pattern
-                if matched and not any(i in matched.groupdict()[title_group].lower() for i in BAD_TITLE_WORDS):
+                if matched and not any(
+                    i in matched.groupdict()[title_group].lower()
+                    for i in BAD_TITLE_WORDS
+                ):
                     kind, info = trait, matched.groupdict()
                     break
 
@@ -203,16 +249,16 @@ def name_trait(name, add_info=False):
 
 
 def detect_traits(name=None, alias=None, filetype=None):
-    """ Build traits list from passed attributes.
+    """Build traits list from passed attributes.
 
-        The result is a list of hierarchical classifiers, the top-level
-        consisting of "audio", "movie", "tv", "video", "document", etc.
-        It can be used as a part of completion paths to build directory
-        structures.
+    The result is a list of hierarchical classifiers, the top-level
+    consisting of "audio", "movie", "tv", "video", "document", etc.
+    It can be used as a part of completion paths to build directory
+    structures.
     """
     result = []
     if filetype:
-        filetype = filetype.lstrip('.')
+        filetype = filetype.lstrip(".")
 
     # Check for "themed" trackers
     theme = config.traits_by_alias.get(alias)

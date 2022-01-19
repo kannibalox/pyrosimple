@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import absolute_import
 
 
 def connect(config_dir=None, optional_config_files=None, cron_cfg="cron"):
-    """ Initialize everything for interactive use.
+    """Initialize everything for interactive use.
 
-        Returns a ready-to-use RtorrentEngine object.
+    Returns a ready-to-use RtorrentEngine object.
     """
     from pyrosimple.scripts.base import ScriptBase
     from pyrosimple.util import load_config
@@ -32,11 +31,17 @@ def connect(config_dir=None, optional_config_files=None, cron_cfg="cron"):
     load_config.ConfigLoader(config_dir).load(optional_config_files or [])
 
     from pyrosimple import config
+
     config.engine.open()
     return config.engine
 
 
-def view(viewname='default', matcher=None,
-         config_dir=None, optional_config_files=None, cron_cfg="cron"):
+def view(
+    viewname="default",
+    matcher=None,
+    config_dir=None,
+    optional_config_files=None,
+    cron_cfg="cron",
+):
     """Helper for interactive / high-level API use."""
     return connect(config_dir, optional_config_files, cron_cfg).view(viewname, matcher)

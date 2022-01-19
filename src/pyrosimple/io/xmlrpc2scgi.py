@@ -35,6 +35,7 @@ from xmlrpc import client as xmlrpclib
 class SCGIException(Exception):
     """SCGI protocol error"""
 
+
 # Types of exceptions thrown
 ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 
@@ -43,22 +44,30 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 # SCGI transports
 #
 
+
 class LocalTransport(object):
-    """ Transport via TCP or a UNIX domain socket.
-    """
+    """Transport via TCP or a UNIX domain socket."""
 
     # Amount of bytes to read at once
     CHUNK_SIZE = 32768
-
 
     def __init__(self, url):
         self.url = url
 
         if url.netloc:
             # TCP socket
-            addrinfo = list(set(socket.getaddrinfo(url.hostname, url.port, socket.AF_INET, socket.SOCK_STREAM)))
+            addrinfo = list(
+                set(
+                    socket.getaddrinfo(
+                        url.hostname, url.port, socket.AF_INET, socket.SOCK_STREAM
+                    )
+                )
+            )
             if len(addrinfo) != 1:
-                raise URLError("Host of URL %r resolves to multiple addresses %r" % (url.geturl(), addrinfo))
+                raise URLError(
+                    "Host of URL %r resolves to multiple addresses %r"
+                    % (url.geturl(), addrinfo)
+                )
 
             self.sock_args = addrinfo[0][:3]
             self.sock_addr = addrinfo[0][4]
@@ -68,10 +77,8 @@ class LocalTransport(object):
             self.sock_args = (socket.AF_UNIX, socket.SOCK_STREAM)
             self.sock_addr = os.path.abspath(path)
 
-
     def send(self, data):
-        """ Open transport, send data, and yield response chunks.
-        """
+        """Open transport, send data, and yield response chunks."""
         sock = socket.socket(*self.sock_args)
         try:
             sock.connect(self.sock_addr)
@@ -95,14 +102,13 @@ class LocalTransport(object):
 
 
 class SSHTransport(object):
-    """ Transport via SSH to a UNIX domain socket.
-    """
+    """Transport via SSH to a UNIX domain socket."""
 
     def __init__(self, url):
         self.url = url
-        self.cmd = ['ssh', '-T'] # no pseudo-tty
+        self.cmd = ["ssh", "-T"]  # no pseudo-tty
 
-        if not url.path.startswith('/'):
+        if not url.path.startswith("/"):
             raise URLError("Bad path in URL %r" % url.geturl())
 
         # pipes.quote is used because ssh always goes through a login shell.
@@ -113,33 +119,46 @@ class SSHTransport(object):
         else:
             clean_path = pipes.quote(url.path)
 
-        ssh_netloc = ''.join((url.username or '', '@' if url.username else '', url.hostname))
+        ssh_netloc = "".join(
+            (url.username or "", "@" if url.username else "", url.hostname)
+        )
         if url.port:
-            reconstructed_netloc = '%s:%d' % (ssh_netloc, url.port)
+            reconstructed_netloc = "%s:%d" % (ssh_netloc, url.port)
             self.cmd.extend(["-p", str(url.port)])
         else:
             reconstructed_netloc = ssh_netloc
         if reconstructed_netloc != url.netloc:
-            raise URLError("Bad location in URL %r (expected %r)" % (url.geturl(), reconstructed_netloc))
+            raise URLError(
+                "Bad location in URL %r (expected %r)"
+                % (url.geturl(), reconstructed_netloc)
+            )
 
         self.cmd.extend(["--", ssh_netloc])
-        #self.cmd.extend(["/bin/nc", "-U", "--", clean_path])
+        # self.cmd.extend(["/bin/nc", "-U", "--", clean_path])
         self.cmd.extend(["socat", "STDIO", "UNIX-CONNECT:" + clean_path])
 
-
     def send(self, data):
-        """ Open transport, send data, and yield response chunks.
-        """
+        """Open transport, send data, and yield response chunks."""
         try:
-            proc = subprocess.Popen(self.cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc = subprocess.Popen(
+                self.cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
         except OSError as exc:
-            raise URLError("Calling %r failed (%s)!" % (' '.join(self.cmd), exc))
+            raise URLError("Calling %r failed (%s)!" % (" ".join(self.cmd), exc))
         else:
             stdout, stderr = proc.communicate(data)
             if proc.returncode:
-                raise URLError("Calling %r failed with RC=%d!\n%s" % (
-                   ' '.join(self.cmd), proc.returncode, stderr,
-                ))
+                raise URLError(
+                    "Calling %r failed with RC=%d!\n%s"
+                    % (
+                        " ".join(self.cmd),
+                        proc.returncode,
+                        stderr,
+                    )
+                )
             yield stdout
 
 
@@ -153,11 +172,12 @@ urlparse.uses_netloc.extend(TRANSPORTS.keys())
 
 
 def transport_from_url(url):
-    """ Create a transport for the given URL.
-    """
-    if '/' not in url and ':' in url and url.rsplit(':')[-1].isdigit():
-        url = 'scgi://' + url
-    url = urlparse.urlsplit(url, scheme="scgi", allow_fragments=False)  # pylint: disable=redundant-keyword-arg
+    """Create a transport for the given URL."""
+    if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
+        url = "scgi://" + url
+    url = urlparse.urlsplit(
+        url, scheme="scgi", allow_fragments=False
+    )  # pylint: disable=redundant-keyword-arg
 
     try:
         transport = TRANSPORTS[url.scheme.lower()]
@@ -176,6 +196,7 @@ def transport_from_url(url):
 # See spec at http://python.ca/scgi/protocol.txt
 #
 
+
 def _encode_netstring(data):
     "Encode data as netstring."
     return b"%d:%s," % (len(data), data)
@@ -183,7 +204,9 @@ def _encode_netstring(data):
 
 def _encode_headers(headers):
     "Make SCGI header bytes from list of tuples."
-    return b''.join([b'%s\0%s\0' % (k.encode('ascii'), v.encode('ascii')) for k, v in headers])
+    return b"".join(
+        [b"%s\0%s\0" % (k.encode("ascii"), v.encode("ascii")) for k, v in headers]
+    )
 
 
 def _encode_payload(data, headers=None):
@@ -208,10 +231,16 @@ def _parse_headers(headers):
         for line in headers.splitlines():
             if line:
                 k, v = line.rstrip().split(b": ", 1)
-                result[k.decode('ascii')] = v.decode('ascii')
+                result[k.decode("ascii")] = v.decode("ascii")
         return result
     except (TypeError, ValueError) as exc:
-        raise SCGIException("Error in SCGI headers %r (%s)" % (headers.decode(), exc,))
+        raise SCGIException(
+            "Error in SCGI headers %r (%s)"
+            % (
+                headers.decode(),
+                exc,
+            )
+        )
 
 
 def _parse_response(resp):
@@ -227,7 +256,13 @@ def _parse_response(resp):
     try:
         headers, payload = resp.split(b"\r\n\r\n", 1)
     except (TypeError, ValueError) as exc:
-        raise SCGIException("No header delimiter in SCGI response of length %d (%s)" % (len(resp), exc,))
+        raise SCGIException(
+            "No header delimiter in SCGI response of length %d (%s)"
+            % (
+                len(resp),
+                exc,
+            )
+        )
     headers = _parse_headers(headers)
 
     clen = headers.get("Content-Length")
@@ -242,14 +277,14 @@ def _parse_response(resp):
 # SCGI request handling
 #
 class SCGIRequest(object):
-    """ Send a SCGI request.
-        See spec at "http://python.ca/scgi/protocol.txt".
+    """Send a SCGI request.
+    See spec at "http://python.ca/scgi/protocol.txt".
 
-        Use tcp socket
-        SCGIRequest('scgi://host:port').send(data)
+    Use tcp socket
+    SCGIRequest('scgi://host:port').send(data)
 
-        Or use the named unix domain socket
-        SCGIRequest('scgi:///tmp/rtorrent.sock').send(data)
+    Or use the named unix domain socket
+    SCGIRequest('scgi:///tmp/rtorrent.sock').send(data)
     """
 
     def __init__(self, url_or_transport):
@@ -261,9 +296,8 @@ class SCGIRequest(object):
         self.resp_headers = {}
         self.latency = 0.0
 
-
     def send(self, data):
-        """ Send data over scgi to URL and get response.
+        """Send data over scgi to URL and get response.
 
         :param data: The bytestring to send
         :type data: bytes
@@ -271,7 +305,7 @@ class SCGIRequest(object):
         """
         start = time.time()
         try:
-            scgi_resp = b''.join(self.transport.send(_encode_payload(data)))
+            scgi_resp = b"".join(self.transport.send(_encode_payload(data)))
         finally:
             self.latency = time.time() - start
 
@@ -280,15 +314,15 @@ class SCGIRequest(object):
 
 
 def scgi_request(url, methodname, *params, **kw):
-    """ Send a XMLRPC request over SCGI to the given URL.
+    """Send a XMLRPC request over SCGI to the given URL.
 
-        :param url: Endpoint URL.
-        :param methodname: XMLRPC method name.
-        :param params: Tuple of simple python objects.
-        :type url: string
-        :type methodname: string
-        :keyword deserialize: Parse XML result? (default is True)
-        :return: XMLRPC string response, or the equivalent Python data.
+    :param url: Endpoint URL.
+    :param methodname: XMLRPC method name.
+    :param params: Tuple of simple python objects.
+    :type url: string
+    :type methodname: string
+    :keyword deserialize: Parse XML result? (default is True)
+    :return: XMLRPC string response, or the equivalent Python data.
     """
     xmlreq = xmlrpclib.dumps(params, methodname)
     xmlresp = SCGIRequest(url).send(xmlreq.encode()).decode()

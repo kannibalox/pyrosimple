@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import with_statement
-from __future__ import absolute_import
 
 import sys
 import time
@@ -253,7 +251,7 @@ class RtorrentItem(engine.TorrentProxy):
                 path = os.path.join(path, self._fields["name"])
         path = os.path.expanduser(path)
         if self._fields["is_multi_file"]:
-            return path + '/'
+            return path + "/"
         else:
             return path
 
@@ -612,6 +610,7 @@ class RtorrentEngine(engine.TorrentEngine):
             "is_open",
             "is_active",
             "ratio",
+            "message",
             "up.rate",
             "up.total",
             "down.rate",

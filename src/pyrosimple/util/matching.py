@@ -28,13 +28,30 @@ from pyrosimple.util import fmt, pymagic
 
 log = pymagic.get_lazy_logger(__name__)
 
-TRUE = set(("true", "t", "yes", "y", "1", "+",))
-FALSE = set(("false", "f", "no", "n", "0", "-",))
+TRUE = set(
+    (
+        "true",
+        "t",
+        "yes",
+        "y",
+        "1",
+        "+",
+    )
+)
+FALSE = set(
+    (
+        "false",
+        "f",
+        "no",
+        "n",
+        "0",
+        "-",
+    )
+)
 
 
 def truth(val, context):
-    """ Convert truth value in "val" to a boolean.
-    """
+    """Convert truth value in "val" to a boolean."""
     try:
         0 + val
     except TypeError:
@@ -45,49 +62,46 @@ def truth(val, context):
         elif lower_val in FALSE:
             return False
         else:
-            raise FilterError("Bad boolean value %r in %r (expected one of '%s', or '%s')" % (
-                val, context, "' '".join(TRUE), "' '".join(FALSE)
-            ))
+            raise FilterError(
+                "Bad boolean value %r in %r (expected one of '%s', or '%s')"
+                % (val, context, "' '".join(TRUE), "' '".join(FALSE))
+            )
     else:
         return bool(val)
 
 
 def _time_ym_delta(timestamp, delta, months):
-    """ Helper to add a year or month delta to a timestamp.
-    """
+    """Helper to add a year or month delta to a timestamp."""
     timestamp = list(time.localtime(timestamp))
     timestamp[int(months)] += delta
     return time.mktime(tuple(timestamp))
 
 
-def unquote_pre_filter(pre_filter, _regex=re.compile(r'[\\]+')):
-    """ Unquote a pre-filter condition.
-    """
+def unquote_pre_filter(pre_filter, _regex=re.compile(r"[\\]+")):
+    """Unquote a pre-filter condition."""
     if pre_filter.startswith('"') and pre_filter.endswith('"'):
         # Unquote outer level
         pre_filter = pre_filter[1:-1]
-        pre_filter = _regex.sub(lambda x: x.group(0)[:len(x.group(0)) // 2], pre_filter)
+        pre_filter = _regex.sub(
+            lambda x: x.group(0)[: len(x.group(0)) // 2], pre_filter
+        )
 
     return pre_filter
 
 
 class FilterError(error.UserError):
-    """ (Syntax) error in filter.
-    """
+    """(Syntax) error in filter."""
 
 
 class Filter(object):
-    """ Base class for all filters.
-    """
+    """Base class for all filters."""
 
     def pre_filter(self):  # pylint: disable=no-self-use
-        """ Return rTorrent condition to speed up data transfer.
-        """
-        return ''
+        """Return rTorrent condition to speed up data transfer."""
+        return ""
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         raise NotImplementedError()
 
     def __call__(self, item):
@@ -95,102 +109,96 @@ class Filter(object):
 
 
 class CompoundFilterBase(Filter, list):
-    """ List of filters.
-    """
+    """List of filters."""
 
 
 class CompoundFilterAll(CompoundFilterBase):
-    """ List of filters that must all match (AND).
-    """
+    """List of filters that must all match (AND)."""
 
     def __str__(self):
-        return u' '.join(str(i) for i in self)
+        return u" ".join(str(i) for i in self)
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if len(self) == 1:
             return self[0].pre_filter()
         else:
-            result = [x.pre_filter() for x in self if not isinstance(x, CompoundFilterBase)]
+            result = [
+                x.pre_filter() for x in self if not isinstance(x, CompoundFilterBase)
+            ]
             result = [x for x in result if x]
             if result:
                 if int(config.fast_query) == 1:
                     return result[0]  # using just one simple expression is safer
                 else:
                     # TODO: make this purely value-based (is.nz=…)
-                    return 'and={%s}' % ','.join(result)
-        return ''
+                    return "and={%s}" % ",".join(result)
+        return ""
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         return all(i.match(item) for i in self)
 
 
 class CompoundFilterAny(CompoundFilterBase):
-    """ List of filters where at least one must match (OR).
-    """
+    """List of filters where at least one must match (OR)."""
 
     def __str__(self):
-        if all(isinstance(i, FieldFilter) for i in self) and len(set(i._name for i in self)) == 1:
-            return "%s,%s" % (str(self[0]), ','.join(i._condition for i in self[1:]))
+        if (
+            all(isinstance(i, FieldFilter) for i in self)
+            and len(set(i._name for i in self)) == 1
+        ):
+            return "%s,%s" % (str(self[0]), ",".join(i._condition for i in self[1:]))
         else:
-            return "[ %s ]" % ' OR '.join(str(i) for i in self)
+            return "[ %s ]" % " OR ".join(str(i) for i in self)
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if len(self) == 1:
             return self[0].pre_filter()
         # TODO: Find a safe way to do 'or' expressions
-        return ''
+        return ""
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         return any(i.match(item) for i in self)
 
 
 class NegateFilter(Filter):
-    """ Negate result of another filter (NOT).
-    """
+    """Negate result of another filter (NOT)."""
 
     def __init__(self, inner):
         self._inner = inner
 
     def __str__(self):
         if isinstance(self._inner, FieldFilter):
-            return str("%s=!%s" % tuple(str(self._inner).split('=', 1)))
+            return str("%s=!%s" % tuple(str(self._inner).split("=", 1)))
         elif isinstance(self._inner, CompoundFilterBase):
-            return u"[ NOT [ %s ] ]" %  str(self._inner)
+            return u"[ NOT [ %s ] ]" % str(self._inner)
         else:
-            return u"[ NOT %s ]" %  str(self._inner)
+            return u"[ NOT %s ]" % str(self._inner)
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         inner = self._inner.pre_filter()
         if inner:
-            if inner.startswith('"not=$') and inner.endswith('"') and '\\' not in inner:
+            if inner.startswith('"not=$') and inner.endswith('"') and "\\" not in inner:
                 return inner[6:-1]  # double negation, return inner command
             elif inner.startswith('"'):
                 inner = '"$' + inner[1:]
             else:
-                inner = '$' + inner
-            return 'not=' + inner
+                inner = "$" + inner
+            return "not=" + inner
         else:
-            return ''
+            return ""
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         return not self._inner.match(item)
 
 
 class FieldFilter(Filter):
-    """ Base class for all field filters.
-    """
+    """Base class for all field filters."""
 
     PRE_FILTER_FIELDS = dict(
         # alias="",
@@ -202,13 +210,11 @@ class FieldFilter(Filter):
         # realpath="=",
         throttle="d.throttle_name=",
         # tracker="=",
-
         is_active="d.is_active=",
         is_complete="d.complete=",
         is_ignored="d.ignore_commands=",
         is_multi_file="d.is_multi_file=",
         is_open="d.is_open=",
-
         # done="=",
         down="d.down.rate=",
         # fno="=",
@@ -217,7 +223,6 @@ class FieldFilter(Filter):
         size="d.size_bytes=",
         up="d.up.rate=",
         uploaded="d.up.total=",
-
         completed="d.custom=tm_completed",
         loaded="d.custom=tm_loaded",
         started="d.custom=tm_started",
@@ -225,74 +230,70 @@ class FieldFilter(Filter):
         custom_tm_completed="d.custom=tm_completed",
         custom_tm_loaded="d.custom=tm_loaded",
         custom_tm_started="d.custom=tm_started",
-
         # XXX: bad result: rtcontrol -Q2 -o- -v tagged='!'new,foo
         #       use a 'd.is_tagged=tag' command?
         tagged="d.custom=tags",
     )
 
-        #active                last time a peer was connected
-        #directory             directory containing download data
-        #files                 list of files in this item
-        #is_ghost              has no data file or directory?
-        #is_private            private flag set (no DHT/PEX)?
-        #leechtime             time taken from start to completion
-        #seedtime              total seeding time after completion
-        #traits                automatic classification of this item (audio, video, tv, movie, etc.)
-        #views                 views this item is attached to
-        #xfer                  transfer rate
+    # active                last time a peer was connected
+    # directory             directory containing download data
+    # files                 list of files in this item
+    # is_ghost              has no data file or directory?
+    # is_private            private flag set (no DHT/PEX)?
+    # leechtime             time taken from start to completion
+    # seedtime              total seeding time after completion
+    # traits                automatic classification of this item (audio, video, tv, movie, etc.)
+    # views                 views this item is attached to
+    # xfer                  transfer rate
 
     def __init__(self, name, value):
-        """ Store field name and filter value for later evaluations.
-        """
+        """Store field name and filter value for later evaluations."""
         self._name = name
         self._condition = self._value = fmt.to_unicode(value)
         self.validate()
 
     def __str__(self):
-        return fmt.to_utf8("%s=%s" % (self._name, self._condition)).decode('utf-8')
+        return fmt.to_utf8("%s=%s" % (self._name, self._condition)).decode("utf-8")
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
 
 
 class EqualsFilter(FieldFilter):
-    """ Filter fields equal to the given value.
-    """
+    """Filter fields equal to the given value."""
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         result = self._value == getattr(item, self._name)
-        #log.debug("%r for %r = %r, name %r, item %r" % (
+        # log.debug("%r for %r = %r, name %r, item %r" % (
         #    result, getattr(item, self._name), self._value, self._name, item))
         return result
 
 
 class PatternFilter(FieldFilter):
-    """ Case-insensitive pattern filter, either a glob or a /regex/ pattern.
-    """
+    """Case-insensitive pattern filter, either a glob or a /regex/ pattern."""
 
-    CLEAN_PRE_VAL_RE = re.compile(r'(?:\[.*?]\])|(?:\(.*?]\))|(?:{.*?]})|(?:\\)')
-    SPLIT_PRE_VAL_RE = re.compile(r'[^a-zA-Z0-9/_]+')
-    SPLIT_PRE_GLOB_RE = re.compile(r'[?*]+')
+    CLEAN_PRE_VAL_RE = re.compile(r"(?:\[.*?]\])|(?:\(.*?]\))|(?:{.*?]})|(?:\\)")
+    SPLIT_PRE_VAL_RE = re.compile(r"[^a-zA-Z0-9/_]+")
+    SPLIT_PRE_GLOB_RE = re.compile(r"[?*]+")
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         from pyrosimple.torrent import formatting
 
         super(PatternFilter, self).validate()
         self._value = self._value.lower()
         self._template = None
-        self._is_regex = self._value.startswith('/') and self._value.endswith('/')
+        self._is_regex = self._value.startswith("/") and self._value.endswith("/")
         if self._is_regex:
             self._matcher = re.compile(self._value[1:-1]).search
-        elif self._value.startswith('{{') or self._value.endswith('}}'):
+        elif self._value.startswith("{{") or self._value.endswith("}}"):
+
             def _template_globber(val, item):
                 """Helper."""
-                pattern = formatting.format_item(self._template, item).replace('[', '[[]')
+                pattern = formatting.format_item(self._template, item).replace(
+                    "[", "[[]"
+                )
                 ##print('!!!', val, '~~~', pattern, '???')
                 return fnmatch.fnmatchcase(val, pattern.lower())
 
@@ -302,51 +303,50 @@ class PatternFilter(FieldFilter):
             self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if self._name not in self.PRE_FILTER_FIELDS or self._template:
-            return ''
+            return ""
         if not self._value:
             return '"equal={},cat="'.format(self.PRE_FILTER_FIELDS[self._name])
 
         if self._is_regex:
             needle = self._value[1:-1]
-            needle = self.CLEAN_PRE_VAL_RE.sub(' ', needle)
+            needle = self.CLEAN_PRE_VAL_RE.sub(" ", needle)
             needle = self.SPLIT_PRE_VAL_RE.split(needle)
         else:
-            needle = self.CLEAN_PRE_VAL_RE.sub(' ', self._value)
+            needle = self.CLEAN_PRE_VAL_RE.sub(" ", self._value)
             needle = self.SPLIT_PRE_GLOB_RE.split(needle)
         needle = list(sorted(needle, key=len))[-1]
 
         if needle:
             try:
-                needle.encode('ascii')
+                needle.encode("ascii")
             except UnicodeEncodeError:
-                return ''
+                return ""
             else:
                 return r'"string.contains_i=${},\"{}\""'.format(
-                       self.PRE_FILTER_FIELDS[self._name], needle.replace('"', r'\\\"'))
+                    self.PRE_FILTER_FIELDS[self._name], needle.replace('"', r"\\\"")
+                )
 
-        return ''
+        return ""
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
-        val = (getattr(item, self._name) or '').lower()
+        """Return True if filter matches item."""
+        val = (getattr(item, self._name) or "").lower()
         result = self._matcher(val) if self._is_regex else self._matcher(val, item)
         if 0:
-            log.debug("%r for %r ~ %r, name %r, item %r" % (
-                result, val, self._value, self._name, item))
+            log.debug(
+                "%r for %r ~ %r, name %r, item %r"
+                % (result, val, self._value, self._name, item)
+            )
         return result
 
 
 class FilesFilter(PatternFilter):
-    """ Case-insensitive pattern filter on filenames in a torrent.
-    """
+    """Case-insensitive pattern filter on filenames in a torrent."""
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         val = getattr(item, self._name)
         if val is not None:
             for fileinfo in val:
@@ -356,13 +356,12 @@ class FilesFilter(PatternFilter):
 
 
 class TaggedAsFilter(FieldFilter):
-    """ Case-insensitive tags filter. Tag fields are white-space separated lists
-        of tags.
+    """Case-insensitive tags filter. Tag fields are white-space separated lists
+    of tags.
     """
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             if not self._value:
                 return '"not=${}"'.format(self.PRE_FILTER_FIELDS[self._name])
@@ -371,17 +370,17 @@ class TaggedAsFilter(FieldFilter):
                 if self._exact:
                     val = val.copy().pop()
                 return r'"string.contains_i=${},\"{}\""'.format(
-                       self.PRE_FILTER_FIELDS[self._name], val.replace('"', r'\\\"'))
-        return ''
+                    self.PRE_FILTER_FIELDS[self._name], val.replace('"', r"\\\"")
+                )
+        return ""
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         super(TaggedAsFilter, self).validate()
         self._value = self._value.lower()
 
         # If the tag starts with '=', test on equality (just this tag, no others)
-        if self._value.startswith('='):
+        if self._value.startswith("="):
             self._exact = True
             self._value = self._value[1:]
         else:
@@ -392,10 +391,8 @@ class TaggedAsFilter(FieldFilter):
             # Empty tag means empty set, not set of one empty string
             self._value = set((self._value,)) if self._value else set()
 
-
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         tags = getattr(item, self._name) or []
         if self._exact:
             # Equality check
@@ -406,63 +403,64 @@ class TaggedAsFilter(FieldFilter):
 
 
 class BoolFilter(FieldFilter):
-    """ Filter boolean values.
-    """
+    """Filter boolean values."""
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             return '"equal={},value={}"'.format(
-                   self.PRE_FILTER_FIELDS[self._name], int(self._value))
-        return ''
+                self.PRE_FILTER_FIELDS[self._name], int(self._value)
+            )
+        return ""
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         super(BoolFilter, self).validate()
 
         self._value = truth(str(self._value), self._condition)
         self._condition = "yes" if self._value else "no"
 
-
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         val = getattr(item, self._name) or False
         return bool(val) is self._value
 
 
 class NumericFilterBase(FieldFilter):
-    """ Base class for numerical value filters.
-    """
+    """Base class for numerical value filters."""
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         super(NumericFilterBase, self).validate()
 
         self.not_null = False
 
-        if self._value.startswith('+'):
+        if self._value.startswith("+"):
             self._cmp = operator.gt
-            self._rt_cmp = 'greater'
+            self._rt_cmp = "greater"
             self._value = self._value[1:]
-        elif self._value.startswith('-'):
+        elif self._value.startswith("-"):
             self._cmp = operator.lt
-            self._rt_cmp = 'less'
+            self._rt_cmp = "less"
             self._value = self._value[1:]
         else:
             self._cmp = operator.eq
-            self._rt_cmp = 'equal'
-
+            self._rt_cmp = "equal"
 
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         if 0 and getattr(item, self._name):
-            print("%r %r %r %r %r %r" % (self._cmp(float(getattr(item, self._name)), self._value),
-                  self._name, self._condition, item.name, getattr(item, self._name), self._value))
+            print(
+                "%r %r %r %r %r %r"
+                % (
+                    self._cmp(float(getattr(item, self._name)), self._value),
+                    self._name,
+                    self._condition,
+                    item.name,
+                    getattr(item, self._name),
+                    self._value,
+                )
+            )
         val = getattr(item, self._name) or 0
         if self.not_null and self._value and not val:
             return False
@@ -471,36 +469,36 @@ class NumericFilterBase(FieldFilter):
 
 
 class FloatFilter(NumericFilterBase):
-    """ Filter float values.
-    """
+    """Filter float values."""
 
     FIELD_SCALE = dict(
         ratio=1000,
     )
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return '"{}=value=${},value={}"'.format(
-                   self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], val)
-        return ''
+                self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], val
+            )
+        return ""
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         super(FloatFilter, self).validate()
 
         try:
             self._value = float(self._value)
         except (ValueError, TypeError) as exc:
-            raise FilterError("Bad numerical value %r in %r (%s)" % (self._value, self._condition, exc))
+            raise FilterError(
+                "Bad numerical value %r in %r (%s)"
+                % (self._value, self._condition, exc)
+            )
 
 
 class TimeFilter(NumericFilterBase):
-    """ Filter UNIX timestamp values.
-    """
+    """Filter UNIX timestamp values."""
 
     TIMEDELTA_UNITS = dict(
         y=lambda t, d: _time_ym_delta(t, -d, False),
@@ -511,25 +509,29 @@ class TimeFilter(NumericFilterBase):
         i=lambda t, d: t - d * 60,
         s=lambda t, d: t - d,
     )
-    TIMEDELTA_RE = re.compile("^%s$" % ''.join(
-        r"(?:(?P<%s>\d+)[%s%s])?" % (i, i, i.upper()) for i in "ymwdhis"
-    ))
+    TIMEDELTA_RE = re.compile(
+        "^%s$"
+        % "".join(r"(?:(?P<%s>\d+)[%s%s])?" % (i, i, i.upper()) for i in "ymwdhis")
+    )
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             # Adding a day of fuzz to avoid any possible timezone problems
             timestamp = self._value + (
-                -86400 if self._rt_cmp == 'greater' else
-                86400 if self._rt_cmp == 'less' else 0)
+                -86400
+                if self._rt_cmp == "greater"
+                else 86400
+                if self._rt_cmp == "less"
+                else 0
+            )
             return '"{}=value=${},value={}"'.format(
-                   self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], int(timestamp))
-        return ''
+                self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], int(timestamp)
+            )
+        return ""
 
     def validate_time(self, duration=False):
-        """ Validate filter condition (template method) for timestamps and durations.
-        """
+        """Validate filter condition (template method) for timestamps and durations."""
         super(TimeFilter, self).validate()
         timestamp = now = time.time()
 
@@ -538,7 +540,10 @@ class TimeFilter(NumericFilterBase):
             try:
                 timestamp = float(self._value)
             except (ValueError, TypeError) as exc:
-                raise FilterError("Bad timestamp value %r in %r (%s)" % (self._value, self._condition, exc))
+                raise FilterError(
+                    "Bad timestamp value %r in %r (%s)"
+                    % (self._value, self._condition, exc)
+                )
         else:
             # Something human readable
             delta = self.TIMEDELTA_RE.match(self._value)
@@ -555,31 +560,34 @@ class TimeFilter(NumericFilterBase):
                     # Invert logic for time deltas (+ = older; - = within the delta range)
                     if self._cmp == operator.lt:
                         self._cmp = operator.gt
-                        self._rt_cmp = 'greater'
+                        self._rt_cmp = "greater"
                     elif self._cmp == operator.gt:
                         self._cmp = operator.lt
-                        self._rt_cmp = 'less'
+                        self._rt_cmp = "less"
             else:
                 # Assume it's an absolute date
-                if '/' in self._value:
+                if "/" in self._value:
                     # U.S.
                     dtfmt = "%m/%d/%Y"
-                elif '.' in self._value:
+                elif "." in self._value:
                     # European
                     dtfmt = "%d.%m.%Y"
                 else:
                     # Fall back to ISO
                     dtfmt = "%Y-%m-%d"
 
-                val = str(self._value).upper().replace(' ', 'T')
-                if 'T' in val:
+                val = str(self._value).upper().replace(" ", "T")
+                if "T" in val:
                     # Time also given
-                    dtfmt += "T%H:%M:%S"[:3+3*val.count(':')]
+                    dtfmt += "T%H:%M:%S"[: 3 + 3 * val.count(":")]
 
                 try:
                     timestamp = time.mktime(tuple(time.strptime(val, dtfmt)))
                 except (ValueError) as exc:
-                    raise FilterError("Bad timestamp value %r in %r (%s)" % (self._value, self._condition, exc))
+                    raise FilterError(
+                        "Bad timestamp value %r in %r (%s)"
+                        % (self._value, self._condition, exc)
+                    )
 
                 if duration:
                     timestamp -= now
@@ -590,35 +598,28 @@ class TimeFilter(NumericFilterBase):
         ##print time.localtime(self._value)
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         self.validate_time(duration=False)
 
 
 class TimeFilterNotNull(TimeFilter):
-    """ Filter UNIX timestamp values, ignore unset values unless compared to 0.
-    """
+    """Filter UNIX timestamp values, ignore unset values unless compared to 0."""
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         super(TimeFilterNotNull, self).validate()
         self.not_null = True
 
 
 class DurationFilter(TimeFilter):
-    """ Filter durations in seconds.
-    """
+    """Filter durations in seconds."""
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         super(DurationFilter, self).validate_time(duration=True)
 
-
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         if getattr(item, self._name) is None:
             # Never match "N/A" items, except when "-0" was specified
             return False if self._value else self._cmp(-1, 0)
@@ -627,21 +628,20 @@ class DurationFilter(TimeFilter):
 
 
 class ByteSizeFilter(NumericFilterBase):
-    """ Filter size and bandwidth values.
-    """
-    UNITS = dict(b=1, k=1024, m=1024**2, g=1024**3)
+    """Filter size and bandwidth values."""
+
+    UNITS = dict(b=1, k=1024, m=1024 ** 2, g=1024 ** 3)
 
     def pre_filter(self):
-        """ Return rTorrent condition to speed up data transfer.
-        """
+        """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             return '"{}={},value={}"'.format(
-                   self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], int(self._value))
-        return ''
+                self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], int(self._value)
+            )
+        return ""
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         super(ByteSizeFilter, self).validate()
 
         # Get scale
@@ -656,28 +656,30 @@ class ByteSizeFilter(NumericFilterBase):
         try:
             self._value = float(self._value)
         except (ValueError, TypeError) as exc:
-            raise FilterError("Bad numerical value %r in %r (%s)" % (self._value, self._condition, exc))
+            raise FilterError(
+                "Bad numerical value %r in %r (%s)"
+                % (self._value, self._condition, exc)
+            )
 
         # Scale to bytes
         self._value = self._value * scale
 
 
 class MagicFilter(FieldFilter):
-    """ Filter that looks at the comparison value and automatically decides
-        what type of filter to use.
+    """Filter that looks at the comparison value and automatically decides
+    what type of filter to use.
     """
 
     def validate(self):
-        """ Validate filter condition (template method).
-        """
+        """Validate filter condition (template method)."""
         val = self._condition.lower()
         if val and val[0] in "+-":
             val = val[1:]
 
         matcher = PatternFilter
-        if not val or val.startswith('/') and val.endswith('/'):
+        if not val or val.startswith("/") and val.endswith("/"):
             pass
-        elif val.replace('.', '0').isdigit():
+        elif val.replace(".", "0").isdigit():
             matcher = FloatFilter
         elif self._condition in (TRUE | FALSE):
             matcher = BoolFilter
@@ -688,70 +690,68 @@ class MagicFilter(FieldFilter):
 
         self._inner = matcher(self._name, self._condition)
 
-
     def match(self, item):
-        """ Return True if filter matches item.
-        """
+        """Return True if filter matches item."""
         return self._inner.match(item)
 
 
 class ConditionParser(object):
-    """ Filter condition parser.
-    """
+    """Filter condition parser."""
+
     COMPARISON_OPS = {
-        "<":  "-%s",
+        "<": "-%s",
         "<=": "!+%s",
-        ">":  "+%s",
+        ">": "+%s",
         ">=": "!-%s",
         "<>": "!%s",
         "!=": "!%s",
         "~": "/%s/",
     }
 
-
     @classmethod
     def AMENABLE(cls, _):
-        """ Prefined lookup mode for typeless access to any field name.
-        """
+        """Prefined lookup mode for typeless access to any field name."""
         return {"matcher": MagicFilter}
 
-
     def __init__(self, lookup, default_field=None, ident_re=r"[_A-Za-z][_A-Za-z0-9]*"):
-        """ Initialize parser.
+        """Initialize parser.
 
-            The C{lookup} callback takes a C{name} argument and returns a dict describing
-            that field, or None for an unknown field. If a dict is returned, the "matcher"
-            key is supposed to be a C{Filter} instance; if it's None or missing, the field
-            is not comparable.
+        The C{lookup} callback takes a C{name} argument and returns a dict describing
+        that field, or None for an unknown field. If a dict is returned, the "matcher"
+        key is supposed to be a C{Filter} instance; if it's None or missing, the field
+        is not comparable.
 
-            @param lookup: Field definition lookup callable.
-            @param default_field: Optional default field name for conditions without an operator.
-            @param ident_re: Regex describing valid field names.
+        @param lookup: Field definition lookup callable.
+        @param default_field: Optional default field name for conditions without an operator.
+        @param ident_re: Regex describing valid field names.
         """
         self.lookup = lookup
         self.default_field = default_field
         self.ident_re = ident_re
 
-
     def _create_filter(self, condition):
-        """ Create a filter object from a textual condition.
-        """
+        """Create a filter object from a textual condition."""
         # "Normal" comparison operators?
         comparison = re.match(r"^(%s)(<[>=]?|>=?|!=|~)(.*)$" % self.ident_re, condition)
         if comparison:
             name, comparison, values = comparison.groups()
             if values and values[0] in "+-":
-                raise FilterError("Comparison operator cannot be followed by '%s' in '%s'" % (values[0], condition))
+                raise FilterError(
+                    "Comparison operator cannot be followed by '%s' in '%s'"
+                    % (values[0], condition)
+                )
             values = self.COMPARISON_OPS[comparison] % values
         else:
             # Split name from value(s)
             try:
-                name, values = condition.split('=', 1)
+                name, values = condition.split("=", 1)
             except ValueError:
                 if self.default_field:
                     name, values = self.default_field, condition
                 else:
-                    raise FilterError("Field name missing in '%s' (expected '=')" % condition)
+                    raise FilterError(
+                        "Field name missing in '%s' (expected '=')" % condition
+                    )
 
         # Try to find field definition
         field = self.lookup(name)
@@ -762,13 +762,17 @@ class ConditionParser(object):
 
         # Make filters from values (split on commas outside of /…/)
         filters = []
-        split_values = re.findall(r'(!?/[^/]*/|[^,]+)(?:,|$)', values) if values else ['']
+        split_values = (
+            re.findall(r"(!?/[^/]*/|[^,]+)(?:,|$)", values) if values else [""]
+        )
         if not split_values:
-            raise FilterError("Internal Error: Cannot split %r into match values" % (values,))
+            raise FilterError(
+                "Internal Error: Cannot split %r into match values" % (values,)
+            )
 
         for value in split_values:
             wrapper = None
-            if value.startswith('!'):
+            if value.startswith("!"):
                 wrapper = NegateFilter
                 value = value[1:]
             field_matcher = field["matcher"](name, value)
@@ -777,27 +781,24 @@ class ConditionParser(object):
         # Return filters
         return CompoundFilterAny(filters) if len(filters) > 1 else filters[0]
 
-
     def _tree2str(self, tree, root=True):
-        """ Convert parsed condition tree back to a (printable) string.
-        """
+        """Convert parsed condition tree back to a (printable) string."""
         try:
             # Keep strings as they are
-            return '' + tree
+            return "" + tree
         except (TypeError, ValueError):
-            flat = ' '.join(self._tree2str(i, root=False) for i in tree)
+            flat = " ".join(self._tree2str(i, root=False) for i in tree)
             return flat if root else "[ %s ]" % flat
 
-
     def parse(self, conditions):
-        """ Parse filter conditions.
+        """Parse filter conditions.
 
-            @param conditions: multiple conditions.
-            @type conditions: list or str
+        @param conditions: multiple conditions.
+        @type conditions: list or str
         """
         conditions_text = conditions
         if isinstance(conditions, bytes):
-            conditions = shlex.split(conditions.decode('utf-8'))
+            conditions = shlex.split(conditions.decode("utf-8"))
         elif isinstance(conditions, str):
             conditions = shlex.split(conditions)
         else:
@@ -816,21 +817,29 @@ class ConditionParser(object):
                 raise FilterError("NOT must be followed by some conditions!")
 
         # Handle grouping
-        if '[' in conditions:
+        if "[" in conditions:
             tree = [[]]
             for term in conditions:
-                if term == '[':
-                    tree.append([]) # new grouping
-                elif term == ']':
+                if term == "[":
+                    tree.append([])  # new grouping
+                elif term == "]":
                     subtree = tree.pop()
                     if not tree:
-                        raise FilterError("Unbalanced brackets, too many closing ']' in condition %r" % (conditions_text,))
-                    tree[-1].append(subtree) # append finished group to containing level
+                        raise FilterError(
+                            "Unbalanced brackets, too many closing ']' in condition %r"
+                            % (conditions_text,)
+                        )
+                    tree[-1].append(
+                        subtree
+                    )  # append finished group to containing level
                 else:
-                    tree[-1].append(term) # append to current level
+                    tree[-1].append(term)  # append to current level
 
             if len(tree) > 1:
-                raise FilterError("Unbalanced brackets, too many open '[' in condition %r" % (conditions_text,))
+                raise FilterError(
+                    "Unbalanced brackets, too many open '[' in condition %r"
+                    % (conditions_text,)
+                )
             conditions = tree[0]
 
         # Prepare root matcher
@@ -847,7 +856,9 @@ class ConditionParser(object):
             if condition == "OR":
                 # Leading OR, or OR OR in sequence?
                 if not matcher:
-                    raise FilterError("Left-hand side of OR missing in %r!" % (conditions_text,))
+                    raise FilterError(
+                        "Left-hand side of OR missing in %r!" % (conditions_text,)
+                    )
 
                 # Start next run of AND conditions
                 matcher = CompoundFilterAll()
@@ -859,6 +870,8 @@ class ConditionParser(object):
 
         # Trailing OR?
         if not matcher:
-            raise FilterError("Right-hand side of OR missing in %r!" % (conditions_text,))
+            raise FilterError(
+                "Right-hand side of OR missing in %r!" % (conditions_text,)
+            )
 
         return NegateFilter(root) if negate else root

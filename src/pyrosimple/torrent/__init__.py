@@ -18,6 +18,5 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 # make refactoring of 0.4.1 transparent, so the old config.py examples still work
-from __future__ import absolute_import
 
 from pyrosimple.util import matching

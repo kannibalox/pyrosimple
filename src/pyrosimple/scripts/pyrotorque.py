@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import absolute_import
 
 import time
 import shlex
@@ -35,15 +34,14 @@ from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 
 
 def _raise_interrupt(signo, dummy_):
-    """ Helper for signal handling.
-    """
+    """Helper for signal handling."""
     raise KeyboardInterrupt("Caught signal #%d" % signo)
 
 
 class RtorrentQueueManager(ScriptBaseWithConfig):
     ### Keep things wrapped to fit under this comment... ##############################
     """
-        rTorrent queue manager & daemon.
+    rTorrent queue manager & daemon.
     """
 
     # argument description for the usage information
@@ -53,35 +51,44 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
     POLL_TIMEOUT = 1.0
 
-
     def add_options(self):
-        """ Add program options.
-        """
+        """Add program options."""
         super(RtorrentQueueManager, self).add_options()
         self.jobs = None
         self.httpd = None
 
         # basic options
-        self.add_bool_option("-n", "--dry-run",
-            help="advise jobs not to do any real work, just tell what would happen")
-        self.add_bool_option("--no-fork", "--fg", help="Don't fork into background (stay in foreground and log to console)")
+        self.add_bool_option(
+            "-n",
+            "--dry-run",
+            help="advise jobs not to do any real work, just tell what would happen",
+        )
+        self.add_bool_option(
+            "--no-fork",
+            "--fg",
+            help="Don't fork into background (stay in foreground and log to console)",
+        )
         self.add_bool_option("--stop", help="Stop running daemon")
-        self.add_bool_option("--restart", help="Stop running daemon, then fork into background")
+        self.add_bool_option(
+            "--restart", help="Stop running daemon, then fork into background"
+        )
         self.add_bool_option("-?", "--status", help="Check daemon status")
-        self.add_value_option("--pid-file", "PATH",
-            help="file holding the process ID of the daemon, when running in background")
-        self.add_value_option("--guard-file", "PATH",
-            help="guard file for the process watchdog")
-
+        self.add_value_option(
+            "--pid-file",
+            "PATH",
+            help="file holding the process ID of the daemon, when running in background",
+        )
+        self.add_value_option(
+            "--guard-file", "PATH", help="guard file for the process watchdog"
+        )
 
     def _parse_schedule(self, schedule):
-        """ Parse a job schedule.
-        """
+        """Parse a job schedule."""
         result = {}
 
-        for param in shlex.split(str(schedule)): # do not feed unicode to shlex
+        for param in shlex.split(str(schedule)):  # do not feed unicode to shlex
             try:
-                key, val = param.split('=', 1)
+                key, val = param.split("=", 1)
             except (TypeError, ValueError):
                 self.fatal("Bad param '%s' in job schedule '%s'" % (param, schedule))
             else:
@@ -89,10 +96,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         return result
 
-
     def _validate_config(self):
-        """ Handle and check configuration.
-        """
+        """Handle and check configuration."""
         groups = dict(
             job=defaultdict(Bunch),
             httpd=defaultdict(Bunch),
@@ -106,14 +111,17 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 val = matching.truth(str(val), key)
 
             # Assemble grouped parameters
-            stem = key.split('.', 1)[0]
+            stem = key.split(".", 1)[0]
             if key == "httpd.active":
                 groups[stem]["active"] = val
             elif stem in groups:
                 try:
-                    stem, name, param = key.split('.', 2)
+                    stem, name, param = key.split(".", 2)
                 except (TypeError, ValueError):
-                    self.fatal("Bad %s configuration key %r (expecting %s.NAME.PARAM)" % (stem, key, stem))
+                    self.fatal(
+                        "Bad %s configuration key %r (expecting %s.NAME.PARAM)"
+                        % (stem, key, stem)
+                    )
                 else:
                     groups[stem][name][param] = val
 
@@ -124,16 +132,23 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         if self.httpd.active:
             if self.httpd.waitress.url_scheme not in ("http", "https"):
                 self.fatal("HTTP URL scheme must be either 'http' or 'https'")
-            if not isinstance(self.httpd.waitress.port, int) or not(1024 <= self.httpd.waitress.port < 65536):
+            if not isinstance(self.httpd.waitress.port, int) or not (
+                1024 <= self.httpd.waitress.port < 65536
+            ):
                 self.fatal("HTTP port must be a 16 bit number >= 1024")
 
         # Validate jobs
         for name, params in self.jobs.items():
             for key in ("handler", "schedule"):
                 if key not in params:
-                    self.fatal("Job '%s' is missing the required 'job.%s.%s' parameter" % (name, name, key))
+                    self.fatal(
+                        "Job '%s' is missing the required 'job.%s.%s' parameter"
+                        % (name, name, key)
+                    )
 
-            bool_param = lambda k, default, p=params: matching.truth(p.get(k, default), "job.%s.%s" % (name, k))
+            bool_param = lambda k, default, p=params: matching.truth(
+                p.get(k, default), "job.%s.%s" % (name, k)
+            )
 
             params.job_name = name
             params.dry_run = bool_param("dry_run", False) or self.options.dry_run
@@ -144,21 +159,20 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 try:
                     params.handler = pymagic.import_name(params.handler)
                 except ImportError as exc:
-                    self.fatal("Bad handler name '%s' for job '%s':\n    %s" % (params.handler, name, exc))
-
+                    self.fatal(
+                        "Bad handler name '%s' for job '%s':\n    %s"
+                        % (params.handler, name, exc)
+                    )
 
     def _add_jobs(self):
-        """ Add configured jobs.
-        """
+        """Add configured jobs."""
         for name, params in self.jobs.items():
             if params.active:
                 params.handler = params.handler(params)
                 self.sched.add_cron_job(params.handler.run, **params.schedule)
 
-
     def _run_forever(self):
-        """ Run configured jobs until termination request.
-        """
+        """Run configured jobs until termination request."""
         while True:
             try:
                 tick = time.time()
@@ -179,15 +193,18 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 break
             else:
                 # Idle work
-                #self.LOG.warn("IDLE %s %r" % (self.options.guard_file, os.path.exists(self.options.guard_file)))
-                if self.options.guard_file and not os.path.exists(self.options.guard_file):
-                    self.LOG.warn("Guard file '%s' disappeared, exiting!" % self.options.guard_file)
+                # self.LOG.warn("IDLE %s %r" % (self.options.guard_file, os.path.exists(self.options.guard_file)))
+                if self.options.guard_file and not os.path.exists(
+                    self.options.guard_file
+                ):
+                    self.LOG.warn(
+                        "Guard file '%s' disappeared, exiting!"
+                        % self.options.guard_file
+                    )
                     break
 
-
     def mainloop(self):
-        """ The main loop.
-        """
+        """The main loop."""
         self._validate_config()
         config.engine.load_config()
 
@@ -195,7 +212,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         if not self.options.no_fork and not self.options.guard_file:
             self.options.guard_file = os.path.join(config.config_dir, "run/pyrotorque")
         if not self.options.pid_file:
-            self.options.pid_file = os.path.join(config.config_dir, "run/pyrotorque.pid")
+            self.options.pid_file = os.path.join(
+                config.config_dir, "run/pyrotorque.pid"
+            )
 
         # Process control
         if self.options.status or self.options.stop or self.options.restart:
@@ -213,15 +232,19 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                         running, _ = osmagic.check_process(self.options.pid_file)
                         if not running:
                             break
-                        time.sleep(.1)
+                        time.sleep(0.1)
 
                     self.LOG.info("Process #%d stopped." % (pid))
                 elif pid:
                     self.LOG.info("Process #%d NOT running anymore." % (pid))
                 else:
-                    self.LOG.info("No pid file '%s'" % (self.options.pid_file or "<N/A>"))
+                    self.LOG.info(
+                        "No pid file '%s'" % (self.options.pid_file or "<N/A>")
+                    )
             else:
-                self.LOG.info("Process #%d %s running." % (pid, "UP and" if running else "NOT"))
+                self.LOG.info(
+                    "Process #%d %s running." % (pid, "UP and" if running else "NOT")
+                )
 
             if self.options.restart:
                 if self.options.pid_file:
@@ -242,13 +265,18 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             return
 
         # Detach, if not disabled via option
-        if not self.options.no_fork: # or getattr(sys.stdin, "isatty", lambda: False)():
-            osmagic.daemonize(pidfile=self.options.pid_file, logfile=logutil.get_logfile())
-            time.sleep(.05) # let things settle a little
+        if (
+            not self.options.no_fork
+        ):  # or getattr(sys.stdin, "isatty", lambda: False)():
+            osmagic.daemonize(
+                pidfile=self.options.pid_file, logfile=logutil.get_logfile()
+            )
+            time.sleep(0.05)  # let things settle a little
         signal.signal(signal.SIGTERM, _raise_interrupt)
 
         # Set up services
         from apscheduler.scheduler import Scheduler
+
         self.sched = Scheduler(config.torque)
 
         # Run services
@@ -264,13 +292,15 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 try:
                     os.remove(self.options.pid_file)
                 except EnvironmentError as exc:
-                    self.LOG.warn("Failed to remove pid file '%s' (%s)" % (self.options.pid_file, exc))
+                    self.LOG.warn(
+                        "Failed to remove pid file '%s' (%s)"
+                        % (self.options.pid_file, exc)
+                    )
                     self.return_code = error.EX_IOERR
 
 
-def run(): #pragma: no cover
-    """ The entry point.
-    """
+def run():  # pragma: no cover
+    """The entry point."""
     ScriptBase.setup(cron_cfg="torque")
     RtorrentQueueManager().run()
 

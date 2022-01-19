@@ -17,27 +17,24 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import absolute_import
 
 from pyrosimple import error
 from pyrosimple.util import xmlrpc, pymagic
 
 
 class FilterJobBase(object):
-    """ Base class for filter rule jobs.
-    """
+    """Base class for filter rule jobs."""
 
     def __init__(self, config=None):
-        """ Set up filter config.
-        """
+        """Set up filter config."""
         self.config = config or {}
         self.LOG = pymagic.get_class_logger(self)
-        self.LOG.debug("%s created with config %r" % (self.__class__.__name__, self.config))
-
+        self.LOG.debug(
+            "%s created with config %r" % (self.__class__.__name__, self.config)
+        )
 
     def run(self):
-        """ Filter job callback.
-        """
+        """Filter job callback."""
         from pyrosimple import config
 
         try:
@@ -48,30 +45,24 @@ class FilterJobBase(object):
         except (error.LoggableError, xmlrpc.ERRORS) as exc:
             self.LOG.warn(str(exc))
 
-
     def run_filter(self, items):
-        """ Perform job on filtered items.
-        """
+        """Perform job on filtered items."""
         raise NotImplementedError()
 
 
 class ActionRule(FilterJobBase):
-    """ Perform an action on selected items.
-    """
+    """Perform an action on selected items."""
 
     def run_filter(self, items):
-        """ Perform configured action on filtered items.
-        """
+        """Perform configured action on filtered items."""
         # TODO: what actions? xmlrpc, delete, cull, stop, etc. for sure.
 
 
 class TorrentMirror(FilterJobBase):
-    """ Mirror selected items via a specified tracker.
-    """
+    """Mirror selected items via a specified tracker."""
 
     def run_filter(self, items):
-        """ Load filtered items into remote client via tracker / watchdir.
-        """
+        """Load filtered items into remote client via tracker / watchdir."""
         # TODO: config is tracker_url, tracker_upload, watch_dir
         # create clones of item's metafile, write to watch_dir, and upload
         # to tracker_upload (support file: at first, for a local bttrack);
