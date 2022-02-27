@@ -24,8 +24,6 @@ import signal
 import asyncore
 from collections import defaultdict
 
-import iteritems
-
 from pyrosimple.util import logutil
 from pyrosimple.util.parts import Bunch
 from pyrosimple import config, error
@@ -125,7 +123,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 else:
                     groups[stem][name][param] = val
 
-        for key, val in iteritems(groups):
+        for key, val in groups.items():
             setattr(self, key.replace("job", "jobs"), Bunch(val))
 
         # Validate httpd config
@@ -169,7 +167,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for name, params in self.jobs.items():
             if params.active:
                 params.handler = params.handler(params)
-                self.sched.add_cron_job(params.handler.run, **params.schedule)
+                self.sched.add_job(params.handler.run, trigger='cron', **params.schedule)
 
     def _run_forever(self):
         """Run configured jobs until termination request."""
@@ -275,9 +273,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         signal.signal(signal.SIGTERM, _raise_interrupt)
 
         # Set up services
-        from apscheduler.scheduler import Scheduler
+        from apscheduler.schedulers.background import BackgroundScheduler
 
-        self.sched = Scheduler(config.torque)
+        self.sched = BackgroundScheduler()
 
         # Run services
         self.sched.start()
