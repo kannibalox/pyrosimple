@@ -158,7 +158,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for name, params in self.jobs.items():
             if params.active:
                 params.handler = params.handler(params)
-                self.sched.add_job(params.handler.run, trigger='cron', **params.schedule)
+                self.sched.add_job(params.handler.run, name=name, trigger='cron', **params.schedule)
 
     def _run_forever(self):
         """Run configured jobs until termination request."""
