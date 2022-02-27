@@ -126,15 +126,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for key, val in groups.items():
             setattr(self, key.replace("job", "jobs"), Bunch(val))
 
-        # Validate httpd config
-        if self.httpd.active:
-            if self.httpd.waitress.url_scheme not in ("http", "https"):
-                self.fatal("HTTP URL scheme must be either 'http' or 'https'")
-            if not isinstance(self.httpd.waitress.port, int) or not (
-                1024 <= self.httpd.waitress.port < 65536
-            ):
-                self.fatal("HTTP port must be a 16 bit number >= 1024")
-
         # Validate jobs
         for name, params in self.jobs.items():
             for key in ("handler", "schedule"):
