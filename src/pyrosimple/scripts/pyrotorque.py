@@ -21,7 +21,6 @@
 import time
 import shlex
 import signal
-import asyncore
 from collections import defaultdict
 
 from pyrosimple.util import logutil
@@ -164,15 +163,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         """Run configured jobs until termination request."""
         while True:
             try:
-                tick = time.time()
-
-                asyncore.loop(timeout=self.POLL_TIMEOUT, use_poll=True)
-
-                # Sleep for remaining poll cycle time
-                tick += self.POLL_TIMEOUT - time.time()
-                if tick > 0:
-                    # wait POLL_TIMEOUT at most (robust against time shifts)
-                    time.sleep(min(tick, self.POLL_TIMEOUT))
+                time.sleep(self.POLL_TIMEOUT)
             except KeyboardInterrupt as exc:
                 self.LOG.info("Termination request received (%s)" % exc)
                 break
