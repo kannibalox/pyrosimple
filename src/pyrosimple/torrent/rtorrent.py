@@ -812,7 +812,7 @@ class RtorrentEngine(engine.TorrentEngine):
         """Get list of download items.
 
         @param view: Name of the view.
-        @param prefetch: OPtional list of field names to fetch initially.
+        @param prefetch: Optional list of field names to fetch initially.
         @param cache: Cache items for the given view?
         """
         # TODO: Cache should be by hash.
@@ -843,7 +843,7 @@ class RtorrentEngine(engine.TorrentEngine):
             try:
                 # Prepare multi-call arguments
                 args = [
-                    "d.%s%s" % ("" if field.startswith("is_") else "get_", field)
+                    "d.%s%s" % ("" if field.startswith("is_") else "", field)
                     for field in prefetch
                 ]
 
