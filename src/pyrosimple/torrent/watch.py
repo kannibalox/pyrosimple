@@ -23,6 +23,7 @@
 import time
 import logging
 import asyncore
+from pathlib import Path
 
 from pyrosimple.util.parts import Bunch
 from pyrosimple import error
@@ -376,6 +377,9 @@ class TreeWatch(object):
 
         # XXX: Add a check that the notifier is working, by creating / deleting a file
         # XXX: Also check for unhandled files
+        for path in self.config.path:
+            for filepath in Path(path).glob('*.torrent'):
+                MetafileHandler(self, filepath).handle()
 
         # TODO: XXX: Especially on startup, we need to walk the directory tree
         #    and check for files not loaded (by checking hashes)!
