@@ -18,6 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import sys
 import time
 import shlex
 import signal
@@ -65,6 +66,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "--fg",
             help="Don't fork into background (stay in foreground and log to console)",
         )
+        self.add_value_option("--run-once", "JOB", help="run the specified job once in the foreground")
         self.add_bool_option("--stop", help="Stop running daemon")
         self.add_bool_option(
             "--restart", help="Stop running daemon, then fork into background"
@@ -243,6 +245,13 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.LOG.debug(str(exc))
             self.return_code = error.EX_TEMPFAIL
             return
+
+        # Check if we only need to run once
+        if self.options.run_once:
+            params = self.jobs[self.options.run_once]
+            params.handler2 = params.handler(params)
+            params.handler2.run()
+            sys.exit(0)
 
         # Detach, if not disabled via option
         if (
