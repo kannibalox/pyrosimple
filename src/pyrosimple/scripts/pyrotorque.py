@@ -88,6 +88,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for param in shlex.split(str(schedule)):  # do not feed unicode to shlex
             try:
                 key, val = param.split("=", 1)
+                if key == 'jitter':
+                    val = int(val)
             except (TypeError, ValueError):
                 self.fatal("Bad param '%s' in job schedule '%s'" % (param, schedule))
             else:
