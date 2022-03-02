@@ -95,6 +95,8 @@ class MetafileHandler(object):
             self.job.LOG.warn(
                 "Item #%s '%s' already added to client" % (self.ns.info_hash, name)
             )
+            if self.job.config.remove_already_added:
+                Path(self.ns.pathname).unlink()
             return
 
         return True
