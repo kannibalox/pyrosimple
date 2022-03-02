@@ -379,7 +379,7 @@ class TreeWatch(object):
         # XXX: Also check for unhandled files
         if self.config.check_unhandled:
             for path in self.config.path:
-                for filepath in Path(path).glob('*.torrent'):
+                for filepath in Path(path).rglob('**/*.torrent'):
                     MetafileHandler(self, filepath).handle()
                     if self.config.remove_unhandled and filepath.exists():
                         filepath.unlink()

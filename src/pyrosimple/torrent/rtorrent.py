@@ -797,7 +797,7 @@ class RtorrentEngine(engine.TorrentEngine):
         """
         commands = tuple("d.{}=".format(x) for x in fields)
         result_type = namedtuple("DownloadItem", [x.replace(".", "_") for x in fields])
-        items = self.open().d.multicall(viewname, *commands)
+        items = self.open().d.multicall2('', viewname, *commands)
         return [result_type(*x) for x in items]
 
     def log(self, msg):
@@ -864,8 +864,8 @@ class RtorrentEngine(engine.TorrentEngine):
                     ]
                     raw_items = [[i[0] for i in multi_call(args)]]
                 else:
-                    multi_call = self.open().d.multicall
-                    args = [view.viewname] + [
+                    multi_call = self.open().d.multicall2
+                    args = ['', view.viewname] + [
                         field if "=" in field else field + "=" for field in args
                     ]
                     if view.matcher and int(config.fast_query):
@@ -875,6 +875,7 @@ class RtorrentEngine(engine.TorrentEngine):
                         self.LOG.info("!!! pre-filter: {}".format(pre_filter or "N/A"))
                         if pre_filter:
                             multi_call = self.open().d.multicall.filtered
+                            del args[0]
                             args.insert(1, pre_filter)
                     raw_items = multi_call(*tuple(args))
 
