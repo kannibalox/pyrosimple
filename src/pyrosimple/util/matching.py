@@ -27,8 +27,6 @@ import operator
 from pyrosimple import error, config
 from pyrosimple.util import fmt, pymagic
 
-log = pymagic.get_lazy_logger(__name__)
-
 TRUE = set(
     (
         "true",
