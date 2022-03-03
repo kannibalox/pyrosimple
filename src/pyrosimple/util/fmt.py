@@ -26,7 +26,7 @@ from pprint import pformat
 log = logging.getLogger(__name__)
 
 
-def human_size(size):
+def human_size(size: int) -> str:
     """Return a human-readable representation of a byte size.
 
     @param size: Number of bytes as an integer or string.
@@ -40,15 +40,17 @@ def human_size(size):
 
     if size < 1024:
         return "%4d bytes" % size
-    for unit in ("KiB", "MiB", "GiB"):
-        size /= 1024.0
-        if size < 1024:
-            return "%6.1f %s" % (size, unit)
 
-    return "%6.1f GiB" % size
+    rem = float(size)
+    for unit in ("KiB", "MiB", "GiB", "TiB"):
+        rem /= 1024.0
+        if rem < 1024:
+            return "%6.1f %s" % (rem, unit)
+
+    return "%6.1f TiB" % rem
 
 
-def iso_datetime(timestamp=None):
+def iso_datetime(timestamp=None) -> str:
     """Convert UNIX timestamp to ISO datetime string.
 
     @param timestamp: UNIX epoch value (default: the current time).
@@ -59,7 +61,7 @@ def iso_datetime(timestamp=None):
     return datetime.datetime.fromtimestamp(timestamp).isoformat(" ")[:19]
 
 
-def iso_datetime_optional(timestamp):
+def iso_datetime_optional(timestamp) -> str:
     """Convert UNIX timestamp to ISO datetime string, or "never".
 
     @param timestamp: UNIX epoch value.
@@ -70,7 +72,7 @@ def iso_datetime_optional(timestamp):
     return "never"
 
 
-def human_duration(time1, time2=None, precision=0, short=False):
+def human_duration(time1, time2=None, precision=0, short=False) -> str:
     """Return a human-readable representation of a time delta.
 
     @param time1: Relative time value.
@@ -188,7 +190,7 @@ def to_utf8(text):
                 return text  # Use as-is and hope the best
 
 
-def to_console(text):
+def to_console(text) -> bytes:
     """Return a byte string intended for console output."""
     if isinstance(text, bytes):
         # For now, leave byte strings as-is (ignoring possible display problems)
@@ -214,7 +216,7 @@ def convert_strings_in_iter(obj):
     return obj
 
 
-def xmlrpc_result_to_string(result, pretty=False):
+def xmlrpc_result_to_string(result, pretty=False) -> str:
     result = convert_strings_in_iter(result)
 
     if pretty:

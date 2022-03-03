@@ -95,10 +95,10 @@ class RTorrentMethod(object):
         `flatten=True` removes one nesting level in a result list (useful for multicalls).
         """
         self._proxy._requests += 1
-        start = time.time()
-        raw_xml = kwargs.get("raw_xml", False)
-        flatten = kwargs.get("flatten", False)
-        fail_silently = kwargs.get("fail_silently", False)
+        start: float = time.time()
+        raw_xml: bool = kwargs.get("raw_xml", False)
+        flatten: bool = kwargs.get("flatten", False)
+        fail_silently: bool = kwargs.get("fail_silently", False)
 
         try:
             # Map multicall arguments
