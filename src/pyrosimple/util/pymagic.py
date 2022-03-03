@@ -23,8 +23,6 @@ import json
 import logging
 import pkg_resources
 
-from pyrosimple.util.proxies import LazyProxy
-
 
 # Create aliases to make pydev / pylint happy
 resource_isdir = (
