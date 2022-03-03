@@ -24,7 +24,7 @@ import unittest
 from pyrosimple.torrent import formatting
 
 log = logging.getLogger(__name__)
-log.trace("module loaded")
+log.debug("module loaded")
 
 
 class FormattingTest(unittest.TestCase):

@@ -24,7 +24,7 @@ import unittest
 from pyrosimple import config
 
 log = logging.getLogger(__name__)
-log.trace("module loaded")
+log.debug("module loaded")
 
 
 class ConfigTest(unittest.TestCase):

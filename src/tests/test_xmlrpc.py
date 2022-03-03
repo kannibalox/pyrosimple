@@ -24,7 +24,7 @@ import unittest
 from pyrosimple.util import xmlrpc
 
 log = logging.getLogger(__name__)
-log.trace("module loaded")
+log.debug("module loaded")
 
 
 class XmlRpcTest(unittest.TestCase):

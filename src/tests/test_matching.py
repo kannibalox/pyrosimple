@@ -24,11 +24,11 @@ import unittest
 
 import six
 
-from pyrobase.parts import Bunch
+from pyrosimple.util.parts import Bunch
 from pyrosimple.util import matching
 
 log = logging.getLogger(__name__)
-log.trace("module loaded")
+log.debug("module loaded")
 
 
 def lookup(name):

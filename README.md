@@ -21,4 +21,3 @@ tl;dr I want to move fast and break things.
   - Use external lib for bencode
 - Only supports python 3 and rtorrent 0.9.8
 - `lstor --raw` prints json
-- No testing because I like to live on the edge

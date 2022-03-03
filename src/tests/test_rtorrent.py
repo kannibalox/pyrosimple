@@ -24,7 +24,7 @@ import unittest
 from pyrosimple.torrent import rtorrent
 
 log = logging.getLogger(__name__)
-log.trace("module loaded")
+log.debug("module loaded")
 
 
 class RTorrentTest(unittest.TestCase):

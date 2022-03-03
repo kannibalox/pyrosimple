@@ -25,12 +25,13 @@ import unittest
 import copy
 import operator
 from functools import reduce  # forward compatibility for Python 3
+from pathlib import Path
 
 from pyrosimple.util.metafile import * #@UnusedWildImport
-from pyrobase.bencode import bread
+import bencode
 
 log = logging.getLogger(__name__)
-log.trace("module loaded")
+log.debug("module loaded")
 
 # helper methods to make tests easier to write
 def get_from_dict(data_dict, map_list):
@@ -89,9 +90,10 @@ class CheckMetaTest(unittest.TestCase):
             {'announce', 3},
         ]
         for testcase in bad_dicts:
-            self.failUnlessRaises(ValueError, check_meta, testcase)
+            self.assertRaises(ValueError, check_meta, testcase)
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        good_metainfo = bread(os.path.join(dir_path, 'multi.torrent'))
+        with Path(dir_path, 'multi.torrent').open('rb') as fh:
+            good_metainfo = bencode.decode(fh.read())
         bad_meta_info_data = [
             ([], ['a']),
             (['pieces'], u"test"),
@@ -116,8 +118,7 @@ class CheckMetaTest(unittest.TestCase):
         for key, data in bad_meta_info_data:
             meta = copy.deepcopy(good_metainfo)
             set_in_dict(meta, ['info'] + key, data)
-            print(meta)
-            self.failUnlessRaises(ValueError, check_meta, meta)
+            self.assertRaises(ValueError, check_meta, meta)
 
         self.assertEqual(good_metainfo, check_meta(good_metainfo))
 

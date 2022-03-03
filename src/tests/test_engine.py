@@ -24,7 +24,7 @@ import unittest
 from pyrosimple.torrent import engine
 
 log = logging.getLogger(__name__)
-log.trace("module loaded")
+log.debug("module loaded")
 
 
 class IntervalTest(unittest.TestCase):
