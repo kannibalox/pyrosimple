@@ -199,9 +199,7 @@ class MetafileHandler(object):
             if not self.job.config.quiet:
                 msg = "%s: Loaded '%s' from '%s/'%s%s" % (
                     self.job.__class__.__name__,
-                    fmt.to_utf8(
-                        self.job.proxy.d.name(self.ns.info_hash, fail_silently=True)
-                    ),
+                    self.job.proxy.d.name(self.ns.info_hash, fail_silently=True),
                     os.path.dirname(self.ns.pathname).rstrip(os.sep),
                     " [queued]" if queue_it else "",
                     (" [startable]" if queue_it else " [started]")
