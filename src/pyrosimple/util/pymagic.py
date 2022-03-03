@@ -82,15 +82,6 @@ def get_class_logger(obj):
     return logging.getLogger(obj.__class__.__module__ + "." + obj.__class__.__name__)
 
 
-def get_lazy_logger(name):
-    """Return a logger proxy that is lazily initialized.
-
-    This avoids the problems associated with module-level loggers being created
-    early (on import), *before* the logging system is properly initialized.
-    """
-    return LazyProxy(lambda n=name: logging.getLogger(n))
-
-
 class JSONEncoder(json.JSONEncoder):
     """Custon JSON encoder."""
 

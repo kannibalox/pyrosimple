@@ -21,6 +21,7 @@ import re
 import time
 import shlex
 import fnmatch
+import logging
 import operator
 
 from pyrosimple import error, config
@@ -335,7 +336,7 @@ class PatternFilter(FieldFilter):
         val = (getattr(item, self._name) or "").lower()
         result = self._matcher(val) if self._is_regex else self._matcher(val, item)
         if 0:
-            log.debug(
+            logging.getLogger(__name__).debug(
                 "%r for %r ~ %r, name %r, item %r"
                 % (result, val, self._value, self._name, item)
             )

@@ -21,6 +21,7 @@
 import re
 import sys
 import json
+import logging
 import operator
 
 from pyrosimple.util import templating
@@ -29,9 +30,6 @@ from pyrosimple.util.parts import Bunch
 from pyrosimple import error, config
 from pyrosimple.torrent import engine
 from pyrosimple.util import os, fmt, algo, pymagic
-
-
-log = pymagic.get_lazy_logger(__name__)
 
 
 #
@@ -388,6 +386,7 @@ def validate_sort_fields(sort_fields):
 
     # Split and validate field list
     sort_fields = validate_field_list(sort_fields, name_filter=sort_order_filter)
+    log = logging.getLogger(__name__)
     log.debug(
         "Sorting order is: %s"
         % ", ".join([("-" if i in descending else "") + i for i in sort_fields])
