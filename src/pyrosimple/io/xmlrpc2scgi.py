@@ -328,10 +328,6 @@ def scgi_request(url, methodname, *params, **kw):
     xmlresp = SCGIRequest(url).send(xmlreq.encode()).decode()
 
     if kw.get("deserialize", True):
-        # This fixes a bug with the Python xmlrpclib module
-        # (has no handler for <i8> in some versions)
-        xmlresp = xmlresp.replace("<i8>", "<i4>").replace("</i8>", "</i4>")
-
         # Return deserialized data
         return xmlrpclib.loads(xmlresp)[0][0]
     else:
