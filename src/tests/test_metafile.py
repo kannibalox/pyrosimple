@@ -91,7 +91,7 @@ class CheckMetaTest(unittest.TestCase):
         ]
         for testcase in bad_dicts:
             self.assertRaises(ValueError, check_meta, testcase)
-        dir_path = os.path.dirname(os.path.realpath(__file__))
+        dir_path = Path(__file__).parent
         with Path(dir_path, 'multi.torrent').open('rb') as fh:
             good_metainfo = bencode.decode(fh.read())
         bad_meta_info_data = [
