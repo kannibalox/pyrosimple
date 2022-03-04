@@ -177,8 +177,7 @@ class RTorrentMethod(object):
                 if not fail_silently:
                     # Dump the bad packet, then re-raise
                     filename = "/tmp/xmlrpc2scgi-%s.xml" % os.getuid()
-                    handle = open(filename, "wb")
-                    try:
+                    with open(filename, "wb") as handle:
                         handle.write(b"REQUEST\n")
                         handle.write(xmlreq)
                         handle.write(b"\nRESPONSE\n")
@@ -187,8 +186,6 @@ class RTorrentMethod(object):
                             "INFO: Bad data packets written to %r" % filename,
                             file=sys.stderr,
                         )
-                    finally:
-                        handle.close()
                 raise
             else:
                 try:

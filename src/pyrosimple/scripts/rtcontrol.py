@@ -531,7 +531,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # For a header, use configured escape codes on a terminal
         if item is None and os.isatty(sys.stdout.fileno()):
             item_text = b"".join(
-                (config.output_header_ecma48.encode(), item_text, b"\x1B[0m")
+                (config.output_header_ecma48, item_text, b"\x1B[0m")
             )
 
         # Set up stdout for writing
@@ -646,7 +646,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         def dupes_in_matches():
             """Generator for index of matches that are dupes."""
             items_by_path = config.engine.group_by("realpath")
-            hashes = set([x.hash for x in matches])
+            hashes = {x.hash for x in matches}
             for idx, item in enumerate(matches):
                 same_path_but_not_in_matches = any(
                     x.hash not in hashes for x in items_by_path.get(item.realpath, [])
@@ -656,7 +656,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         if mode == "dupes+":
             items_by_path = config.engine.group_by("realpath")
-            hashes = set([x.hash for x in matches])
+            hashes = {x.hash for x in matches}
             dupes = []
             for item in matches:
                 if item.realpath:
@@ -682,7 +682,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 changed = True
                 matches[:] = dupes
         elif mode == "invert":
-            hashes = set([x.hash for x in matches])
+            hashes = {x.hash for x in matches}
             changed = True
             matches[:] = list(i for i in orig_matches if i.hash not in hashes)
         elif mode == "unique":
@@ -927,10 +927,8 @@ class RtorrentControl(ScriptBaseWithConfig):
                     self.emit(item, defaults, to_log=self.options.cron)
 
                 args = tuple(
-                    [
-                        output_formatter(i, namespace=dict(item=item))
-                        for i in template_args
-                    ]
+                    output_formatter(i, namespace=dict(item=item))
+                    for i in template_args
                 )
 
                 if self.options.dry_run:

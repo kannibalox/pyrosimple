@@ -297,9 +297,7 @@ def assign_fields(meta, assignments):
                 # Create missing dicts as we go...
                 namespace = namespace.setdefault(fmt.to_utf8(key), {})
         except (KeyError, IndexError, TypeError, ValueError) as exc:
-            if self.options.debug:
-                raise
-            raise error.UserError("Bad assignment %r (%s)!" % (assignment, exc))
+            raise error.UserError("Bad assignment %r (%s)!" % (assignment, exc)) from exc
         else:
             if val is None:
                 del namespace[fmt.to_utf8(keypath[-1])]
@@ -679,10 +677,10 @@ class Metafile(object):
                         tracker_url
                     )
                     tracker_url = tracker_url[0]
-            except (KeyError, IndexError):
+            except (KeyError, IndexError) as exc:
                 raise error.UserError(
                     "Bad tracker URL %r, or unknown alias!" % (tracker_url,)
-                )
+                ) from exc
 
             # Determine metafile name
             output_name = self.filename
