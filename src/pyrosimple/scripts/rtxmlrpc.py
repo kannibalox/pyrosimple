@@ -23,9 +23,11 @@ import os
 import re
 import sys
 import glob
+import json
 import logging
 import tempfile
 import textwrap
+from pprint import pformat
 
 try:
     import requests
@@ -48,7 +50,7 @@ def read_blob(arg):
     if arg == "@-":
         result = sys.stdin.read()
     elif any(
-        arg.startswith("@{}://".format(x)) for x in {"http", "https", "ftp", "file"}
+        arg.startswith("@{}://".format(x)) for x in ["http", "https", "ftp", "file"]
     ):
         if not requests:
             raise error.UserError(
@@ -95,8 +97,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         super().add_options()
 
         # basic options
-        self.add_bool_option("-r", "--repr", help="show Python pretty-printed response")
-        self.add_bool_option("-x", "--xml", help="show XML response")
+        self.parser.add_argument("-o", "--output-format", default="pretty", choices=["pretty", "xml", "repr", "json"], help="Output format to use. Defaults to 'pretty'")
         self.add_bool_option(
             "-i",
             "--as-import",
@@ -155,7 +156,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def execute(self, proxy, method, args):
         """Execute given XMLRPC call."""
         try:
-            result = getattr(proxy, method)(raw_xml=self.options.xml, *tuple(args))
+            raw = (self.options.output_format == "xml")
+            result = getattr(proxy, method)(raw_xml=raw, *tuple(args))
         except xmlrpc.ERRORS as exc:
             self.LOG.error(
                 "While calling %s(%s): %s"
@@ -168,9 +170,13 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             )
         else:
             if not self.options.quiet:
-                result = fmt.xmlrpc_result_to_string(result, pretty=self.options.repr)
-                output = getattr(sys.stdout, "buffer", sys.stdout)
-                output.write(fmt.to_console(result) + b"\n")
+                if self.options.output_format == "repr":
+                    result = pformat(result)
+                elif self.options.output_format == "json":
+                    result = json.dumps(result)
+                else:
+                    result = fmt.xmlrpc_result_to_string(result)
+                print(result)
 
     def repl_usage(self):
         """Print a short REPL usage summary."""
@@ -199,7 +205,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
         self.options.quiet = False
         proxy = self.open()
-        ps1 = proxy.session.name() + u"> "
+        ps1 = proxy.session.name() + "> "
         words = ["help", "stats", "exit"]
         words += [x + "=" for x in proxy.system.listMethods()]
         history_file = os.path.join(config.config_dir, ".rtxmlrpc_history")
@@ -388,11 +394,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
         # Enter REPL if no args
         if len(self.args) < 1:
-            return self.do_repl()
+            self.do_repl()
+            return
 
         # Check for bad options
-        if self.options.repr and self.options.xml:
-            self.parser.error("You cannot combine --repr and --xml!")
         if sum([self.options.as_import, self.options.session]) > 1:
             self.parser.error("You cannot combine -i and --session!")
 

@@ -201,11 +201,7 @@ def to_console(text) -> bytes:
 
 
 def convert_strings_in_iter(obj):
-    # Unicode will get pformatted with a 'u' prefix on 2
-    if False and isinstance(obj, unicode):
-        obj = obj.encode("utf8")
-    # Bytes will get pformatted with a 'b' prefix on 3
-    elif not False and isinstance(obj, bytes):
+    if isinstance(obj, bytes):
         obj = obj.decode()
     elif isinstance(obj, dict):
         for k, v in obj.items():
@@ -216,13 +212,12 @@ def convert_strings_in_iter(obj):
     return obj
 
 
-def xmlrpc_result_to_string(result, pretty=False) -> str:
+def xmlrpc_result_to_string(result) -> str:
     result = convert_strings_in_iter(result)
 
-    if pretty:
-        # Pretty-print if requested, or it's a collection and not a scalar
-        return pformat(result)
-    elif isinstance(result, str) or isinstance(result, bytes):
+    if isinstance(result, str):
+        return result
+    elif isinstance(result, bytes):
         return to_unicode(result)
     elif hasattr(result, "__iter__"):
         return "\n".join(i if isinstance(i, str) else pformat(i) for i in result)
