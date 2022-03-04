@@ -29,8 +29,8 @@ import sys
 import time
 import urllib
 
-from pathlib import PurePath, Path
-from typing import List, Union, Optional
+from pathlib import Path, PurePath
+from typing import List, Optional, Union
 
 import bencode
 

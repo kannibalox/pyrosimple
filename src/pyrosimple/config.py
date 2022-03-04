@@ -20,7 +20,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from typing import Dict, Any, List
+import urllib
+
+from typing import Any, Dict, List
 
 from pyrosimple.util.parts import Bunch
 
@@ -36,7 +38,6 @@ def lookup_announce_alias(name):
 
 def map_announce2alias(url):
     """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
-    import urllib
 
     # Try to find an exact alias URL match and return its label
     for alias, urls in announce.items():

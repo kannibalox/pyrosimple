@@ -18,16 +18,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from pyrosimple import error
+from pyrosimple import config, error
 from pyrosimple.util import pymagic, xmlrpc
 
 
 class FilterJobBase:
     """Base class for filter rule jobs."""
 
-    def __init__(self, config=None):
+    def __init__(self, filter_config=None):
         """Set up filter config."""
-        self.config = config or {}
+        self.config = filter_config or {}
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug(
             "%s created with config %r", self.__class__.__name__, self.config
@@ -35,7 +35,6 @@ class FilterJobBase:
 
     def run(self):
         """Filter job callback."""
-        from pyrosimple import config
 
         try:
             config.engine.open()

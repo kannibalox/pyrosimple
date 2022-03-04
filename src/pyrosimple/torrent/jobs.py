@@ -54,7 +54,7 @@ def module_test():
 
     python -m pyrosimple.torrent.jobs
     """
-    from pyrosimple import connect
+    from pyrosimple import connect  # pylint: disable=import-outside-toplevel
 
     try:
         engine = connect()

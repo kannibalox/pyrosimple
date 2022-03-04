@@ -18,8 +18,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import hashlib
 import random
 import re
+
 from urllib.parse import parse_qs
 
 import bencode
@@ -109,8 +111,6 @@ class MetafileCreator(ScriptBaseWithConfig):
 
     def make_magnet_meta(self, magnet_uri):
         """Create a magnet-uri torrent."""
-        import cgi
-        import hashlib
 
         if magnet_uri.startswith("magnet:"):
             magnet_uri = magnet_uri[7:]

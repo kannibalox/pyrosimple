@@ -81,11 +81,13 @@ def preparse(template_text, lookup=None):
         template = template_text
     else:
         if template_text.startswith("{{"):
+            # pylint: disable=import-outside-toplevel
             import tempita  # only on demand
 
             template = tempita.Template(template_text, name=template_path)
             template.__engine__ = "tempita"
         elif template_text.startswith("{#"):
+            # pylint: disable=import-outside-toplevel
             from jinja2 import Template
 
             template = Template(template_text)

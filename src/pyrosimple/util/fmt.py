@@ -22,8 +22,8 @@ import logging
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import time
 
-from typing import Union, Optional
 from pprint import pformat
+from typing import Optional
 
 
 log = logging.getLogger(__name__)

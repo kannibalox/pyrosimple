@@ -20,6 +20,7 @@
 
 
 import errno
+import importlib.metadata
 import logging.config
 import random
 import sys
@@ -83,7 +84,6 @@ class ScriptBase:
         self.return_code = 0
 
         try:
-            import importlib.metadata
 
             self.__version__ = importlib.metadata.version("pyrosimple")
         except ImportError:

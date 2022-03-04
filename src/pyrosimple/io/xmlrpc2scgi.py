@@ -26,8 +26,7 @@ import socket
 import subprocess
 import time
 
-from typing import Generator, Tuple, Union, Dict, List
-
+from typing import Dict, Generator, List, Tuple, Union
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib

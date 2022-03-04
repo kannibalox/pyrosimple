@@ -24,7 +24,7 @@ import operator
 import re
 import sys
 
-from typing import Optional, Dict, Any, Union
+from typing import Any, Dict, Optional, Union
 
 import tempita
 

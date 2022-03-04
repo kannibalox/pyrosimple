@@ -25,6 +25,7 @@ import shlex
 import time
 
 from pyrosimple import config, error
+from pyrosimple.torrent import formatting
 
 
 TRUE = {
@@ -276,7 +277,6 @@ class PatternFilter(FieldFilter):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        from pyrosimple.torrent import formatting
 
         super().validate()
         self._value = self._value.lower()

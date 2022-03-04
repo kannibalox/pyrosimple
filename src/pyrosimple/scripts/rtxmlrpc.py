@@ -208,10 +208,15 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
     def do_repl(self):
         """REPL for rTorrent XMLRPC commands."""
-        from prompt_toolkit import prompt
-        from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-        from prompt_toolkit.completion import WordCompleter
-        from prompt_toolkit.history import FileHistory
+        # pylint: disable=import-outside-toplevel
+        try:
+            from prompt_toolkit import prompt
+            from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+            from prompt_toolkit.completion import WordCompleter
+            from prompt_toolkit.history import FileHistory
+        except ImportError:
+            self.LOG.critical("prompt_toolkit must be installed to use the REPL!")
+            raise
 
         self.options.quiet = False
         proxy = self.open()
