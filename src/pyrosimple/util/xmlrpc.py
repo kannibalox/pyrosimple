@@ -59,7 +59,7 @@ class HashNotFound(XmlRpcError):
 ERRORS = (XmlRpcError,) + xmlrpc2scgi.ERRORS
 
 
-class RTorrentMethod(object):
+class RTorrentMethod():
     """Collect attribute accesses to build the final method name."""
 
     # Actually, many more methods might need a fake target added; but these are the ones we call...
@@ -73,6 +73,10 @@ class RTorrentMethod(object):
     def __init__(self, proxy, method_name):
         self._proxy = proxy
         self._method_name = method_name
+        self._outbound: int = 0
+        self._inbound: int = 0
+        self._net_latency: int = 0
+        self._latency: int = 0
 
     def __getattr__(self, attr):
         """Append attr to the existing method name."""
@@ -150,10 +154,6 @@ class RTorrentMethod(object):
             if raw_xml:
                 return xmlresp
 
-            # This fixes a bug with the Python xmlrpclib module
-            # (has no handler for <i8> in some versions)
-            xmlresp = xmlresp.replace("<i8>", "<i4>").replace("</i8>", "</i4>")
-
             try:
                 # Deserialize data
                 result = xmlrpclib.loads(xmlresp.encode("utf-8"))[0][0]
@@ -167,12 +167,13 @@ class RTorrentMethod(object):
                     and exc.faultCode == -501
                     and exc.faultString == "Could not find info-hash."
                 ):
+                    # pylint: disable=raise-missing-from
                     raise HashNotFound(
-                        "Unknown hash for {}({}) @ {}",
+                        "Unknown hash for {}({}) @ {}".format(
                         self._method_name,
                         args[0] if args else "",
                         self._proxy._url,
-                    )
+                    ))
 
                 if not fail_silently:
                     # Dump the bad packet, then re-raise
@@ -190,7 +191,7 @@ class RTorrentMethod(object):
             else:
                 try:
                     return sum(result, []) if flatten else result
-                except TypeError:
+                except TypeError as exc:
                     if (
                         result
                         and isinstance(result, list)
@@ -199,9 +200,8 @@ class RTorrentMethod(object):
                     ):
                         raise error.LoggableError(
                             "XMLRPC error in multicall: " + repr(result[0])
-                        )
-                    else:
-                        raise
+                        ) from exc
+                    raise
         finally:
             # Calculate latency
             self._latency = time.time() - start
@@ -231,7 +231,7 @@ class RTorrentProxy(object):
         try:
             self._transport = xmlrpc2scgi.transport_from_url(self._url)
         except socket.gaierror as exc:
-            raise XmlRpcError("Bad XMLRPC URL {0}: {1}", self._url, exc)
+            raise XmlRpcError("Bad XMLRPC URL {0}: {1}".format(self._url, exc)) from exc
         self._versions = ("", "")
         self._version_info = ()
         self._use_deprecated = True

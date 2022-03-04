@@ -36,8 +36,7 @@ def flatten(nested, containers=(list, tuple)):
                 # inspect new 'i'th element in outer loop
                 i -= 1
                 break
-            else:
-                flat[i : i + 1] = flat[i]
+            flat[i : i + 1] = flat[i]
 
         # 'i'th element is scalar, proceed
         i += 1
@@ -45,7 +44,7 @@ def flatten(nested, containers=(list, tuple)):
     return flat
 
 
-class AttributeMapping(object):
+class AttributeMapping():
     """Wrap an object's dict so that it can be accessed by the mapping protocol."""
 
     def __init__(self, obj, defaults=None):
@@ -68,4 +67,4 @@ class AttributeMapping(object):
             try:
                 return self.defaults[key]
             except KeyError:
-                raise AttributeError("%s for %r.%s" % (exc, self.obj, key))
+                raise AttributeError("%s for %r.%s" % (exc, self.obj, key)) from exc
