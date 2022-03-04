@@ -11,6 +11,7 @@ class Bunch(dict):
             try:
                 return self[name]
             except KeyError:
+                # pylint: disable=raise-missing-from
                 raise AttributeError(
                     "Bunch has no attribute %r in %s"
                     % (name, ", ".join([repr(i) for i in self.keys()]))

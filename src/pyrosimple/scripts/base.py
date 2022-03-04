@@ -32,7 +32,7 @@ from pyrosimple import config, error
 from pyrosimple.util import load_config, os, pymagic
 
 
-class ScriptBase(object):
+class ScriptBase:
     """Base class for command line interfaces."""
 
     # logging configuration
@@ -285,7 +285,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
 
     def add_options(self):
         """Add configuration options."""
-        super(ScriptBaseWithConfig, self).add_options()
+        super().add_options()
 
         self.add_value_option(
             "--config-dir",
@@ -313,7 +313,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
 
     def get_options(self):
         """Get program options."""
-        super(ScriptBaseWithConfig, self).get_options()
+        super().get_options()
 
         self.config_dir = os.path.abspath(
             os.path.expanduser(
@@ -350,7 +350,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
                 break
 
 
-class PromptDecorator(object):
+class PromptDecorator:
     """Decorator for interactive commands."""
 
     # Return code for Q)uit choice

@@ -183,11 +183,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 break
             else:
                 # Idle work
-                # self.LOG.warn("IDLE %s %r" % (self.options.guard_file, os.path.exists(self.options.guard_file)))
+                # self.LOG.warning("IDLE %s %r" % (self.options.guard_file, os.path.exists(self.options.guard_file)))
                 if self.options.guard_file and not os.path.exists(
                     self.options.guard_file
                 ):
-                    self.LOG.warn(
+                    self.LOG.warning(
                         "Guard file '%s' disappeared, exiting!", self.options.guard_file
                     )
                     break

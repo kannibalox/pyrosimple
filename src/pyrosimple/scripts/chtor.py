@@ -236,7 +236,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                 try:
                     metafile.check_meta(metainfo)
                 except ValueError as exc:
-                    self.LOG.warn(
+                    self.LOG.warning(
                         "Metafile %r failed integrity check: %s"
                         % (
                             filename,
@@ -250,7 +250,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                 if filter_url_prefix and not metainfo["announce"].startswith(
                     filter_url_prefix
                 ):
-                    self.LOG.warn(
+                    self.LOG.warning(
                         "Skipping metafile %r no tracked by %r!"
                         % (
                             filename,
@@ -300,7 +300,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                         metainfo.setdefault("libtorrent_resume", {})
                         metainfo["libtorrent_resume"].update(libtorrent_resume)
                     else:
-                        self.LOG.warn("No resume information found!")
+                        self.LOG.warning("No resume information found!")
 
                 # Clean rTorrent data?
                 if self.options.clean_rtorrent:
@@ -409,7 +409,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                 % ("Would've changed" if self.options.dry_run else "Changed", changed)
             )
         if bad:
-            self.LOG.warn("Skipped %d bad metafile(s)!" % (bad))
+            self.LOG.warning("Skipped %d bad metafile(s)!" % (bad))
 
 
 def run():  # pragma: no cover

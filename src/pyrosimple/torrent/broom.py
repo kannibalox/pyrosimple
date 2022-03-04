@@ -37,7 +37,7 @@ def parse_cond(text):
     return matching.ConditionParser(engine.FieldDefinition.lookup, "name").parse(text)
 
 
-class DiskSpaceManager(object):
+class DiskSpaceManager:
     """Core implementation of ``rtsweep``."""
 
     def __init__(self, config=None, rulesets=None):
@@ -57,12 +57,12 @@ class DiskSpaceManager(object):
             section_name = "sweep_rules_" + ruleset.lower()
             try:
                 ruledefs = getattr(self.config, section_name)
-            except AttributeError:
+            except AttributeError as exc:
                 raise error.UserError(
                     "There is no [{}] section in your configuration".format(
                         section_name.upper()
                     )
-                )
+                ) from exc
             for ruledef, filtercond in ruledefs.items():
                 if ruledef.endswith(".filter"):
                     rulename = ruledef.rsplit(".", 1)[0]

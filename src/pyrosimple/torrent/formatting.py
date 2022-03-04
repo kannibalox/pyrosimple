@@ -135,7 +135,7 @@ class OutputMapping(algo.AttributeMapping):
         @param defaults: default values
         @type defaults: dict
         """
-        super(OutputMapping, self).__init__(obj, defaults)
+        super().__init__(obj, defaults)
 
         # add percent sign so we can easily reference it in .ini files
         # (a better way is to use "%%%%" though, so regard this as deprecated)
@@ -164,6 +164,7 @@ class OutputMapping(algo.AttributeMapping):
                 try:
                     fmtfunc = globals()["fmt_" + fmtname]
                 except KeyError:
+                    # pylint: disable=raise-missing-from
                     raise error.UserError(
                         "Unknown formatting spec %r for %r" % (fmtname, key)
                     )
@@ -177,12 +178,12 @@ class OutputMapping(algo.AttributeMapping):
         # Check for a field formatter
         try:
             field = engine.FieldDefinition.FIELDS[key]
-        except KeyError:
+        except KeyError as exc:
             if (
                 key not in self.defaults
                 and not engine.TorrentProxy.add_manifold_attribute(key)
             ):
-                raise error.UserError("Unknown field %r" % (key,))
+                raise error.UserError("Unknown field %r" % (key,)) from exc
         else:
             if field._formatter and not have_raw:
                 formatter = (
@@ -196,7 +197,7 @@ class OutputMapping(algo.AttributeMapping):
             return "%" if key == "pc" else key.upper()
         else:
             # Return formatted value
-            val = super(OutputMapping, self).__getitem__(key)
+            val = super().__getitem__(key)
             try:
                 return formatter(val) if formatter else val
             except (TypeError, ValueError, KeyError, IndexError, AttributeError) as exc:
@@ -317,8 +318,6 @@ def format_item(format_spec, item, defaults=None):
     elif template_engine == "jinja2" or (
         not template_engine and format_spec.startswith("{#")
     ):
-        from jinja2 import Template
-
         return format_spec.render(d=item)
     else:
         # Interpolation
@@ -401,10 +400,10 @@ def validate_sort_fields(sort_fields):
         return operator.attrgetter(*tuple(sort_fields))
 
     # Need to provide complex key
-    class Key(object):
+    class Key:
         "Complex sort order key"
 
-        def __init__(self, obj, *args):
+        def __init__(self, obj, *_):
             "Remember object to be compared"
             self.obj = obj
 

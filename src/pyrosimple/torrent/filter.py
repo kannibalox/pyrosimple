@@ -22,7 +22,7 @@ from pyrosimple import error
 from pyrosimple.util import pymagic, xmlrpc
 
 
-class FilterJobBase(object):
+class FilterJobBase:
     """Base class for filter rule jobs."""
 
     def __init__(self, config=None):
@@ -43,7 +43,7 @@ class FilterJobBase(object):
             items = []
             self.run_filter(items)
         except (error.LoggableError, xmlrpc.ERRORS) as exc:
-            self.LOG.warn(str(exc))
+            self.LOG.warning(str(exc))
 
     def run_filter(self, items):
         """Perform job on filtered items."""

@@ -82,7 +82,7 @@ def print_help_fields():
     )
 
 
-class FieldStatistics(object):
+class FieldStatistics:
     """Collect statistical values for the fields of a search result."""
 
     def __init__(self, size):

@@ -523,9 +523,9 @@ class TimeFilter(NumericFilterBase):
                 timestamp = float(self._value)
             except (ValueError, TypeError) as exc:
                 raise FilterError(
-                    "Bad timestamp value %r in %r (%s)"
-                    % (self._value, self._condition, exc)
-                )
+                    "Bad timestamp value %r in %r"
+                    % (self._value, self._condition)
+                ) from exc
         else:
             # Something human readable
             delta = self.TIMEDELTA_RE.match(self._value)
@@ -728,6 +728,7 @@ class ConditionParser:
             try:
                 name, values = condition.split("=", 1)
             except ValueError:
+                #  pylint: disable=raise-missing-from
                 if self.default_field:
                     name, values = self.default_field, condition
                 else:

@@ -109,7 +109,7 @@ class MaskingPrettyPrinter(pprint.PrettyPrinter):
 
     def format(
         self, obj, context, maxlevels, level
-    ):  # pylint: disable=arguments-differ
+    ):  # pylint: disable=arguments-renamed
         """Mask obj if it looks like an URL, then pass it to the super class."""
         if isinstance(obj, str) and "://" in fmt.to_unicode(obj):
             obj = mask_keys(obj)
@@ -540,14 +540,14 @@ class Metafile:
                 while fileoffset < filesize:
                     # Read rest of piece or file, whatever is smaller
                     chunk = handle.read(min(filesize - fileoffset, piece_size - done))
-                    sha1sum.update(chunk)  # bogus pylint: disable=E1101
+                    sha1sum.update(chunk)
                     done += len(chunk)
                     fileoffset += len(chunk)
                     totalhashed += len(chunk)
 
                     # Piece is done
                     if done == piece_size:
-                        pieces.append(sha1sum.digest())  # bogus pylint: disable=E1101
+                        pieces.append(sha1sum.digest())
                         if piece_callback:
                             piece_callback(filename, pieces[-1])
 
@@ -561,7 +561,7 @@ class Metafile:
 
         # Add hash of partial last piece
         if done > 0:
-            pieces.append(sha1sum.digest())  # bogus pylint: disable=E1103
+            pieces.append(sha1sum.digest())
             if piece_callback:
                 piece_callback(filename, pieces[-1])
 

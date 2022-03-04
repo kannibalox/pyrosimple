@@ -219,7 +219,7 @@ class RTorrentMethod:
                 )
 
 
-class RTorrentProxy(object):
+class RTorrentProxy:
     """Proxy to rTorrent's XMLRPC interface.
 
     Method calls are built from attribute accesses, i.e. you can do

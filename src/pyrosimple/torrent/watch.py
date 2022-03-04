@@ -36,9 +36,9 @@ from pyrosimple.util.parts import Bunch
 
 try:
     import pyinotify
-except ImportError as exc:
+except ImportError:
     pyinotify = Bunch(
-        WatchManager=None, ProcessEvent=object, _import_error=str(exc)
+        WatchManager=None, ProcessEvent=object
     )  # bogus pylint: disable=C0103
 
 
@@ -283,7 +283,7 @@ class TreeWatchHandler(pyinotify.ProcessEvent):
             self.job.LOG.warning("Unexpected inotify event %r" % event)
 
 
-class TreeWatch(object):
+class TreeWatch:
     """rTorrent folder tree watch via inotify."""
 
     def __init__(self, config=None):
@@ -346,8 +346,8 @@ class TreeWatch(object):
         """
         if not pyinotify.WatchManager:
             raise error.UserError(
-                "You need to install 'pyinotify' to use %s (%s)!"
-                % (self.__class__.__name__, pyinotify._import_error)
+                "You need to install 'pyinotify' to use %s!"
+                % (self.__class__.__name__)
             )  # pylint: disable=E1101, W0212
 
         self.manager = pyinotify.WatchManager()

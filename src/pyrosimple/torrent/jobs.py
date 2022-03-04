@@ -24,7 +24,7 @@ from pyrosimple.util import fmt, pymagic, xmlrpc
 from pyrosimple.util.parts import Bunch
 
 
-class EngineStats(object):
+class EngineStats:
     """rTorrent connection statistics logger."""
 
     def __init__(self, config=None):
@@ -46,7 +46,7 @@ class EngineStats(object):
                 proxy,
             )
         except (error.LoggableError, xmlrpc.ERRORS) as exc:
-            self.LOG.warn(str(exc))
+            self.LOG.warning(str(exc))
 
 
 def module_test():
@@ -54,21 +54,12 @@ def module_test():
 
     python -m pyrosimple.torrent.jobs
     """
-    import pprint
-
     from pyrosimple import connect
 
     try:
         engine = connect()
         print("%s - %s" % (engine.engine_id, engine.open()))
 
-        data, views = _flux_engine_data(engine)
-        print("data = ")
-        pprint.pprint(data)
-        print("views = ")
-        pprint.pprint(views)
-
-        print("%s - %s" % (engine.engine_id, engine.open()))
     except (error.LoggableError, xmlrpc.ERRORS) as torrent_exc:
         print("ERROR: %s" % torrent_exc)
 

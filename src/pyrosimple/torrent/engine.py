@@ -61,7 +61,7 @@ def _duration(start, end):
 
 
 def _interval_split(
-    interval, only=None, context=None, event_re=re.compile("[A-Z][0-9]+")
+    interval, only=None, event_re=re.compile("[A-Z][0-9]+")
 ):
     """Split C{interval} into a series of event type and timestamp tuples.
     An exaple of the input is "R1283008245P1283008268".
@@ -91,7 +91,7 @@ def _interval_split(
     )
 
 
-def _interval_sum(interval, start=None, end=None, context=None):
+def _interval_sum(interval, start=None, end=None):
     """Return sum of intervals between "R"esume and "P"aused events
     in C{interval}, optionally limited by a time window defined
     by C{start} and C{end}. Return ``None`` if there's no sensible
@@ -101,7 +101,7 @@ def _interval_sum(interval, start=None, end=None, context=None):
     e.g. "R1283008245P1283008268".
     """
     end = float(end) if end else time.time()
-    events = _interval_split(interval, context=context)
+    events = _interval_split(interval)
     result = []
     ##import sys; print >>sys.stderr, "!!!!!isum", interval.fetch("custom_activations"), events, start, end
 
@@ -220,7 +220,7 @@ def detect_traits(item):
 #
 # Field Descriptors
 #
-class FieldDefinition(object):
+class FieldDefinition:
     """Download item field."""
 
     FIELDS: Dict[str, Any] = {}
@@ -319,7 +319,7 @@ class MutableField(FieldDefinition):
 #
 # [Somewhat] Generic Engine Interface (abstract base classes)
 #
-class TorrentProxy(object):
+class TorrentProxy:
     """A single download item."""
 
     @classmethod
@@ -345,6 +345,7 @@ class TorrentProxy(object):
             try:
                 return FieldDefinition.FIELDS[name]
             except KeyError:
+                # pylint: disable=raise-missing-from
                 limit = int(name[5:].lstrip("0") or "0", 10)
                 if limit > 100:
                     raise error.UserError("kind_N: N > 100 in %r" % name)
@@ -360,9 +361,11 @@ class TorrentProxy(object):
                 setattr(cls, name, field)
 
                 return field
+        else:
+            return None
 
     @classmethod
-    def add_custom_fields(cls, *args, **kw):
+    def add_custom_fields(cls, *_, **__):
         """Add any custom fields defined in the configuration."""
         for factory in config.custom_field_factories:
             for field in factory():
@@ -682,7 +685,7 @@ class TorrentProxy(object):
         "leechtime",
         "time taken from start to completion",
         matcher=matching.DurationFilter,
-        accessor=lambda o: _interval_sum(o, end=o.completed, context=o.name)
+        accessor=lambda o: _interval_sum(o, end=o.completed)
         or _duration(o.started, o.completed),
         formatter=_fmt_duration,
     )
@@ -699,7 +702,7 @@ class TorrentProxy(object):
         "seedtime",
         "total seeding time after completion",
         matcher=matching.DurationFilter,
-        accessor=lambda o: _interval_sum(o, start=o.completed, context=o.name)
+        accessor=lambda o: _interval_sum(o, start=o.completed)
         if o.is_complete
         else None,
         formatter=_fmt_duration,
@@ -711,7 +714,7 @@ class TorrentProxy(object):
         "stopped",
         "time download was last stopped or paused",
         matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: (_interval_split(o, only="P", context=o.name) + [(0, 0)])[0][
+        accessor=lambda o: (_interval_split(o, only="P") + [(0, 0)])[0][
             1
         ],
         formatter=fmt.iso_datetime_optional,
@@ -765,7 +768,7 @@ class TorrentProxy(object):
     # add .age formatter (age = " 1y 6m", " 2w 6d", "12h30m", etc.)
 
 
-class TorrentView(object):
+class TorrentView:
     """A view on a subset of torrent items."""
 
     def __init__(self, engine, viewname, matcher=None):
@@ -818,7 +821,7 @@ class TorrentView(object):
                 yield item
 
 
-class TorrentEngine(object):
+class TorrentEngine:
     """A torrent backend."""
 
     def __init__(self):

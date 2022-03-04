@@ -58,6 +58,7 @@ def import_name(module_spec, name=None):
         try:
             module_name, name = module_spec.split(":", 1)
         except ValueError:
+            # pylint: disable=raise-missing-from
             raise ValueError(
                 "Missing object specifier in %r (syntax: 'package.module:object.attr')"
                 % (module_spec,)
@@ -66,7 +67,7 @@ def import_name(module_spec, name=None):
     try:
         module = __import__(module_name, globals(), {}, [name])
     except ImportError as exc:
-        raise ImportError("Bad module name in %r (%s)" % (module_spec, exc))
+        raise ImportError("Bad module name in %r (%s)" % (module_spec, exc)) from exc
 
     # Resolve the requested name
     result = module
@@ -91,4 +92,4 @@ class JSONEncoder(json.JSONEncoder):
         elif hasattr(o, "as_dict"):
             return o.as_dict()
         else:
-            return super(JSONEncoder, self).default(o)
+            return super().default(o)

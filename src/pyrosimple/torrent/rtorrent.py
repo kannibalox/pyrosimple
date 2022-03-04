@@ -774,7 +774,7 @@ class RtorrentEngine(engine.TorrentEngine):
 
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
-            self.LOG.warn(
+            self.LOG.warning(
                 "Your xmlrpc-c is broken (64 bit integer support missing,"
                 " %r returned instead)",
                 type(time_usec),

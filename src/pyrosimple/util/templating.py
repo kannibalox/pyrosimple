@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=too-few-public-methods
 """ Templating Helpers.
 
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>
@@ -23,7 +22,7 @@ import os
 from contextlib import closing
 
 
-class InterpolationTemplate(object):
+class InterpolationTemplate:
     """Simple string interpolation."""
 
     def __init__(self, fmt, mapping=None):

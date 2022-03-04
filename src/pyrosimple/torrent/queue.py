@@ -25,7 +25,7 @@ from pyrosimple.torrent import engine, formatting, matching
 from pyrosimple.util import fmt, pymagic, xmlrpc
 
 
-class QueueManager(object):
+class QueueManager:
     """rTorrent queue manager implementation."""
 
     def __init__(self, config=None):
