@@ -113,8 +113,12 @@ class QueueManager(object):
         )
         start_now = min(start_now, len(startable))
 
-        # down_traffic = sum(i.down for i in downloading)
-        ##self.LOG.info("%d downloading, down %d" % (len(downloading), down_traffic))
+        if self.config.max_downloading_traffic:
+            down_traffic = sum(i.down for i in downloading)
+            self.LOG.debug("%d downloading, down %d" % (len(downloading), down_traffic))
+            if down_traffic > int(self.config.max_downloading_traffic):
+                self.LOG.debug("Max download traffic reaching, skipping start")
+                return
 
         # Start eligible items
         for idx, item in enumerate(startable):
