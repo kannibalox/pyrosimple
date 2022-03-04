@@ -23,6 +23,9 @@ import time
 import shlex
 import signal
 from collections import defaultdict
+from typing import Optional, Dict
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from pyrosimple.util import logutil
 from pyrosimple.util.parts import Bunch
@@ -52,7 +55,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
     def add_options(self):
         """Add program options."""
         super(RtorrentQueueManager, self).add_options()
-        self.jobs = None
+        self.jobs: Optional[Dict] = None
         self.httpd = None
 
         # basic options
@@ -138,13 +141,13 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                         % (name, name, key)
                     )
 
-            bool_param = lambda k, default, p=params: matching.truth(
+            bool_param = lambda name, k, default, p=params: matching.truth(
                 p.get(k, default), "job.%s.%s" % (name, k)
             )
 
             params.job_name = name
-            params.dry_run = bool_param("dry_run", False) or self.options.dry_run
-            params.active = bool_param("active", True)
+            params.dry_run = bool_param(name, "dry_run", False) or self.options.dry_run
+            params.active = bool_param(name, "active", True)
             params.schedule = self._parse_schedule(params.schedule)
 
             if params.active:
@@ -266,8 +269,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         signal.signal(signal.SIGTERM, _raise_interrupt)
 
         # Set up services
-        from apscheduler.schedulers.background import BackgroundScheduler
-
         self.sched = BackgroundScheduler()
 
         # Run services

@@ -332,7 +332,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.add_value_option(
             "-s",
             "--sort-fields",
-            "[-]FIELD[,...] [-s...]",
+            "FIELD",
             action="append",
             default=[],
             help="fields used for sorting, descending if prefixed with a '-'; '-s*' uses output field list",
@@ -341,7 +341,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.add_value_option(
             "-A",
             "--anneal",
-            "MODE [-A...]",
+            "MODE",
             type="choice",
             action="append",
             default=[],

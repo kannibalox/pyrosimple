@@ -21,7 +21,7 @@
 from pyrosimple.util.parts import Bunch
 from pyrosimple import error
 from pyrosimple import config as config_ini
-from pyrosimple.util import fmt, xmlrpc, pymagic, stats
+from pyrosimple.util import fmt, xmlrpc, pymagic
 
 
 class EngineStats(object):

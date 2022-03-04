@@ -22,13 +22,13 @@
 
 import time
 import logging
-import asyncore
+import asyncio
 from pathlib import Path
 
 from pyrosimple.util.parts import Bunch
 from pyrosimple import error
 from pyrosimple import config as configuration
-from pyrosimple.util import os, fmt, xmlrpc, pymagic, metafile, traits, logutil
+from pyrosimple.util import os, xmlrpc, pymagic, metafile, traits, logutil
 from pyrosimple.torrent import matching, formatting
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 
@@ -430,7 +430,7 @@ class TreeWatchCommand(ScriptBaseWithConfig):
                     load_mode=None,
                 )
             )
-            asyncore.loop(timeout=~0, use_poll=True)
+            asyncio.sleep(0)
         else:
             config = Bunch()
             config.update(

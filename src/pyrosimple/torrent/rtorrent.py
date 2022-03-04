@@ -26,6 +26,7 @@ import fnmatch
 import logging
 import operator
 from collections import namedtuple
+from functools import partial
 
 from pyrosimple.util.parts import Bunch
 from pyrosimple import config, error
@@ -384,6 +385,16 @@ class RtorrentItem(engine.TorrentProxy):
         """Hash check a download."""
         self._make_it_so("hash-checking", ["check_hash"])
 
+    def __print_result(self, data, method=None, args=None):
+        "Helper to print XMLRPC call results"
+        args_list = ""
+        if args:
+            args_list = '"' + '","'.join(args) + '"'
+        print(
+            "%s\t%s\t%s=%s"
+            % (self._fields["hash"], data, method.lstrip(":"), args_list)
+        )
+
     def execute(self, commands):
         """Execute XMLRPC command(s)."""
         try:
@@ -400,17 +411,9 @@ class RtorrentItem(engine.TorrentProxy):
                     "Bad command %r, probably missing a '=' (%s)" % (command, exc)
                 )
 
-            def print_result(data):
-                "Helper to print XMLRPC call results"
-                args_list = ""
-                if args:
-                    args_list = '"' + '","'.join(args) + '"'
-                print(
-                    "%s\t%s\t%s=%s"
-                    % (self._fields["hash"], data, method.lstrip(":"), args_list)
-                )
-
-            observer = print_result if method.startswith(">") else None
+            observer = None
+            if method.startswith(">"):
+                observer = partial(self.__print_result, args=args, method=method)
             method = method.lstrip(">")
             if not (method.startswith(":") or method[:2].endswith(".")):
                 method = "d." + method

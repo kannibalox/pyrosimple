@@ -25,7 +25,7 @@ import logging
 import operator
 
 from pyrosimple import error, config
-from pyrosimple.util import fmt, pymagic
+from pyrosimple.util import fmt
 
 TRUE = set(
     (
