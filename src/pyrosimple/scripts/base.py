@@ -102,7 +102,7 @@ class ScriptBase(object):
         )
 
         self.parser.add_argument('--version', action='version', version="%(prog)s " + self.version_info)
-        self.parser.add_argument('args')
+        self.parser.add_argument('args', nargs='*')
 
     def add_bool_option(self, *args, **kwargs):
         """Add a boolean option.
