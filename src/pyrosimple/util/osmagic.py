@@ -18,46 +18,38 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import os
 import sys
 import time
 import errno
 import signal
 import logging
-
-from pyrosimple.util import os
+from typing import Tuple
 
 
 def _write_pidfile(pidfile):
     """Write file with current process ID."""
-    pid = str(os.getpid())
-    handle = open(pidfile, "w")
-    try:
-        handle.write("%s\n" % pid)
-    finally:
-        handle.close()
+    with open(pidfile, "wb") as handle:
+        handle.write(str(os.getpid()).encode())
 
 
-def check_process(pidfile):
+def check_process(pidfile) -> Tuple[bool, int]:
     """Read pid file and check process status.
     Return (running, pid).
     """
     # Check pid file
     try:
-        handle = open(pidfile, "r")
+        with open(pidfile, "rb") as handle:
+            pid = int(handle.read().decode().strip(), 10)
     except IOError as exc:
         if exc.errno == errno.ENOENT:
             # pid file disappeared
             return False, 0
         raise
-
-    try:
-        pid = int(handle.read().strip(), 10)
     except (TypeError, ValueError) as exc:
         raise EnvironmentError(
-            "Invalid PID file '%s' (%s), won't start!" % (pidfile, exc)
-        )
-    finally:
-        handle.close()
+            "Invalid PID file '%s', won't start!" % (pidfile)
+        ) from exc
 
     # Check process
     try:
@@ -134,7 +126,7 @@ def daemonize(pidfile=None, logfile=None, sync=True):
     if pidfile:
         _write_pidfile(pidfile)
 
-    def sig_term(*dummy):
+    def sig_term(*_):
         "Handler for SIGTERM."
         sys.exit(0)
 
@@ -152,10 +144,9 @@ def daemonize(pidfile=None, logfile=None, sync=True):
                 os.dup2(logfile.fileno(), sys.stderr.fileno())
         else:
             log.debug("Redirecting stdout / stderr to %r", logfile)
-            loghandle = open(logfile, "a+")
-            os.dup2(loghandle.fileno(), sys.stdout.fileno())
-            os.dup2(loghandle.fileno(), sys.stderr.fileno())
-            loghandle.close()
+            with open(logfile, "ab+") as loghandle:
+                os.dup2(loghandle.fileno(), sys.stdout.fileno())
+                os.dup2(loghandle.fileno(), sys.stderr.fileno())
 
     if sync:
         # Wait for 5 seconds at most, in 10ms steps
