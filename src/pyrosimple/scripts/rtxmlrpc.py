@@ -91,6 +91,9 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         " |\n           --session <session-file>... | --session <directory>"
         " |\n           --session @<filename-list> | --session @-"
     )
+    def __init__(self):
+        super().__init__()
+        self.proxy = None
 
     def add_options(self):
         """Add program options."""
@@ -112,8 +115,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         # TODO: Tempita with "result" object in namespace
         # self.add_value_option("-o", "--output-format", "FORMAT",
         #    help="pass result to a template for formatting")
-
-        self.proxy = None
 
     def open(self):
         """Open connection and return proxy."""
@@ -138,7 +139,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 try:
                     arg = int(arg, 10)
                 except (ValueError, TypeError) as exc:
-                    self.LOG.warn("Not a valid number: %r (%s)" % (arg, exc))
+                    self.LOG.warning("Not a valid number: %r (%s)" % (arg, exc))
             elif arg.startswith("[["):  # escaping, not a list
                 arg = arg[1:]
             elif arg == "[]":
@@ -229,10 +230,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 if cmd in {"?", "help"}:
                     self.repl_usage()
                     continue
-                elif cmd in {"", "stats"}:
+                if cmd in {"", "stats"}:
                     print(repr(proxy).split(None, 1)[1])
                     continue
-                elif cmd in {"exit"}:
+                if cmd in {"exit"}:
                     raise EOFError()
 
                 try:
@@ -325,7 +326,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 os.path.basename(filename),
             )
             if not match:
-                self.LOG.warn("Skipping badly named session file '%s'...", filename)
+                self.LOG.warning("Skipping badly named session file '%s'...", filename)
                 continue
             infohash = match.group(1)
 
@@ -335,7 +336,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     raw_data = handle.read()
                 data = Bunch(bencode.bdecode(raw_data))
             except EnvironmentError as exc:
-                self.LOG.warn(
+                self.LOG.warning(
                     "Can't read '%s' (%s)"
                     % (
                         filename,
@@ -346,7 +347,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
             ##print(infohash, '=', repr(data))
             if "state_changed" not in data:
-                self.LOG.warn("Skipping invalid session file '%s'...", filename)
+                self.LOG.warning("Skipping invalid session file '%s'...", filename)
                 continue
 
             # Restore metadata
@@ -382,11 +383,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 )
             proxy.d.save_full_session(infohash)
 
-            """ TODO:
-                NO public "set" command! 'timestamp.finished': 1503012786,
-                NO public "set" command! 'timestamp.started': 1503012784,
-                NO public "set" command! 'total_uploaded': 0,
-            """
+            # TODO:
+            #  NO public "set" command! 'timestamp.finished': 1503012786,
+            #  NO public "set" command! 'timestamp.started': 1503012784,
+            #  NO public "set" command! 'total_uploaded': 0,
 
     def mainloop(self):
         """The main loop."""
