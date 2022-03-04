@@ -28,9 +28,6 @@ from pyrosimple.torrent import engine, matching, formatting
 class QueueManager(object):
     """rTorrent queue manager implementation."""
 
-    # Special view containing all items that are transferring data, have peers connected, or are incomplete
-    VIEWNAME = "pyrotorque"
-
     def __init__(self, config=None):
         """Set up queue manager."""
         self.config = config or {}
@@ -44,7 +41,7 @@ class QueueManager(object):
         bool_param = lambda key, default: matching.truth(
             self.config.get(key, default), "job.%s.%s" % (self.config.job_name, key)
         )
-
+        self.config.viewname = self.config.get('viewname', 'pyrotorque')
         self.config.quiet = bool_param("quiet", False)
         self.config.startable = matching.ConditionParser(
             engine.FieldDefinition.lookup, "name"
@@ -185,7 +182,7 @@ class QueueManager(object):
             self.proxy = config_ini.engine.open()
 
             # Get items from 'pyrotorque' view
-            items = list(config_ini.engine.items(self.VIEWNAME, cache=False))
+            items = list(config_ini.engine.items(self.config.viewname, cache=False))
 
             if self.sort_key:
                 items.sort(key=self.sort_key)
