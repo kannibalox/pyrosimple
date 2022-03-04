@@ -468,10 +468,10 @@ class Metafile(object):
                     relpath = fifo.readline().rstrip("\n")
                     if not relpath:  # EOF?
                         break
-                    self.LOG.debug("Read relative path %r from FIFO..." % (relpath,))
+                    self.LOG.debug("Read relative path %r from FIFO...", relpath)
                     yield os.path.join(os.path.dirname(self.datapath), relpath)
 
-            self.LOG.debug("FIFO %r closed!" % (self.datapath,))
+            self.LOG.debug("FIFO %r closed!", self.datapath)
 
         # Directory?
         elif os.path.isdir(self.datapath):
@@ -535,7 +535,7 @@ class Metafile(object):
                     ],
                 }
             )
-            self.LOG.debug("Hashing %r, size %d..." % (filename, filesize))
+            self.LOG.debug("Hashing %r, size %d...", filename, filesize)
 
             # Open file and hash it
             fileoffset = 0
@@ -586,12 +586,10 @@ class Metafile(object):
 
         hashing_secs = time.time() - hashing_secs
         self.LOG.info(
-            "Hashing of %s took %.1f secs (%s/s)"
-            % (
-                fmt.human_size(totalhashed).strip(),
-                hashing_secs,
-                fmt.human_size(totalhashed / hashing_secs).strip(),
-            )
+            "Hashing of %s took %.1f secs (%s/s)",
+            fmt.human_size(totalhashed).strip(),
+            hashing_secs,
+            fmt.human_size(totalhashed / hashing_secs).strip(),
         )
 
         # Return validated info dict
@@ -695,19 +693,17 @@ class Metafile(object):
                     output_name[1:1] = "-" + tracker_alias
                 except (IndexError,):
                     self.LOG.error(
-                        "Malformed announce URL %r, skipping!" % (tracker_url,)
+                        "Malformed announce URL %r, skipping!", tracker_url
                     )
                     continue
                 output_name = "".join(output_name)
 
             # Hash the data
             self.LOG.info(
-                "Creating %r for %s %r..."
-                % (
-                    output_name,
-                    "filenames read from" if self._fifo else "data in",
-                    self.datapath,
-                )
+                "Creating %r for %s %r...",
+                output_name,
+                "filenames read from" if self._fifo else "data in",
+                self.datapath,
             )
             meta, _ = self._make_meta(tracker_url, root_name, private, progress)
 
@@ -722,7 +718,7 @@ class Metafile(object):
                 callback(meta)
 
             # Write metafile to disk
-            self.LOG.debug("Writing %r..." % (output_name,))
+            self.LOG.debug("Writing %r...", output_name)
             with open(output_name, "wb") as fh:
                 fh.write(bencode.encode(meta))
 
@@ -741,9 +737,9 @@ class Metafile(object):
                     check_piece.piece_index : check_piece.piece_index + 20
                 ]
             ):
-                self.LOG.warn(
-                    "Piece #%d: Hashes differ in file %r"
-                    % (check_piece.piece_index // 20, filename)
+                self.LOG.warning(
+                    "Piece #%d: Hashes differ in file %r",
+                    check_piece.piece_index // 20, filename
                 )
             check_piece.piece_index += 20
 

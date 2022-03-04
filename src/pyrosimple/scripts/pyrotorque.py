@@ -172,11 +172,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             try:
                 time.sleep(self.POLL_TIMEOUT)
             except KeyboardInterrupt as exc:
-                self.LOG.info("Termination request received (%s)" % exc)
+                self.LOG.info("Termination request received (%s)", exc)
                 break
             except SystemExit as exc:
                 self.return_code = exc.code or 0
-                self.LOG.info("System exit (RC=%r)" % self.return_code)
+                self.LOG.info("System exit (RC=%r)", self.return_code)
                 break
             else:
                 # Idle work
@@ -185,8 +185,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     self.options.guard_file
                 ):
                     self.LOG.warn(
-                        "Guard file '%s' disappeared, exiting!"
-                        % self.options.guard_file
+                        "Guard file '%s' disappeared, exiting!",
+                        self.options.guard_file
                     )
                     break
 
@@ -221,16 +221,16 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                             break
                         time.sleep(0.1)
 
-                    self.LOG.info("Process #%d stopped." % (pid))
+                    self.LOG.info("Process #%d stopped.", pid)
                 elif pid:
-                    self.LOG.info("Process #%d NOT running anymore." % (pid))
+                    self.LOG.info("Process #%d NOT running anymore.", pid)
                 else:
                     self.LOG.info(
-                        "No pid file '%s'" % (self.options.pid_file or "<N/A>")
+                        "No pid file '%s'", (self.options.pid_file or "<N/A>")
                     )
             else:
                 self.LOG.info(
-                    "Process #%d %s running." % (pid, "UP and" if running else "NOT")
+                    "Process #%d %s running.", pid, "UP and" if running else "NOT")
                 )
 
             if self.options.restart:
@@ -285,8 +285,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     os.remove(self.options.pid_file)
                 except EnvironmentError as exc:
                     self.LOG.warn(
-                        "Failed to remove pid file '%s' (%s)"
-                        % (self.options.pid_file, exc)
+                        "Failed to remove pid file '%s' (%s)",
+                        self.options.pid_file, exc)
                     )
                     self.return_code = error.EX_IOERR
 

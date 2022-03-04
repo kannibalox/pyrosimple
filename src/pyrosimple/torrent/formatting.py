@@ -388,8 +388,8 @@ def validate_sort_fields(sort_fields):
     sort_fields = validate_field_list(sort_fields, name_filter=sort_order_filter)
     log = logging.getLogger(__name__)
     log.debug(
-        "Sorting order is: %s"
-        % ", ".join([("-" if i in descending else "") + i for i in sort_fields])
+        "Sorting order is: %s",
+        ", ".join([("-" if i in descending else "") + i for i in sort_fields])
     )
 
     # No descending fields?

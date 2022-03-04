@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=I0011
+# pylint: disable=locally-disabled
 """ rTorrent Proxy.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -49,7 +49,7 @@ class RtorrentItem(engine.TorrentProxy):
 
     def __init__(self, engine_, fields):
         """Initialize download item."""
-        super(RtorrentItem, self).__init__()
+        super().__init__()
         self._engine = engine_
         self._fields = dict(fields)
 
@@ -61,7 +61,7 @@ class RtorrentItem(engine.TorrentProxy):
             for call in calls:
                 self._engine.LOG.debug(
                     "%s%s torrent #%s (%s)"
-                    % (command[0].upper(), command[1:], self._fields["hash"], call)
+                    , command[0].upper(), command[1:], self._fields["hash"], call
                 )
                 if call.startswith(":") or call[:2].endswith("."):
                     namespace = self._engine._rpc
@@ -333,14 +333,14 @@ class RtorrentItem(engine.TorrentProxy):
         if (name or "NONE") == self.throttle:
             self._engine.LOG.debug(
                 "Keeping throttle %r on torrent #%s"
-                % (self.throttle, self._fields["hash"])
+                , self.throttle, self._fields["hash"]
             )
             return
 
         active = self.is_active
         if active:
             self._engine.LOG.debug(
-                "Torrent #%s stopped for throttling" % (self._fields["hash"],)
+                "Torrent #%s stopped for throttling", self._fields["hash"]
             )
             self.stop()
         self._make_it_so(
@@ -348,7 +348,7 @@ class RtorrentItem(engine.TorrentProxy):
         )
         if active:
             self._engine.LOG.debug(
-                "Torrent #%s restarted after throttling" % (self._fields["hash"],)
+                "Torrent #%s restarted after throttling", self._fields["hash"],
             )
             self.start()
 
@@ -473,7 +473,7 @@ class RtorrentItem(engine.TorrentProxy):
             for rm_path in reversed(rm_paths):
                 is_dir = os.path.isdir(rm_path) and not os.path.islink(rm_path)
                 self._engine.LOG.debug(
-                    "Deleting '%s%s'" % (rm_path, "/" if is_dir else "")
+                    "Deleting '%s%s'", rm_path, "/" if is_dir else ""
                 )
                 if not dry_run:
                     try:
@@ -483,7 +483,7 @@ class RtorrentItem(engine.TorrentProxy):
                             # Seems this disappeared somehow inbetween (race condition)
                             self._engine.LOG.info(
                                 "Path '%s%s' disappeared before it could be deleted"
-                                % (rm_path, "/" if is_dir else "")
+                                , rm_path, "/" if is_dir else ""
                             )
                         else:
                             raise
@@ -542,13 +542,11 @@ class RtorrentItem(engine.TorrentProxy):
             ##print "---", residue - ignorable
             if residue and residue != ignorable:
                 self._engine.LOG.info(
-                    "Keeping non-empty directory '%s' with %d %s%s!"
-                    % (
+                    "Keeping non-empty directory '%s' with %d %s%s!",
                         path,
                         len(residue),
                         "entry" if len(residue) == 1 else "entries",
                         (" (%d ignorable)" % len(ignorable)) if ignorable else "",
-                    )
                 )
             else:
                 ##print "---", ignorable
@@ -559,7 +557,7 @@ class RtorrentItem(engine.TorrentProxy):
                         try:
                             os.remove(waif)
                         except EnvironmentError as exc:
-                            self._engine.LOG.warn(
+                            self._engine.LOG.warning(
                                 "Problem deleting waif '%s' (%s)" % (waif, exc)
                             )
 
@@ -648,7 +646,7 @@ class RtorrentEngine(engine.TorrentEngine):
 
     def __init__(self):
         """Initialize proxy."""
-        super(RtorrentEngine, self).__init__()
+        super().__init__()
         self.versions = (None, None)
         self.version_info = (0,)
         self.startup = time.time()
@@ -674,7 +672,7 @@ class RtorrentEngine(engine.TorrentEngine):
             raise error.UserError("Config file %r doesn't exist!" % (rcfile,))
 
         # Parse the file
-        self.LOG.debug("Loading rtorrent config from %r" % (rcfile,))
+        self.LOG.debug("Loading rtorrent config from %r", rcfile)
         rc_vals = Bunch(scgi_local="", scgi_port="")
         with open(rcfile) as handle:
             continued = False
@@ -689,14 +687,14 @@ class RtorrentEngine(engine.TorrentEngine):
                 try:
                     key, val = line.split("=", 1)
                 except ValueError:
-                    self.LOG.warning("Ignored invalid line %r in %r!" % (line, rcfile))
+                    self.LOG.warning("Ignored invalid line %r in %r!", line, rcfile)
                     continue
                 key, val = key.strip(), val.strip()
                 key = self.RTORRENT_RC_ALIASES.get(key, key).replace(".", "_")
 
                 # Copy values we're interested in
                 if key in self.RTORRENT_RC_KEYS:
-                    self.LOG.debug("rtorrent.rc: %s = %s" % (key, val))
+                    self.LOG.debug("rtorrent.rc: %s = %s", key, val)
                     rc_vals[key] = val
 
         # Validate fields
@@ -771,7 +769,7 @@ class RtorrentEngine(engine.TorrentEngine):
         if time_usec < 2 ** 32:
             self.LOG.warn(
                 "Your xmlrpc-c is broken (64 bit integer support missing,"
-                " %r returned instead)" % (type(time_usec),)
+                " %r returned instead)", type(time_usec)
             )
 
         # Get other manifest values
@@ -789,7 +787,7 @@ class RtorrentEngine(engine.TorrentEngine):
                 self.startup = time.time()
 
         # Return connection
-        self.LOG.debug(repr(self))
+        self.LOG.debug("%s", repr(self))
         return self._rpc
 
     def multicall(self, viewname, fields):
@@ -886,7 +884,7 @@ class RtorrentEngine(engine.TorrentEngine):
                 ##import pprint; self.LOG.debug(pprint.pformat(raw_items))
                 self.LOG.debug(
                     "Got %d items with %d attributes from %r [%s]"
-                    % (len(raw_items), len(prefetch), self.engine_id, multi_call)
+                    , len(raw_items), len(prefetch), self.engine_id, multi_call
                 )
 
                 for item in raw_items:

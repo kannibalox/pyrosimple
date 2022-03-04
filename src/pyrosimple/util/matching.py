@@ -335,8 +335,8 @@ class PatternFilter(FieldFilter):
         result = self._matcher(val) if self._is_regex else self._matcher(val, item)
         if 0:
             logging.getLogger(__name__).debug(
-                "%r for %r ~ %r, name %r, item %r"
-                % (result, val, self._value, self._name, item)
+                "%r for %r ~ %r, name %r, item %r",
+                result, val, self._value, self._name, item
             )
         return result
 

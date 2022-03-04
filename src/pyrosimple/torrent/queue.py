@@ -36,7 +36,7 @@ class QueueManager(object):
         self.LOG = pymagic.get_class_logger(self)
         if "log_level" in self.config:
             self.LOG.setLevel(config.log_level)
-        self.LOG.debug("Queue manager created with config %r" % self.config)
+        self.LOG.debug("Queue manager created with config %r", self.config)
 
         bool_param = lambda key, default: matching.truth(
             self.config.get(key, default), "job.%s.%s" % (self.config.job_name, key)
@@ -50,8 +50,8 @@ class QueueManager(object):
             % (config_ini.torque["queue_startable_base"], self.config.startable)
         )
         self.LOG.info(
-            "Startable matcher for '%s' is: [ %s ]"
-            % (self.config.job_name, self.config.startable)
+            "Startable matcher for '%s' is: [ %s ]",
+            self.config.job_name, self.config.startable
         )
         self.config.downloading = matching.ConditionParser(
             engine.FieldDefinition.lookup, "name"
@@ -64,8 +64,8 @@ class QueueManager(object):
             )
         )
         self.LOG.info(
-            "Downloading matcher for '%s' is: [ %s ]"
-            % (self.config.job_name, self.config.downloading)
+            "Downloading matcher for '%s' is: [ %s ]",
+            self.config.job_name, self.config.downloading
         )
         self.sort_key = (
             formatting.validate_sort_fields(self.config.sort_fields)
@@ -97,8 +97,8 @@ class QueueManager(object):
         delayed = int(self.last_start + self.config.intermission - now)
         if delayed > 0:
             self.LOG.debug(
-                "Delaying start of {:d} item(s),"
-                " due to {:d}s intermission with {:d}s left".format(
+                "Delaying start of %d item(s),"
+                " due to %ds intermission with %ds left",
                     len(startable), self.config.intermission, delayed
                 )
             )
@@ -115,7 +115,7 @@ class QueueManager(object):
 
         if self.config.max_downloading_traffic:
             down_traffic = sum(i.down for i in downloading)
-            self.LOG.debug("%d downloading, down %d" % (len(downloading), down_traffic))
+            self.LOG.debug("%d downloading, down %d", len(downloading), down_traffic)
             if down_traffic > int(self.config.max_downloading_traffic):
                 self.LOG.debug("Max download traffic reaching, skipping start")
                 return
@@ -125,11 +125,9 @@ class QueueManager(object):
             # Check if we reached 'start_now' in this run
             if idx >= start_now:
                 self.LOG.debug(
-                    "Only starting %d item(s) in this run, %d more could be downloading"
-                    % (
-                        start_now,
-                        len(startable) - idx,
-                    )
+                    "Only starting %d item(s) in this run, %d more could be downloading",
+                    start_now,
+                    len(startable) - idx,
                 )
                 break
 
@@ -139,19 +137,17 @@ class QueueManager(object):
             # Only check the other conditions when we have `downloading_min` covered
             if len(downloading) < self.config.downloading_min:
                 self.LOG.debug(
-                    "Catching up from %d to a minimum of %d downloading item(s)"
-                    % (len(downloading), self.config.downloading_min)
+                    "Catching up from %d to a minimum of %d downloading item(s)",
+                    len(downloading), self.config.downloading_min
                 )
             else:
                 # Limit to the given maximum of downloading items
                 if len(downloading) >= self.config.downloading_max:
                     self.LOG.debug(
-                        "Already downloading %d item(s) out of %d max, %d more could be downloading"
-                        % (
-                            len(downloading),
-                            self.config.downloading_max,
-                            len(startable) - idx,
-                        )
+                        "Already downloading %d item(s) out of %d max, %d more could be downloading",
+                        len(downloading),
+                        self.config.downloading_max,
+                        len(startable) - idx,
                     )
                     break
 
@@ -159,13 +155,11 @@ class QueueManager(object):
             self.last_start = now
             downloading.append(item)
             self.LOG.info(
-                u"%s '%s' [%s, #%s]"
-                % (
-                    "WOULD start" if self.config.dry_run else "Starting",
-                    item.name,
-                    item.alias,
-                    item.hash,
-                )
+                u"%s '%s' [%s, #%s]",
+                "WOULD start" if self.config.dry_run else "Starting",
+                item.name,
+                item.alias,
+                item.hash,
             )
             if not self.config.dry_run:
                 item.start()
@@ -194,7 +188,7 @@ class QueueManager(object):
 
             # Handle found items
             self._start(items)
-            self.LOG.debug("%s - %s" % (config_ini.engine.engine_id, self.proxy))
+            self.LOG.debug("%s - %s", config_ini.engine.engine_id, self.proxy)
         except (error.LoggableError, xmlrpc.ERRORS) as exc:
             # only debug, let the statistics logger do its job
             self.LOG.debug(str(exc))

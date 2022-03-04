@@ -109,7 +109,7 @@ class RTorrentMethod(object):
                     if self._method_name in ("d.multicall", "d.multicall.filtered"):
                         args = (0,) + args
                     if config.debug:
-                        self._proxy.LOG.debug("BEFORE MAPPING: %r" % (args,))
+                        self._proxy.LOG.debug("BEFORE MAPPING: %r", args)
                     if self._method_name == "system.multicall":
                         for call in args[0]:
                             call["methodName"] = self._proxy._map_call(
@@ -120,7 +120,7 @@ class RTorrentMethod(object):
                             self._proxy._map_call(i) for i in args[2:]
                         )
                     if config.debug:
-                        self._proxy.LOG.debug("AFTER MAPPING: %r" % (args,))
+                        self._proxy.LOG.debug("AFTER MAPPING: %r", args)
                 elif self._method_name in self.NEEDS_FAKE_TARGET:
                     args = (0,) + args
 
@@ -134,7 +134,7 @@ class RTorrentMethod(object):
             self._proxy._outbound_max = max(self._proxy._outbound_max, self._outbound)
 
             if config.debug:
-                self._proxy.LOG.debug("XMLRPC raw request: %r" % xmlreq)
+                self._proxy.LOG.debug("XMLRPC raw request: %r", xmlreq)
 
             # Send it
             scgi_req = xmlrpc2scgi.SCGIRequest(self._proxy._transport)
@@ -280,7 +280,7 @@ class RTorrentProxy(object):
                 map_version = tuple(int(i) for i in key.split("_")[1:])
                 if map_version <= self._version_info:
                     if config.debug:
-                        self.LOG.debug("MAPPING for %r added: %r" % (map_version, val))
+                        self.LOG.debug("MAPPING for %r added: %r", map_version, val)
                     self._mapping.update(val)
             self._fix_mappings()
         except ERRORS as exc:
@@ -297,12 +297,12 @@ class RTorrentProxy(object):
         )
 
         if config.debug:
-            self.LOG.debug("CMD MAPPINGS ARE: %r" % (self._mapping,))
+            self.LOG.debug("CMD MAPPINGS ARE: %r", self._mapping)
 
     def _map_call(self, cmd):
         """Map old to new command names."""
         if config.debug and cmd != self._mapping.get(cmd, cmd):
-            self.LOG.debug("MAP %s ==> %s" % (cmd, self._mapping[cmd]))
+            self.LOG.debug("MAP %s ==> %s", cmd, self._mapping[cmd])
         cmd = self._mapping.get(cmd, cmd)
 
         # These we do by code, to avoid lengthy lists in the config

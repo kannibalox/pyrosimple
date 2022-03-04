@@ -84,7 +84,7 @@ def guard(pidfile, guardfile=None):
             )
         else:
             logging.getLogger("daemonize").info(
-                "Process #%d disappeared, continuing..." % pid
+                "Process #%d disappeared, continuing...", pid
             )
 
     # Keep race condition window small, by immediately writing launcher process ID
@@ -104,12 +104,11 @@ def daemonize(pidfile=None, logfile=None, sync=True):
     try:
         pid = os.fork()
         if pid > 0:
-            log.debug("Parent exiting (PID %d, CHILD %d)" % (ppid, pid))
+            log.debug("Parent exiting (PID %d, CHILD %d)", ppid, pid)
             sys.exit(0)
     except OSError as exc:
         log.critical(
-            "fork #1 failed (PID %d): (%d) %s\n"
-            % (os.getpid(), exc.errno, exc.strerror)
+            "fork #1 failed (PID %d): (%d) %s\n", os.getpid(), exc.errno, exc.strerror
         )
         sys.exit(1)
 
@@ -121,14 +120,14 @@ def daemonize(pidfile=None, logfile=None, sync=True):
         pid = os.fork()
         if pid > 0:
             log.debug(
-                "Session leader exiting (PID %d, PPID %d, DEMON %d)"
-                % (os.getpid(), ppid, pid)
+                "Session leader exiting (PID %d, PPID %d, DEMON %d)",
+                os.getpid(), ppid, pid
             )
             sys.exit(0)
     except OSError as exc:
         log.critical(
-            "fork #2 failed (PID %d): (%d) %s\n"
-            % (os.getpid(), exc.errno, exc.strerror)
+            "fork #2 failed (PID %d): (%d) %s\n",
+            os.getpid(), exc.errno, exc.strerror
         )
         sys.exit(1)
 
@@ -152,7 +151,7 @@ def daemonize(pidfile=None, logfile=None, sync=True):
             if logfile.fileno() != sys.stderr.fileno():
                 os.dup2(logfile.fileno(), sys.stderr.fileno())
         else:
-            log.debug("Redirecting stdout / stderr to %r" % logfile)
+            log.debug("Redirecting stdout / stderr to %r", logfile)
             loghandle = open(logfile, "a+")
             os.dup2(loghandle.fileno(), sys.stdout.fileno())
             os.dup2(loghandle.fileno(), sys.stderr.fileno())
@@ -169,4 +168,4 @@ def daemonize(pidfile=None, logfile=None, sync=True):
             else:
                 time.sleep(polling[1])
 
-    log.debug("Process detached (PID %d)" % os.getpid())
+    log.debug("Process detached (PID %d)", os.getpid())

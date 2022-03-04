@@ -183,8 +183,8 @@ def to_utf8(text):
                         line.decode(encoding).encode("utf8")
                     except UnicodeDecodeError:
                         log.warn(
-                            "Cannot transcode the following into UTF8 cause of %s: %r"
-                            % (exc, line)
+                            "Cannot transcode the following into UTF8 cause of %s: %r",
+                            exc, line
                         )
                         break
                 return text  # Use as-is and hope the best

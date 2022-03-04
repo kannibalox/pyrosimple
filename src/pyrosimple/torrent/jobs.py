@@ -31,21 +31,19 @@ class EngineStats(object):
         """Set up statistics logger."""
         self.config = config or Bunch()
         self.LOG = pymagic.get_class_logger(self)
-        self.LOG.debug("Statistics logger created with config %r" % self.config)
+        self.LOG.debug("Statistics logger created with config %r", self.config)
 
     def run(self):
         """Statistics logger job callback."""
         try:
             proxy = config_ini.engine.open()
             self.LOG.info(
-                "Stats for %s - up %s, %s"
-                % (
-                    config_ini.engine.engine_id,
-                    fmt.human_duration(
-                        proxy.system.time() - config_ini.engine.startup, 0, 2, True
-                    ).strip(),
-                    proxy,
-                )
+                "Stats for %s - up %s, %s",
+                config_ini.engine.engine_id,
+                fmt.human_duration(
+                    proxy.system.time() - config_ini.engine.startup, 0, 2, True
+                ).strip(),
+                proxy,
             )
         except (error.LoggableError, xmlrpc.ERRORS) as exc:
             self.LOG.warn(str(exc))

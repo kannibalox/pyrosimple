@@ -198,7 +198,7 @@ class ConfigLoader(object):
 
     def _load_ini(self, namespace, config_file):
         """Load INI style configuration."""
-        self.LOG.debug("Loading %r..." % (config_file,))
+        self.LOG.debug("Loading %r...", config_file)
         ini_file = ConfigParser.SafeConfigParser()
         ini_file.optionxform = str  # case-sensitive option names
         if ini_file.read(config_file):
@@ -206,14 +206,14 @@ class ConfigLoader(object):
         else:
             self.LOG.warning(
                 "Configuration file %r not found,"
-                " use the command 'pyroadmin --create-config' to create it!"
-                % (config_file,)
+                " use the command 'pyroadmin --create-config' to create it!",
+                config_file
             )
 
     def _load_py(self, namespace, config_file):
         """Load scripted configuration."""
         if config_file and os.path.isfile(config_file):
-            self.LOG.debug("Loading %r..." % (config_file,))
+            self.LOG.debug("Loading %r...", config_file)
             p = importlib.import_module("pyrosimple")
             sys.modules["pyrocore"] = p
             sys.modules["pyrobase"] = p
@@ -225,7 +225,7 @@ class ConfigLoader(object):
                 namespace,
             )
         else:
-            self.LOG.warning("Configuration file %r not found!" % (config_file,))
+            self.LOG.warning("Configuration file %r not found!", config_file)
 
     def load(self, optional_cfg_files=None):
         """Actually load the configuation from either the default location or the given directory."""
@@ -266,7 +266,7 @@ class ConfigLoader(object):
         # Check and create configuration directory
         if os.path.exists(self.config_dir):
             self.LOG.debug(
-                "Configuration directory %r already exists!" % (self.config_dir,)
+                "Configuration directory %r already exists!", self.config_dir
             )
         else:
             os.mkdir(self.config_dir)
@@ -286,7 +286,7 @@ class ConfigLoader(object):
                     )
                 )
                 for config_file in config_files:
-                    self.LOG.info("Removing %r!" % (config_file,))
+                    self.LOG.info("Removing %r!", config_file)
                     os.remove(config_file)
 
         # Create default configuration files
@@ -302,10 +302,10 @@ class ConfigLoader(object):
             # Write configuration files
             config_trail = [".default"]
             if os.path.exists(config_file):
-                self.LOG.debug("Configuration file %r already exists!" % (config_file,))
+                self.LOG.debug("Configuration file %r already exists!", config_file)
             else:
                 config_trail.append("")
             for i in config_trail:
                 with open(config_file + i, "wb") as handle:
                     handle.write(text)
-                self.LOG.info("Configuration file %r written!" % (config_file + i,))
+                self.LOG.info("Configuration file %r written!", (config_file + i))

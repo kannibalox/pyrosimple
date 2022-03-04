@@ -30,7 +30,7 @@ class FilterJobBase(object):
         self.config = config or {}
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug(
-            "%s created with config %r" % (self.__class__.__name__, self.config)
+            "%s created with config %r", self.__class__.__name__, self.config
         )
 
     def run(self):
