@@ -18,14 +18,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import operator
 import re
 import time
-import operator
-from typing import Dict, Any, Set
+
 from collections import defaultdict
+from typing import Any, Dict, Set
 
 from pyrosimple import config, error
-from pyrosimple.util import os, pymagic, fmt, traits, matching, metafile, xmlrpc
+from pyrosimple.util import fmt, matching, metafile, os, pymagic, traits, xmlrpc
 
 
 #

@@ -19,23 +19,23 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os
-import sys
-import time
 import shlex
 import signal
-from collections import defaultdict
-from typing import Optional, Dict
-from pathlib import Path
+import sys
+import time
 
+from collections import defaultdict
+from pathlib import Path
+from typing import Dict, Optional
+
+from apscheduler.schedulers.background import BackgroundScheduler
 from daemon import DaemonContext
 from daemon.pidfile import TimeoutPIDLockFile
-from apscheduler.schedulers.background import BackgroundScheduler
 
-from pyrosimple.util import logutil
-from pyrosimple.util.parts import Bunch
 from pyrosimple import config, error
-from pyrosimple.util import os, pymagic, matching
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.util import logutil, matching, os, pymagic
+from pyrosimple.util.parts import Bunch
 
 
 class RtorrentQueueManager(ScriptBaseWithConfig):

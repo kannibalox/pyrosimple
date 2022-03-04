@@ -4,6 +4,9 @@
 
     Copyright (c) 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
+import json
+import logging
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -18,20 +21,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import re
-import sys
-import json
-import time
 import shlex
-import logging
 import subprocess
+import sys
+import time
 
 import daemon
 
-from pyrosimple.util.parts import Bunch, DefaultBunch
 from pyrosimple import config, error
-from pyrosimple.util import os, fmt, pymagic, matching, xmlrpc
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig, PromptDecorator
+from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import engine, formatting
+from pyrosimple.util import fmt, matching, os, pymagic, xmlrpc
+from pyrosimple.util.parts import Bunch, DefaultBunch
 
 
 def print_help_fields():

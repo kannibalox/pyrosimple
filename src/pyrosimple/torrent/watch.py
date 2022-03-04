@@ -20,17 +20,19 @@
 
 # TODO: Re-tie metafiles when they're moved in the tree
 
-import time
-import logging
 import asyncio
+import logging
+import time
+
 from pathlib import Path
 
-from pyrosimple.util.parts import Bunch
-from pyrosimple import error
 from pyrosimple import config as configuration
-from pyrosimple.util import os, xmlrpc, pymagic, metafile, traits, logutil
-from pyrosimple.torrent import matching, formatting
+from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.torrent import formatting, matching
+from pyrosimple.util import logutil, metafile, os, pymagic, traits, xmlrpc
+from pyrosimple.util.parts import Bunch
+
 
 try:
     import pyinotify

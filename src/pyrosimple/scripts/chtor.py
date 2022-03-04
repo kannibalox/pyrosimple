@@ -18,17 +18,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import re
 import copy
-import time
 import hashlib
+import re
+import time
 import urllib.parse
 
 import bencode
 
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple import config, error
-from pyrosimple.util import os, metafile
+from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.util import metafile, os
 
 
 def replace_fields(meta, patterns):

@@ -18,16 +18,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import glob
 import io
+import json
+import logging
 import os
 import re
 import sys
-import glob
-import json
-import logging
 import tempfile
 import textwrap
+
 from pprint import pformat
+
 
 try:
     import requests
@@ -37,11 +39,11 @@ except ImportError:
 from xmlrpc import client as xmlrpc_client
 
 import bencode
-from pyrosimple.util.parts import Bunch
 
 from pyrosimple import config, error
-from pyrosimple.util import fmt, xmlrpc
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.util import fmt, xmlrpc
+from pyrosimple.util.parts import Bunch
 
 
 def read_blob(arg):
@@ -207,9 +209,9 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def do_repl(self):
         """REPL for rTorrent XMLRPC commands."""
         from prompt_toolkit import prompt
-        from prompt_toolkit.history import FileHistory
         from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
         from prompt_toolkit.completion import WordCompleter
+        from prompt_toolkit.history import FileHistory
 
         self.options.quiet = False
         proxy = self.open()

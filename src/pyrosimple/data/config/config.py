@@ -9,11 +9,11 @@ def _custom_fields():
     """Yield custom field definitions."""
     # Import some commonly needed modules
     import os
+
     from pyrosimple.torrent import engine, matching
     from pyrosimple.util import fmt
 
     # PUT CUSTOM FIELD CODE HERE
-
     # Disk space check (as an example)
     # see https://pyrosimple.readthedocs.io/en/latest/custom.html#has-room
     def has_room(obj):

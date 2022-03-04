@@ -20,14 +20,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import re
-import glob
-import errno
-import importlib
-
-import io
-import sys
 import configparser as ConfigParser
+import errno
+import glob
+import importlib
+import io
+import re
+import sys
 
 from pyrosimple import config, error
 from pyrosimple.util import os, pymagic

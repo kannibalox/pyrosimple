@@ -18,15 +18,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import socket
 import sys
 import time
-import socket
 
 from xmlrpc import client as xmlrpclib
-from pyrosimple.io import xmlrpc2scgi
 
 from pyrosimple import config, error
-from pyrosimple.util import os, fmt, pymagic
+from pyrosimple.io import xmlrpc2scgi
+from pyrosimple.util import fmt, os, pymagic
 
 
 NOHASH = (

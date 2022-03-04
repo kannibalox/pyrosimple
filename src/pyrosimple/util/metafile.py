@@ -18,23 +18,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import re
-import sys
-import time
-import stat
-import math
 import errno
-import pprint
 import fnmatch
 import hashlib
+import math
+import pprint
+import re
+import stat
+import sys
+import time
 import urllib
+
 from pathlib import PurePath
 
 import bencode
 
-from pyrosimple.util.parts import Bunch
 from pyrosimple import config, error
-from pyrosimple.util import os, fmt, pymagic
+from pyrosimple.util import fmt, os, pymagic
+from pyrosimple.util.parts import Bunch
 
 
 # Allowed characters in a metafile filename or path

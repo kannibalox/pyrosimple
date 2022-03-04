@@ -4,6 +4,10 @@
 
     Copyright (c) 2009, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
+import codecs
+import datetime
+import logging
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -18,10 +22,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import time
-import codecs
-import logging
-import datetime
+
 from pprint import pformat
+
 
 log = logging.getLogger(__name__)
 

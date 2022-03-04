@@ -18,18 +18,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import re
-import sys
 import json
 import logging
 import operator
+import re
+import sys
 
-from pyrosimple.util import templating
-from pyrosimple.util.parts import Bunch
-
-from pyrosimple import error, config
+from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import os, fmt, algo, pymagic
+from pyrosimple.util import algo, fmt, os, pymagic, templating
+from pyrosimple.util.parts import Bunch
 
 
 #

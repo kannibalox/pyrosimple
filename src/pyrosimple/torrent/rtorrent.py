@@ -18,20 +18,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import sys
-import time
 import errno
-import shlex
 import fnmatch
 import logging
 import operator
+import shlex
+import sys
+import time
+
 from collections import namedtuple
 from functools import partial
 
-from pyrosimple.util.parts import Bunch
 from pyrosimple import config, error
-from pyrosimple.util import os, xmlrpc, load_config, traits, fmt, matching
 from pyrosimple.torrent import engine
+from pyrosimple.util import fmt, load_config, matching, os, traits, xmlrpc
+from pyrosimple.util.parts import Bunch
 
 
 class CommaLexer(shlex.shlex):

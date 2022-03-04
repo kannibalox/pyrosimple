@@ -24,8 +24,8 @@
 
 from collections import namedtuple
 
-from pyrosimple import error
 from pyrosimple import config as config_ini
+from pyrosimple import error
 from pyrosimple.torrent import engine, matching
 
 

@@ -19,16 +19,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import sys
-import time
 import errno
-import random
-import textwrap
 import logging.config
+import random
+import sys
+import textwrap
+import time
+
 from argparse import ArgumentParser
 
-from pyrosimple import error, config
-from pyrosimple.util import os, pymagic, load_config
+from pyrosimple import config, error
+from pyrosimple.util import load_config, os, pymagic
 
 
 class ScriptBase(object):

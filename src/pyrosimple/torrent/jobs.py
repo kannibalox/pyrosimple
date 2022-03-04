@@ -18,10 +18,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from pyrosimple.util.parts import Bunch
-from pyrosimple import error
 from pyrosimple import config as config_ini
-from pyrosimple.util import fmt, xmlrpc, pymagic
+from pyrosimple import error
+from pyrosimple.util import fmt, pymagic, xmlrpc
+from pyrosimple.util.parts import Bunch
 
 
 class EngineStats(object):
@@ -55,6 +55,7 @@ def module_test():
     python -m pyrosimple.torrent.jobs
     """
     import pprint
+
     from pyrosimple import connect
 
     try:

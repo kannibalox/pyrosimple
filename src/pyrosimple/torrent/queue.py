@@ -19,10 +19,10 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import time
 
-from pyrosimple import error
 from pyrosimple import config as config_ini
-from pyrosimple.util import fmt, xmlrpc, pymagic
-from pyrosimple.torrent import engine, matching, formatting
+from pyrosimple import error
+from pyrosimple.torrent import engine, formatting, matching
+from pyrosimple.util import fmt, pymagic, xmlrpc
 
 
 class QueueManager(object):

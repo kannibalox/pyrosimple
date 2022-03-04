@@ -19,8 +19,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from pyrosimple import config, error
-from pyrosimple.util import xmlrpc
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.util import xmlrpc
 
 
 class CategoryManager(ScriptBaseWithConfig):

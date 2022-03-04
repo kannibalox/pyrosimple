@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import logging
 
+
 # Maximum length of object representations
 MAX_DISPLAY_LEN = 99
 

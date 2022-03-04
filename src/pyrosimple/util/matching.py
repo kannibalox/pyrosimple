@@ -4,6 +4,9 @@
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
+import fnmatch
+import operator
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -18,13 +21,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import re
-import time
 import shlex
-import fnmatch
-import operator
+import time
 
-from pyrosimple import error, config
+from pyrosimple import config, error
 from pyrosimple.util import fmt
+
 
 TRUE = {
     "true",

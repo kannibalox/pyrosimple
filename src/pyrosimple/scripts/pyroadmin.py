@@ -18,22 +18,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import re
-import sys
-import glob
-import shutil
-import pprint
 import fnmatch
-from zipfile import ZipFile
+import glob
+import pprint
+import re
+import shutil
+import sys
+
 from contextlib import closing
+from zipfile import ZipFile
+
+import six
 
 from six.moves import StringIO, urllib
 from six.moves import xmlrpc_client as xmlrpclib
-import six
 
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple import config, error
-from pyrosimple.util import os, load_config, metafile, matching, fmt
+from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.util import fmt, load_config, matching, metafile, os
 
 
 class AdminTool(ScriptBaseWithConfig):
