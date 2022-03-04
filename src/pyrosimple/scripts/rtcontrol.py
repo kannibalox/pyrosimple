@@ -277,14 +277,14 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def __init__(self):
         """Initialize rtcontrol."""
-        super(RtorrentControl, self).__init__()
+        super().__init__()
 
         self.prompt = PromptDecorator(self)
         self.plain_output_format = False
 
     def add_options(self):
         """Add program options."""
-        super(RtorrentControl, self).add_options()
+        super().add_options()
 
         # basic options
         self.add_bool_option(
@@ -415,9 +415,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             default=[],
             help="execute OS command pattern(s) directly",
         )
-        # TODO: implement -S
-        #        self.add_bool_option("-S", "--summary",
-        #            help="print statistics")
 
         # torrent state change (actions)
         for action in self.ACTION_MODES:
@@ -533,7 +530,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # For a header, use configured escape codes on a terminal
         if item is None and os.isatty(sys.stdout.fileno()):
             item_text = b"".join(
-                (config.output_header_ecma48.encode(), item_text, b"\x1B[0m")
+                (config.output_header_ecma48, item_text, b"\x1B[0m")
             )
 
         # Set up stdout for writing
@@ -600,7 +597,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         for name in emit_fields[:]:
             name = name.decode()
             if name not in engine.FieldDefinition.FIELDS:
-                self.LOG.warn(
+                self.LOG.warning(
                     "Omitted unknown name '%s' from statistics and output format sorting"
                     % name
                 )
@@ -842,11 +839,11 @@ class RtorrentControl(ScriptBaseWithConfig):
                 set(["invert", "unique"])
             ):
                 if self.options.from_view not in (None, "default"):
-                    self.LOG.warn(
+                    self.LOG.warning(
                         "Mixing --anneal with a view other than 'default' might yield unexpected results!"
                     )
                 if int(config.fast_query):
-                    self.LOG.warn(
+                    self.LOG.warning(
                         "Using --anneal together with the query optimizer might yield unexpected results!"
                     )
             for mode in self.options.anneal:
@@ -923,7 +920,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 for i in action.args
             ]
             for item in matches:
-                if not self.prompt.ask_bool(u"%s item %s" % (action.label, item.name)):
+                if not self.prompt.ask_bool("%s item %s" % (action.label, item.name)):
                     continue
                 if (
                     self.options.output_format
@@ -1096,10 +1093,6 @@ class RtorrentControl(ScriptBaseWithConfig):
                     view.size(),
                 )
             )
-
-        if self.options.debug and 0:
-            print("\n" + repr(matches[0]))
-            print("\n" + repr(matches[0].files))
 
         # XMLRPC stats
         self.LOG.debug("XMLRPC stats: %s" % config.engine._rpc)
