@@ -40,7 +40,7 @@ except ImportError as exc:
     )  # bogus pylint: disable=C0103
 
 
-class MetafileHandler(object):
+class MetafileHandler():
     """Handler for loading metafiles into rTorrent."""
 
     def __init__(self, job, pathname):
@@ -53,13 +53,13 @@ class MetafileHandler(object):
             tracker_alias=None,
         )
 
-    def parse(self):
+    def parse(self) -> bool:
         """Parse metafile and check pre-conditions."""
         try:
             if not os.path.getsize(self.ns.pathname):
                 # Ignore 0-byte dummy files (Firefox creates these while downloading)
                 self.job.LOG.warning("Ignoring 0-byte metafile '%s'", self.ns.pathname)
-                return
+                return False
             self.metadata = metafile.checked_open(self.ns.pathname)
         except EnvironmentError as exc:
             self.job.LOG.error(
@@ -68,10 +68,10 @@ class MetafileHandler(object):
                 str(exc).replace(": '%s'" % self.ns.pathname, ""),
 
             )
-            return
+            return False
         except ValueError as exc:
             self.job.LOG.error("Invalid metafile '%s': %s", self.ns.pathname, exc)
-            return
+            return False
 
         self.ns.info_hash = metafile.info_hash(self.metadata)
         self.ns.info_name = self.metadata["info"]["name"]
@@ -87,13 +87,13 @@ class MetafileHandler(object):
             if exc.faultString != "Could not find info-hash.":
                 self.job.LOG.error(
                     "While checking for #%s: %s", self.ns.info_hash, exc)
-                return
+                return False
         else:
             self.job.LOG.warn(
                 "Item #%s '%s' already added to client", self.ns.info_hash, name)
             if self.job.config.remove_already_added:
                 Path(self.ns.pathname).unlink()
-            return
+            return False
 
         return True
 
@@ -221,7 +221,7 @@ class MetafileHandler(object):
             self.load()
 
 
-class RemoteWatch(object):
+class RemoteWatch():
     """rTorrent remote torrent file watch."""
 
     def __init__(self, config=None):
@@ -309,14 +309,9 @@ class TreeWatch(object):
         self.config.queued = bool_param("queued", False)
         self.config.trace_inotify = bool_param("trace_inotify", False)
 
-        self.config.path = set(
-            [
-                os.path.abspath(os.path.expanduser(path.strip()).rstrip(os.sep))
-                for path in self.config.path.split(os.pathsep)
-            ]
-        )
+        self.config.path = {Path(p).expanduser().absolute() for p in self.config.path.split(os.pathsep)}
         for path in self.config.path:
-            if not os.path.isdir(path):
+            if not path.is_dir():
                 raise error.UserError("Path '%s' is not a directory!" % path)
 
         # Assemble custom commands

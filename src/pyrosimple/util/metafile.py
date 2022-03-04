@@ -28,6 +28,7 @@ import pprint
 import fnmatch
 import hashlib
 import urllib
+from pathlib import PurePath
 
 import bencode
 
@@ -97,7 +98,7 @@ def console_progress():
 def mask_keys(announce_url: str):
     """Mask any passkeys (hex sequences) in an announce URL."""
     return PASSKEY_RE.sub(
-        lambda m: m.group() if m.group() in PASSKEY_OK else u"*" * len(m.group()),
+        lambda m: m.group() if m.group() in PASSKEY_OK else "*" * len(m.group()),
         announce_url,
     )
 
@@ -407,7 +408,7 @@ def checked_open(filename, log=None, quiet=False):
     return data
 
 
-class Metafile(object):
+class Metafile():
     """A torrent metafile."""
 
     # Patterns of names to ignore
@@ -525,20 +526,14 @@ class Metafile(object):
             file_list.append(
                 {
                     "length": filesize,
-                    "path": [
-                        x
-                        for x in fmt.to_unicode(filepath)
-                        .replace(os.sep, "/")
-                        .split("/")
-                    ],
+                    "path": PurePath(filepath).parts,
                 }
             )
             self.LOG.debug("Hashing %r, size %d...", filename, filesize)
 
             # Open file and hash it
             fileoffset = 0
-            handle = open(filename, "rb")
-            try:
+            with open(filename, "rb") as handle:
                 while fileoffset < filesize:
                     # Read rest of piece or file, whatever is smaller
                     chunk = handle.read(min(filesize - fileoffset, piece_size - done))
@@ -560,8 +555,6 @@ class Metafile(object):
                     # Report progress
                     if progress:
                         progress(totalhashed, totalsize)
-            finally:
-                handle.close()
 
         # Add hash of partial last piece
         if done > 0:
@@ -631,8 +624,6 @@ class Metafile(object):
             "info": info,
             "announce": tracker_url.strip(),
         }
-
-        # XXX meta["encoding"] = "UTF-8"
 
         # Return validated meta dict
         return check_meta(meta), totalhashed

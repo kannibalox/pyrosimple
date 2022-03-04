@@ -226,12 +226,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     self.LOG.info("Process #%d NOT running anymore.", pid)
                 else:
                     self.LOG.info(
-                        "No pid file '%s'", (self.options.pid_file or "<N/A>")
-                    )
+                        "No pid file '%s'", (self.options.pid_file or "<N/A>"))
             else:
                 self.LOG.info(
                     "Process #%d %s running.", pid, "UP and" if running else "NOT")
-                )
 
             if self.options.restart:
                 if self.options.pid_file:
@@ -287,7 +285,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     self.LOG.warn(
                         "Failed to remove pid file '%s' (%s)",
                         self.options.pid_file, exc)
-                    )
                     self.return_code = error.EX_IOERR
 
 

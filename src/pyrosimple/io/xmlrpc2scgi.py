@@ -45,7 +45,7 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 #
 
 
-class LocalTransport(object):
+class LocalTransport():
     """Transport via TCP or a UNIX domain socket."""
 
     # Amount of bytes to read at once
@@ -101,7 +101,7 @@ class LocalTransport(object):
             sock.close()
 
 
-class SSHTransport(object):
+class SSHTransport():
     """Transport via SSH to a UNIX domain socket."""
 
     def __init__(self, url):
@@ -147,7 +147,7 @@ class SSHTransport(object):
                 stderr=subprocess.PIPE,
             )
         except OSError as exc:
-            raise URLError("Calling %r failed (%s)!" % (" ".join(self.cmd), exc))
+            raise URLError("Calling %r failed (%s)!" % (" ".join(self.cmd), exc)) from exc
         else:
             stdout, stderr = proc.communicate(data)
             if proc.returncode:
@@ -186,7 +186,7 @@ def transport_from_url(url):
             # Support simplified "domain:port" URLs
             return transport_from_url("scgi://%s:%s" % (url.scheme, url.path))
         else:
-            raise URLError("Unsupported scheme in URL %r" % url.geturl())
+            raise URLError("Unsupported scheme in URL %r" % url.geturl()) # pylint: disable=raise-missing-from
     else:
         return transport(url)
 
@@ -240,7 +240,7 @@ def _parse_headers(headers):
                 headers.decode(),
                 exc,
             )
-        )
+        ) from exc
 
 
 def _parse_response(resp):
@@ -262,7 +262,7 @@ def _parse_response(resp):
                 len(resp),
                 exc,
             )
-        )
+        ) from exc
     headers = _parse_headers(headers)
 
     clen = headers.get("Content-Length")
@@ -276,7 +276,7 @@ def _parse_response(resp):
 #
 # SCGI request handling
 #
-class SCGIRequest(object):
+class SCGIRequest():
     """Send a SCGI request.
     See spec at "http://python.ca/scgi/protocol.txt".
 

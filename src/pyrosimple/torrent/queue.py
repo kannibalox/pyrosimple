@@ -75,7 +75,8 @@ class QueueManager(object):
 
     def _start(self, items):
         """Start some items if conditions are met."""
-        # TODO: Filter by a custom date field, for scheduled downloads starting at a certain time, or after a given delay
+        # TODO: Filter by a custom date field, for scheduled downloads starting at a certain time
+        # or after a given delay
 
         # TODO: Don't start anything more if download BW is used >= config threshold in %
 
@@ -102,8 +103,6 @@ class QueueManager(object):
                 len(startable), self.config.intermission, delayed
             )
             return
-
-        # TODO: sort by priority, then loaded time
 
         # Stick to "start_at_once" parameter, unless "downloading_min" is violated
         downloading = [i for i in items if self.config.downloading.match(i)]
@@ -154,7 +153,7 @@ class QueueManager(object):
             self.last_start = now
             downloading.append(item)
             self.LOG.info(
-                u"%s '%s' [%s, #%s]",
+                "%s '%s' [%s, #%s]",
                 "WOULD start" if self.config.dry_run else "Starting",
                 item.name,
                 item.alias,
@@ -165,7 +164,7 @@ class QueueManager(object):
                 if not self.config.quiet:
                     self.proxy.log(
                         xmlrpc.NOHASH,
-                        u"%s: Started '%s' {%s}"
+                        "%s: Started '%s' {%s}"
                         % (
                             self.__class__.__name__,
                             fmt.to_unicode(item.name),
