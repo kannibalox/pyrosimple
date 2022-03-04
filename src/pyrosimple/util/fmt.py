@@ -22,7 +22,7 @@ import logging
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import time
 
-from typing import Union
+from typing import Union, Optional
 from pprint import pformat
 
 
@@ -53,7 +53,7 @@ def human_size(size: int) -> str:
     return "%6.1f TiB" % rem
 
 
-def iso_datetime(timestamp=None) -> str:
+def iso_datetime(timestamp:Optional[float]=None) -> str:
     """Convert UNIX timestamp to ISO datetime string.
 
     @param timestamp: UNIX epoch value (default: the current time).
@@ -75,7 +75,7 @@ def iso_datetime_optional(timestamp) -> str:
     return "never"
 
 
-def human_duration(time1, time2=None, precision=0, short=False) -> str:
+def human_duration(time1: float, time2=Optional[float], precision: int=0, short: bool=False) -> str:
     """Return a human-readable representation of a time delta.
 
     @param time1: Relative time value.
@@ -128,16 +128,6 @@ def human_duration(time1, time2=None, precision=0, short=False) -> str:
         return result.rjust(1 + precision * 4 + (4 if time2 else 0))
     else:
         return result
-
-
-def to_console(text) -> bytes:
-    """Return a byte string intended for console output."""
-    if isinstance(text, bytes):
-        # For now, leave byte strings as-is (ignoring possible display problems)
-        return text
-
-    # Convert other stuff into an UTF-8 string
-    return str(text).encode("utf8")
 
 
 def convert_strings_in_iter(obj):

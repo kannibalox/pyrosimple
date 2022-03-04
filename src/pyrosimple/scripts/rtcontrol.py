@@ -26,12 +26,14 @@ import subprocess
 import sys
 import time
 
+from typing import Optional
+
 import daemon
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import engine, formatting
-from pyrosimple.util import fmt, matching, os, pymagic, xmlrpc
+from pyrosimple.util import matching, os, pymagic, xmlrpc
 from pyrosimple.util.parts import Bunch, DefaultBunch
 
 
@@ -850,12 +852,10 @@ class RtorrentControl(ScriptBaseWithConfig):
             self.return_code = 44
 
         # Build header stencil
-        stencil = None
+        stencil: Optional[str] = None
         if self.options.column_headers and self.plain_output_format and matches:
-            stencil = fmt.to_console(
-                formatting.format_item(
+            stencil = formatting.format_item(
                     self.options.output_format, matches[0], self.FORMATTER_DEFAULTS
-                )
             ).split("\t")
 
         # Tee to ncurses view, if requested

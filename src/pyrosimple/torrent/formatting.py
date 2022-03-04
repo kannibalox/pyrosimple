@@ -24,6 +24,10 @@ import operator
 import re
 import sys
 
+from typing import Optional, Dict, Any, Union
+
+import tempita
+
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
 from pyrosimple.util import algo, fmt, os, pymagic, templating
@@ -41,7 +45,7 @@ def fmt_sz(intval: int) -> str:
         return "N/A".rjust(len(fmt.human_size(0)))
 
 
-def fmt_iso(timestamp):
+def fmt_iso(timestamp: float) -> str:
     """Format a UNIX timestamp to an ISO datetime string."""
     try:
         return fmt.iso_datetime(timestamp)
@@ -49,7 +53,7 @@ def fmt_iso(timestamp):
         return "N/A".rjust(len(fmt.iso_datetime(0)))
 
 
-def fmt_duration(duration):
+def fmt_duration(duration: int):
     """Format a duration value in seconds to a readable form."""
     try:
         return fmt.human_duration(float(duration), 0, 2, True)
@@ -65,7 +69,7 @@ def fmt_delta(timestamp):
         return "N/A".rjust(len(fmt.human_duration(0, precision=2, short=True)))
 
 
-def fmt_pc(floatval):
+def fmt_pc(floatval: float):
     """Scale a ratio value to percent."""
     return round(float(floatval) * 100.0, 2)
 
@@ -80,17 +84,17 @@ def fmt_subst(regex, subst):
     return lambda text: re.sub(regex, subst, text) if text else text
 
 
-def fmt_mtime(val):
+def fmt_mtime(val: str) -> float:
     """Modification time of a path."""
-    return os.path.getmtime(val) if val else 0
+    return os.path.getmtime(val) if val else 0.0
 
 
-def fmt_pathbase(val):
+def fmt_pathbase(val: str):
     """Base name of a path."""
     return os.path.basename(val or "")
 
 
-def fmt_pathname(val):
+def fmt_pathname(val: str):
     """Base name of a path, without its extension."""
     return os.path.splitext(os.path.basename(val or ""))[0]
 
@@ -228,7 +232,7 @@ def preparse(output_format):
 
 # TODO: All constant stuff should be calculated once, make this a class or something
 # Also parse the template only once (possibly in config validation)!
-def expand_template(template, namespace):
+def expand_template(template: tempita.Template, namespace: Dict) -> str:
     """Expand the given (preparsed) template.
     Currently, only Tempita templates are supported.
 
@@ -257,7 +261,7 @@ def expand_template(template, namespace):
     # Expand template
     try:
         template = preparse(template)
-        return template.substitute(**variables)
+        return str(template.substitute(**variables))
     except (AttributeError, ValueError, NameError, TypeError) as exc:
         hint = ""
         if "column" in str(exc):
@@ -283,7 +287,7 @@ def expand_template(template, namespace):
         )
 
 
-def format_item(format_spec, item, defaults=None):
+def format_item(format_spec, item: Union[Dict, str], defaults=None) -> str:
     """Format an item according to the given output format.
     The format can be gioven as either an interpolation string,
     or a Tempita template (which has to start with "E{lb}E{lb}"),
@@ -299,8 +303,8 @@ def format_item(format_spec, item, defaults=None):
         not template_engine and format_spec.startswith("{{")
     ):
         # Set item, or field names for column titles
-        namespace = dict(headers=not bool(item))
-        if item:
+        namespace: Dict[str, Any] = dict(headers=not bool(item))
+        if isinstance(item, str):
             namespace["d"] = item
         else:
             namespace["d"] = Bunch()
@@ -318,7 +322,7 @@ def format_item(format_spec, item, defaults=None):
     elif template_engine == "jinja2" or (
         not template_engine and format_spec.startswith("{#")
     ):
-        return format_spec.render(d=item)
+        return str(format_spec.render(d=item))
     else:
         # Interpolation
         format_spec = getattr(format_spec, "fmt", format_spec)
@@ -331,7 +335,7 @@ def format_item(format_spec, item, defaults=None):
                 format_spec,
             )
 
-        return format_spec % OutputMapping(item, defaults)
+        return str(format_spec % OutputMapping(item, defaults))
 
 
 def validate_field_list(fields, allow_fmt_specs=False, name_filter=None):
