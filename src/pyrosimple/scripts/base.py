@@ -137,8 +137,6 @@ class ScriptBase(object):
             kwargs["help"] += " [%s]" % kwargs["default"]
         if "choices" in kwargs:
             del kwargs["type"]
-        print(args[:-1])
-        print(kwargs)
         self.parser.add_argument(*args[:-1], **kwargs)
 
     def get_options(self):
