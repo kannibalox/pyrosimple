@@ -298,7 +298,9 @@ def assign_fields(meta, assignments):
                 # Create missing dicts as we go...
                 namespace = namespace.setdefault(fmt.to_utf8(key), {})
         except (KeyError, IndexError, TypeError, ValueError) as exc:
-            raise error.UserError("Bad assignment %r (%s)!" % (assignment, exc)) from exc
+            raise error.UserError(
+                "Bad assignment %r (%s)!" % (assignment, exc)
+            ) from exc
         else:
             if val is None:
                 del namespace[fmt.to_utf8(keypath[-1])]
@@ -408,7 +410,7 @@ def checked_open(filename, log=None, quiet=False):
     return data
 
 
-class Metafile():
+class Metafile:
     """A torrent metafile."""
 
     # Patterns of names to ignore
@@ -601,7 +603,7 @@ class Metafile():
                 piece_size_exp = 0
 
         piece_size_exp = min(max(15, piece_size_exp), 24)
-        piece_size = 2 ** piece_size_exp
+        piece_size = 2**piece_size_exp
 
         # Build info hash
         info, totalhashed = self._make_info(
@@ -681,9 +683,7 @@ class Metafile():
                 try:
                     output_name[1:1] = "-" + tracker_alias
                 except (IndexError,):
-                    self.LOG.error(
-                        "Malformed announce URL %r, skipping!", tracker_url
-                    )
+                    self.LOG.error("Malformed announce URL %r, skipping!", tracker_url)
                     continue
                 output_name = "".join(output_name)
 
@@ -728,7 +728,8 @@ class Metafile():
             ):
                 self.LOG.warning(
                     "Piece #%d: Hashes differ in file %r",
-                    check_piece.piece_index // 20, filename
+                    check_piece.piece_index // 20,
+                    filename,
                 )
             check_piece.piece_index += 20
 

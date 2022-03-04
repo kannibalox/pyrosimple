@@ -59,7 +59,7 @@ class HashNotFound(XmlRpcError):
 ERRORS = (XmlRpcError,) + xmlrpc2scgi.ERRORS
 
 
-class RTorrentMethod():
+class RTorrentMethod:
     """Collect attribute accesses to build the final method name."""
 
     # Actually, many more methods might need a fake target added; but these are the ones we call...
@@ -170,10 +170,11 @@ class RTorrentMethod():
                     # pylint: disable=raise-missing-from
                     raise HashNotFound(
                         "Unknown hash for {}({}) @ {}".format(
-                        self._method_name,
-                        args[0] if args else "",
-                        self._proxy._url,
-                    ))
+                            self._method_name,
+                            args[0] if args else "",
+                            self._proxy._url,
+                        )
+                    )
 
                 if not fail_silently:
                     # Dump the bad packet, then re-raise

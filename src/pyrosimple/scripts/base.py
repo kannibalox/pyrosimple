@@ -82,6 +82,7 @@ class ScriptBase(object):
 
         try:
             import importlib.metadata
+
             self.__version__ = importlib.metadata.version("pyrosimple")
         except ImportError:
             self.__version__ = "unknown"
@@ -101,8 +102,10 @@ class ScriptBase(object):
             + "\n\n    https://pyrosimple.readthedocs.io/",
         )
 
-        self.parser.add_argument('--version', action='version', version="%(prog)s " + self.version_info)
-        self.parser.add_argument('args', nargs='*')
+        self.parser.add_argument(
+            "--version", action="version", version="%(prog)s " + self.version_info
+        )
+        self.parser.add_argument("args", nargs="*")
 
     def add_bool_option(self, *args, **kwargs):
         """Add a boolean option.
@@ -387,7 +390,7 @@ class PromptDecorator(object):
             choice = "*"
             while choice not in "YNAQ":
                 choice = input(
-                    u"%s? [%s)es, %s)o, a)ll yes, q)uit]: "
+                    "%s? [%s)es, %s)o, a)ll yes, q)uit]: "
                     % (
                         question,
                         "yY"[int(default)],

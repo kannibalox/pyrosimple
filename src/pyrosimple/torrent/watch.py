@@ -40,7 +40,7 @@ except ImportError as exc:
     )  # bogus pylint: disable=C0103
 
 
-class MetafileHandler():
+class MetafileHandler:
     """Handler for loading metafiles into rTorrent."""
 
     def __init__(self, job, pathname):
@@ -66,7 +66,6 @@ class MetafileHandler():
                 "Can't read metafile '%s' (%s)",
                 self.ns.pathname,
                 str(exc).replace(": '%s'" % self.ns.pathname, ""),
-
             )
             return False
         except ValueError as exc:
@@ -76,7 +75,8 @@ class MetafileHandler():
         self.ns.info_hash = metafile.info_hash(self.metadata)
         self.ns.info_name = self.metadata["info"]["name"]
         self.job.LOG.info(
-            "Loaded '%s' from metafile '%s'", self.ns.info_name, self.ns.pathname)
+            "Loaded '%s' from metafile '%s'", self.ns.info_name, self.ns.pathname
+        )
 
         # Check whether item is already loaded
         try:
@@ -85,12 +85,12 @@ class MetafileHandler():
             pass
         except xmlrpc.ERRORS as exc:
             if exc.faultString != "Could not find info-hash.":
-                self.job.LOG.error(
-                    "While checking for #%s: %s", self.ns.info_hash, exc)
+                self.job.LOG.error("While checking for #%s: %s", self.ns.info_hash, exc)
                 return False
         else:
             self.job.LOG.warn(
-                "Item #%s '%s' already added to client", self.ns.info_hash, name)
+                "Item #%s '%s' already added to client", self.ns.info_hash, name
+            )
             if self.job.config.remove_already_added:
                 Path(self.ns.pathname).unlink()
             return False
@@ -221,7 +221,7 @@ class MetafileHandler():
             self.load()
 
 
-class RemoteWatch():
+class RemoteWatch:
     """rTorrent remote torrent file watch."""
 
     def __init__(self, config=None):
@@ -309,7 +309,9 @@ class TreeWatch(object):
         self.config.queued = bool_param("queued", False)
         self.config.trace_inotify = bool_param("trace_inotify", False)
 
-        self.config.path = {Path(p).expanduser().absolute() for p in self.config.path.split(os.pathsep)}
+        self.config.path = {
+            Path(p).expanduser().absolute() for p in self.config.path.split(os.pathsep)
+        }
         for path in self.config.path:
             if not path.is_dir():
                 raise error.UserError("Path '%s' is not a directory!" % path)
@@ -370,7 +372,7 @@ class TreeWatch(object):
         # XXX: Also check for unhandled files
         if self.config.check_unhandled:
             for path in self.config.path:
-                for filepath in Path(path).rglob('**/*.torrent'):
+                for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
                     if self.config.remove_unhandled and filepath.exists():
                         filepath.unlink()

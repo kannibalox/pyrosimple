@@ -44,7 +44,7 @@ def flatten(nested, containers=(list, tuple)):
     return flat
 
 
-class AttributeMapping():
+class AttributeMapping:
     """Wrap an object's dict so that it can be accessed by the mapping protocol."""
 
     def __init__(self, obj, defaults=None):

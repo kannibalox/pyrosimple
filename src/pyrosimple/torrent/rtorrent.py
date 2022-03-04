@@ -60,8 +60,11 @@ class RtorrentItem(engine.TorrentProxy):
         try:
             for call in calls:
                 self._engine.LOG.debug(
-                    "%s%s torrent #%s (%s)"
-                    , command[0].upper(), command[1:], self._fields["hash"], call
+                    "%s%s torrent #%s (%s)",
+                    command[0].upper(),
+                    command[1:],
+                    self._fields["hash"],
+                    call,
                 )
                 if call.startswith(":") or call[:2].endswith("."):
                     namespace = self._engine._rpc
@@ -332,8 +335,9 @@ class RtorrentItem(engine.TorrentProxy):
 
         if (name or "NONE") == self.throttle:
             self._engine.LOG.debug(
-                "Keeping throttle %r on torrent #%s"
-                , self.throttle, self._fields["hash"]
+                "Keeping throttle %r on torrent #%s",
+                self.throttle,
+                self._fields["hash"],
             )
             return
 
@@ -348,7 +352,8 @@ class RtorrentItem(engine.TorrentProxy):
         )
         if active:
             self._engine.LOG.debug(
-                "Torrent #%s restarted after throttling", self._fields["hash"],
+                "Torrent #%s restarted after throttling",
+                self._fields["hash"],
             )
             self.start()
 
@@ -482,8 +487,9 @@ class RtorrentItem(engine.TorrentProxy):
                         if exc.errno == errno.ENOENT:
                             # Seems this disappeared somehow inbetween (race condition)
                             self._engine.LOG.info(
-                                "Path '%s%s' disappeared before it could be deleted"
-                                , rm_path, "/" if is_dir else ""
+                                "Path '%s%s' disappeared before it could be deleted",
+                                rm_path,
+                                "/" if is_dir else "",
                             )
                         else:
                             raise
@@ -543,10 +549,10 @@ class RtorrentItem(engine.TorrentProxy):
             if residue and residue != ignorable:
                 self._engine.LOG.info(
                     "Keeping non-empty directory '%s' with %d %s%s!",
-                        path,
-                        len(residue),
-                        "entry" if len(residue) == 1 else "entries",
-                        (" (%d ignorable)" % len(ignorable)) if ignorable else "",
+                    path,
+                    len(residue),
+                    "entry" if len(residue) == 1 else "entries",
+                    (" (%d ignorable)" % len(ignorable)) if ignorable else "",
                 )
             else:
                 ##print "---", ignorable
@@ -766,10 +772,11 @@ class RtorrentEngine(engine.TorrentEngine):
         time_usec = self._rpc.system.time_usec()
 
         # Make sure xmlrpc-c works as expected
-        if time_usec < 2 ** 32:
+        if time_usec < 2**32:
             self.LOG.warn(
                 "Your xmlrpc-c is broken (64 bit integer support missing,"
-                " %r returned instead)", type(time_usec)
+                " %r returned instead)",
+                type(time_usec),
             )
 
         # Get other manifest values
@@ -798,7 +805,7 @@ class RtorrentEngine(engine.TorrentEngine):
         """
         commands = tuple("d.{}=".format(x) for x in fields)
         result_type = namedtuple("DownloadItem", [x.replace(".", "_") for x in fields])
-        items = self.open().d.multicall2('', viewname, *commands)
+        items = self.open().d.multicall2("", viewname, *commands)
         return [result_type(*x) for x in items]
 
     def log(self, msg):
@@ -866,7 +873,7 @@ class RtorrentEngine(engine.TorrentEngine):
                     raw_items = [[i[0] for i in multi_call(args)]]
                 else:
                     multi_call = self.open().d.multicall2
-                    args = ['', view.viewname] + [
+                    args = ["", view.viewname] + [
                         field if "=" in field else field + "=" for field in args
                     ]
                     if view.matcher and int(config.fast_query):
@@ -883,8 +890,11 @@ class RtorrentEngine(engine.TorrentEngine):
                 ##self.LOG.debug("multicall %r" % (args,))
                 ##import pprint; self.LOG.debug(pprint.pformat(raw_items))
                 self.LOG.debug(
-                    "Got %d items with %d attributes from %r [%s]"
-                    , len(raw_items), len(prefetch), self.engine_id, multi_call
+                    "Got %d items with %d attributes from %r [%s]",
+                    len(raw_items),
+                    len(prefetch),
+                    self.engine_id,
+                    multi_call,
                 )
 
                 for item in raw_items:

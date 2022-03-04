@@ -207,7 +207,7 @@ class ConfigLoader(object):
             self.LOG.warning(
                 "Configuration file %r not found,"
                 " use the command 'pyroadmin --create-config' to create it!",
-                config_file
+                config_file,
             )
 
     def _load_py(self, namespace, config_file):

@@ -87,6 +87,7 @@ def preparse(template_text, lookup=None):
             template.__engine__ = "tempita"
         elif template_text.startswith("{#"):
             from jinja2 import Template
+
             template = Template(template_text)
             template.__engine__ = "jinja2"
         else:

@@ -68,7 +68,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "--fg",
             help="Don't fork into background (stay in foreground and log to console)",
         )
-        self.add_value_option("--run-once", "JOB", help="run the specified job once in the foreground")
+        self.add_value_option(
+            "--run-once", "JOB", help="run the specified job once in the foreground"
+        )
         self.add_bool_option("--stop", help="Stop running daemon")
         self.add_bool_option(
             "--restart", help="Stop running daemon, then fork into background"
@@ -90,7 +92,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for param in shlex.split(str(schedule)):  # do not feed unicode to shlex
             try:
                 key, val = param.split("=", 1)
-                if key == 'jitter':
+                if key == "jitter":
                     val = int(val)
             except (TypeError, ValueError):
                 self.fatal("Bad param '%s' in job schedule '%s'" % (param, schedule))
@@ -163,7 +165,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for name, params in self.jobs.items():
             if params.active:
                 params.handler = params.handler(params)
-                self.sched.add_job(params.handler.run, name=name, trigger='cron', **params.schedule)
+                self.sched.add_job(
+                    params.handler.run, name=name, trigger="cron", **params.schedule
+                )
 
     def _run_forever(self):
         """Run configured jobs until termination request."""
@@ -184,8 +188,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     self.options.guard_file
                 ):
                     self.LOG.warn(
-                        "Guard file '%s' disappeared, exiting!",
-                        self.options.guard_file
+                        "Guard file '%s' disappeared, exiting!", self.options.guard_file
                     )
                     break
 
@@ -198,9 +201,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         if not self.options.no_fork and not self.options.guard_file:
             self.options.guard_file = os.path.join(config.config_dir, "run/pyrotorque")
         if not self.options.pid_file:
-            self.options.pid_file = TimeoutPIDLockFile(Path(
-                config.config_dir, "run/pyrotorque.pid"
-            ))
+            self.options.pid_file = TimeoutPIDLockFile(
+                Path(config.config_dir, "run/pyrotorque.pid")
+            )
 
         # Process control
         if self.options.status or self.options.stop or self.options.restart:
@@ -226,10 +229,12 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     self.LOG.info("Process #%d NOT running anymore.", pid)
                 else:
                     self.LOG.info(
-                        "No pid file '%s'", (self.options.pid_file or "<N/A>"))
+                        "No pid file '%s'", (self.options.pid_file or "<N/A>")
+                    )
             else:
                 self.LOG.info(
-                    "Process #%d %s running.", pid, "UP and" if running else "NOT")
+                    "Process #%d %s running.", pid, "UP and" if running else "NOT"
+                )
 
             if self.options.stop:
                 self.return_code = error.EX_OK if running else error.EX_UNAVAILABLE
@@ -237,7 +242,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         # Check for guard file and running daemon, abort if not OK
         if self.options.guard_file and not os.path.exists(self.options.guard_file):
-            raise EnvironmentError("Guard file '%s' not found, won't start!" % self.options.guard_file)
+            raise EnvironmentError(
+                "Guard file '%s' not found, won't start!" % self.options.guard_file
+            )
 
         # Check if we only need to run once
         if self.options.run_once:

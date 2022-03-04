@@ -26,7 +26,7 @@ import operator
 from pyrosimple import error, config
 from pyrosimple.util import fmt
 
-TRUE ={
+TRUE = {
     "true",
     "t",
     "yes",
@@ -44,11 +44,12 @@ FALSE = {
     "-",
 }
 
+
 def truth(val, context) -> bool:
     """Convert truth value in "val" to a boolean."""
     # Try coercing it to an int then a bool
     try:
-        return(bool(0 + val))
+        return bool(0 + val)
     except TypeError:
         pass
 
@@ -88,7 +89,7 @@ class FilterError(error.UserError):
     """(Syntax) error in filter."""
 
 
-class Filter():
+class Filter:
     """Base class for all filters."""
 
     def pre_filter(self) -> str:  # pylint: disable=no-self-use
@@ -609,7 +610,7 @@ class DurationFilter(TimeFilter):
 class ByteSizeFilter(NumericFilterBase):
     """Filter size and bandwidth values."""
 
-    UNITS = dict(b=1, k=1024, m=1024 ** 2, g=1024 ** 3)
+    UNITS = dict(b=1, k=1024, m=1024**2, g=1024**3)
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
@@ -674,7 +675,7 @@ class MagicFilter(FieldFilter):
         return self._inner.match(item)
 
 
-class ConditionParser():
+class ConditionParser:
     """Filter condition parser."""
 
     COMPARISON_OPS = {

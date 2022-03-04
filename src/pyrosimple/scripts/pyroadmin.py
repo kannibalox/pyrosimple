@@ -339,7 +339,7 @@ class AdminTool(ScriptBaseWithConfig):
                             if len(val) > self.RC_CONTINUATION_THRESHOLD:
                                 val = "\\\n    " + val
                             print(
-                                u'method.set_key = {}, "{}", {}'.format(
+                                'method.set_key = {}, "{}", {}'.format(
                                     name, fmt.to_unicode(key), fmt.to_unicode(val)
                                 )
                             )

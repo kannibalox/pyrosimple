@@ -320,6 +320,7 @@ def format_item(format_spec, item, defaults=None):
         not template_engine and format_spec.startswith("{#")
     ):
         from jinja2 import Template
+
         return format_spec.render(d=item)
     else:
         # Interpolation
@@ -394,7 +395,7 @@ def validate_sort_fields(sort_fields):
     log = logging.getLogger(__name__)
     log.debug(
         "Sorting order is: %s",
-        ", ".join([("-" if i in descending else "") + i for i in sort_fields])
+        ", ".join([("-" if i in descending else "") + i for i in sort_fields]),
     )
 
     # No descending fields?

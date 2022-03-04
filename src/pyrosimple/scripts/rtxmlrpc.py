@@ -91,6 +91,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         " |\n           --session <session-file>... | --session <directory>"
         " |\n           --session @<filename-list> | --session @-"
     )
+
     def __init__(self):
         super().__init__()
         self.proxy = None
@@ -100,7 +101,13 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         super().add_options()
 
         # basic options
-        self.parser.add_argument("-o", "--output-format", default="pretty", choices=["pretty", "xml", "repr", "json"], help="Output format to use. Defaults to 'pretty'")
+        self.parser.add_argument(
+            "-o",
+            "--output-format",
+            default="pretty",
+            choices=["pretty", "xml", "repr", "json"],
+            help="Output format to use. Defaults to 'pretty'",
+        )
         self.add_bool_option(
             "-i",
             "--as-import",
@@ -157,7 +164,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def execute(self, proxy, method, args):
         """Execute given XMLRPC call."""
         try:
-            raw = (self.options.output_format == "xml")
+            raw = self.options.output_format == "xml"
             result = getattr(proxy, method)(raw_xml=raw, *tuple(args))
         except xmlrpc.ERRORS as exc:
             self.LOG.error(

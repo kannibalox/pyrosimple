@@ -529,9 +529,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # For a header, use configured escape codes on a terminal
         if item is None and os.isatty(sys.stdout.fileno()):
-            item_text = b"".join(
-                (config.output_header_ecma48, item_text, b"\x1B[0m")
-            )
+            item_text = b"".join((config.output_header_ecma48, item_text, b"\x1B[0m"))
 
         # Set up stdout for writing
         output = getattr(sys.stdout, "buffer", sys.stdout)
@@ -807,12 +805,10 @@ class RtorrentControl(ScriptBaseWithConfig):
         if self.options.detach:
             config.engine.load_config()
             daemon_log = os.path.join(config.config_dir, "log", "rtcontrol.log")
-            with open(daemon_log, 'ab+') as log_handle:
+            with open(daemon_log, "ab+") as log_handle:
                 self.LOG.debug("Daemonizing process")
                 dcontext = daemon.DaemonContext(
-                    stderr=log_handle,
-                    stdout=log_handle,
-                    umask=0o022
+                    stderr=log_handle, stdout=log_handle, umask=0o022
                 )
                 dcontext.open()
             time.sleep(0.05)  # let things settle a little

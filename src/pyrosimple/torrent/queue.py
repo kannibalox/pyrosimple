@@ -41,7 +41,7 @@ class QueueManager(object):
         bool_param = lambda key, default: matching.truth(
             self.config.get(key, default), "job.%s.%s" % (self.config.job_name, key)
         )
-        self.config.viewname = self.config.get('viewname', 'pyrotorque')
+        self.config.viewname = self.config.get("viewname", "pyrotorque")
         self.config.quiet = bool_param("quiet", False)
         self.config.startable = matching.ConditionParser(
             engine.FieldDefinition.lookup, "name"
@@ -51,7 +51,8 @@ class QueueManager(object):
         )
         self.LOG.info(
             "Startable matcher for '%s' is: [ %s ]",
-            self.config.job_name, self.config.startable
+            self.config.job_name,
+            self.config.startable,
         )
         self.config.downloading = matching.ConditionParser(
             engine.FieldDefinition.lookup, "name"
@@ -65,7 +66,8 @@ class QueueManager(object):
         )
         self.LOG.info(
             "Downloading matcher for '%s' is: [ %s ]",
-            self.config.job_name, self.config.downloading
+            self.config.job_name,
+            self.config.downloading,
         )
         self.sort_key = (
             formatting.validate_sort_fields(self.config.sort_fields)
@@ -100,7 +102,9 @@ class QueueManager(object):
             self.LOG.debug(
                 "Delaying start of %d item(s),"
                 " due to %ds intermission with %ds left",
-                len(startable), self.config.intermission, delayed
+                len(startable),
+                self.config.intermission,
+                delayed,
             )
             return
 
@@ -136,7 +140,8 @@ class QueueManager(object):
             if len(downloading) < self.config.downloading_min:
                 self.LOG.debug(
                     "Catching up from %d to a minimum of %d downloading item(s)",
-                    len(downloading), self.config.downloading_min
+                    len(downloading),
+                    self.config.downloading_min,
                 )
             else:
                 # Limit to the given maximum of downloading items

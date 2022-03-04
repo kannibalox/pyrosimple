@@ -25,7 +25,7 @@ def _custom_fields():
             stats = os.statvfs(pathname)
             return stats.f_bavail * stats.f_frsize - int(
                 diskspace_threshold_mb
-            ) * 1024 ** 2 > obj.size * (1.0 - obj.done / 100.0)
+            ) * 1024**2 > obj.size * (1.0 - obj.done / 100.0)
         else:
             return None
 
