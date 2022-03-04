@@ -26,7 +26,7 @@ import socket
 import subprocess
 import time
 
-from typing import Generator, Tuple, Union
+from typing import Generator, Tuple, Union, Dict, List
 
 from urllib import parse as urlparse
 from urllib.error import URLError
@@ -204,28 +204,28 @@ def transport_from_url(url):
 #
 
 
-def _encode_netstring(data):
+def _encode_netstring(data: bytes) -> bytes:
     "Encode data as netstring."
     return b"%d:%s," % (len(data), data)
 
 
-def _encode_headers(headers):
+def _encode_headers(headers: List[Tuple[str, str]]) -> bytes:
     "Make SCGI header bytes from list of tuples."
     return b"".join(
         [b"%s\0%s\0" % (k.encode("ascii"), v.encode("ascii")) for k, v in headers]
     )
 
 
-def _encode_payload(data, headers=None):
+def _encode_payload(data: bytes, headers=None) -> bytes:
     "Wrap data in an SCGI request."
-    prolog = b"CONTENT_LENGTH\0%d\0SCGI\x001\0" % len(data)
+    prolog: bytes = b"CONTENT_LENGTH\0%d\0SCGI\x001\0" % len(data)
     if headers:
         prolog += _encode_headers(headers)
 
     return _encode_netstring(prolog) + data
 
 
-def _parse_headers(headers):
+def _parse_headers(headers: bytes) -> Dict[str, str]:
     """
     Get headers dict from header bytestring.
 
@@ -250,7 +250,7 @@ def _parse_headers(headers):
         ) from exc
 
 
-def _parse_response(resp):
+def _parse_response(resp) -> Tuple[bytes, Dict[str, str]]:
     """
     Get xmlrpc response from scgi response
 
@@ -303,14 +303,14 @@ class SCGIRequest:
         self.resp_headers = {}
         self.latency = 0.0
 
-    def send(self, data):
+    def send(self, data: bytes) -> bytes:
         """Send data over scgi to URL and get response.
 
         :param data: The bytestring to send
         :type data: bytes
         :return: Response bytestring
         """
-        start = time.time()
+        start: float = time.time()
         try:
             scgi_resp = b"".join(self.transport.send(_encode_payload(data)))
         finally:
@@ -320,7 +320,7 @@ class SCGIRequest:
         return resp
 
 
-def scgi_request(url, methodname, *params, **kw):
+def scgi_request(url: str, methodname: str, *params, **kw):
     """Send a XMLRPC request over SCGI to the given URL.
 
     :param url: Endpoint URL.
