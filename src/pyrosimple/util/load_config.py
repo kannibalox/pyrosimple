@@ -70,7 +70,7 @@ def walk_resources(package_or_requirement, resource_name, recurse=True, base="")
             yield base + filename
 
 
-class ConfigLoader(object):
+class ConfigLoader:
     """Populates this module's dictionary with the user-defined configuration values."""
 
     CONFIG_INI = "config.ini"
@@ -216,18 +216,21 @@ class ConfigLoader(object):
             p = importlib.import_module("pyrosimple")
             sys.modules["pyrocore"] = p
             sys.modules["pyrobase"] = p
-            exec(
-                compile(
-                    open(config_file).read(), config_file, "exec"
-                ),  # pylint: disable=exec-used
-                vars(config),
-                namespace,
-            )
+            with open(config_file, 'rb') as handle:
+                # pylint: disable=exec-used
+                exec(
+                    compile(
+                        handle.read(), config_file, "exec"
+                    ),
+                    vars(config),
+                    namespace,
+                )
         else:
             self.LOG.warning("Configuration file %r not found!", config_file)
 
     def load(self, optional_cfg_files=None):
-        """Actually load the configuation from either the default location or the given directory."""
+        """Actually load the configuation from either
+        the default location or the given directory."""
         optional_cfg_files = optional_cfg_files or []
 
         # Guard against coding errors
