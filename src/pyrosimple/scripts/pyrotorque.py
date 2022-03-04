@@ -26,7 +26,7 @@ import time
 
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from daemon import DaemonContext
@@ -53,8 +53,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
     def add_options(self):
         """Add program options."""
-        super(RtorrentQueueManager, self).add_options()
-        self.jobs: Optional[Dict] = None
+        super().add_options()
+        self.jobs: Dict = {}
         self.httpd = None
 
         # basic options

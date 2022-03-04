@@ -20,6 +20,7 @@
 
 import random
 import re
+from urllib.parse import parse_qs
 
 import bencode
 
@@ -45,7 +46,7 @@ class MetafileCreator(ScriptBaseWithConfig):
 
     def add_options(self):
         """Add program options."""
-        super(MetafileCreator, self).add_options()
+        super().add_options()
 
         self.add_bool_option("-p", "--private", help="disallow DHT and PEX")
         self.add_bool_option("--no-date", help="leave out creation date")
@@ -114,7 +115,7 @@ class MetafileCreator(ScriptBaseWithConfig):
         if magnet_uri.startswith("magnet:"):
             magnet_uri = magnet_uri[7:]
         meta = {"magnet-uri": "magnet:" + magnet_uri}
-        magnet_params = cgi.parse_qs(magnet_uri.lstrip("?"))
+        magnet_params = parse_qs(magnet_uri.lstrip("?"))
 
         meta_name = magnet_params.get("xt", [hashlib.sha1(magnet_uri).hexdigest()])[0]
         if "dn" in magnet_params:

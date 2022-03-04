@@ -79,6 +79,7 @@ output_header_ecma48 = b""
 output_header_frequency = 1
 waif_pattern_list = []
 traits_by_alias = {}
+connections = []
 torque = {}
 magnet_watch = None
 influxdb = {}

@@ -63,7 +63,7 @@ class MetafileChanger(ScriptBaseWithConfig):
 
     def add_options(self):
         """Add program options."""
-        super(MetafileChanger, self).add_options()
+        super().add_options()
 
         self.add_bool_option(
             "-n",
@@ -202,7 +202,7 @@ class MetafileChanger(ScriptBaseWithConfig):
         # Resolve tracker alias, if URL doesn't look like an URL
         if (
             self.options.reannounce
-            and not urllib.parse.parse(self.options.reannounce).scheme
+            and not urllib.parse.urlparse(self.options.reannounce).scheme
         ):
             tracker_alias, idx = self.options.reannounce, "0"
             if "." in tracker_alias:
@@ -225,7 +225,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                 # Read and remember current content
                 metainfo = bencode.bread(filename)
                 old_metainfo = bencode.bencode(metainfo)
-            except (EnvironmentError, KeyError, bencode.BencodeError) as exc:
+            except (EnvironmentError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.LOG.warning(
                     "Skipping bad metafile %r (%s: %s)"
                     % (filename, type(exc).__name__, exc)

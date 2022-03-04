@@ -365,7 +365,6 @@ class AdminTool(ScriptBaseWithConfig):
                                 rctype = {
                                     str: "string",
                                     int: "value",
-                                    long: "value",
                                 }.get(objtype, "simple")
                             else:
                                 rctype = {str: "string", int: "value"}.get(
