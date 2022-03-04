@@ -215,7 +215,7 @@ class MetafileHandler:
             #   and add traits to the flags, too, in that case
 
         except xmlrpc.ERRORS as exc:
-            self.job.LOG.error("While loading #%s: %s" % (self.ns.info_hash, exc))
+            self.job.LOG.error("While loading #%s: %s", self.ns.info_hash, exc)
 
     def handle(self):
         """Handle metafile."""
@@ -230,7 +230,7 @@ class RemoteWatch:
         """Set up remote watcher."""
         self.config = config or {}
         self.LOG = pymagic.get_class_logger(self)
-        self.LOG.debug("Remote watcher created with config %r" % self.config)
+        self.LOG.debug("Remote watcher created with config %r", self.config)
 
     def run(self):
         """Check remote watch target."""
@@ -291,7 +291,7 @@ class TreeWatch:
         self.LOG = pymagic.get_class_logger(self)
         if "log_level" in self.config:
             self.LOG.setLevel(config.log_level)
-        self.LOG.debug("Tree watcher created with config %r" % self.config)
+        self.LOG.debug("Tree watcher created with config %r", self.config)
 
         self.manager = None
         self.handler = None
@@ -330,7 +330,7 @@ class TreeWatch:
                         % (key, self.custom_cmds[key], val)
                     )
                 self.custom_cmds[key] = formatting.preparse(val)
-        self.LOG.debug("custom commands = %r" % self.custom_cmds)
+        self.LOG.debug("custom commands = %r", self.custom_cmds)
 
         # Get client proxy
         self.proxy = xmlrpc.RTorrentProxy(configuration.scgi_url)
@@ -448,16 +448,16 @@ class TreeWatchCommand(ScriptBaseWithConfig):
 
             ok = handler.parse()
             self.LOG.debug(
-                "Metafile '%s' would've %sbeen loaded"
-                % (pathname, "" if ok else "NOT ")
+                "Metafile '%s' would've %sbeen loaded",
+                pathname, ("" if ok else "NOT ")
             )
 
             if ok:
                 handler.addinfo()
                 post_process = str if self.options.verbose else logutil.shorten
                 self.LOG.info(
-                    "Templating values are:\n    %s"
-                    % "\n    ".join(
+                    "Templating values are:\n    %s",
+                    "\n    ".join(
                         "%s=%s" % (key, post_process(repr(val)))
                         for key, val in sorted(handler.ns.items())
                     )

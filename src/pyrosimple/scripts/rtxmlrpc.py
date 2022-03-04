@@ -34,7 +34,7 @@ from pprint import pformat
 try:
     import requests
 except ImportError:
-    requests = None
+    requests_found = False
 
 from xmlrpc import client as xmlrpc_client
 
@@ -54,7 +54,7 @@ def read_blob(arg):
     elif any(
         arg.startswith("@{}://".format(x)) for x in ["http", "https", "ftp", "file"]
     ):
-        if not requests:
+        if not requests_found:
             raise error.UserError(
                 "You must 'pip install requests' to support @URL arguments."
             )

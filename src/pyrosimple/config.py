@@ -20,6 +20,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from typing import Dict, Any, List
+
 from pyrosimple.util.parts import Bunch
 
 
@@ -68,18 +70,18 @@ config_dir = None
 scgi_url = ""
 engine = Bunch(open=lambda: None)
 fast_query = 0
-formats = {}
+formats: Dict[Any, Any] = {}
 sort_fields = ""
-announce = {}
-config_validator_callbacks = []
-custom_field_factories = []
+announce: Dict[Any, Any] = {}
+config_validator_callbacks: List[Any] = []
+custom_field_factories: List[Any] = []
 custom_template_helpers = Bunch()
-xmlrpc = {}
+xmlrpc: Dict[Any, Any] = {}
 output_header_ecma48 = b""
 output_header_frequency = 1
-waif_pattern_list = []
-traits_by_alias = {}
-connections = []
-torque = {}
+waif_pattern_list: List[Any] = []
+traits_by_alias: Dict[Any, Any] = {}
+connections: List[str] = []
+torque: Dict[Any, Any] = {}
 magnet_watch = None
-influxdb = {}
+influxdb: Dict[Any, Any] = {}

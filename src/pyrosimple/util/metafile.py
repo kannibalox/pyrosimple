@@ -29,7 +29,7 @@ import sys
 import time
 import urllib
 
-from pathlib import PurePath
+from pathlib import PurePath, Path
 
 import bencode
 
@@ -250,11 +250,10 @@ def sanitize(meta, diagnostics=False):
                     return u8_text
                 except UnicodeError:
                     continue
-        else:
-            # Broken beyond anything reasonable
-            bad_encodings.add("UNKNOWN/EXOTIC")
-            bad_fields.add(field)
-            return str(text, "utf-8", "replace").replace("\ufffd", "_").encode("utf-8")
+        # Broken beyond anything reasonable
+        bad_encodings.add("UNKNOWN/EXOTIC")
+        bad_fields.add(field)
+        return str(text, "utf-8", "replace").replace("\ufffd", "_").encode("utf-8")
 
     # Go through all string fields and check them
     for field in ("comment", "created by"):
@@ -465,13 +464,13 @@ class Metafile:
             self._fifo += 1
 
             # Read paths relative to directory containing the FIFO
-            with open(self.datapath, "r") as fifo:
+            with open(self.datapath, "rb") as fifo:
                 while True:
-                    relpath = fifo.readline().rstrip("\n")
+                    relpath = fifo.readline().rstrip(b"\n")
                     if not relpath:  # EOF?
                         break
                     self.LOG.debug("Read relative path %r from FIFO...", relpath)
-                    yield os.path.join(os.path.dirname(self.datapath), relpath)
+                    yield Path(Path(self.datapath).parent, relpath)
 
             self.LOG.debug("FIFO %r closed!", self.datapath)
 
