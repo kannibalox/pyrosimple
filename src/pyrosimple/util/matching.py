@@ -21,52 +21,48 @@ import re
 import time
 import shlex
 import fnmatch
-import logging
 import operator
 
 from pyrosimple import error, config
 from pyrosimple.util import fmt
 
-TRUE = set(
-    (
-        "true",
-        "t",
-        "yes",
-        "y",
-        "1",
-        "+",
-    )
-)
-FALSE = set(
-    (
-        "false",
-        "f",
-        "no",
-        "n",
-        "0",
-        "-",
-    )
-)
+TRUE ={
+    "true",
+    "t",
+    "yes",
+    "y",
+    "1",
+    "+",
+}
 
+FALSE = {
+    "false",
+    "f",
+    "no",
+    "n",
+    "0",
+    "-",
+}
 
-def truth(val, context):
+def truth(val, context) -> bool:
     """Convert truth value in "val" to a boolean."""
+    # Try coercing it to an int then a bool
     try:
-        0 + val
+        return(bool(0 + val))
     except TypeError:
-        lower_val = val.lower()
+        pass
 
-        if lower_val in TRUE:
-            return True
-        elif lower_val in FALSE:
-            return False
-        else:
-            raise FilterError(
-                "Bad boolean value %r in %r (expected one of '%s', or '%s')"
-                % (val, context, "' '".join(TRUE), "' '".join(FALSE))
-            )
+    lower_val = val.lower()
+
+    if lower_val in TRUE:
+        return True
+    elif lower_val in FALSE:
+        return False
     else:
-        return bool(val)
+        raise FilterError(
+            "Bad boolean value %r in %r (expected one of '%s', or '%s')"
+            % (val, context, "' '".join(TRUE), "' '".join(FALSE))
+        )
 
 
 def _time_ym_delta(timestamp, delta, months):
@@ -92,14 +88,14 @@ class FilterError(error.UserError):
     """(Syntax) error in filter."""
 
 
-class Filter(object):
+class Filter():
     """Base class for all filters."""
 
-    def pre_filter(self):  # pylint: disable=no-self-use
+    def pre_filter(self) -> str:  # pylint: disable=no-self-use
         """Return rTorrent condition to speed up data transfer."""
         return ""
 
-    def match(self, item):
+    def match(self, item) -> bool:
         """Return True if filter matches item."""
         raise NotImplementedError()
 
@@ -115,7 +111,7 @@ class CompoundFilterAll(CompoundFilterBase):
     """List of filters that must all match (AND)."""
 
     def __str__(self):
-        return u" ".join(str(i) for i in self)
+        return " ".join(str(i) for i in self)
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
@@ -173,9 +169,9 @@ class NegateFilter(Filter):
         if isinstance(self._inner, FieldFilter):
             return str("%s=!%s" % tuple(str(self._inner).split("=", 1)))
         elif isinstance(self._inner, CompoundFilterBase):
-            return u"[ NOT [ %s ] ]" % str(self._inner)
+            return "[ NOT [ %s ] ]" % str(self._inner)
         else:
-            return u"[ NOT %s ]" % str(self._inner)
+            return "[ NOT %s ]" % str(self._inner)
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
@@ -280,7 +276,7 @@ class PatternFilter(FieldFilter):
         """Validate filter condition (template method)."""
         from pyrosimple.torrent import formatting
 
-        super(PatternFilter, self).validate()
+        super().validate()
         self._value = self._value.lower()
         self._template = None
         self._is_regex = self._value.startswith("/") and self._value.endswith("/")
@@ -333,11 +329,6 @@ class PatternFilter(FieldFilter):
         """Return True if filter matches item."""
         val = (getattr(item, self._name) or "").lower()
         result = self._matcher(val) if self._is_regex else self._matcher(val, item)
-        if 0:
-            logging.getLogger(__name__).debug(
-                "%r for %r ~ %r, name %r, item %r",
-                result, val, self._value, self._name, item
-            )
         return result
 
 
@@ -352,6 +343,7 @@ class FilesFilter(PatternFilter):
                 if fnmatch.fnmatchcase(fileinfo.path.lower(), self._value):
                     return True
             return False
+        return False
 
 
 class TaggedAsFilter(FieldFilter):
@@ -375,7 +367,7 @@ class TaggedAsFilter(FieldFilter):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        super(TaggedAsFilter, self).validate()
+        super().validate()
         self._value = self._value.lower()
 
         # If the tag starts with '=', test on equality (just this tag, no others)
@@ -414,7 +406,7 @@ class BoolFilter(FieldFilter):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        super(BoolFilter, self).validate()
+        super().validate()
 
         self._value = truth(str(self._value), self._condition)
         self._condition = "yes" if self._value else "no"
@@ -430,7 +422,7 @@ class NumericFilterBase(FieldFilter):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        super(NumericFilterBase, self).validate()
+        super().validate()
 
         self.not_null = False
 
@@ -448,18 +440,6 @@ class NumericFilterBase(FieldFilter):
 
     def match(self, item):
         """Return True if filter matches item."""
-        if 0 and getattr(item, self._name):
-            print(
-                "%r %r %r %r %r %r"
-                % (
-                    self._cmp(float(getattr(item, self._name)), self._value),
-                    self._name,
-                    self._condition,
-                    item.name,
-                    getattr(item, self._name),
-                    self._value,
-                )
-            )
         val = getattr(item, self._name) or 0
         if self.not_null and self._value and not val:
             return False
@@ -485,7 +465,7 @@ class FloatFilter(NumericFilterBase):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        super(FloatFilter, self).validate()
+        super().validate()
 
         try:
             self._value = float(self._value)
@@ -493,7 +473,7 @@ class FloatFilter(NumericFilterBase):
             raise FilterError(
                 "Bad numerical value %r in %r (%s)"
                 % (self._value, self._condition, exc)
-            )
+            ) from exc
 
 
 class TimeFilter(NumericFilterBase):
@@ -531,7 +511,7 @@ class TimeFilter(NumericFilterBase):
 
     def validate_time(self, duration=False):
         """Validate filter condition (template method) for timestamps and durations."""
-        super(TimeFilter, self).validate()
+        super().validate()
         timestamp = now = time.time()
 
         if str(self._value).isdigit():
@@ -586,7 +566,7 @@ class TimeFilter(NumericFilterBase):
                     raise FilterError(
                         "Bad timestamp value %r in %r (%s)"
                         % (self._value, self._condition, exc)
-                    )
+                    ) from exc
 
                 if duration:
                     timestamp -= now
@@ -606,7 +586,7 @@ class TimeFilterNotNull(TimeFilter):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        super(TimeFilterNotNull, self).validate()
+        super().validate()
         self.not_null = True
 
 
@@ -615,7 +595,7 @@ class DurationFilter(TimeFilter):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        super(DurationFilter, self).validate_time(duration=True)
+        super().validate_time(duration=True)
 
     def match(self, item):
         """Return True if filter matches item."""
@@ -623,7 +603,7 @@ class DurationFilter(TimeFilter):
             # Never match "N/A" items, except when "-0" was specified
             return False if self._value else self._cmp(-1, 0)
         else:
-            return super(DurationFilter, self).match(item)
+            return super().match(item)
 
 
 class ByteSizeFilter(NumericFilterBase):
@@ -641,7 +621,7 @@ class ByteSizeFilter(NumericFilterBase):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        super(ByteSizeFilter, self).validate()
+        super().validate()
 
         # Get scale
         lower_val = str(self._value).lower()
@@ -658,7 +638,7 @@ class ByteSizeFilter(NumericFilterBase):
             raise FilterError(
                 "Bad numerical value %r in %r (%s)"
                 % (self._value, self._condition, exc)
-            )
+            ) from exc
 
         # Scale to bytes
         self._value = self._value * scale
@@ -694,7 +674,7 @@ class MagicFilter(FieldFilter):
         return self._inner.match(item)
 
 
-class ConditionParser(object):
+class ConditionParser():
     """Filter condition parser."""
 
     COMPARISON_OPS = {
