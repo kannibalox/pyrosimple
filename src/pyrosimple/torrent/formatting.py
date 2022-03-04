@@ -316,6 +316,11 @@ def format_item(format_spec, item, defaults=None):
             )
 
         return expand_template(format_spec, namespace)
+    elif template_engine == "jinja2" or (
+        not template_engine and format_spec.startswith("{#")
+    ):
+        from jinja2 import Template
+        return format_spec.render(d=item)
     else:
         # Interpolation
         format_spec = getattr(format_spec, "fmt", format_spec)

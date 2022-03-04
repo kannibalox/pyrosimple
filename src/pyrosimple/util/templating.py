@@ -85,6 +85,10 @@ def preparse(template_text, lookup=None):
 
             template = tempita.Template(template_text, name=template_path)
             template.__engine__ = "tempita"
+        elif template_text.startswith("{#"):
+            from jinja2 import Template
+            template = Template(template_text)
+            template.__engine__ = "jinja2"
         else:
             template = InterpolationTemplate(template_text)
 
