@@ -22,7 +22,7 @@ import time
 from pyrosimple import config as config_ini
 from pyrosimple import error
 from pyrosimple.torrent import engine, formatting, matching
-from pyrosimple.util import fmt, pymagic, xmlrpc
+from pyrosimple.util import pymagic, xmlrpc
 
 
 class QueueManager:
@@ -172,7 +172,7 @@ class QueueManager:
                         "%s: Started '%s' {%s}"
                         % (
                             self.__class__.__name__,
-                            fmt.to_unicode(item.name),
+                            item.name,
                             item.alias,
                         ),
                     )

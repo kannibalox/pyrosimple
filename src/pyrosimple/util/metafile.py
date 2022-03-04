@@ -30,6 +30,7 @@ import time
 import urllib
 
 from pathlib import PurePath, Path
+from typing import List, Union, Optional
 
 import bencode
 
@@ -111,7 +112,7 @@ class MaskingPrettyPrinter(pprint.PrettyPrinter):
         self, obj, context, maxlevels, level
     ):  # pylint: disable=arguments-renamed
         """Mask obj if it looks like an URL, then pass it to the super class."""
-        if isinstance(obj, str) and "://" in fmt.to_unicode(obj):
+        if isinstance(obj, str) and "://" in obj:
             obj = mask_keys(obj)
         return pprint.PrettyPrinter.format(self, obj, context, maxlevels, level)
 
@@ -165,7 +166,6 @@ def check_info(info):
             for part in path:
                 if not isinstance(part, str):
                     raise ValueError("bad metainfo - bad path dir")
-                part = fmt.to_unicode(part)
                 if part == "..":
                     raise ValueError(
                         "relative path in %s disallowed for security reasons"
@@ -268,7 +268,7 @@ def sanitize(meta, diagnostics=False):
     return (meta, bad_encodings, bad_fields) if diagnostics else meta
 
 
-def assign_fields(meta, assignments):
+def assign_fields(meta, assignments: List[str]):
     """Takes a list of C{key=value} strings and assigns them to the
     given metafile. If you want to set nested keys (e.g. "info.source"),
     you have to use a dot as a separator. For exotic keys *containing*
@@ -279,14 +279,14 @@ def assign_fields(meta, assignments):
     If just a key name is given (no '='), the field is removed.
     """
     for assignment in assignments:
-        assignment = fmt.to_unicode(assignment)
         try:
+            val: Optional[Union[str, int]]
             if "=" in assignment:
                 field, val = assignment.split("=", 1)
             else:
                 field, val = assignment, None
 
-            if val and val[0] in "+-" and val[1:].isdigit():
+            if val is not None and val[0] in "+-" and val[1:].isdigit():
                 val = int(val, 10)
 
             # TODO: Allow numerical indices, and "+" for append
@@ -296,16 +296,16 @@ def assign_fields(meta, assignments):
             ]
             for key in keypath[:-1]:
                 # Create missing dicts as we go...
-                namespace = namespace.setdefault(fmt.to_utf8(key), {})
+                namespace = namespace.setdefault(key, {})
         except (KeyError, IndexError, TypeError, ValueError) as exc:
             raise error.UserError(
                 "Bad assignment %r (%s)!" % (assignment, exc)
             ) from exc
         else:
             if val is None:
-                del namespace[fmt.to_utf8(keypath[-1])]
+                del namespace[keypath[-1]]
             else:
-                namespace[fmt.to_utf8(keypath[-1])] = fmt.to_utf8(val)
+                namespace[keypath[-1]] = val
 
     return meta
 
@@ -765,7 +765,7 @@ class Metafile:
 
         # Build result
         result = [
-            "NAME %s" % (os.path.basename(fmt.to_unicode(self.filename))),
+            "NAME %s" % (Path(self.filename).name),
             "SIZE %s (%i * %s + %s)"
             % (
                 fmt.human_size(total_size).strip(),
@@ -813,17 +813,17 @@ class Metafile:
             result.append(
                 "%-69s%9s"
                 % (
-                    fmt.to_unicode(info["name"]),
+                    info["name"].decode(),
                     fmt.human_size(total_size),
                 )
             )
         else:
             # Directory structure
-            result.append("%s/" % fmt.to_unicode(info["name"]))
+            result.append("%s/" % info["name"])
             oldpaths = [None] * 99
             for entry in info["files"]:
                 # Remove crap that certain PHP software puts in paths
-                entry_path = [fmt.to_unicode(i) for i in entry["path"] if i]
+                entry_path = [i for i in entry["path"] if i]
 
                 for idx, item in enumerate(entry_path[:-1]):
                     if item != oldpaths[idx]:

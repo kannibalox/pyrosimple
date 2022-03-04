@@ -33,7 +33,7 @@ from pyrosimple.util.parts import Bunch
 #
 # Format specifiers
 #
-def fmt_sz(intval):
+def fmt_sz(intval: int) -> str:
     """Format a byte sized value."""
     try:
         return fmt.human_size(intval)
@@ -95,12 +95,12 @@ def fmt_pathname(val):
     return os.path.splitext(os.path.basename(val or ""))[0]
 
 
-def fmt_pathext(val):
+def fmt_pathext(val: str):
     """Extension of a path (including the '.')."""
     return os.path.splitext(val or "")[1]
 
 
-def fmt_pathdir(val):
+def fmt_pathdir(val: str):
     """Directory containing the given path."""
     return os.path.dirname(val or "")
 

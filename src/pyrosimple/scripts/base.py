@@ -27,6 +27,7 @@ import textwrap
 import time
 
 from argparse import ArgumentParser
+from typing import List
 
 from pyrosimple import config, error
 from pyrosimple.util import load_config, os, pymagic
@@ -45,7 +46,7 @@ class ScriptBase:
     ARGS_HELP = "<log-base>..."
 
     # additonal stuff appended after the command handler's docstring
-    ADDITIONAL_HELP = []
+    ADDITIONAL_HELP: List[str] = []
 
     # Can be empty or None in derived classes
     COPYRIGHT = "Copyright (c) 2009 - 2018 Pyroscope Project"
@@ -264,7 +265,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
     """CLI tool with configuration support."""
 
     CONFIG_DIR_DEFAULT = "~/.pyroscope"
-    OPTIONAL_CFG_FILES = []
+    OPTIONAL_CFG_FILES: List[str] = []
 
     def add_options(self):
         """Add configuration options."""

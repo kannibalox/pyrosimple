@@ -4,7 +4,6 @@
 
     Copyright (c) 2009, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
-import codecs
 import datetime
 import logging
 
@@ -23,6 +22,7 @@ import logging
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import time
 
+from typing import Union
 from pprint import pformat
 
 
@@ -130,70 +130,6 @@ def human_duration(time1, time2=None, precision=0, short=False) -> str:
         return result
 
 
-def to_unicode(text):
-    """Return a decoded unicode string.
-    False values are returned untouched.
-    """
-    if not text or isinstance(text, str):
-        return text
-
-    try:
-        # Try UTF-8 first
-        return text.decode("UTF-8")
-    except UnicodeError:
-        try:
-            # Then Windows Latin-1
-            return text.decode("CP1252")
-        except UnicodeError:
-            # Give up, return byte string in the hope things work out
-            return text
-
-
-def to_utf8(text):
-    """Enforce UTF8 encoding."""
-    # return empty/false stuff unaltered
-    if not text:
-        if isinstance(text, str):
-            text = b""
-        return text
-
-    try:
-        # Is it a unicode string, or pure ascii?
-        return text.encode("utf8")
-    except (UnicodeDecodeError, AttributeError):
-        try:
-            # Is it a utf8 byte string?
-            if text.startswith(codecs.BOM_UTF8):
-                text = text[len(codecs.BOM_UTF8) :]
-            return text.decode("utf8").encode("utf8")
-        except UnicodeDecodeError:
-            # Check BOM
-            if text.startswith(codecs.BOM_UTF16_LE):
-                encoding = "utf-16le"
-                text = text[len(codecs.BOM_UTF16_LE) :]
-            elif text.startswith(codecs.BOM_UTF16_BE):
-                encoding = "utf-16be"
-                text = text[len(codecs.BOM_UTF16_BE) :]
-            else:
-                # Assume CP-1252
-                encoding = "cp1252"
-
-            try:
-                return text.decode(encoding).encode("utf8")
-            except UnicodeDecodeError as exc:
-                for line in text.splitlines():
-                    try:
-                        line.decode(encoding).encode("utf8")
-                    except UnicodeDecodeError:
-                        log.warning(
-                            "Cannot transcode the following into UTF8 cause of %s: %r",
-                            exc,
-                            line,
-                        )
-                        break
-                return text  # Use as-is and hope the best
-
-
 def to_console(text) -> bytes:
     """Return a byte string intended for console output."""
     if isinstance(text, bytes):
@@ -205,6 +141,7 @@ def to_console(text) -> bytes:
 
 
 def convert_strings_in_iter(obj):
+    """Helper function to nicely format results"""
     if isinstance(obj, bytes):
         obj = obj.decode()
     elif isinstance(obj, dict):
@@ -217,12 +154,13 @@ def convert_strings_in_iter(obj):
 
 
 def xmlrpc_result_to_string(result) -> str:
+    """Helper function to nicely format results"""
     result = convert_strings_in_iter(result)
 
     if isinstance(result, str):
         return result
     elif isinstance(result, bytes):
-        return to_unicode(result)
+        return result.decode()
     elif hasattr(result, "__iter__"):
         return "\n".join(i if isinstance(i, str) else pformat(i) for i in result)
     else:

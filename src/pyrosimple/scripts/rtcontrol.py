@@ -484,7 +484,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         yield "kind_"
 
     # TODO: refactor to engine.TorrentProxy as format() method
-    def format_item(self, item, defaults=None, stencil=None):
+    def format_item(self, item: str, defaults=None, stencil=None) -> str:
         """Format an item."""
 
         def shell_escape(text, _safe=re.compile(r"^[-._,+a-zA-Z0-9]+$")):
@@ -492,13 +492,11 @@ class RtorrentControl(ScriptBaseWithConfig):
             if not text or _safe.match(text):
                 return text
 
-            squote = type(text)("'")
+            squote = "'"
             return squote + text.replace(squote, type(text)(r"'\''")) + squote
 
         try:
-            item_text = fmt.to_console(
-                formatting.format_item(self.options.output_format, item, defaults)
-            )
+            item_text: str = formatting.format_item(self.options.output_format, item, defaults)
         except (NameError, ValueError, TypeError) as exc:
             self.fatal(
                 "Trouble with formatting item %r\n\n  FORMAT = %r\n\n  REASON ="
@@ -508,11 +506,11 @@ class RtorrentControl(ScriptBaseWithConfig):
             raise  # in --debug mode
 
         if self.options.shell:
-            item_text = b"\t".join(shell_escape(i) for i in item_text.split("\t"))
+            item_text = "\t".join(shell_escape(i) for i in item_text.split("\t"))
 
         # Justify headers according to stencil
         if stencil:
-            item_text = b"\t".join(
+            item_text = "\t".join(
                 i.ljust(len(s)) for i, s in zip(item_text.split("\t"), stencil)
             )
 
@@ -520,9 +518,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def emit(
         self, item, defaults=None, stencil=None, to_log=False, item_formatter=None
-    ):
+    ) -> int:
         """Print an item to stdout, or the log on INFO level."""
-        item_text = self.format_item(item, defaults, stencil)
+        item_text: str = self.format_item(item, defaults, stencil)
 
         # Post-process line?
         if item_formatter:
@@ -530,10 +528,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # For a header, use configured escape codes on a terminal
         if item is None and os.isatty(sys.stdout.fileno()):
-            item_text = b"".join((config.output_header_ecma48, item_text, b"\x1B[0m"))
-
-        # Set up stdout for writing
-        output = getattr(sys.stdout, "buffer", sys.stdout)
+            item_text = "".join((config.output_header_ecma48.decode(), item_text, "\x1B[0m"))
 
         # Dump to selected target
         if to_log:
@@ -542,11 +537,11 @@ class RtorrentControl(ScriptBaseWithConfig):
             else:
                 self.LOG.info(item_text)
         elif self.options.nul:
-            output.write(item_text + b"\0")
+            print(item_text + "\0")
         else:
-            output.write(item_text + b"\n")
+            print(item_text + "\n")
 
-        return item_text.count(b"\n") + 1
+        return item_text.count("\n") + 1
 
     # TODO: refactor to formatting.OutputMapping as a class method
     def validate_output_format(self, default_format):

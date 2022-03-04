@@ -25,7 +25,6 @@ import shlex
 import time
 
 from pyrosimple import config, error
-from pyrosimple.util import fmt
 
 
 TRUE = {
@@ -244,14 +243,14 @@ class FieldFilter(Filter):
     # views                 views this item is attached to
     # xfer                  transfer rate
 
-    def __init__(self, name, value):
+    def __init__(self, name: str, value: str):
         """Store field name and filter value for later evaluations."""
         self._name = name
-        self._condition = self._value = fmt.to_unicode(value)
+        self._condition = self._value = value
         self.validate()
 
-    def __str__(self):
-        return fmt.to_utf8("%s=%s" % (self._name, self._condition)).decode("utf-8")
+    def __str__(self) -> str:
+        return "%s=%s" % (self._name, self._condition)
 
     def validate(self):
         """Validate filter condition (template method)."""

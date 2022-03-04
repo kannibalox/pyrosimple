@@ -342,7 +342,7 @@ class AdminTool(ScriptBaseWithConfig):
                                 val = "\\\n    " + val
                             print(
                                 'method.set_key = {}, "{}", {}'.format(
-                                    name, fmt.to_unicode(key), fmt.to_unicode(val)
+                                    name, key, val
                                 )
                             )
                     elif objtype is str:
