@@ -531,7 +531,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # For a header, use configured escape codes on a terminal
         if item is None and os.isatty(sys.stdout.fileno()):
             item_text = b"".join(
-                (config.output_header_ecma48, item_text, b"\x1B[0m")
+                (config.output_header_ecma48.encode(), item_text, b"\x1B[0m")
             )
 
         # Set up stdout for writing
