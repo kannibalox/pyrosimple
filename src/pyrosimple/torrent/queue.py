@@ -99,8 +99,7 @@ class QueueManager(object):
             self.LOG.debug(
                 "Delaying start of %d item(s),"
                 " due to %ds intermission with %ds left",
-                    len(startable), self.config.intermission, delayed
-                )
+                len(startable), self.config.intermission, delayed
             )
             return
 

@@ -87,7 +87,6 @@ class MetafileHandler(object):
             if exc.faultString != "Could not find info-hash.":
                 self.job.LOG.error(
                     "While checking for #%s: %s", self.ns.info_hash, exc)
-                )
                 return
         else:
             self.job.LOG.warn(
