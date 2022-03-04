@@ -18,25 +18,24 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import os
 import sys
 import time
 import shlex
 import signal
 from collections import defaultdict
 from typing import Optional, Dict
+from pathlib import Path
 
+from daemon import DaemonContext
+from daemon.pidfile import TimeoutPIDLockFile
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from pyrosimple.util import logutil
 from pyrosimple.util.parts import Bunch
 from pyrosimple import config, error
-from pyrosimple.util import os, pymagic, osmagic, matching
+from pyrosimple.util import os, pymagic, matching
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-
-
-def _raise_interrupt(signo, dummy_):
-    """Helper for signal handling."""
-    raise KeyboardInterrupt("Caught signal #%d" % signo)
 
 
 class RtorrentQueueManager(ScriptBaseWithConfig):
@@ -199,25 +198,26 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         if not self.options.no_fork and not self.options.guard_file:
             self.options.guard_file = os.path.join(config.config_dir, "run/pyrotorque")
         if not self.options.pid_file:
-            self.options.pid_file = os.path.join(
+            self.options.pid_file = TimeoutPIDLockFile(Path(
                 config.config_dir, "run/pyrotorque.pid"
-            )
+            ))
 
         # Process control
         if self.options.status or self.options.stop or self.options.restart:
-            if self.options.pid_file and os.path.exists(self.options.pid_file):
-                running, pid = osmagic.check_process(self.options.pid_file)
+            if self.options.pid_file.is_locked():
+                running, pid = True, self.options.pid_file.read_pid()
             else:
                 running, pid = False, 0
 
             if self.options.stop or self.options.restart:
                 if running:
                     os.kill(pid, signal.SIGTERM)
+                    self.LOG.debug("Process #%d sent SIGTERM.", pid)
 
                     # Wait for termination (max. 10 secs)
                     for _ in range(100):
-                        running, _ = osmagic.check_process(self.options.pid_file)
-                        if not running:
+                        if not self.options.pid_file.is_locked():
+                            running = False
                             break
                         time.sleep(0.1)
 
@@ -231,23 +231,13 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.LOG.info(
                     "Process #%d %s running.", pid, "UP and" if running else "NOT")
 
-            if self.options.restart:
-                if self.options.pid_file:
-                    running, pid = osmagic.check_process(self.options.pid_file)
-                    if running:
-                        self.return_code = error.EX_TEMPFAIL
-                        return
-            else:
+            if self.options.stop:
                 self.return_code = error.EX_OK if running else error.EX_UNAVAILABLE
                 return
 
         # Check for guard file and running daemon, abort if not OK
-        try:
-            osmagic.guard(self.options.pid_file, self.options.guard_file)
-        except EnvironmentError as exc:
-            self.LOG.debug(str(exc))
-            self.return_code = error.EX_TEMPFAIL
-            return
+        if self.options.guard_file and not os.path.exists(self.options.guard_file):
+            raise EnvironmentError("Guard file '%s' not found, won't start!" % self.options.guard_file)
 
         # Check if we only need to run once
         if self.options.run_once:
@@ -256,36 +246,36 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             params.handler2.run()
             sys.exit(0)
 
+        dcontext = DaemonContext(
+            detach_process=False,
+            stdin=sys.stdin,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+        )
         # Detach, if not disabled via option
         if (
             not self.options.no_fork
         ):  # or getattr(sys.stdin, "isatty", lambda: False)():
-            osmagic.daemonize(
-                pidfile=self.options.pid_file, logfile=logutil.get_logfile()
-            )
-            time.sleep(0.05)  # let things settle a little
-        signal.signal(signal.SIGTERM, _raise_interrupt)
+            dcontext.detach_process = True
+            dcontext.stdin = None
+            dcontext.stderr = logutil.get_logfile()
+            dcontext.stdout = logutil.get_logfile()
+            dcontext.pidfile = self.options.pid_file
 
-        # Set up services
-        self.sched = BackgroundScheduler()
+        with dcontext:
+            if dcontext.pidfile:
+                print(dcontext.pidfile)
+            # Set up services
+            self.sched = BackgroundScheduler()
 
-        # Run services
-        self.sched.start()
-        try:
-            self._add_jobs()
-            # TODO: daemonize here, or before the scheduler starts?
-            self._run_forever()
-        finally:
-            self.sched.shutdown()
-
-            if self.options.pid_file:
-                try:
-                    os.remove(self.options.pid_file)
-                except EnvironmentError as exc:
-                    self.LOG.warn(
-                        "Failed to remove pid file '%s' (%s)",
-                        self.options.pid_file, exc)
-                    self.return_code = error.EX_IOERR
+            # Run services
+            self.sched.start()
+            try:
+                self._add_jobs()
+                # TODO: daemonize here, or before the scheduler starts?
+                self._run_forever()
+            finally:
+                self.sched.shutdown()
 
 
 def run():  # pragma: no cover

@@ -25,9 +25,11 @@ import shlex
 import logging
 import subprocess
 
+import daemon
+
 from pyrosimple.util.parts import Bunch, DefaultBunch
 from pyrosimple import config, error
-from pyrosimple.util import os, fmt, osmagic, pymagic, matching, xmlrpc
+from pyrosimple.util import os, fmt, pymagic, matching, xmlrpc
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig, PromptDecorator
 from pyrosimple.torrent import engine, formatting
 
@@ -804,14 +806,18 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Detach to background?
         # This MUST happen before the next step, when we connect to the torrent client
+        dcontext = None
         if self.options.detach:
             config.engine.load_config()
             daemon_log = os.path.join(config.config_dir, "log", "rtcontrol.log")
-            osmagic.daemonize(
-                logfile=daemon_log
-                if os.path.exists(os.path.dirname(daemon_log))
-                else None
-            )
+            with open(daemon_log, 'ab+') as log_handle:
+                self.LOG.debug("Daemonizing process")
+                dcontext = daemon.DaemonContext(
+                    stderr=log_handle,
+                    stdout=log_handle,
+                    umask=0o022
+                )
+                dcontext.open()
             time.sleep(0.05)  # let things settle a little
 
         # View handling
@@ -1097,6 +1103,10 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # XMLRPC stats
         self.LOG.debug("XMLRPC stats: %s" % config.engine._rpc)
+
+        # Clean up daemon context
+        if dcontext is not None:
+            dcontext.close()
 
 
 def run():  # pragma: no cover
