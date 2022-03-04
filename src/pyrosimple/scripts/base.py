@@ -19,14 +19,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import re
 import sys
 import time
 import errno
 import random
 import textwrap
 import logging.config
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 from pyrosimple import error, config
 from pyrosimple.util import os, pymagic, load_config
@@ -77,22 +76,22 @@ class ScriptBase(object):
         self.startup = time.time()
         self.LOG = pymagic.get_class_logger(self)
 
-        where = os.path.commonprefix(
-            [__file__, os.path.realpath(sys.argv[0]), sys.prefix]
-        )
-        where = re.sub(
-            "^" + os.path.expanduser("~") + os.sep, "~" + os.sep, where + os.sep
-        ).rstrip(os.sep)
-        self.version_info = "{}{}{} on Python {}".format(
-            "", " from " if where else "", where, sys.version.split()[0]
-        )
-
         self.args = None
         self.options = None
         self.return_code = 0
-        self.parser = OptionParser(
-            "%prog [options] " + self.ARGS_HELP + "\n\n"
-            "%prog "
+
+        try:
+            import importlib.metadata
+            self.__version__ = importlib.metadata.version("pyrosimple")
+        except ImportError:
+            self.__version__ = "unknown"
+        self.version_info = "{} on Python {}".format(
+            self.__version__, sys.version.split()[0]
+        )
+
+        self.parser = ArgumentParser(
+            usage="%(prog)s [options] " + self.ARGS_HELP + "\n\n"
+            "%(prog)s "
             + self.version_info
             + ("\n" + self.COPYRIGHT if self.COPYRIGHT else "")
             + "\n\n"
@@ -100,8 +99,10 @@ class ScriptBase(object):
             + "\n".join(self.ADDITIONAL_HELP)
             + "\n\nFor more details, see the full documentation at"
             + "\n\n    https://pyrosimple.readthedocs.io/",
-            version="%prog " + self.version_info,
         )
+
+        self.parser.add_argument('--version', action='version', version="%(prog)s " + self.version_info)
+        self.parser.add_argument('args')
 
     def add_bool_option(self, *args, **kwargs):
         """Add a boolean option.
@@ -113,7 +114,7 @@ class ScriptBase(object):
             .replace("--", "")
             .replace("-", "_")
         )
-        self.parser.add_option(
+        self.parser.add_argument(
             dest=dest, action="store_true", default=False, help=kwargs["help"], *args
         )
 
@@ -134,7 +135,11 @@ class ScriptBase(object):
             )
         if "default" in kwargs and kwargs["default"]:
             kwargs["help"] += " [%s]" % kwargs["default"]
-        self.parser.add_option(*args[:-1], **kwargs)
+        if "choices" in kwargs:
+            del kwargs["type"]
+        print(args[:-1])
+        print(kwargs)
+        self.parser.add_argument(*args[:-1], **kwargs)
 
     def get_options(self):
         """Get program options."""
@@ -149,7 +154,8 @@ class ScriptBase(object):
         self.add_options()
 
         self.handle_completion()
-        self.options, self.args = self.parser.parse_args()
+        self.options = self.parser.parse_args()
+        self.args = self.options.args
 
         # Override logging options in debug mode
         if self.options.debug:
@@ -219,7 +225,7 @@ class ScriptBase(object):
                     msg = str(exc, "UTF-8")
                 self.LOG.error(msg)
                 sys.exit(error.EX_SOFTWARE)
-            except KeyboardInterrupt as exc:
+            except KeyboardInterrupt:
                 if self.options.debug:
                     raise
 
@@ -296,7 +302,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         self.add_value_option(
             "-D",
             "--define",
-            "KEY=VAL [-D ...]",
+            "KEY=VAL",
             default=[],
             action="append",
             dest="defines",
