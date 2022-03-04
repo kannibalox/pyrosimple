@@ -310,7 +310,7 @@ def assign_fields(meta, assignments: List[str]):
     return meta
 
 
-def add_fast_resume(meta, datapath):
+def add_fast_resume(meta, datapath: str):
     """Add fast resume data to a metafile dict."""
     # Get list of files
     files = meta["info"].get("files", None)
@@ -334,9 +334,9 @@ def add_fast_resume(meta, datapath):
 
     for fileinfo in files:
         # Get the path into the filesystem
-        filepath = os.sep.join(fileinfo["path"])
+        filepath = Path(fileinfo["path"])
         if not single:
-            filepath = os.path.join(datapath, filepath.strip(os.sep))
+            filepath = Path(datapath, filepath)
 
         # Check file size
         if os.path.getsize(filepath) != fileinfo["length"]:
@@ -365,23 +365,20 @@ def add_fast_resume(meta, datapath):
     return meta
 
 
-def info_hash(metadata):
+def info_hash(metadata) -> str:
     """Return info hash as a string."""
     return hashlib.sha1(bencode.encode(metadata["info"])).hexdigest().upper()
 
 
-def data_size(metadata):
+def data_size(metadata) -> int:
     """Calculate the size of a torrent based on parsed metadata."""
     info = metadata["info"]
 
     if "length" in info:
         # Single file
-        total_size = info["length"]
-    else:
-        # Directory structure
-        total_size = sum([f["length"] for f in info["files"]])
-
-    return total_size
+        return int(info["length"])
+    # Directory structure
+    return sum([f["length"] for f in info["files"]])
 
 
 def checked_open(filename, log=None, quiet=False):
@@ -392,7 +389,7 @@ def checked_open(filename, log=None, quiet=False):
     """
     with open(filename, "rb") as handle:
         raw_data = handle.read()
-    data = bencode.decode(raw_data)
+    data: bytes = bencode.decode(raw_data)
 
     # pylint: disable=
     try:
@@ -403,7 +400,7 @@ def checked_open(filename, log=None, quiet=False):
         if log:
             # Warn about it, unless it's a quiet value query
             if not quiet:
-                log.warn("%s: %s" % (filename, exc))
+                log.warning("%s: %s" % (filename, exc))
         else:
             raise
 
@@ -764,7 +761,7 @@ class Metafile:
         piece_number, last_piece_length = divmod(total_size, piece_length)
 
         # Build result
-        result = [
+        result: List[str] = [
             "NAME %s" % (Path(self.filename).name),
             "SIZE %s (%i * %s + %s)"
             % (

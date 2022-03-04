@@ -50,7 +50,7 @@ class LocalTransport:
     """Transport via TCP or a UNIX domain socket."""
 
     # Amount of bytes to read at once
-    CHUNK_SIZE = 32768
+    CHUNK_SIZE: int = 32768
 
     def __init__(self, url: urlparse.ParseResult):
         self.url = url
@@ -187,13 +187,14 @@ def transport_from_url(url):
     try:
         transport = TRANSPORTS[url.scheme.lower()]
     except KeyError:
+        # pylint: disable=raise-missing-from
         if not any((url.netloc, url.query)) and url.path.isdigit():
             # Support simplified "domain:port" URLs
             return transport_from_url("scgi://%s:%s" % (url.scheme, url.path))
         else:
             raise URLError(
                 "Unsupported scheme in URL %r" % url.geturl()
-            )  # pylint: disable=raise-missing-from
+            )
     else:
         return transport(url)
 
