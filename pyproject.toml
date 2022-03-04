@@ -1,3 +1,7 @@
+[tool.pylint]
+[tool.pylint.'MESSAGES CONTROL']
+disable="locally-disabled, no-else-return, too-few-public-methods, protected-access, no-else-raise, consider-using-f-string"
+
 [tool.poetry]
 name = "pyrosimple"
 version = "1.2.0"
