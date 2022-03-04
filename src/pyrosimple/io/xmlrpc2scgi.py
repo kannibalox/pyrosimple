@@ -26,6 +26,8 @@ import socket
 import subprocess
 import time
 
+from typing import Generator, Tuple, Union
+
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
@@ -50,8 +52,9 @@ class LocalTransport:
     # Amount of bytes to read at once
     CHUNK_SIZE = 32768
 
-    def __init__(self, url):
+    def __init__(self, url: urlparse.ParseResult):
         self.url = url
+        self.sock_addr: Union[Tuple[str, int], str]
 
         if url.netloc:
             # TCP socket
@@ -68,15 +71,16 @@ class LocalTransport:
                     % (url.geturl(), addrinfo)
                 )
 
-            self.sock_args = addrinfo[0][:3]
-            self.sock_addr = addrinfo[0][4]
+            self.sock_args = addrinfo[0][:2]
+            self.sock_addr = addrinfo[0][4][:2]
         else:
             # UNIX domain socket
+            print(url.path)
             path = os.path.expanduser(url.path)
             self.sock_args = (socket.AF_UNIX, socket.SOCK_STREAM)
             self.sock_addr = os.path.abspath(path)
 
-    def send(self, data):
+    def send(self, data) -> Generator[bytes, None, None]:
         """Open transport, send data, and yield response chunks."""
         sock = socket.socket(*self.sock_args)
         try:
