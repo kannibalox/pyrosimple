@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=I0011,C0103
 """ Python Utility Functions.
 
     Copyright (c) 2009, 2010 The PyroScope Project <pyroscope.project@gmail.com>
@@ -17,25 +16,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-from __future__ import absolute_import
-
 import json
 import logging
-
-import pkg_resources
-
-
-# Create aliases to make pydev / pylint happy
-resource_isdir = (
-    pkg_resources.resource_isdir
-)  # @UndefinedVariable pylint: disable=E1101
-resource_listdir = (
-    pkg_resources.resource_listdir
-)  # @UndefinedVariable pylint: disable=E1101
-resource_string = (
-    pkg_resources.resource_string
-)  # @UndefinedVariable pylint: disable=E1101
-
 
 def import_name(module_spec, name=None):
     """Import identifier C{name} from module C{module_spec}.
@@ -85,7 +67,7 @@ def get_class_logger(obj):
 class JSONEncoder(json.JSONEncoder):
     """Custon JSON encoder."""
 
-    def default(self, o):  # pylint: disable=method-hidden
+    def default(self, o):
         """Support more object types."""
         if isinstance(o, set):
             return list(sorted(o))

@@ -24,7 +24,7 @@ import re
 import time
 import urllib.parse
 
-import bencode
+import bencode # typing: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
