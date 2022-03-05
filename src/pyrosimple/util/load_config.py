@@ -28,6 +28,8 @@ import io
 import re
 import sys
 
+from importlib import resources
+
 from pyrosimple import config, error
 from pyrosimple.util import os, pymagic
 
@@ -50,7 +52,9 @@ def walk_resources(package_or_requirement, resource_name, recurse=True, base="")
     resource_base = (resource_name.rstrip("/") + "/" + base.strip("/")).rstrip("/")
 
     # Create default configuration files
-    for filename in pymagic.resource_listdir(package_or_requirement, resource_base):
+    for filename in resources.files(
+        package_or_requirement + "." + resource_base
+    ).iterdir():
         # Skip hidden and other trashy names
         if filename.startswith(".") or any(
             filename.endswith(i) for i in (".pyc", ".pyo", "~")
@@ -58,8 +62,10 @@ def walk_resources(package_or_requirement, resource_name, recurse=True, base="")
             continue
 
         # Handle subdirectories
-        if pymagic.resource_isdir(
-            package_or_requirement, resource_base + "/" + filename
+        if (
+            resources.files(package_or_requirement + "." + resource_base)
+            .joinpath(filename)
+            .is_dir()
         ):
             if recurse:
                 for i in walk_resources(
@@ -182,9 +188,10 @@ class ConfigLoader:
                 continue  # skip any non-plain filenames
 
             try:
-                defaults = pymagic.resource_string(
-                    "pyrosimple", "data/config/" + cfg_file
-                )  # @UndefinedVariable
+                with resources.files("pyrosimple").joinpath(
+                    "data/config/", cfg_file
+                ).open("rb") as handle:
+                    defaults = handle.read()
             except IOError as exc:
                 if idx and exc.errno == errno.ENOENT:
                     continue
