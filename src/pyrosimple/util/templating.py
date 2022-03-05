@@ -88,7 +88,7 @@ def preparse(template_text, lookup=None):
             # pylint: disable=import-outside-toplevel
             from jinja2 import Template
 
-            template = Template(template_text)
+            template = Template(template_text.replace("%%", "%"))
             template.__engine__ = "jinja2"
         else:
             template = InterpolationTemplate(template_text)
