@@ -71,7 +71,7 @@ class ScriptBase:
         else:
             logging.basicConfig(level=logging.INFO)
 
-        logging.getLogger().debug("Logging config read from '%s'" % logging_cfg)
+        logging.getLogger().debug("Logging config read from '%s'", logging_cfg)
 
     def __init__(self):
         """Initialize CLI."""
@@ -175,14 +175,14 @@ class ScriptBase:
             logging.getLogger().setLevel(logging.DEBUG)
 
         self.LOG.debug(
-            "Options: %s"
-            % ", ".join("%s=%r" % i for i in sorted(vars(self.options).items()))
-        )
+            "Options: %s",
+            ", ".join("%s=%r" % i for i in sorted(vars(self.options).items())
+        ))
 
     def fatal(self, msg, exc=None):
         """Exit on a fatal error."""
         if exc is not None:
-            self.LOG.fatal("%s (%s)" % (msg, exc))
+            self.LOG.fatal("%s (%s)", msg, exc)
             if self.options.debug:
                 return  # let the caller re-raise it
         else:
@@ -245,7 +245,7 @@ class ScriptBase:
             if log_total and self.options:  ## No time logging on --version and such
                 running_time = time.time() - self.startup
                 self.LOG.log(
-                    self.STD_LOG_LEVEL, "Total time: %.3f seconds." % running_time
+                    self.STD_LOG_LEVEL, "Total time: %.3f seconds.", running_time
                 )
             logging.shutdown()
 
