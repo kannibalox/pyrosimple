@@ -21,7 +21,7 @@ jobs:
         poetry install -v
     - name: Run unittests
       run: |
-        python -m unittest discover src/tests/
+        poetry run python -m unittest discover src/tests/
     - name: Analysing the code with pylint
       run: |
-        pylint src/pyrosimple/
+        poetry run pylint src/pyrosimple/
