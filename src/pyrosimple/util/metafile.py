@@ -32,7 +32,7 @@ import urllib
 from pathlib import Path, PurePath
 from typing import List, Optional, Union
 
-import bencode # typing: ignore
+import bencode  # typing: ignore
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, os, pymagic

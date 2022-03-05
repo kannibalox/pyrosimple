@@ -19,6 +19,7 @@
 import json
 import logging
 
+
 def import_name(module_spec, name=None):
     """Import identifier C{name} from module C{module_spec}.
 
