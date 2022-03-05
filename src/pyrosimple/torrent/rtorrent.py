@@ -128,8 +128,6 @@ class RtorrentItem(engine.TorrentProxy):
 
             if attrs:
                 for idx, attr in enumerate(attrs):
-                    if attr.startswith("get_"):
-                        attr = attr[4:]
                     for item, rpc_item in zip(result, rpc_result):
                         item[attr] = rpc_item[6 + idx]
 
@@ -230,8 +228,6 @@ class RtorrentItem(engine.TorrentProxy):
                 )
                 if getter_name[0] == "=":
                     getter_name = getter_name[1:]
-                else:
-                    getter_name = "get_" + getter_name
                 getter = getattr(self._engine._rpc.d, getter_name)
 
                 try:
@@ -444,7 +440,7 @@ class RtorrentItem(engine.TorrentProxy):
             return item.completed_chunks < item.size_chunks
 
         self.cull(
-            file_filter=partial_file, attrs=["get_completed_chunks", "get_size_chunks"]
+            file_filter=partial_file, attrs=["completed_chunks", "size_chunks"]
         )
 
     def cull(self, file_filter=None, attrs=None):

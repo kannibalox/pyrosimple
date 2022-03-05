@@ -235,7 +235,7 @@ class RTorrentProxy:
             raise XmlRpcError("Bad XMLRPC URL {0}: {1}".format(self._url, exc)) from exc
         self._versions = ("", "")
         self._version_info = ()
-        self._use_deprecated = True
+        self._use_deprecated = False
         self._mapping = mapping or config.xmlrpc
         self._fix_mappings()
 
@@ -268,7 +268,6 @@ class RTorrentProxy:
                 self.system.library_version(),
             )
             self._version_info = tuple(int(i) for i in self._versions[0].split("."))
-            self._use_deprecated = self._version_info < (0, 8, 7)
 
             # Merge mappings for this version
             self._mapping = self._mapping.copy()
@@ -302,12 +301,6 @@ class RTorrentProxy:
         if config.debug and cmd != self._mapping.get(cmd, cmd):
             self.LOG.debug("MAP %s ==> %s", cmd, self._mapping[cmd])
         cmd = self._mapping.get(cmd, cmd)
-
-        # These we do by code, to avoid lengthy lists in the config
-        if not self._use_deprecated and any(
-            cmd.startswith(i) for i in ("d.get_", "f.get_", "p.get_", "t.get_")
-        ):
-            cmd = cmd[:2] + cmd[6:]
 
         return cmd
 
