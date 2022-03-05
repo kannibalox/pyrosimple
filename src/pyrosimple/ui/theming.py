@@ -33,7 +33,7 @@ class ThemeSwitcher(ScriptBaseWithConfig):
 
     def add_options(self):
         """Add program options."""
-        super(ThemeSwitcher, self).add_options()
+        super().add_options()
 
         self.add_bool_option("-l", "--list", help="list available themes")
         self.add_bool_option(
@@ -58,12 +58,12 @@ class ThemeSwitcher(ScriptBaseWithConfig):
         # Read persisted state
         selected_themes = []
         if os.path.exists(selected_file):
-            with open(selected_file, "rt") as handle:
+            with open(selected_file, "rt", encoding="ascii") as handle:
                 selected_themes = [x.strip() for x in handle]
 
         current_theme = None
         if os.path.exists(current_file):
-            with open(current_file, "rt") as handle:
+            with open(current_file, "rt", encoding="ascii") as handle:
                 current_theme = handle.readline().strip()
 
         # Scan config for available themes
@@ -98,7 +98,7 @@ class ThemeSwitcher(ScriptBaseWithConfig):
                 else:
                     selected_themes.append(name)
 
-                with open(selected_file, "wt") as handle:
+                with open(selected_file, "wt", encoding="ascii") as handle:
                     handle.write("\n".join(selected_themes + [""]))
 
             if self.options.list:
@@ -123,7 +123,7 @@ class ThemeSwitcher(ScriptBaseWithConfig):
 
             # Persist new theme
             if new_theme != current_theme:
-                with open(current_file, "wt") as handle:
+                with open(current_file, "wt", encoding="ascii") as handle:
                     handle.write(new_theme + "\n")
 
             # Return result

@@ -56,7 +56,7 @@ def engine_data(engine):
         uptime=engine.uptime,
         upload=[result[0], result[1]],
         download=[result[2], result[3]],
-        views=dict([(name, result[4 + i]) for i, name in enumerate(views)]),
+        views={name: result[4 + i] for i, name in enumerate(views)},
     )
 
     return data

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=
+# pylint: disable=attribute-defined-outside-init
 """ Torrent Item Filters.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -24,8 +24,8 @@ import re
 import shlex
 import time
 
+import pyrosimple
 from pyrosimple import config, error
-from pyrosimple.torrent import formatting
 
 
 TRUE = {
@@ -106,9 +106,8 @@ class Filter:
         return self.match(item)
 
 
-class CompoundFilterBase(Filter, list):
+class CompoundFilterBase(Filter, list): # pylint: disable=abstract-method
     """List of filters."""
-
 
 class CompoundFilterAll(CompoundFilterBase):
     """List of filters that must all match (AND)."""
@@ -195,7 +194,7 @@ class NegateFilter(Filter):
         return not self._inner.match(item)
 
 
-class FieldFilter(Filter):
+class FieldFilter(Filter): # pylint: disable=abstract-method
     """Base class for all field filters."""
 
     PRE_FILTER_FIELDS = dict(
@@ -288,13 +287,13 @@ class PatternFilter(FieldFilter):
 
             def _template_globber(val, item):
                 """Helper."""
-                pattern = formatting.format_item(self._template, item).replace(
+                pattern = pyrosimple.torrent.formatting.format_item(self._template, item).replace(
                     "[", "[[]"
                 )
                 ##print('!!!', val, '~~~', pattern, '???')
                 return fnmatch.fnmatchcase(val, pattern.lower())
 
-            self._template = formatting.preparse(self._value)
+            self._template = pyrosimple.torrent.formatting.preparse(self._value)
             self._matcher = _template_globber
         else:
             self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)

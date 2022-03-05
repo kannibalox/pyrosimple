@@ -53,7 +53,7 @@ class AdminTool(ScriptBaseWithConfig):
 
     def add_options(self):
         """Add program options."""
-        super(AdminTool, self).add_options()
+        super().add_options()
 
         self.add_bool_option("--create-config", help="create default configuration")
         self.add_bool_option(
@@ -217,7 +217,7 @@ class AdminTool(ScriptBaseWithConfig):
                 ignore_file = os.path.join(folder, ".rcignore")
                 rc_ignore = set([".*", "*~"])
                 if os.path.exists(ignore_file):
-                    with open(ignore_file) as handle:
+                    with open(ignore_file, 'r', encoding='utf-8') as handle:
                         for line in handle:
                             line = line.strip()
                             if line and not line.startswith("#"):
@@ -249,7 +249,7 @@ class AdminTool(ScriptBaseWithConfig):
                     conf_rc.append('import = "{}{}{}"'.format(folder, os.sep, name))
 
                 self.LOG.info("Creating %r..." % (folder + "/.import.rc",))
-                with open(os.path.expanduser(folder + "/.import.rc"), "wt") as handle:
+                with open(os.path.expanduser(folder + "/.import.rc"), "wt", encoding='utf-8') as handle:
                     handle.write("\n".join(conf_rc + [""]))
 
         elif self.options.dump_rc:
@@ -398,7 +398,7 @@ class AdminTool(ScriptBaseWithConfig):
             shutil.copytree(stub_template, stub_dir)
 
             py_stub = os.path.join(stub_dir, "PyroScopeScreenlet.py")
-            with open(py_stub, "w") as handle:
+            with open(py_stub, "w", encoding='utf-8') as handle:
                 handle.write(
                     "\n".join(
                         [

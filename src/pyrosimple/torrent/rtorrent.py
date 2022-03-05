@@ -373,7 +373,7 @@ class RtorrentItem(engine.TorrentProxy):
         # Check identifier rules
         if not key:
             raise error.UserError("Custom field name cannot be empty!")
-        elif len(key) == 1 and key in "12345":
+        if len(key) == 1 and key in "12345":
             method, args = "custom" + key + ".set", (value,)
         elif not (key[0].isalpha() and key.replace("_", "").isalnum()):
             raise error.UserError(
@@ -681,7 +681,7 @@ class RtorrentEngine(engine.TorrentEngine):
         # Parse the file
         self.LOG.debug("Loading rtorrent config from %r", rcfile)
         rc_vals = Bunch(scgi_local="", scgi_port="")
-        with open(rcfile) as handle:
+        with open(rcfile, 'r', encoding='locale') as handle:
             continued = False
             for line in handle.readlines():
                 # Skip comments, continuations, and empty lines
@@ -921,7 +921,7 @@ class RtorrentEngine(engine.TorrentEngine):
             for item in self._item_cache[view.viewname]:
                 yield item
 
-    def show(self, items, view=None, append=False, disjoin=False):
+    def show(self, items, view=None, append=False, disjoin=False): # pylint: disable=arguments-differ
         """Visualize a set of items (search result), and return the view name."""
         proxy = self.open()
         view = self._resolve_viewname(view or "rtcontrol")

@@ -105,6 +105,7 @@ class MetafileLister(ScriptBase):
                         )
 
                     class BencodeJSONEncoder(json.JSONEncoder):
+                        """Small helper class to translate 'binary' strings"""
                         def default(self, o):
                             if isinstance(o, bytes):
                                 return o.hex().upper()

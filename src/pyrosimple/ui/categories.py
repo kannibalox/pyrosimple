@@ -34,7 +34,7 @@ class CategoryManager(ScriptBaseWithConfig):
 
     def add_options(self):
         """Add program options."""
-        super(CategoryManager, self).add_options()
+        super().add_options()
 
         self.add_bool_option("-l", "--list", help="list added category views")
         self.add_bool_option("-n", "--next", help="switch to next category view")

@@ -19,9 +19,6 @@
 
 import os
 
-from contextlib import closing
-
-
 class InterpolationTemplate:
     """Simple string interpolation."""
 
@@ -73,7 +70,7 @@ def preparse(template_text, lookup=None):
             elif lookup:
                 template_path = lookup(template_path)
 
-            with closing(open(template_path, "r")) as handle:
+            with open(template_path, "rt", encoding="utf-8") as handle:
                 template_text = handle.read().rstrip()
 
     if hasattr(template_text, "__engine__"):
@@ -82,7 +79,7 @@ def preparse(template_text, lookup=None):
     else:
         if template_text.startswith("{{"):
             # pylint: disable=import-outside-toplevel
-            import tempita  # only on demand
+            import tempita # typing: ignore
 
             template = tempita.Template(template_text, name=template_path)
             template.__engine__ = "tempita"

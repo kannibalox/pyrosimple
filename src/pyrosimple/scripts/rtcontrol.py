@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=no-self-use
+# pylint: disable=no-self-use,too-many-lines,too-many-nested-blocks
 """ rTorrent Control.
 
     Copyright (c) 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -28,7 +28,7 @@ import time
 
 from typing import Optional
 
-import daemon
+import daemon # type: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
@@ -467,13 +467,13 @@ class RtorrentControl(ScriptBaseWithConfig):
                 yield "%s=no" % (name,)
                 yield "%s=yes" % (name,)
                 continue
-            elif issubclass(field._matcher, matching.PatternFilter):
+            if issubclass(field._matcher, matching.PatternFilter):
                 yield "%s=" % (name,)
                 yield "%s=/" % (name,)
                 yield "%s=?" % (name,)
                 yield "%s=\"'*'\"" % (name,)
                 continue
-            elif issubclass(field._matcher, matching.NumericFilterBase):
+            if issubclass(field._matcher, matching.NumericFilterBase):
                 for i in range(10):
                     yield "%s=%d" % (name, i)
             else:
@@ -594,8 +594,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             name = name.decode()
             if name not in engine.FieldDefinition.FIELDS:
                 self.LOG.warning(
-                    "Omitted unknown name '%s' from statistics and output format sorting"
-                    % name
+                    "Omitted unknown name '%s' from statistics and output format sorting", name
                 )
             else:
                 result.append(name)
@@ -628,7 +627,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             sourceview.size(),
             sourceview.matcher,
         )
-        self.LOG.info("%s%s rTorrent view %r." % (msg, action_name, targetname))
+        self.LOG.info("%s%s rTorrent view %r.", msg, action_name, targetname)
         config.engine.log(msg)
 
     def anneal(self, mode, matches, orig_matches):
@@ -795,7 +794,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         matcher = matching.ConditionParser(engine.FieldDefinition.lookup, "name").parse(
             self.args
         )
-        self.LOG.debug("Matcher is: %s" % matcher)
+        self.LOG.debug("Matcher is: %s", matcher)
 
         # Detach to background?
         # This MUST happen before the next step, when we connect to the torrent client
@@ -892,13 +891,11 @@ class RtorrentControl(ScriptBaseWithConfig):
             action = actions[0]  # TODO: loop over it
             self.LOG.log(
                 logging.DEBUG if self.options.cron else logging.INFO,
-                "%s %s %d out of %d torrents."
-                % (
-                    "Would" if self.options.dry_run else "About to",
-                    action.label,
-                    len(matches),
-                    view.size(),
-                ),
+                "%s %s %d out of %d torrents.",
+                "Would" if self.options.dry_run else "About to",
+                action.label,
+                len(matches),
+                view.size(),
             )
             defaults = {"action": action.label}
             defaults.update(self.FORMATTER_DEFAULTS)
@@ -929,7 +926,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 if self.options.dry_run:
                     if self.options.debug:
                         self.LOG.debug(
-                            "Would call action %s(*%r)" % (action.method, args)
+                            "Would call action %s(*%r)", action.method, args
                         )
                 else:
                     getattr(item, action.method)(*args)
@@ -977,7 +974,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 ]
 
                 if self.options.dry_run:
-                    self.LOG.info("Would call command(s) %r" % (cmds,))
+                    self.LOG.info("Would call command(s) %r", cmds)
                 else:
                     for cmd in cmds:
                         if self.options.call:
@@ -985,7 +982,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         else:
                             logged_cmd = '"%s"' % ('" "'.join(cmd),)
                         if self.options.verbose:
-                            self.LOG.info("Calling: %s" % (logged_cmd,))
+                            self.LOG.info("Calling: %s", logged_cmd)
                         try:
                             if self.options.call:
                                 subprocess.check_call(cmd[0], shell=True)
@@ -1008,7 +1005,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             if raw_output_format:
                 json_fields = raw_output_format.split(",")
                 json_data = [
-                    dict([(name, getattr(i, name)) for name in json_fields])
+                    {name: getattr(i, name) for name in json_fields}
                     for i in matches
                 ]
             json.dump(
@@ -1071,23 +1068,19 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
 
             self.LOG.info(
-                "Dumped %d out of %d torrents."
-                % (
-                    len(matches),
-                    view.size(),
-                )
+                "Dumped %d out of %d torrents.",
+                len(matches),
+                view.size(),
             )
         else:
             self.LOG.info(
-                "Filtered %d out of %d torrents."
-                % (
-                    len(matches),
-                    view.size(),
-                )
+                "Filtered %d out of %d torrents.",
+                len(matches),
+                view.size(),
             )
 
         # XMLRPC stats
-        self.LOG.debug("XMLRPC stats: %s" % config.engine._rpc)
+        self.LOG.debug("XMLRPC stats: %s", config.engine._rpc)
 
         # Clean up daemon context
         if dcontext is not None:

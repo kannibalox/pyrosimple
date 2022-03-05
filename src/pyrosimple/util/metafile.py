@@ -429,6 +429,8 @@ class Metafile:
         self.filename = filename
         self.progress = None
         self.datapath = datapath
+        self._datapath = None
+        self._fifo = None
         self.ignore = self.IGNORE_GLOB[:]
         self.LOG = pymagic.get_class_logger(self)
 

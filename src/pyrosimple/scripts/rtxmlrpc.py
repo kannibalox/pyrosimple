@@ -38,7 +38,7 @@ except ImportError:
 
 from xmlrpc import client as xmlrpc_client
 
-import bencode
+import bencode # type: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
@@ -148,7 +148,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 try:
                     arg = int(arg, 10)
                 except (ValueError, TypeError) as exc:
-                    self.LOG.warning("Not a valid number: %r (%s)" % (arg, exc))
+                    self.LOG.warning("Not a valid number: %r (%s)", arg, exc)
             elif arg.startswith("[["):  # escaping, not a list
                 arg = arg[1:]
             elif arg == "[]":
@@ -170,8 +170,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             result = getattr(proxy, method)(raw_xml=raw, *tuple(args))
         except xmlrpc.ERRORS as exc:
             self.LOG.error(
-                "While calling %s(%s): %s"
-                % (method, ", ".join(repr(i) for i in args), exc)
+                "While calling %s(%s): %s",
+                method, ", ".join(repr(i) for i in args), exc
             )
             self.return_code = (
                 error.EX_NOINPUT
@@ -188,7 +188,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     result = fmt.xmlrpc_result_to_string(result)
                 print(result)
 
-    def repl_usage(self):
+    def repl_usage(self): # pylint: disable=no-self-use
         """Print a short REPL usage summary."""
         print(
             textwrap.dedent(
@@ -351,11 +351,9 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 data = Bunch(bencode.bdecode(raw_data))
             except EnvironmentError as exc:
                 self.LOG.warning(
-                    "Can't read '%s' (%s)"
-                    % (
-                        filename,
-                        str(exc).replace(": '%s'" % filename, ""),
-                    )
+                    "Can't read '%s' (%s)",
+                    filename,
+                    str(exc).replace(": '%s'" % filename, ""),
                 )
                 continue
 
@@ -424,7 +422,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             self.do_command()
 
         # XMLRPC stats
-        self.LOG.debug("XMLRPC stats: %s" % self.open())
+        self.LOG.debug("XMLRPC stats: %s", self.open())
 
 
 def run():  # pragma: no cover

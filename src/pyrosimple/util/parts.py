@@ -1,3 +1,4 @@
+"""Generic collections set to ease work with dicts"""
 from collections import defaultdict
 
 

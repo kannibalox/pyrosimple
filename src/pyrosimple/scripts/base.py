@@ -78,6 +78,7 @@ class ScriptBase:
         """Initialize CLI."""
         self.startup = time.time()
         self.LOG = pymagic.get_class_logger(self)
+        self.config_dir = ""
 
         self.args = None
         self.options = None
