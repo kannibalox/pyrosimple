@@ -112,8 +112,7 @@ class RTorrentMethod:
                 ) or self._method_name.endswith(".multicall.filtered"):
                     if self._method_name in ("d.multicall", "d.multicall.filtered"):
                         args = (0,) + args
-                    if config.debug:
-                        self._proxy.LOG.debug("BEFORE MAPPING: %r", args)
+                    self._proxy.LOG.debug("BEFORE MAPPING: %r", args)
                     if self._method_name == "system.multicall":
                         for call in args[0]:
                             call["methodName"] = self._proxy._map_call(
@@ -123,8 +122,7 @@ class RTorrentMethod:
                         args = args[0:2] + tuple(
                             self._proxy._map_call(i) for i in args[2:]
                         )
-                    if config.debug:
-                        self._proxy.LOG.debug("AFTER MAPPING: %r", args)
+                    self._proxy.LOG.debug("AFTER MAPPING: %r", args)
                 elif self._method_name in self.NEEDS_FAKE_TARGET:
                     args = (0,) + args
 
@@ -137,8 +135,7 @@ class RTorrentMethod:
             self._proxy._outbound += self._outbound
             self._proxy._outbound_max = max(self._proxy._outbound_max, self._outbound)
 
-            if config.debug:
-                self._proxy.LOG.debug("XMLRPC raw request: %r", xmlreq)
+            self._proxy.LOG.debug("XMLRPC raw request: %r", xmlreq)
 
             # Send it
             scgi_req = xmlrpc2scgi.SCGIRequest(self._proxy._transport)
@@ -208,15 +205,12 @@ class RTorrentMethod:
             self._latency = time.time() - start
             self._proxy._latency += self._latency
 
-            if config.debug:
-                self._proxy.LOG.debug(
-                    "%s(%s) took %.3f secs"
-                    % (
-                        self._method_name,
-                        ", ".join(repr(i) for i in args),
-                        self._latency,
-                    )
-                )
+            self._proxy.LOG.debug(
+                "%s(%s) took %.3f secs",
+                self._method_name,
+                ", ".join(repr(i) for i in args),
+                self._latency,
+            )
 
 
 class RTorrentProxy:
@@ -276,8 +270,7 @@ class RTorrentProxy:
             ):
                 map_version = tuple(int(i) for i in key.split("_")[1:])
                 if map_version <= self._version_info:
-                    if config.debug:
-                        self.LOG.debug("MAPPING for %r added: %r", map_version, val)
+                    self.LOG.debug("MAPPING for %r added: %r", map_version, val)
                     self._mapping.update(val)
             self._fix_mappings()
         except ERRORS as exc:
@@ -293,16 +286,14 @@ class RTorrentProxy:
             if not key.endswith("=")
         )
 
-        if config.debug:
-            self.LOG.debug("CMD MAPPINGS ARE: %r", self._mapping)
+        self.LOG.debug("CMD MAPPINGS ARE: %r", self._mapping)
 
     def _map_call(self, cmd):
         """Map old to new command names."""
-        if config.debug and cmd != self._mapping.get(cmd, cmd):
-            self.LOG.debug("MAP %s ==> %s", cmd, self._mapping[cmd])
-        cmd = self._mapping.get(cmd, cmd)
-
-        return cmd
+        new_cmd = self._mapping.get(cmd, cmd)
+        if cmd != new_cmd:
+            self.LOG.debug("MAP %s ==> %s", cmd, new_cmd)
+        return new_cmd
 
     def __getattr__(self, attr):
         """Return a method object for accesses to virtual attributes."""

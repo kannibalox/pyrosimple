@@ -65,6 +65,12 @@ class MetafileCreator(ScriptBaseWithConfig):
             help="optional root name (default is basename of the data path)",
         )
         self.add_value_option(
+            "-m",
+            "--magnet-watch",
+            "NAME",
+            help="path to place .meta files from magnet links",
+        )
+        self.add_value_option(
             "-x",
             "--exclude",
             "PATTERN [-x ...]",
@@ -126,9 +132,9 @@ class MetafileCreator(ScriptBaseWithConfig):
             .replace("urn.btih.", "")
         )
 
-        if not config.magnet_watch:
-            self.fatal("You MUST set the 'magnet_watch' config option!")
-        meta_path = os.path.join(config.magnet_watch, "magnet-%s.torrent" % meta_name)
+        if not self.options.magnet_watch:
+            self.fatal("You MUST set the '--magnet-watch' config option!")
+        meta_path = os.path.join(self.options.magnet_watch, "magnet-%s.torrent" % meta_name)
         self.LOG.debug("Writing magnet-uri metafile %r..." % (meta_path,))
 
         try:

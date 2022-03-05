@@ -956,7 +956,6 @@ def run():
     """Module level test."""
     logging.basicConfig(level=logging.DEBUG)
     load_config.ConfigLoader().load()
-    config.debug = True
     print(repr(config.engine.item(sys.argv[1])))
 
 

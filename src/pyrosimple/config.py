@@ -84,5 +84,3 @@ waif_pattern_list: List[Any] = []
 traits_by_alias: Dict[Any, Any] = {}
 connections: List[str] = []
 torque: Dict[Any, Any] = {}
-magnet_watch = None
-influxdb: Dict[Any, Any] = {}
