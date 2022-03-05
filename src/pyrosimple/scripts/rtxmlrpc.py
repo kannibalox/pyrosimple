@@ -38,7 +38,7 @@ except ImportError:
 
 from xmlrpc import client as xmlrpc_client
 
-import bencode # type: ignore
+import bencode  # type: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
@@ -171,7 +171,9 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         except xmlrpc.ERRORS as exc:
             self.LOG.error(
                 "While calling %s(%s): %s",
-                method, ", ".join(repr(i) for i in args), exc
+                method,
+                ", ".join(repr(i) for i in args),
+                exc,
             )
             self.return_code = (
                 error.EX_NOINPUT
@@ -188,7 +190,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     result = fmt.xmlrpc_result_to_string(result)
                 print(result)
 
-    def repl_usage(self): # pylint: disable=no-self-use
+    def repl_usage(self):  # pylint: disable=no-self-use
         """Print a short REPL usage summary."""
         print(
             textwrap.dedent(

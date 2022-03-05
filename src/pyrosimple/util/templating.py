@@ -19,6 +19,7 @@
 
 import os
 
+
 class InterpolationTemplate:
     """Simple string interpolation."""
 
@@ -79,7 +80,7 @@ def preparse(template_text, lookup=None):
     else:
         if template_text.startswith("{{"):
             # pylint: disable=import-outside-toplevel
-            import tempita # typing: ignore
+            import tempita  # typing: ignore
 
             template = tempita.Template(template_text, name=template_path)
             template.__engine__ = "tempita"

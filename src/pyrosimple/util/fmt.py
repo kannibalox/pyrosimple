@@ -53,7 +53,7 @@ def human_size(size: int) -> str:
     return "%6.1f TiB" % rem
 
 
-def iso_datetime(timestamp:Optional[float]=None) -> str:
+def iso_datetime(timestamp: Optional[float] = None) -> str:
     """Convert UNIX timestamp to ISO datetime string.
 
     @param timestamp: UNIX epoch value (default: the current time).
@@ -75,7 +75,9 @@ def iso_datetime_optional(timestamp) -> str:
     return "never"
 
 
-def human_duration(time1: float, time2=Optional[float], precision: int=0, short: bool=False) -> str:
+def human_duration(
+    time1: float, time2=Optional[float], precision: int = 0, short: bool = False
+) -> str:
     """Return a human-readable representation of a time delta.
 
     @param time1: Relative time value.

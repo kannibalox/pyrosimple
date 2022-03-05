@@ -60,9 +60,7 @@ def _duration(start, end):
         return None
 
 
-def _interval_split(
-    interval, only=None, event_re=re.compile("[A-Z][0-9]+")
-):
+def _interval_split(interval, only=None, event_re=re.compile("[A-Z][0-9]+")):
     """Split C{interval} into a series of event type and timestamp tuples.
     An exaple of the input is "R1283008245P1283008268".
     Returns events in reversed order (latest first).
@@ -714,9 +712,7 @@ class TorrentProxy:
         "stopped",
         "time download was last stopped or paused",
         matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: (_interval_split(o, only="P") + [(0, 0)])[0][
-            1
-        ],
+        accessor=lambda o: (_interval_split(o, only="P") + [(0, 0)])[0][1],
         formatter=fmt.iso_datetime_optional,
     )
 

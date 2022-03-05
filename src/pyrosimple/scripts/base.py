@@ -84,7 +84,8 @@ class ScriptBase:
         self.return_code = 0
 
         try:
-            import importlib.metadata # pylint: disable=import-outside-toplevel,no-member
+            import importlib.metadata  # pylint: disable=import-outside-toplevel,no-member
+
             self.__version__ = importlib.metadata.version("pyrosimple")
         except ImportError:
             self.__version__ = "unknown"
@@ -176,8 +177,8 @@ class ScriptBase:
 
         self.LOG.debug(
             "Options: %s",
-            ", ".join("%s=%r" % i for i in sorted(vars(self.options).items())
-        ))
+            ", ".join("%s=%r" % i for i in sorted(vars(self.options).items())),
+        )
 
     def fatal(self, msg, exc=None):
         """Exit on a fatal error."""

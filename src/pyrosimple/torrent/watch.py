@@ -346,8 +346,7 @@ class TreeWatch:
         """
         if not pyinotify.WatchManager:
             raise error.UserError(
-                "You need to install 'pyinotify' to use %s!"
-                % (self.__class__.__name__)
+                "You need to install 'pyinotify' to use %s!" % (self.__class__.__name__)
             )  # pylint: disable=E1101, W0212
 
         self.manager = pyinotify.WatchManager()
@@ -448,8 +447,7 @@ class TreeWatchCommand(ScriptBaseWithConfig):
 
             ok = handler.parse()
             self.LOG.debug(
-                "Metafile '%s' would've %sbeen loaded",
-                pathname, ("" if ok else "NOT ")
+                "Metafile '%s' would've %sbeen loaded", pathname, ("" if ok else "NOT ")
             )
 
             if ok:
@@ -460,7 +458,7 @@ class TreeWatchCommand(ScriptBaseWithConfig):
                     "\n    ".join(
                         "%s=%s" % (key, post_process(repr(val)))
                         for key, val in sorted(handler.ns.items())
-                    )
+                    ),
                 )
 
     @classmethod

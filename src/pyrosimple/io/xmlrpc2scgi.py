@@ -191,9 +191,7 @@ def transport_from_url(url):
             # Support simplified "domain:port" URLs
             return transport_from_url("scgi://%s:%s" % (url.scheme, url.path))
         else:
-            raise URLError(
-                "Unsupported scheme in URL %r" % url.geturl()
-            )
+            raise URLError("Unsupported scheme in URL %r" % url.geturl())
     else:
         return transport(url)
 

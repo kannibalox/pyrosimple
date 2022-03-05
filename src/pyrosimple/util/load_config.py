@@ -216,12 +216,10 @@ class ConfigLoader:
             p = importlib.import_module("pyrosimple")
             sys.modules["pyrocore"] = p
             sys.modules["pyrobase"] = p
-            with open(config_file, 'rb') as handle:
+            with open(config_file, "rb") as handle:
                 # pylint: disable=exec-used
                 exec(
-                    compile(
-                        handle.read(), config_file, "exec"
-                    ),
+                    compile(handle.read(), config_file, "exec"),
                     vars(config),
                     namespace,
                 )

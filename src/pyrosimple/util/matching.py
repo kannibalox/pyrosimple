@@ -25,6 +25,7 @@ import shlex
 import time
 
 import pyrosimple
+
 from pyrosimple import config, error
 
 
@@ -106,8 +107,9 @@ class Filter:
         return self.match(item)
 
 
-class CompoundFilterBase(Filter, list): # pylint: disable=abstract-method
+class CompoundFilterBase(Filter, list):  # pylint: disable=abstract-method
     """List of filters."""
+
 
 class CompoundFilterAll(CompoundFilterBase):
     """List of filters that must all match (AND)."""
@@ -194,7 +196,7 @@ class NegateFilter(Filter):
         return not self._inner.match(item)
 
 
-class FieldFilter(Filter): # pylint: disable=abstract-method
+class FieldFilter(Filter):  # pylint: disable=abstract-method
     """Base class for all field filters."""
 
     PRE_FILTER_FIELDS = dict(
@@ -287,9 +289,9 @@ class PatternFilter(FieldFilter):
 
             def _template_globber(val, item):
                 """Helper."""
-                pattern = pyrosimple.torrent.formatting.format_item(self._template, item).replace(
-                    "[", "[[]"
-                )
+                pattern = pyrosimple.torrent.formatting.format_item(
+                    self._template, item
+                ).replace("[", "[[]")
                 ##print('!!!', val, '~~~', pattern, '???')
                 return fnmatch.fnmatchcase(val, pattern.lower())
 
@@ -521,8 +523,7 @@ class TimeFilter(NumericFilterBase):
                 timestamp = float(self._value)
             except (ValueError, TypeError) as exc:
                 raise FilterError(
-                    "Bad timestamp value %r in %r"
-                    % (self._value, self._condition)
+                    "Bad timestamp value %r in %r" % (self._value, self._condition)
                 ) from exc
         else:
             # Something human readable

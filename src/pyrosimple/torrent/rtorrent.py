@@ -681,7 +681,7 @@ class RtorrentEngine(engine.TorrentEngine):
         # Parse the file
         self.LOG.debug("Loading rtorrent config from %r", rcfile)
         rc_vals = Bunch(scgi_local="", scgi_port="")
-        with open(rcfile, 'r', encoding='locale') as handle:
+        with open(rcfile, "r", encoding="locale") as handle:
             continued = False
             for line in handle.readlines():
                 # Skip comments, continuations, and empty lines
@@ -921,7 +921,9 @@ class RtorrentEngine(engine.TorrentEngine):
             for item in self._item_cache[view.viewname]:
                 yield item
 
-    def show(self, items, view=None, append=False, disjoin=False): # pylint: disable=arguments-differ
+    def show(
+        self, items, view=None, append=False, disjoin=False
+    ):  # pylint: disable=arguments-differ
         """Visualize a set of items (search result), and return the view name."""
         proxy = self.open()
         view = self._resolve_viewname(view or "rtcontrol")

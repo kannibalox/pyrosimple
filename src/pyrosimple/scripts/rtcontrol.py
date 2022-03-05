@@ -28,7 +28,7 @@ import time
 
 from typing import Optional
 
-import daemon # type: ignore
+import daemon  # type: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
@@ -498,7 +498,9 @@ class RtorrentControl(ScriptBaseWithConfig):
             return squote + text.replace(squote, type(text)(r"'\''")) + squote
 
         try:
-            item_text: str = formatting.format_item(self.options.output_format, item, defaults)
+            item_text: str = formatting.format_item(
+                self.options.output_format, item, defaults
+            )
         except (NameError, ValueError, TypeError) as exc:
             self.fatal(
                 "Trouble with formatting item %r\n\n  FORMAT = %r\n\n  REASON ="
@@ -530,7 +532,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # For a header, use configured escape codes on a terminal
         if item is None and os.isatty(sys.stdout.fileno()):
-            item_text = "".join((config.output_header_ecma48.decode(), item_text, "\x1B[0m"))
+            item_text = "".join(
+                (config.output_header_ecma48.decode(), item_text, "\x1B[0m")
+            )
 
         # Dump to selected target
         if to_log:
@@ -594,7 +598,8 @@ class RtorrentControl(ScriptBaseWithConfig):
             name = name.decode()
             if name not in engine.FieldDefinition.FIELDS:
                 self.LOG.warning(
-                    "Omitted unknown name '%s' from statistics and output format sorting", name
+                    "Omitted unknown name '%s' from statistics and output format sorting",
+                    name,
                 )
             else:
                 result.append(name)
@@ -854,7 +859,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         stencil: Optional[str] = None
         if self.options.column_headers and self.plain_output_format and matches:
             stencil = formatting.format_item(
-                    self.options.output_format, matches[0], self.FORMATTER_DEFAULTS
+                self.options.output_format, matches[0], self.FORMATTER_DEFAULTS
             ).split("\t")
 
         # Tee to ncurses view, if requested
@@ -925,9 +930,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
                 if self.options.dry_run:
                     if self.options.debug:
-                        self.LOG.debug(
-                            "Would call action %s(*%r)", action.method, args
-                        )
+                        self.LOG.debug("Would call action %s(*%r)", action.method, args)
                 else:
                     getattr(item, action.method)(*args)
                     if self.options.flush:
@@ -1005,8 +1008,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             if raw_output_format:
                 json_fields = raw_output_format.split(",")
                 json_data = [
-                    {name: getattr(i, name) for name in json_fields}
-                    for i in matches
+                    {name: getattr(i, name) for name in json_fields} for i in matches
                 ]
             json.dump(
                 json_data,

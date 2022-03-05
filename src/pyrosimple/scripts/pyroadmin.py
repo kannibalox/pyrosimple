@@ -26,6 +26,7 @@ import shutil
 import sys
 
 from contextlib import closing
+from pathlib import Path
 from zipfile import ZipFile
 
 import six
@@ -217,7 +218,7 @@ class AdminTool(ScriptBaseWithConfig):
                 ignore_file = os.path.join(folder, ".rcignore")
                 rc_ignore = set([".*", "*~"])
                 if os.path.exists(ignore_file):
-                    with open(ignore_file, 'r', encoding='utf-8') as handle:
+                    with open(ignore_file, "r", encoding="utf-8") as handle:
                         for line in handle:
                             line = line.strip()
                             if line and not line.startswith("#"):
@@ -249,7 +250,9 @@ class AdminTool(ScriptBaseWithConfig):
                     conf_rc.append('import = "{}{}{}"'.format(folder, os.sep, name))
 
                 self.LOG.info("Creating %r..." % (folder + "/.import.rc",))
-                with open(os.path.expanduser(folder + "/.import.rc"), "wt", encoding='utf-8') as handle:
+                with Path(folder + "/.import.rc").expanduser().open(
+                    "wt", encoding="utf-8"
+                ) as handle:
                     handle.write("\n".join(conf_rc + [""]))
 
         elif self.options.dump_rc:
@@ -341,9 +344,7 @@ class AdminTool(ScriptBaseWithConfig):
                             if len(val) > self.RC_CONTINUATION_THRESHOLD:
                                 val = "\\\n    " + val
                             print(
-                                'method.set_key = {}, "{}", {}'.format(
-                                    name, key, val
-                                )
+                                'method.set_key = {}, "{}", {}'.format(name, key, val)
                             )
                     elif objtype is str:
                         definition = rc_quoted(value)
@@ -398,7 +399,7 @@ class AdminTool(ScriptBaseWithConfig):
             shutil.copytree(stub_template, stub_dir)
 
             py_stub = os.path.join(stub_dir, "PyroScopeScreenlet.py")
-            with open(py_stub, "w", encoding='utf-8') as handle:
+            with open(py_stub, "w", encoding="utf-8") as handle:
                 handle.write(
                     "\n".join(
                         [
