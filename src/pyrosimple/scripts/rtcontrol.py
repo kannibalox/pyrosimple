@@ -539,9 +539,9 @@ class RtorrentControl(ScriptBaseWithConfig):
             else:
                 self.LOG.info(item_text)
         elif self.options.nul:
-            print(item_text + "\0")
+            print(item_text, end="\0")
         else:
-            print(item_text + "\n")
+            print(item_text)
 
         return item_text.count("\n") + 1
 
