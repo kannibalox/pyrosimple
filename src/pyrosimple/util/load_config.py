@@ -30,7 +30,7 @@ import sys
 
 try:
     from importlib.resources import files as resources_files
-except ImportError:
+except ModuleNotFoundError:
     from importlib_resources.resources import files as resources_files
 
 from pyrosimple import config, error
