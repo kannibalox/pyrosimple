@@ -105,10 +105,9 @@ class MetafileHandler:
         self.ns.watch_path = self.job.config.path
         self.ns.relpath = None
         for watch in self.job.config.path:
-            if self.ns.pathname.startswith(watch.rstrip("/") + "/"):
-                self.ns.relpath = os.path.dirname(self.ns.pathname)[
-                    len(watch.rstrip("/")) + 1 :
-                ]
+            path = Path(self.ns.pathname)
+            if path.is_relative_to(watch):
+                self.ns.relpath = path.relative_to(watch)
                 break
 
         # Build indicator flags for target state from filename
@@ -371,11 +370,11 @@ class TreeWatch:
 
         # XXX: Add a check that the notifier is working, by creating / deleting a file
         # XXX: Also check for unhandled files
-        if self.config.check_unhandled:
+        if self.config.get('check_unhandled', False):
             for path in self.config.path:
                 for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
-                    if self.config.remove_unhandled and filepath.exists():
+                    if self.config.get('remove_unhandled', False) and filepath.exists():
                         filepath.unlink()
 
         # TODO: XXX: Especially on startup, we need to walk the directory tree
