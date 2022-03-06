@@ -192,6 +192,6 @@ class QueueManager:
             # Handle found items
             self._start(items)
             self.LOG.debug("%s - %s", config_ini.engine.engine_id, self.proxy)
-        except (error.LoggableError, xmlrpc.ERRORS) as exc:
+        except (error.LoggableError, *xmlrpc.ERRORS) as exc:
             # only debug, let the statistics logger do its job
             self.LOG.debug(str(exc))
