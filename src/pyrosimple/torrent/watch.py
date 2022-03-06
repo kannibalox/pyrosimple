@@ -106,9 +106,11 @@ class MetafileHandler:
         self.ns.relpath = None
         for watch in self.job.config.path:
             path = Path(self.ns.pathname)
-            if path.is_relative_to(watch):
+            try:
                 self.ns.relpath = path.relative_to(watch)
                 break
+            except ValueError:
+                pass
 
         # Build indicator flags for target state from filename
         flags = self.ns.pathname.split(os.sep)
