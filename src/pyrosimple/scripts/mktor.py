@@ -26,7 +26,6 @@ from urllib.parse import parse_qs
 
 import bencode
 
-from pyrosimple import config
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.util import metafile, os
 
