@@ -299,7 +299,8 @@ class ConfigLoader:
         # Create default configuration files
         for filepath in sorted(walk_resources("pyrosimple", "data/config")):
             # Load from package data
-            text = pymagic.resource_string("pyrosimple", "data/config" + filepath)
+            with resources.files("pyrosimple").joinpath("data/config", filepath).open('rb') as handle:
+                text: bytes = handle.read()
 
             # Create missing subdirs
             config_file = self.config_dir + filepath
