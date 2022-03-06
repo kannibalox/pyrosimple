@@ -28,7 +28,10 @@ import io
 import re
 import sys
 
-from importlib import resources
+try:
+    from importlib.resources import files as resources_files
+except ImportError:
+    from importlib_resources.resources import files as resources_files
 
 from pyrosimple import config, error
 from pyrosimple.util import os, pymagic
@@ -52,7 +55,7 @@ def walk_resources(package_or_requirement, resource_name, recurse=True, base="")
     resource_base = (resource_name.rstrip("/") + "/" + base.strip("/")).rstrip("/")
 
     # Create default configuration files
-    for filename in resources.files(
+    for filename in resources_files(
         package_or_requirement + "." + resource_base
     ).iterdir():
         # Skip hidden and other trashy names
@@ -63,7 +66,7 @@ def walk_resources(package_or_requirement, resource_name, recurse=True, base="")
 
         # Handle subdirectories
         if (
-            resources.files(package_or_requirement + "." + resource_base)
+            resources_files(package_or_requirement + "." + resource_base)
             .joinpath(filename)
             .is_dir()
         ):
@@ -188,7 +191,7 @@ class ConfigLoader:
                 continue  # skip any non-plain filenames
 
             try:
-                with resources.files("pyrosimple").joinpath(
+                with resources_files("pyrosimple").joinpath(
                     "data/config/", cfg_file
                 ).open("rb") as handle:
                     defaults = handle.read()
@@ -299,7 +302,7 @@ class ConfigLoader:
         # Create default configuration files
         for filepath in sorted(walk_resources("pyrosimple", "data/config")):
             # Load from package data
-            with resources.files("pyrosimple").joinpath("data/config", filepath).open('rb') as handle:
+            with resources_files("pyrosimple").joinpath("data/config", filepath).open('rb') as handle:
                 text: bytes = handle.read()
 
             # Create missing subdirs
