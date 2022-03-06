@@ -77,7 +77,7 @@ class MetafileHandler:
         self.ns.info_hash = metafile.info_hash(self.metadata)
         self.ns.info_name = self.metadata["info"]["name"]
         self.job.LOG.info(
-            "Loaded '%s' from metafile '%s'", self.ns.info_name, self.ns.pathname
+            "Loaded '%s' from metafile '%s'", self.ns.info_name.decode(), self.ns.pathname
         )
 
         # Check whether item is already loaded
