@@ -24,14 +24,16 @@ import configparser as ConfigParser
 import errno
 import glob
 import importlib
+import importlib.resources
 import io
 import re
 import sys
 
 try:
-    from importlib.resources import files as resources_files
-except ModuleNotFoundError:
-    from importlib_resources.resources import files as resources_files
+    resources_files = importlib.resources.files
+except AttributeError:
+    import importlib_resources
+    resources_files = importlib_resources.files
 
 from pyrosimple import config, error
 from pyrosimple.util import os, pymagic
