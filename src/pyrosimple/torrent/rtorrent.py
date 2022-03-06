@@ -677,7 +677,7 @@ class RtorrentEngine(engine.TorrentEngine):
         # Parse the file
         self.LOG.debug("Loading rtorrent config from %r", rcfile)
         rc_vals = Bunch(scgi_local="", scgi_port="")
-        with open(rcfile, "r", encoding="locale") as handle:
+        with open(rcfile, "r", encoding="utf-8") as handle:
             continued = False
             for line in handle.readlines():
                 # Skip comments, continuations, and empty lines

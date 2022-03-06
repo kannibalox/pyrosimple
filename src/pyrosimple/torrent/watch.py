@@ -362,7 +362,7 @@ class TreeWatch:
 
         # Add all configured base dirs
         for path in self.config.path:
-            self.manager.add_watch(path.strip(), mask, rec=True, auto_add=True)
+            self.manager.add_watch(path, mask, rec=True, auto_add=True)
 
     def run(self):
         """Regular maintenance and fallback task."""
