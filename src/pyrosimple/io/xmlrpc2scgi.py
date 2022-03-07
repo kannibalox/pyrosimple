@@ -79,7 +79,7 @@ class LocalTransport:
             self.sock_args = (socket.AF_UNIX, socket.SOCK_STREAM)
             self.sock_addr = os.path.abspath(path)
 
-    def send(self, data) -> Generator[bytes, None, None]:
+    def send(self, data: bytes) -> Generator[bytes, None, None]:
         """Open transport, send data, and yield response chunks."""
         sock = socket.socket(*self.sock_args)
         try:
@@ -227,7 +227,7 @@ def _parse_headers(headers: bytes) -> Dict[str, str]:
         ) from exc
 
 
-def _parse_response(resp) -> Tuple[bytes, Dict[str, str]]:
+def _parse_response(resp: bytes) -> Tuple[bytes, Dict[str, str]]:
     """
     Get xmlrpc response from scgi response
 
@@ -247,14 +247,14 @@ def _parse_response(resp) -> Tuple[bytes, Dict[str, str]]:
                 exc,
             )
         ) from exc
-    headers = _parse_headers(headers)
+    parsed_headers = _parse_headers(headers)
 
-    clen = headers.get("Content-Length")
+    clen = parsed_headers.get("Content-Length")
     if clen is not None:
         # Check length, just in case the transport is bogus
         assert len(payload) == int(clen)
 
-    return payload, headers
+    return payload, parsed_headers
 
 
 #

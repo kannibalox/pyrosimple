@@ -28,6 +28,7 @@ import time
 
 from collections import namedtuple
 from functools import partial
+from typing import List, Set, Callable
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
@@ -54,7 +55,7 @@ class RtorrentItem(engine.TorrentProxy):
         self._engine = engine_
         self._fields = dict(fields)
 
-    def _make_it_so(self, command, calls, *args, **kwargs):
+    def _make_it_so(self, command: str, calls: list[str], *args, **kwargs):
         """Perform some error-checked XMLRPC calls."""
         observer = kwargs.pop("observer", False)
         args = (self._fields["hash"],) + args
@@ -133,7 +134,7 @@ class RtorrentItem(engine.TorrentProxy):
 
             return result
 
-    def _memoize(self, name, getter, *args, **kwargs):
+    def _memoize(self, name: str, getter: Callable, *args, **kwargs) -> str:
         """Cache a stable expensive-to-get item value for later (optimized) retrieval."""
         field = "custom_m_" + name
         cached = self.fetch(field)
@@ -294,7 +295,7 @@ class RtorrentItem(engine.TorrentProxy):
             "setting priority for", ["priority.set"], max(0, min(int(prio), 3))
         )
 
-    def tag(self, tags):
+    def tag(self, tags: str):
         """Add or remove tags."""
         # Get tag list and add/remove given tags
         tags = tags.lower()
@@ -354,7 +355,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
             self.start()
 
-    def set_custom(self, key, value=None):
+    def set_custom(self, key: str, value: str | None =None):
         """Set a custom value. C{key} might have the form "key=value" when value is C{None}."""
         # Split combined key/value
         if value is None:
@@ -367,17 +368,18 @@ class RtorrentItem(engine.TorrentProxy):
                 )
 
         # Check identifier rules
+        args: List[str]
         if not key:
             raise error.UserError("Custom field name cannot be empty!")
         if len(key) == 1 and key in "12345":
-            method, args = "custom" + key + ".set", (value,)
+            method, args = "custom" + key + ".set", [value]
         elif not (key[0].isalpha() and key.replace("_", "").isalnum()):
             raise error.UserError(
                 "Bad custom field name %r (must only contain a-z, A-Z, 0-9 and _)"
                 % (key,)
             )
         else:
-            method, args = "custom.set", (key, value)
+            method, args = "custom.set", [key, value]
 
         # Make the assignment
         self._make_it_so("setting custom_%s = %r on" % (key, value), [method], *args)
@@ -806,15 +808,15 @@ class RtorrentEngine(engine.TorrentEngine):
         items = self.open().d.multicall2("", viewname, *commands)
         return [result_type(*x) for x in items]
 
-    def log(self, msg):
+    def log(self, msg: str):
         """Log a message in the torrent client."""
         self.open().log(0, msg)
 
-    def item(self, infohash, prefetch=None, cache=False):
+    def item(self, infohash: str, prefetch=None, cache=False):
         """Fetch a single item by its info hash."""
         return next(self.items(infohash, prefetch, cache))
 
-    def items(self, view=None, prefetch=None, cache=True):
+    def items(self, view=None, prefetch: Set[str] | None=None, cache=True):
         """Get list of download items.
 
         @param view: Name of the view.
@@ -856,7 +858,7 @@ class RtorrentEngine(engine.TorrentEngine):
                 infohash = view._check_hash_view()
                 if infohash:
                     multi_call = self.open().system.multicall
-                    args = [
+                    multi_args = [
                         dict(
                             methodName=field.rsplit("=", 1)[0],
                             params=[infohash]
@@ -871,7 +873,7 @@ class RtorrentEngine(engine.TorrentEngine):
                     raw_items = [[i[0] for i in multi_call(args)]]
                 else:
                     multi_call = self.open().d.multicall2
-                    args = ["", view.viewname] + [
+                    multi_args = ["", view.viewname] + [
                         field if "=" in field else field + "=" for field in args
                     ]
                     if view.matcher and int(config.fast_query):
@@ -883,7 +885,7 @@ class RtorrentEngine(engine.TorrentEngine):
                             multi_call = self.open().d.multicall.filtered
                             del args[0]
                             args.insert(1, pre_filter)
-                    raw_items = multi_call(*tuple(args))
+                    raw_items = multi_call(*tuple(multi_args))
 
                 ##self.LOG.debug("multicall %r" % (args,))
                 ##import pprint; self.LOG.debug(pprint.pformat(raw_items))
