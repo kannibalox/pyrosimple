@@ -1,8 +1,8 @@
 #! /usr/bin/env python-pyrocore
 # -*- coding: utf-8 -*-
 
-from pyrocore import config
-from pyrocore.scripts import base
+from pyrosimple import config
+from pyrosimple.scripts import base
 
 from six.moves.urllib.parse import urlparse
 
@@ -34,8 +34,7 @@ class StuckTrackers(base.ScriptBaseWithConfig):
         import time
         from collections import namedtuple, Counter
 
-        from pyrobase import fmt
-        from pyrocore.util import xmlrpc
+        from pyrosimple.util import xmlrpc, fmt
 
         proxy = config.engine.open()
         now = int(time.time())

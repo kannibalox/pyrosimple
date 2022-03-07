@@ -282,13 +282,13 @@ class RtorrentItem(engine.TorrentProxy):
         """Stop and close download."""
         self._make_it_so("stopping", ["stop", "close"])
 
-    def ignore(self, flag):
+    def ignore(self, flag: int):
         """Set ignore status."""
         self._make_it_so(
             "setting ignore status for", ["ignore_commands.set"], int(flag)
         )
 
-    def set_prio(self, prio):
+    def set_prio(self, prio: int):
         """Set priority (0-3)."""
         self._make_it_so(
             "setting priority for", ["priority.set"], max(0, min(int(prio), 3))
@@ -424,7 +424,8 @@ class RtorrentItem(engine.TorrentProxy):
     def delete(self):
         """Remove torrent from client."""
         self.stop()
-        self._make_it_so("removing metafile of", ["delete_tied"])
+        if self.metafile:
+            self._make_it_so("removing metafile of", ["delete_tied"])
         self._make_it_so("erasing", ["erase"])
 
     # TODO: def set_files_priority(self, pattern, prio)
