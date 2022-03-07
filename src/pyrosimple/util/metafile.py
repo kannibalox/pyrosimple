@@ -334,7 +334,7 @@ def add_fast_resume(meta, datapath: str):
 
     for fileinfo in files:
         # Get the path into the filesystem
-        filepath = Path(fileinfo["path"])
+        filepath = Path(*fileinfo["path"])
         if not single:
             filepath = Path(datapath, filepath)
 
