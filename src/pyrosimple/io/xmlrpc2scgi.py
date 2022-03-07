@@ -139,31 +139,10 @@ class SSHTransport:
         # self.cmd.extend(["/bin/nc", "-U", "--", clean_path])
         self.cmd.extend(["socat", "STDIO", "UNIX-CONNECT:" + clean_path])
 
-    def send(self, data):
+    def send(self, data: bytes) -> bytes:
         """Open transport, send data, and yield response chunks."""
-        try:
-            proc = subprocess.Popen(
-                self.cmd,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-        except OSError as exc:
-            raise URLError(
-                "Calling %r failed (%s)!" % (" ".join(self.cmd), exc)
-            ) from exc
-        else:
-            stdout, stderr = proc.communicate(data)
-            if proc.returncode:
-                raise URLError(
-                    "Calling %r failed with RC=%d!\n%s"
-                    % (
-                        " ".join(self.cmd),
-                        proc.returncode,
-                        stderr,
-                    )
-                )
-            yield stdout
+        proc = subprocess.run(self.cmd, capture_output=True, check=True, input=data)
+        return proc.stdout
 
 
 TRANSPORTS = {
