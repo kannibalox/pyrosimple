@@ -76,7 +76,7 @@ def iso_datetime_optional(timestamp) -> str:
 
 
 def human_duration(
-    time1: float, time2=Optional[float], precision: int = 0, short: bool = False
+    time1: float, time2: Optional[float] = None, precision: int = 0, short: bool = False
 ) -> str:
     """Return a human-readable representation of a time delta.
 
