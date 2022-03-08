@@ -355,7 +355,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
             self.start()
 
-    def set_custom(self, key: str, value: str | None =None):
+    def set_custom(self, key: str, value: str | None = None):
         """Set a custom value. C{key} might have the form "key=value" when value is C{None}."""
         # Split combined key/value
         if value is None:
@@ -442,9 +442,7 @@ class RtorrentItem(engine.TorrentProxy):
             # print "???", repr(item)
             return item.completed_chunks < item.size_chunks
 
-        self.cull(
-            file_filter=partial_file, attrs=["completed_chunks", "size_chunks"]
-        )
+        self.cull(file_filter=partial_file, attrs=["completed_chunks", "size_chunks"])
 
     def cull(self, file_filter=None, attrs=None):
         """Delete ALL data files and remove torrent from client.
@@ -816,7 +814,7 @@ class RtorrentEngine(engine.TorrentEngine):
         """Fetch a single item by its info hash."""
         return next(self.items(infohash, prefetch, cache))
 
-    def items(self, view=None, prefetch: Set[str] | None=None, cache=True):
+    def items(self, view=None, prefetch: Set[str] | None = None, cache=True):
         """Get list of download items.
 
         @param view: Name of the view.

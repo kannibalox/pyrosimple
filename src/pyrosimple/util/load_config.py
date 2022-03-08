@@ -29,10 +29,12 @@ import io
 import re
 import sys
 
+
 try:
     resources_files = importlib.resources.files
 except AttributeError:
     import importlib_resources
+
     resources_files = importlib_resources.files
 
 from pyrosimple import config, error
@@ -304,7 +306,9 @@ class ConfigLoader:
         # Create default configuration files
         for filepath in sorted(walk_resources("pyrosimple", "data/config")):
             # Load from package data
-            with resources_files("pyrosimple").joinpath("data/config", filepath).open('rb') as handle:
+            with resources_files("pyrosimple").joinpath("data/config", filepath).open(
+                "rb"
+            ) as handle:
                 text: bytes = handle.read()
 
             # Create missing subdirs

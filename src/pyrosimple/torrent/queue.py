@@ -115,7 +115,10 @@ class QueueManager:
         )
         start_now = min(start_now, len(startable))
 
-        if 'max_downloading_traffic' in self.config and self.config.max_downloading_traffic:
+        if (
+            "max_downloading_traffic" in self.config
+            and self.config.max_downloading_traffic
+        ):
             down_traffic = sum(i.down for i in downloading)
             self.LOG.debug("%d downloading, down %d", len(downloading), down_traffic)
             if down_traffic > int(self.config.max_downloading_traffic):

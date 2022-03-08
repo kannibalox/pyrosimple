@@ -30,7 +30,7 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import List, Optional, Union
+from typing import Generator, List, Optional, Union
 
 import bencode  # typing: ignore
 

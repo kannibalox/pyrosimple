@@ -133,7 +133,9 @@ class MetafileCreator(ScriptBaseWithConfig):
 
         if not self.options.magnet_watch:
             self.fatal("You MUST set the '--magnet-watch' config option!")
-        meta_path = os.path.join(self.options.magnet_watch, "magnet-%s.torrent" % meta_name)
+        meta_path = os.path.join(
+            self.options.magnet_watch, "magnet-%s.torrent" % meta_name
+        )
         self.LOG.debug("Writing magnet-uri metafile %r..." % (meta_path,))
 
         try:

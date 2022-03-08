@@ -372,11 +372,11 @@ class TreeWatch:
 
         # XXX: Add a check that the notifier is working, by creating / deleting a file
         # XXX: Also check for unhandled files
-        if self.config.get('check_unhandled', False):
+        if self.config.get("check_unhandled", False):
             for path in self.config.path:
                 for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
-                    if self.config.get('remove_unhandled', False) and filepath.exists():
+                    if self.config.get("remove_unhandled", False) and filepath.exists():
                         filepath.unlink()
 
         # TODO: XXX: Especially on startup, we need to walk the directory tree
