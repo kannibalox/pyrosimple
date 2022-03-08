@@ -411,7 +411,7 @@ class TorrentProxy:
             ),
         )
 
-    def fetch(self, name, engine_name=None):
+    def fetch(self, name, engine_name=None, cache=False):
         """Get a field on demand.
 
         "engine_name" is the internal name of the client engine.

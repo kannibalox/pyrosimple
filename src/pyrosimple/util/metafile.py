@@ -469,7 +469,7 @@ class Metafile:
                     if not relpath:  # EOF?
                         break
                     self.LOG.debug("Read relative path %r from FIFO...", relpath)
-                    yield Path(Path(self.datapath).parent, relpath)
+                    yield Path(Path(self.datapath).parent, relpath.decode())
 
             self.LOG.debug("FIFO %r closed!", self.datapath)
 
