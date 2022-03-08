@@ -454,7 +454,7 @@ class Metafile:
 
     datapath = property(_get_datapath, _set_datapath)
 
-    def walk(self):
+    def walk(self) -> Generator[Path, None, None]:
         """Generate paths in "self.datapath"."""
         # FIFO?
         if self._fifo:

@@ -28,7 +28,7 @@ import time
 
 from collections import namedtuple
 from functools import partial
-from typing import List, Set, Callable
+from typing import Callable, List, Set
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
@@ -134,7 +134,7 @@ class RtorrentItem(engine.TorrentProxy):
 
             return result
 
-    def _memoize(self, name: str, getter: Callable, *args, **kwargs) -> str:
+    def _memoize(self, name: str, getter: Callable, *args, **kwargs):
         """Cache a stable expensive-to-get item value for later (optimized) retrieval."""
         field = "custom_m_" + name
         cached = self.fetch(field)
