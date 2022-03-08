@@ -489,14 +489,6 @@ class RtorrentControl(ScriptBaseWithConfig):
     def format_item(self, item: str, defaults=None, stencil=None) -> str:
         """Format an item."""
 
-        def shell_escape(text, _safe=re.compile(r"^[-._,+a-zA-Z0-9]+$")):
-            """Escape given string according to shell rules."""
-            if not text or _safe.match(text):
-                return text
-
-            squote = "'"
-            return squote + text.replace(squote, type(text)(r"'\''")) + squote
-
         try:
             item_text: str = formatting.format_item(
                 self.options.output_format, item, defaults
@@ -510,7 +502,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             raise  # in --debug mode
 
         if self.options.shell:
-            item_text = "\t".join(shell_escape(i) for i in item_text.split("\t"))
+            item_text = "\t".join(shlex.quote(i) for i in item_text.split("\t"))
 
         # Justify headers according to stencil
         if stencil:
