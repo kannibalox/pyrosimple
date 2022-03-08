@@ -191,58 +191,56 @@ class RtorrentItem(engine.TorrentProxy):
         """Return known fields."""
         return self._fields.copy()
 
-    def fetch(self, name, engine_name=None):
+    def fetch(self, name, engine_name=None, cache: bool = False):
         """Get a field on demand."""
         # TODO: Get each on-demand field in a multicall for all other items, since
         # we likely need it anyway; another (more easy) way would be to pre-fetch dynamically
         # with the list of fields from filters and output formats
-        try:
-            return self._fields[name]
-        except KeyError:
-            if isinstance(name, int):
-                name = "custom_%d" % name
+        if cache:
+            try:
+                return self._fields[name]
+            except KeyError:
+                pass
+        if isinstance(name, int):
+            name = "custom_%d" % name
 
-            if name == "done":
-                val = float(self.fetch("completed_chunks")) / self.fetch("size_chunks")
-            elif name == "files":
-                val = self._get_files()
-            elif name.startswith("kind_") and name[5:].isdigit():
-                val = self._get_kind(int(name[5:], 10))
-            elif name.startswith("custom_"):
-                key = name[7:]
-                try:
-                    if len(key) == 1 and key in "12345":
-                        val = getattr(self._engine._rpc.d, "custom" + key)(
-                            self._fields["hash"]
-                        )
-                    else:
-                        val = self._engine._rpc.d.custom(self._fields["hash"], key)
-                except xmlrpc.ERRORS as exc:
-                    raise error.EngineError(
-                        "While accessing field %r: %s" % (name, exc)
+        if name == "done":
+            val = float(self.fetch("completed_chunks")) / self.fetch("size_chunks")
+        elif name == "files":
+            val = self._get_files()
+        elif name.startswith("kind_") and name[5:].isdigit():
+            val = self._get_kind(int(name[5:], 10))
+        elif name.startswith("custom_"):
+            key = name[7:]
+            try:
+                if len(key) == 1 and key in "12345":
+                    val = getattr(self._engine._rpc.d, "custom" + key)(
+                        self._fields["hash"]
                     )
-            else:
-                getter_name = (
-                    engine_name
-                    if engine_name
-                    else RtorrentEngine.PYRO2RT_MAPPING.get(name, name)
-                )
-                if getter_name[0] == "=":
-                    getter_name = getter_name[1:]
-                getter = getattr(self._engine._rpc.d, getter_name)
+                else:
+                    val = self._engine._rpc.d.custom(self._fields["hash"], key)
+            except xmlrpc.ERRORS as exc:
+                raise error.EngineError("While accessing field %r: %s" % (name, exc))
+        else:
+            getter_name = (
+                engine_name
+                if engine_name
+                else RtorrentEngine.PYRO2RT_MAPPING.get(name, name)
+            )
+            if getter_name[0] == "=":
+                getter_name = getter_name[1:]
+            getter = getattr(self._engine._rpc.d, getter_name)
 
-                try:
-                    val = getter(self._fields["hash"])
-                except xmlrpc.ERRORS as exc:
-                    raise error.EngineError(
-                        "While accessing field %r: %s" % (name, exc)
-                    )
+            try:
+                val = getter(self._fields["hash"])
+            except xmlrpc.ERRORS as exc:
+                raise error.EngineError("While accessing field %r: %s" % (name, exc))
 
-            # TODO: Currently, NOT caching makes no sense; in a demon, it does!
-            # if isinstance(FieldDefinition.FIELDS.get(name), engine.ConstantField):
-            self._fields[name] = val
+        # TODO: Currently, NOT caching makes no sense; in a demon, it does!
+        # if isinstance(FieldDefinition.FIELDS.get(name), engine.ConstantField):
+        self._fields[name] = val
 
-            return val
+        return val
 
     def datapath(self):
         """Get an item's data path."""
