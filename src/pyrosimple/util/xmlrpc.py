@@ -34,6 +34,7 @@ NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
 
+
 class XmlRpcError(Exception):
     """Base class for XMLRPC protocol errors."""
 
@@ -67,7 +68,6 @@ class RTorrentMethod(xmlrpclib._Method):
         return super().__call__(*args)
 
 
-
 class RTorrentProxy(xmlrpclib.ServerProxy):
     """Proxy to rTorrent's XMLRPC interface.
 
@@ -78,9 +78,19 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     of self.__var name mangling and the __call__/__getattr__ magic.
     """
 
-    def __init__(self, uri, transport=None, encoding=None, verbose=False,
-                 allow_none=False, use_datetime=False, use_builtin_types=False,
-                 *, headers=(), context=None):
+    def __init__(
+        self,
+        uri,
+        transport=None,
+        encoding=None,
+        verbose=False,
+        allow_none=False,
+        use_datetime=False,
+        use_builtin_types=False,
+        *,
+        headers=(),
+        context=None
+    ):
         # establish a "logical" server connection
 
         # get the url
@@ -98,12 +108,14 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
         if transport is None:
             handler = scgi.transport_from_url(uri)
-            transport = handler(use_datetime=use_datetime,
-                                use_builtin_types=use_builtin_types,
-                                headers=headers)
+            transport = handler(
+                use_datetime=use_datetime,
+                use_builtin_types=use_builtin_types,
+                headers=headers,
+            )
         self.__transport = transport
 
-        self.__encoding = encoding or 'utf-8'
+        self.__encoding = encoding or "utf-8"
         self.__verbose = verbose
         self.__allow_none = allow_none
 
@@ -113,17 +125,15 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     def __request(self, methodname, params):
         # call a method on the remote server
 
-        request = xmlrpclib.dumps(params, methodname, encoding=self.__encoding,
-                        allow_none=self.__allow_none).encode(self.__encoding, 'xmlcharrefreplace')
+        request = xmlrpclib.dumps(
+            params, methodname, encoding=self.__encoding, allow_none=self.__allow_none
+        ).encode(self.__encoding, "xmlcharrefreplace")
         if self.__verbose:
             print("req: ", request)
 
         response = self.__transport.request(
-            self.__host,
-            self.__handler,
-            request,
-            verbose=self.__verbose
-            )
+            self.__host, self.__handler, request, verbose=self.__verbose
+        )
 
         if len(response) == 1:
             response = response[0]
@@ -131,10 +141,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         return response
 
     def __repr__(self):
-        return (
-            "<%s for %s>" %
-            (self.__class__.__name__, self.__uri)
-            )
+        return "<%s for %s>" % (self.__class__.__name__, self.__uri)
 
     def __getattr__(self, name):
         # magic method dispatcher
@@ -145,7 +152,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     def __call__(self, attr):
         """A workaround to get special attributes on the ServerProxy
-           without interfering with the magic __getattr__
+        without interfering with the magic __getattr__
         """
         if attr == "close":
             return self.__close

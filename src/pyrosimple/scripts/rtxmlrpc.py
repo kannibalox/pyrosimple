@@ -136,7 +136,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
             self.proxy = xmlrpc.RTorrentProxy(config.scgi_url)
-            #self.proxy._set_mappings()
+            # self.proxy._set_mappings()
         return self.proxy
 
     def cooked(self, raw_args):

@@ -1,5 +1,5 @@
-import os
 import io
+import os
 import pipes
 import socket
 import subprocess
@@ -10,9 +10,11 @@ from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
 
+
 def register_scheme(scheme):
-    for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):
+    for method in filter(lambda s: s.startswith("uses_"), dir(urlparse)):
         getattr(urlparse, method).append(scheme)
+
 
 class SCGIException(Exception):
     """SCGI protocol error"""
@@ -26,30 +28,40 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 # SCGI transports
 #
 
+
 class TCPTransport(xmlrpclib.Transport):
     CHUNK_SIZE: int = 32768
     """Transport via TCP socket."""
+
     def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            host, port = host.split(':')
+            host, port = host.split(":")
             sock.connect((host, int(port)))
             sock.sendall(_encode_payload(request_body))
-            with sock.makefile('rb') as handle:
-                return self.parse_response(io.BytesIO(_parse_response(handle.read())[0]))
+            with sock.makefile("rb") as handle:
+                return self.parse_response(
+                    io.BytesIO(_parse_response(handle.read())[0])
+                )
+
 
 class UnixTransport(xmlrpclib.Transport):
     """Transport via UNIX domain socket."""
+
     def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
         with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as sock:
             sock.connect(host)
             sock.sendall(_encode_payload(request_body))
-            with sock.makefile('b') as handle:
-                return self.parse_response(io.BytesIO(_parse_response(handle.read())[0]))
+            with sock.makefile("b") as handle:
+                return self.parse_response(
+                    io.BytesIO(_parse_response(handle.read())[0])
+                )
+
 
 class SSHTransport(xmlrpclib.Transport):
     pass
+
 
 TRANSPORTS = {
     "scgi": TCPTransport,
@@ -83,6 +95,7 @@ def transport_from_url(url):
             raise URLError("Unsupported scheme in URL %r" % url.geturl())
     else:
         return transport
+
 
 #
 # Helpers to handle SCGI data

@@ -762,7 +762,10 @@ class RtorrentEngine(engine.TorrentEngine):
 
         # Connect and get instance ID (also ensures we're connectable)
         self._rpc = xmlrpc.RTorrentProxy(config.scgi_url)
-        self.versions = (self._rpc.system.client_version(), self._rpc.system.library_version())
+        self.versions = (
+            self._rpc.system.client_version(),
+            self._rpc.system.library_version(),
+        )
         self.engine_id = self._rpc.session.name()
         time_usec = self._rpc.system.time_usec()
 
