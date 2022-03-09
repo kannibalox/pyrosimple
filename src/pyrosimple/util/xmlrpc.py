@@ -25,7 +25,7 @@ import time
 from xmlrpc import client as xmlrpclib
 
 from pyrosimple import config, error
-from pyrosimple.io import xmlrpc2scgi
+from pyrosimple.io import scgi
 from pyrosimple.util import fmt, os, pymagic
 
 
@@ -33,6 +33,26 @@ NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
 
+def scgi_request(url: str, methodname: str, *params, **kw):
+    """Send a XMLRPC request over SCGI to the given URL.
+
+    :param url: Endpoint URL.
+    :param methodname: XMLRPC method name.
+    :param params: Tuple of simple python objects.
+    :type url: string
+    :type methodname: string
+    :keyword deserialize: Parse XML result? (default is True)
+    :return: XMLRPC string response, or the equivalent Python data.
+    """
+    xmlreq = xmlrpclib.dumps(params, methodname)
+    xmlresp = scgi.SCGIRequest(url).send(xmlreq.encode()).decode()
+
+    if kw.get("deserialize", True):
+        # Return deserialized data
+        return xmlrpclib.loads(xmlresp)[0][0]
+    else:
+        # Return raw XML
+        return xmlresp
 
 class XmlRpcError(Exception):
     """Base class for XMLRPC protocol errors."""
@@ -56,7 +76,7 @@ class HashNotFound(XmlRpcError):
 
 
 # Currently, we don't have our own errors, so just copy it
-ERRORS = (XmlRpcError,) + xmlrpc2scgi.ERRORS
+ERRORS = (XmlRpcError,) + scgi.ERRORS
 
 
 class RTorrentMethod:
@@ -138,7 +158,7 @@ class RTorrentMethod:
             self._proxy.LOG.debug("XMLRPC raw request: %r", xmlreq)
 
             # Send it
-            scgi_req = xmlrpc2scgi.SCGIRequest(self._proxy._transport)
+            scgi_req = scgi.SCGIRequest(self._proxy._transport)
             xmlresp = scgi_req.send(xmlreq)
             self._inbound = len(xmlresp)
             self._proxy._inbound += self._inbound
@@ -175,7 +195,7 @@ class RTorrentMethod:
 
                 if not fail_silently:
                     # Dump the bad packet, then re-raise
-                    filename = "/tmp/xmlrpc2scgi-%s.xml" % os.getuid()
+                    filename = "/tmp/xmlrpc-%s.xml" % os.getuid()
                     with open(filename, "wb") as handle:
                         handle.write(b"REQUEST\n")
                         handle.write(xmlreq)
@@ -220,13 +240,16 @@ class RTorrentProxy:
     something like C{proxy.system.client_version()}.
     """
 
-    def __init__(self, url, mapping=None):
+    def __init__(self, url, mapping=None, transport=None):
         self.LOG = pymagic.get_class_logger(self)
         self._url = os.path.expandvars(url)
-        try:
-            self._transport = xmlrpc2scgi.transport_from_url(self._url)
-        except socket.gaierror as exc:
-            raise XmlRpcError("Bad XMLRPC URL {0}: {1}".format(self._url, exc)) from exc
+        if transport is None:
+            try:
+                self._transport = scgi.transport_from_url(self._url)
+            except socket.gaierror as exc:
+                raise XmlRpcError("Bad XMLRPC URL {0}: {1}".format(self._url, exc)) from exc
+        else:
+            self._transport = transport
         self._versions = ("", "")
         self._version_info = ()
         self._use_deprecated = False

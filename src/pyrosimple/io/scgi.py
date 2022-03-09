@@ -1,25 +1,3 @@
-# -*- coding: utf-8 -*-
-# pylint: disable=too-few-public-methods,no-else-return
-""" XMLRPC via SCGI client proxy over various transports.
-
-    Copyright (c) 2011 The PyroScope Project <pyroscope.project@gmail.com>
-
-    Losely based on code Copyright (C) 2005-2007, Glenn Washburn <crass@berlios.de>
-    SSH tunneling back-ported from https://github.com/Quantique
-"""
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import os
 import pipes
 import socket
@@ -30,7 +8,6 @@ from typing import Dict, Generator, List, Tuple, Union
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
-
 
 class SCGIException(Exception):
     """SCGI protocol error"""
@@ -174,6 +151,44 @@ def transport_from_url(url):
     else:
         return transport(url)
 
+#
+# SCGI request handling
+#
+class SCGIRequest:
+    """Send a SCGI request.
+    See spec at "http://python.ca/scgi/protocol.txt".
+
+    Use tcp socket
+    SCGIRequest('scgi://host:port').send(data)
+
+    Or use the named unix domain socket
+    SCGIRequest('scgi:///tmp/rtorrent.sock').send(data)
+    """
+
+    def __init__(self, url_or_transport):
+        try:
+            self.transport = transport_from_url(url_or_transport + "")
+        except TypeError:
+            self.transport = url_or_transport
+
+        self.resp_headers = {}
+        self.latency = 0.0
+
+    def send(self, data: bytes) -> bytes:
+        """Send data over scgi to URL and get response.
+
+        :param data: The bytestring to send
+        :type data: bytes
+        :return: Response bytestring
+        """
+        start: float = time.time()
+        try:
+            scgi_resp = b"".join(self.transport.send(_encode_payload(data)))
+        finally:
+            self.latency = time.time() - start
+
+        resp, self.resp_headers = _parse_response(scgi_resp)
+        return resp
 
 #
 # Helpers to handle SCGI data
@@ -255,65 +270,3 @@ def _parse_response(resp: bytes) -> Tuple[bytes, Dict[str, str]]:
         assert len(payload) == int(clen)
 
     return payload, parsed_headers
-
-
-#
-# SCGI request handling
-#
-class SCGIRequest:
-    """Send a SCGI request.
-    See spec at "http://python.ca/scgi/protocol.txt".
-
-    Use tcp socket
-    SCGIRequest('scgi://host:port').send(data)
-
-    Or use the named unix domain socket
-    SCGIRequest('scgi:///tmp/rtorrent.sock').send(data)
-    """
-
-    def __init__(self, url_or_transport):
-        try:
-            self.transport = transport_from_url(url_or_transport + "")
-        except TypeError:
-            self.transport = url_or_transport
-
-        self.resp_headers = {}
-        self.latency = 0.0
-
-    def send(self, data: bytes) -> bytes:
-        """Send data over scgi to URL and get response.
-
-        :param data: The bytestring to send
-        :type data: bytes
-        :return: Response bytestring
-        """
-        start: float = time.time()
-        try:
-            scgi_resp = b"".join(self.transport.send(_encode_payload(data)))
-        finally:
-            self.latency = time.time() - start
-
-        resp, self.resp_headers = _parse_response(scgi_resp)
-        return resp
-
-
-def scgi_request(url: str, methodname: str, *params, **kw):
-    """Send a XMLRPC request over SCGI to the given URL.
-
-    :param url: Endpoint URL.
-    :param methodname: XMLRPC method name.
-    :param params: Tuple of simple python objects.
-    :type url: string
-    :type methodname: string
-    :keyword deserialize: Parse XML result? (default is True)
-    :return: XMLRPC string response, or the equivalent Python data.
-    """
-    xmlreq = xmlrpclib.dumps(params, methodname)
-    xmlresp = SCGIRequest(url).send(xmlreq.encode()).decode()
-
-    if kw.get("deserialize", True):
-        # Return deserialized data
-        return xmlrpclib.loads(xmlresp)[0][0]
-    else:
-        # Return raw XML
-        return xmlresp
