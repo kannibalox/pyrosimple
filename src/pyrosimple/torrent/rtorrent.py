@@ -55,7 +55,7 @@ class RtorrentItem(engine.TorrentProxy):
         self._engine = engine_
         self._fields = dict(fields)
 
-    def _make_it_so(self, command: str, calls: list[str], *args, **kwargs):
+    def _make_it_so(self, command: str, calls: List[str], *args, **kwargs):
         """Perform some error-checked XMLRPC calls."""
         observer = kwargs.pop("observer", False)
         args = (self._fields["hash"],) + args
