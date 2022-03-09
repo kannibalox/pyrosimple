@@ -702,10 +702,9 @@ class RtorrentEngine(engine.TorrentEngine):
         # Validate fields
         if rc_vals.scgi_local:
             rc_vals.scgi_local = os.path.expanduser(rc_vals.scgi_local)
-            if rc_vals.scgi_local.startswith("/"):
-                rc_vals.scgi_local = "scgi://" + rc_vals.scgi_local
-        if rc_vals.scgi_port and not rc_vals.scgi_port.startswith("scgi://"):
-            rc_vals.scgi_port = "scgi://" + rc_vals.scgi_port
+            rc_vals.scgi_local = "scgi://" + rc_vals.scgi_local
+        if rc_vals.scgi_port and not rc_vals.scgi_port.startswith("scgi+unix://"):
+            rc_vals.scgi_port = "scgi+unix://" + rc_vals.scgi_port
 
         # Prefer UNIX domain sockets over TCP sockets
         namespace.scgi_url = rc_vals.scgi_local or rc_vals.scgi_port
@@ -763,7 +762,7 @@ class RtorrentEngine(engine.TorrentEngine):
 
         # Connect and get instance ID (also ensures we're connectable)
         self._rpc = xmlrpc.RTorrentProxy(config.scgi_url)
-        self.versions, self.version_info = self._rpc._set_mappings()
+        self.versions = (self._rpc.system.client_version(), self._rpc.system.library_version())
         self.engine_id = self._rpc.session.name()
         time_usec = self._rpc.system.time_usec()
 

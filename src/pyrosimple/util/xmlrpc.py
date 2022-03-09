@@ -21,6 +21,7 @@
 import socket
 import sys
 import time
+import urllib
 
 from xmlrpc import client as xmlrpclib
 
@@ -32,27 +33,6 @@ from pyrosimple.util import fmt, os, pymagic
 NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
-
-def scgi_request(url: str, methodname: str, *params, **kw):
-    """Send a XMLRPC request over SCGI to the given URL.
-
-    :param url: Endpoint URL.
-    :param methodname: XMLRPC method name.
-    :param params: Tuple of simple python objects.
-    :type url: string
-    :type methodname: string
-    :keyword deserialize: Parse XML result? (default is True)
-    :return: XMLRPC string response, or the equivalent Python data.
-    """
-    xmlreq = xmlrpclib.dumps(params, methodname)
-    xmlresp = scgi.SCGIRequest(url).send(xmlreq.encode()).decode()
-
-    if kw.get("deserialize", True):
-        # Return deserialized data
-        return xmlrpclib.loads(xmlresp)[0][0]
-    else:
-        # Return raw XML
-        return xmlresp
 
 class XmlRpcError(Exception):
     """Base class for XMLRPC protocol errors."""
@@ -79,249 +59,102 @@ class HashNotFound(XmlRpcError):
 ERRORS = (XmlRpcError,) + scgi.ERRORS
 
 
-class RTorrentMethod:
+class RTorrentMethod(xmlrpclib._Method):
     """Collect attribute accesses to build the final method name."""
 
-    # Actually, many more methods might need a fake target added; but these are the ones we call...
-    NEEDS_FAKE_TARGET = set(
-        (
-            "ui.current_view.set",
-            "view_filter",
-        )
-    )
-
-    def __init__(self, proxy, method_name):
-        self._proxy = proxy
-        self._method_name = method_name
-        self._outbound: int = 0
-        self._inbound: int = 0
-        self._net_latency: int = 0
-        self._latency: int = 0
-
-    def __getattr__(self, attr):
-        """Append attr to the existing method name."""
-        self._method_name += "." + attr
-        return self
-
-    def __str__(self):
-        """Return statistics for this call."""
-        return "out %s, in %s, took %.3fms/%.3fms" % (
-            fmt.human_size(self._outbound).strip(),
-            fmt.human_size(self._inbound).strip(),
-            self._net_latency * 1000.0,
-            self._latency * 1000.0,
-        )
-
-    def __call__(self, *args, **kwargs):
-        """Execute the method call.
-
-        `raw_xml=True` returns the unparsed XML-RPC response.
-        `flatten=True` removes one nesting level in a result list (useful for multicalls).
-        """
-        self._proxy._requests += 1
-        start: float = time.time()
-        raw_xml: bool = kwargs.get("raw_xml", False)
-        flatten: bool = kwargs.get("flatten", False)
-        fail_silently: bool = kwargs.get("fail_silently", False)
-
-        try:
-            # Map multicall arguments
-            if not self._proxy._use_deprecated:
-                if self._method_name.endswith(
-                    ".multicall"
-                ) or self._method_name.endswith(".multicall.filtered"):
-                    if self._method_name in ("d.multicall", "d.multicall.filtered"):
-                        args = (0,) + args
-                    self._proxy.LOG.debug("BEFORE MAPPING: %r", args)
-                    if self._method_name == "system.multicall":
-                        for call in args[0]:
-                            call["methodName"] = self._proxy._map_call(
-                                call["methodName"]
-                            )
-                    else:
-                        args = args[0:2] + tuple(
-                            self._proxy._map_call(i) for i in args[2:]
-                        )
-                    self._proxy.LOG.debug("AFTER MAPPING: %r", args)
-                elif self._method_name in self.NEEDS_FAKE_TARGET:
-                    args = (0,) + args
-
-            # Prepare request
-            xmlreq = xmlrpclib.dumps(
-                args, self._proxy._map_call(self._method_name)
-            ).encode()
-            ##xmlreq = xmlreq.replace('\n', '')
-            self._outbound = len(xmlreq)
-            self._proxy._outbound += self._outbound
-            self._proxy._outbound_max = max(self._proxy._outbound_max, self._outbound)
-
-            self._proxy.LOG.debug("XMLRPC raw request: %r", xmlreq)
-
-            # Send it
-            scgi_req = scgi.SCGIRequest(self._proxy._transport)
-            xmlresp = scgi_req.send(xmlreq)
-            self._inbound = len(xmlresp)
-            self._proxy._inbound += self._inbound
-            self._proxy._inbound_max = max(self._proxy._inbound_max, self._inbound)
-            self._net_latency = scgi_req.latency
-            self._proxy._net_latency += self._net_latency
-
-            xmlresp = xmlresp.decode("utf-8")
-            # Return raw XML response?
-            if raw_xml:
-                return xmlresp
-
-            try:
-                # Deserialize data
-                result = xmlrpclib.loads(xmlresp.encode("utf-8"))[0][0]
-            except (KeyboardInterrupt, SystemExit):
-                # Don't catch these
-                raise
-            except:
-                exc_type, exc = sys.exc_info()[:2]
-                if (
-                    exc_type is xmlrpclib.Fault
-                    and exc.faultCode == -501
-                    and exc.faultString == "Could not find info-hash."
-                ):
-                    # pylint: disable=raise-missing-from
-                    raise HashNotFound(
-                        "Unknown hash for {}({}) @ {}".format(
-                            self._method_name,
-                            args[0] if args else "",
-                            self._proxy._url,
-                        )
-                    )
-
-                if not fail_silently:
-                    # Dump the bad packet, then re-raise
-                    filename = "/tmp/xmlrpc-%s.xml" % os.getuid()
-                    with open(filename, "wb") as handle:
-                        handle.write(b"REQUEST\n")
-                        handle.write(xmlreq)
-                        handle.write(b"\nRESPONSE\n")
-                        handle.write(xmlresp.encode("utf-8"))
-                        print(
-                            "INFO: Bad data packets written to %r" % filename,
-                            file=sys.stderr,
-                        )
-                raise
-            else:
-                try:
-                    return sum(result, []) if flatten else result
-                except TypeError as exc:
-                    if (
-                        result
-                        and isinstance(result, list)
-                        and isinstance(result[0], dict)
-                        and "faultCode" in result[0]
-                    ):
-                        raise error.LoggableError(
-                            "XMLRPC error in multicall: " + repr(result[0])
-                        ) from exc
-                    raise
-        finally:
-            # Calculate latency
-            self._latency = time.time() - start
-            self._proxy._latency += self._latency
-
-            self._proxy.LOG.debug(
-                "%s(%s) took %.3f secs",
-                self._method_name,
-                ", ".join(repr(i) for i in args),
-                self._latency,
-            )
+    # Discard kwargs
+    def __call__(self, *args, **_):
+        return super().__call__(*args)
 
 
-class RTorrentProxy:
+
+class RTorrentProxy(xmlrpclib.ServerProxy):
     """Proxy to rTorrent's XMLRPC interface.
 
     Method calls are built from attribute accesses, i.e. you can do
     something like C{proxy.system.client_version()}.
+
+    All methods from ServerProxy are being overridden due to the combination
+    of self.__var name mangling and the __call__/__getattr__ magic.
     """
 
-    def __init__(self, url, mapping=None, transport=None):
-        self.LOG = pymagic.get_class_logger(self)
-        self._url = os.path.expandvars(url)
+    def __init__(self, uri, transport=None, encoding=None, verbose=False,
+                 allow_none=False, use_datetime=False, use_builtin_types=False,
+                 *, headers=(), context=None):
+        # establish a "logical" server connection
+
+        # get the url
+        p = urllib.parse.urlsplit(uri)
+        if p.scheme not in ("http", "https", "scgi", "scgi+ssh"):
+            raise OSError("unsupported XML-RPC protocol")
+        self.__uri = uri
+        self.__host = p.netloc
+        self.__handler = urllib.parse.urlunsplit(["", "", *p[2:]])
+        if not self.__handler:
+            if p.scheme in ("http", "https"):
+                self.__handler = "/RPC2"
+            else:
+                self.__handler = ""
+
         if transport is None:
-            try:
-                self._transport = scgi.transport_from_url(self._url)
-            except socket.gaierror as exc:
-                raise XmlRpcError("Bad XMLRPC URL {0}: {1}".format(self._url, exc)) from exc
-        else:
-            self._transport = transport
-        self._versions = ("", "")
-        self._version_info = ()
-        self._use_deprecated = False
-        self._mapping = mapping or config.xmlrpc
-        self._fix_mappings()
+            handler = scgi.transport_from_url(uri)
+            transport = handler(use_datetime=use_datetime,
+                                use_builtin_types=use_builtin_types,
+                                headers=headers)
+        self.__transport = transport
 
-        # Statistics (traffic w/o HTTP overhead)
-        self._requests = 0
-        self._outbound = 0
-        self._outbound_max = 0
-        self._inbound = 0
-        self._inbound_max = 0
-        self._latency = 0.0
-        self._net_latency = 0.0
+        self.__encoding = encoding or 'utf-8'
+        self.__verbose = verbose
+        self.__allow_none = allow_none
 
-    def __str__(self):
-        """Return statistics."""
-        return "%d req, out %s [%s max], in %s [%s max], %.3fms/%.3fms avg latency" % (
-            self._requests,
-            fmt.human_size(self._outbound).strip(),
-            fmt.human_size(self._outbound_max).strip(),
-            fmt.human_size(self._inbound).strip(),
-            fmt.human_size(self._inbound_max).strip(),
-            self._net_latency * 1000.0 / self._requests,
-            self._latency * 1000.0 / self._requests,
-        )
+    def __close(self):
+        self.__transport.close()
 
-    def _set_mappings(self):
-        """Set command mappings according to rTorrent version."""
-        try:
-            self._versions = (
-                self.system.client_version(),
-                self.system.library_version(),
+    def __request(self, methodname, params):
+        # call a method on the remote server
+
+        request = xmlrpclib.dumps(params, methodname, encoding=self.__encoding,
+                        allow_none=self.__allow_none).encode(self.__encoding, 'xmlcharrefreplace')
+        if self.__verbose:
+            print("req: ", request)
+
+        response = self.__transport.request(
+            self.__host,
+            self.__handler,
+            request,
+            verbose=self.__verbose
             )
-            self._version_info = tuple(int(i) for i in self._versions[0].split("."))
 
-            # Merge mappings for this version
-            self._mapping = self._mapping.copy()
-            for key, val in sorted(
-                i for i in vars(config).items() if i[0].startswith("xmlrpc_")
-            ):
-                map_version = tuple(int(i) for i in key.split("_")[1:])
-                if map_version <= self._version_info:
-                    self.LOG.debug("MAPPING for %r added: %r", map_version, val)
-                    self._mapping.update(val)
-            self._fix_mappings()
-        except ERRORS as exc:
-            raise error.LoggableError("Can't connect to %s (%s)" % (self._url, exc))
+        if len(response) == 1:
+            response = response[0]
 
-        return self._versions, self._version_info
-
-    def _fix_mappings(self):
-        """Add computed stuff to mappings."""
-        self._mapping.update(
-            (key + "=", val + "=")
-            for key, val in list(self._mapping.items())
-            if not key.endswith("=")
-        )
-
-        self.LOG.debug("CMD MAPPINGS ARE: %r", self._mapping)
-
-    def _map_call(self, cmd):
-        """Map old to new command names."""
-        new_cmd = self._mapping.get(cmd, cmd)
-        if cmd != new_cmd:
-            self.LOG.debug("MAP %s ==> %s", cmd, new_cmd)
-        return new_cmd
-
-    def __getattr__(self, attr):
-        """Return a method object for accesses to virtual attributes."""
-        return RTorrentMethod(self, attr)
+        return response
 
     def __repr__(self):
-        """Return info & statistics."""
-        return "%s(%r) [%s]" % (self.__class__.__name__, self._url, self)
+        return (
+            "<%s for %s>" %
+            (self.__class__.__name__, self.__uri)
+            )
+
+    def __getattr__(self, name):
+        # magic method dispatcher
+        return RTorrentMethod(self.__request, name)
+
+    # note: to call a remote object with a non-standard name, use
+    # result getattr(server, "strange-python-name")(args)
+
+    def __call__(self, attr):
+        """A workaround to get special attributes on the ServerProxy
+           without interfering with the magic __getattr__
+        """
+        if attr == "close":
+            return self.__close
+        elif attr == "transport":
+            return self.__transport
+        raise AttributeError("Attribute %r not found" % (attr,))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.__close()

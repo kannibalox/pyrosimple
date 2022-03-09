@@ -136,7 +136,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
             self.proxy = xmlrpc.RTorrentProxy(config.scgi_url)
-            self.proxy._set_mappings()
+            #self.proxy._set_mappings()
         return self.proxy
 
     def cooked(self, raw_args):
@@ -167,7 +167,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         """Execute given XMLRPC call."""
         try:
             raw = self.options.output_format == "xml"
-            result = getattr(proxy, method)(raw_xml=raw, *tuple(args))
+            result = getattr(proxy, method)(*tuple(args))
         except xmlrpc.ERRORS as exc:
             self.LOG.error(
                 "While calling %s(%s): %s",

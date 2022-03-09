@@ -1,4 +1,5 @@
 import os
+import io
 import pipes
 import socket
 import subprocess
@@ -8,6 +9,10 @@ from typing import Dict, Generator, List, Tuple, Union
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
+
+def register_scheme(scheme):
+    for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):
+        getattr(urlparse, method).append(scheme)
 
 class SCGIException(Exception):
     """SCGI protocol error"""
@@ -21,120 +26,48 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 # SCGI transports
 #
 
-
-class LocalTransport:
-    """Transport via TCP or a UNIX domain socket."""
-
-    # Amount of bytes to read at once
+class TCPTransport(xmlrpclib.Transport):
     CHUNK_SIZE: int = 32768
+    """Transport via TCP socket."""
+    def request(self, host, handler, request_body, verbose=False):
+        self.verbose = verbose
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            host, port = host.split(':')
+            sock.connect((host, int(port)))
+            sock.sendall(_encode_payload(request_body))
+            with sock.makefile('rb') as handle:
+                return self.parse_response(io.BytesIO(_parse_response(handle.read())[0]))
 
-    def __init__(self, url: urlparse.ParseResult):
-        self.url = url
-        self.sock_addr: Union[Tuple[str, int], str]
+class UnixTransport(xmlrpclib.Transport):
+    """Transport via UNIX domain socket."""
+    def request(self, host, handler, request_body, verbose=False):
+        self.verbose = verbose
+        with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as sock:
+            sock.connect(host)
+            sock.sendall(_encode_payload(request_body))
+            with sock.makefile('b') as handle:
+                return self.parse_response(io.BytesIO(_parse_response(handle.read())[0]))
 
-        if url.netloc:
-            # TCP socket
-            addrinfo = list(
-                set(
-                    socket.getaddrinfo(
-                        url.hostname, url.port, socket.AF_INET, socket.SOCK_STREAM
-                    )
-                )
-            )
-            if len(addrinfo) != 1:
-                raise URLError(
-                    "Host of URL %r resolves to multiple addresses %r"
-                    % (url.geturl(), addrinfo)
-                )
-
-            self.sock_args = addrinfo[0][:2]
-            self.sock_addr = addrinfo[0][4][:2]
-        else:
-            # UNIX domain socket
-            print(url.path)
-            path = os.path.expanduser(url.path)
-            self.sock_args = (socket.AF_UNIX, socket.SOCK_STREAM)
-            self.sock_addr = os.path.abspath(path)
-
-    def send(self, data: bytes) -> Generator[bytes, None, None]:
-        """Open transport, send data, and yield response chunks."""
-        sock = socket.socket(*self.sock_args)
-        try:
-            sock.connect(self.sock_addr)
-        except socket.error as exc:
-            raise socket.error("Can't connect to %r (%s)" % (self.url.geturl(), exc))
-
-        try:
-            # Send request
-            sock.send(data)
-
-            # Read response
-            while True:
-                chunk = sock.recv(self.CHUNK_SIZE)
-                if chunk:
-                    yield chunk
-                else:
-                    break
-        finally:
-            # Clean up
-            sock.close()
-
-
-class SSHTransport:
-    """Transport via SSH to a UNIX domain socket."""
-
-    def __init__(self, url):
-        self.url = url
-        self.cmd = ["ssh", "-T"]  # no pseudo-tty
-
-        if not url.path.startswith("/"):
-            raise URLError("Bad path in URL %r" % url.geturl())
-
-        # pipes.quote is used because ssh always goes through a login shell.
-        # The only exception is for redirecting ports, which can't be used
-        # to access a domain socket.
-        if url.path.startswith("/~/"):
-            clean_path = "~/" + pipes.quote(url.path[3:])
-        else:
-            clean_path = pipes.quote(url.path)
-
-        ssh_netloc = "".join(
-            (url.username or "", "@" if url.username else "", url.hostname)
-        )
-        if url.port:
-            reconstructed_netloc = "%s:%d" % (ssh_netloc, url.port)
-            self.cmd.extend(["-p", str(url.port)])
-        else:
-            reconstructed_netloc = ssh_netloc
-        if reconstructed_netloc != url.netloc:
-            raise URLError(
-                "Bad location in URL %r (expected %r)"
-                % (url.geturl(), reconstructed_netloc)
-            )
-
-        self.cmd.extend(["--", ssh_netloc])
-        # self.cmd.extend(["/bin/nc", "-U", "--", clean_path])
-        self.cmd.extend(["socat", "STDIO", "UNIX-CONNECT:" + clean_path])
-
-    def send(self, data: bytes) -> bytes:
-        """Open transport, send data, and yield response chunks."""
-        proc = subprocess.run(self.cmd, capture_output=True, check=True, input=data)
-        return proc.stdout
-
+class SSHTransport(xmlrpclib.Transport):
+    pass
 
 TRANSPORTS = {
-    "scgi": LocalTransport,
+    "scgi": TCPTransport,
+    "scgi+unix": UnixTransport,
     "scgi+ssh": SSHTransport,
 }
 
 # Register our schemes to be parsed as having a netloc
-urlparse.uses_netloc.extend(TRANSPORTS.keys())
+for t in TRANSPORTS.keys():
+    register_scheme(t)
 
 
 def transport_from_url(url):
     """Create a transport for the given URL."""
     if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
         url = "scgi://" + url
+    elif url.startswith("/"):
+        url = "scgi+unix://"
     url = urlparse.urlsplit(
         url, scheme="scgi", allow_fragments=False
     )  # pylint: disable=redundant-keyword-arg
@@ -149,46 +82,7 @@ def transport_from_url(url):
         else:
             raise URLError("Unsupported scheme in URL %r" % url.geturl())
     else:
-        return transport(url)
-
-#
-# SCGI request handling
-#
-class SCGIRequest:
-    """Send a SCGI request.
-    See spec at "http://python.ca/scgi/protocol.txt".
-
-    Use tcp socket
-    SCGIRequest('scgi://host:port').send(data)
-
-    Or use the named unix domain socket
-    SCGIRequest('scgi:///tmp/rtorrent.sock').send(data)
-    """
-
-    def __init__(self, url_or_transport):
-        try:
-            self.transport = transport_from_url(url_or_transport + "")
-        except TypeError:
-            self.transport = url_or_transport
-
-        self.resp_headers = {}
-        self.latency = 0.0
-
-    def send(self, data: bytes) -> bytes:
-        """Send data over scgi to URL and get response.
-
-        :param data: The bytestring to send
-        :type data: bytes
-        :return: Response bytestring
-        """
-        start: float = time.time()
-        try:
-            scgi_resp = b"".join(self.transport.send(_encode_payload(data)))
-        finally:
-            self.latency = time.time() - start
-
-        resp, self.resp_headers = _parse_response(scgi_resp)
-        return resp
+        return transport
 
 #
 # Helpers to handle SCGI data
