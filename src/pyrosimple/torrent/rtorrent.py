@@ -191,7 +191,7 @@ class RtorrentItem(engine.TorrentProxy):
         """Return known fields."""
         return self._fields.copy()
 
-    def fetch(self, name, engine_name=None, cache: bool = False):
+    def fetch(self, name, engine_name=None, cache: bool = True):
         """Get a field on demand."""
         # TODO: Get each on-demand field in a multicall for all other items, since
         # we likely need it anyway; another (more easy) way would be to pre-fetch dynamically
