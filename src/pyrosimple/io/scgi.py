@@ -42,22 +42,23 @@ class RTorrentTransport(xmlrpclib.Transport):
 
 
 class TCPTransport(RTorrentTransport):
-    CHUNK_SIZE: int = 32768
     """Transport via TCP socket."""
 
-    def request(self, host, handler, request_body, verbose=False, headers={}):
+    CHUNK_SIZE: int = 32768
+
+    def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             host, port = host.split(":")
             sock.connect((host, int(port)))
-            sock.sendall(_encode_payload(request_body, headers.items()))
+            sock.sendall(_encode_payload(request_body, self._headers))
             with sock.makefile("rb") as handle:
                 return self.parse_response(
                     io.BytesIO(_parse_response(handle.read())[0])
                 )
 
 
-class UnixTransport(xmlrpclib.Transport):
+class UnixTransport(RTorrentTransport):
     """Transport via UNIX domain socket."""
 
     def request(self, host, handler, request_body, verbose=False):

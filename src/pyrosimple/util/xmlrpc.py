@@ -103,6 +103,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if transport is None:
             if self.__rpc_codec == "json":
                 codec = json
+                headers = ("CONTENT_TYPE", "application/json")
             elif self.__rpc_codec == "xml":
                 codec = xmlrpclib
             handler = scgi.transport_from_url(uri)
@@ -162,7 +163,6 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 self.__handler,
                 request,
                 verbose=self.__verbose,
-                headers={"CONTENT_TYPE": "application/json"},
             )
 
             if response["id"] != rpc_id:
