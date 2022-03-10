@@ -18,6 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import json
 import socket
 import sys
 import time
@@ -60,16 +61,8 @@ class HashNotFound(XmlRpcError):
 ERRORS = (XmlRpcError,) + scgi.ERRORS
 
 
-class RTorrentMethod(xmlrpclib._Method):
-    """Collect attribute accesses to build the final method name."""
-
-    # Discard kwargs
-    def __call__(self, *args, **_):
-        return super().__call__(*args)
-
-
 class RTorrentProxy(xmlrpclib.ServerProxy):
-    """Proxy to rTorrent's XMLRPC interface.
+    """Proxy to rTorrent's RPC interface.
 
     Method calls are built from attribute accesses, i.e. you can do
     something like C{proxy.system.client_version()}.
@@ -89,7 +82,152 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         use_builtin_types=False,
         *,
         headers=(),
-        context=None
+        context=None,
+    ):
+        # establish a "logical" server connection
+
+        # get the url
+        p = urllib.parse.urlsplit(uri)
+        q = urllib.parse.parse_qs(p.query)
+        if p.scheme not in ("http", "https", "scgi", "scgi+ssh"):
+            raise OSError("unsupported XML-RPC protocol")
+        if "rpc" in q:
+            self.__rpc_codec = q["rpc"][0]
+        else:
+            self.__rpc_codec = "xml"
+        self.__uri = uri
+        self.__host = p.netloc
+        self.__handler = urllib.parse.urlunsplit(["", "", *p[2:]])
+        if not self.__handler:
+            if p.scheme in ("http", "https"):
+                self.__handler = "/RPC2"
+            else:
+                self.__handler = ""
+
+        if transport is None:
+            if self.__rpc_codec == "json":
+                codec = json
+            elif self.__rpc_codec == "xml":
+                codec = xmlrpclib
+            handler = scgi.transport_from_url(uri)
+            transport = handler(
+                use_datetime=use_datetime,
+                use_builtin_types=use_builtin_types,
+                codec=codec,
+                headers=headers,
+            )
+        self.__transport = transport
+        self.__encoding = encoding or "utf-8"
+        self.__verbose = verbose
+        self.__allow_none = allow_none
+
+    def __close(self):
+        self.__transport.close()
+
+    def __request(self, methodname, params):
+        # call a method on the remote server
+        if self.__rpc_codec == "xml":
+            # Verbatim from parent
+            request = xmlrpclib.dumps(
+                params,
+                methodname,
+                encoding=self.__encoding,
+                allow_none=self.__allow_none,
+            ).encode(self.__encoding, "xmlcharrefreplace")
+            if self.__verbose:
+                print("req: ", request)
+
+            response = self.__transport.request(
+                self.__host, self.__handler, request, verbose=self.__verbose
+            )
+
+            if len(response) == 1:
+                response = response[0]
+
+            return response
+        elif self.__rpc_codec == "json":
+            if not params:
+                params = [""]
+
+            rpc_id = 4  # Chosen from a random dice roll
+            request = json.dumps(
+                {
+                    "params": params,
+                    "method": methodname,
+                    "jsonrpc": "2.0",
+                    "id": rpc_id,
+                }
+            ).encode(self.__encoding, "xmlcharrefreplace")
+            if self.__verbose:
+                print("req: ", request)
+
+            response = self.__transport.request(
+                self.__host,
+                self.__handler,
+                request,
+                verbose=self.__verbose,
+                headers={"CONTENT_TYPE": "application/json"},
+            )
+
+            if response["id"] != rpc_id:
+                raise ValueError(f"RPC IDs {rpc_id} and {response['id']} do not match")
+            if "error" in response:
+                raise ValueError(f"Received error: {response['error']}")
+            return response["result"]
+
+    def __repr__(self):
+        return "<%s via %s for %s>" % (
+            self.__class__.__name__,
+            self.__rpc_codec,
+            self.__uri,
+        )
+
+    def __getattr__(self, name):
+        # magic method dispatcher
+        return xmlrpclib._Method(self.__request, name)
+
+    # note: to call a remote object with a non-standard name, use
+    # result getattr(server, "strange-python-name")(args)
+
+    def __call__(self, attr):
+        """A workaround to get special attributes on the ServerProxy
+        without interfering with the magic __getattr__
+        """
+        if attr == "close":
+            return self.__close
+        elif attr == "transport":
+            return self.__transport
+        raise AttributeError("Attribute %r not found" % (attr,))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.__close()
+
+
+class RTorrentJsonProxy(xmlrpclib.ServerProxy):
+    """Proxy to rTorrent's RPC interface.
+
+    Method calls are built from attribute accesses, i.e. you can do
+    something like C{proxy.system.client_version()}.
+
+    All methods from ServerProxy are being overridden due to the combination
+    of self.__var name mangling and the __call__/__getattr__ magic.
+    """
+
+    def __init__(
+        self,
+        uri,
+        transport=None,
+        encoding=None,
+        verbose=False,
+        allow_none=False,
+        use_datetime=False,
+        use_builtin_types=False,
+        *,
+        headers=(),
+        context=None,
     ):
         # establish a "logical" server connection
 
@@ -111,10 +249,10 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             transport = handler(
                 use_datetime=use_datetime,
                 use_builtin_types=use_builtin_types,
+                codec=json,
                 headers=headers,
             )
         self.__transport = transport
-
         self.__encoding = encoding or "utf-8"
         self.__verbose = verbose
         self.__allow_none = allow_none
@@ -124,28 +262,36 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     def __request(self, methodname, params):
         # call a method on the remote server
+        if not params:
+            params = [""]
 
-        request = xmlrpclib.dumps(
-            params, methodname, encoding=self.__encoding, allow_none=self.__allow_none
+        request = json.dumps(
+            {
+                "params": params,
+                "method": methodname,
+                "jsonrpc": "2.0",
+                "id": 4,
+            }
         ).encode(self.__encoding, "xmlcharrefreplace")
         if self.__verbose:
             print("req: ", request)
 
         response = self.__transport.request(
-            self.__host, self.__handler, request, verbose=self.__verbose
+            self.__host,
+            self.__handler,
+            request,
+            verbose=self.__verbose,
+            headers={"CONTENT_TYPE": "application/json"},
         )
 
-        if len(response) == 1:
-            response = response[0]
-
-        return response
+        return response["result"]
 
     def __repr__(self):
         return "<%s for %s>" % (self.__class__.__name__, self.__uri)
 
     def __getattr__(self, name):
         # magic method dispatcher
-        return RTorrentMethod(self.__request, name)
+        return xmlrpclib._Method(self.__request, name)
 
     # note: to call a remote object with a non-standard name, use
     # result getattr(server, "strange-python-name")(args)

@@ -29,16 +29,28 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 #
 
 
-class TCPTransport(xmlrpclib.Transport):
+class RTorrentTransport(xmlrpclib.Transport):
+    def __init__(self, codec=xmlrpclib, *args, **kwargs):
+        self.codec = codec
+        super().__init__(*args, **kwargs)
+
+    def parse_response(self, response):
+        if self.codec == xmlrpclib:
+            return super().parse_response(response)
+        else:
+            return self.codec.loads(response.read())
+
+
+class TCPTransport(RTorrentTransport):
     CHUNK_SIZE: int = 32768
     """Transport via TCP socket."""
 
-    def request(self, host, handler, request_body, verbose=False):
+    def request(self, host, handler, request_body, verbose=False, headers={}):
         self.verbose = verbose
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             host, port = host.split(":")
             sock.connect((host, int(port)))
-            sock.sendall(_encode_payload(request_body))
+            sock.sendall(_encode_payload(request_body, headers.items()))
             with sock.makefile("rb") as handle:
                 return self.parse_response(
                     io.BytesIO(_parse_response(handle.read())[0])
