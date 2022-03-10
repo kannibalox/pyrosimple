@@ -19,6 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import json
+import random
 import urllib
 
 from xmlrpc import client as xmlrpclib
@@ -79,7 +80,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         *,
         headers=(),
         context=None,
-    ):
+    ):  # pylint: disable=unused-argument
         # establish a "logical" server connection
 
         # get the url
@@ -124,7 +125,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     def __request(self, methodname, params):
         # call a method on the remote server
         if self.__rpc_codec == "xml":
-            # Verbatim from parent
+            # Verbatim from parent method
             request = xmlrpclib.dumps(
                 params,
                 methodname,
@@ -146,7 +147,8 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             if not params:
                 params = [""]
 
-            rpc_id = 4  # Chosen from a random dice roll
+            # This feels silly but there's not much need for anything better ATM.
+            rpc_id = random.randint(0, 100)
             request = json.dumps(
                 {
                     "params": params,

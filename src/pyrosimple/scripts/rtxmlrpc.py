@@ -166,7 +166,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def execute(self, proxy, method, args):
         """Execute given XMLRPC call."""
         try:
-            raw = self.options.output_format == "xml"
             result = getattr(proxy, method)(*tuple(args))
         except xmlrpc.ERRORS as exc:
             self.LOG.error(

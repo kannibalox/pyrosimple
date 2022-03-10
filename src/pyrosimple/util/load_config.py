@@ -33,6 +33,7 @@ import sys
 try:
     resources_files = importlib.resources.files
 except AttributeError:
+    # pylint: disable=import-error
     import importlib_resources
 
     resources_files = importlib_resources.files

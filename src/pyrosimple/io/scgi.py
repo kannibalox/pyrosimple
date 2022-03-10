@@ -1,17 +1,15 @@
+"""Handles transporting RPC methods over various transports"""
 import io
-import os
-import pipes
 import socket
-import subprocess
-import time
 
-from typing import Dict, Generator, List, Tuple, Union
+from typing import Dict, List, Tuple
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
 
 
 def register_scheme(scheme):
+    """Helper method to register protocols with urllib"""
     for method in filter(lambda s: s.startswith("uses_"), dir(urlparse)):
         getattr(urlparse, method).append(scheme)
 
@@ -30,8 +28,12 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 
 
 class RTorrentTransport(xmlrpclib.Transport):
-    def __init__(self, codec=xmlrpclib, *args, **kwargs):
+    """Base class for handle transports. Primaarily exists to allow_fragments
+    using the same transport with a different underlying RPC mechanism"""
+
+    def __init__(self, *args, codec=xmlrpclib, **kwargs):
         self.codec = codec
+        self.verbose = False
         super().__init__(*args, **kwargs)
 
     def parse_response(self, response):
@@ -73,7 +75,7 @@ class UnixTransport(RTorrentTransport):
 
 
 class SSHTransport(xmlrpclib.Transport):
-    pass
+    """Stub for removed SSH support"""
 
 
 TRANSPORTS = {
@@ -83,7 +85,7 @@ TRANSPORTS = {
 }
 
 # Register our schemes to be parsed as having a netloc
-for t in TRANSPORTS.keys():
+for t in TRANSPORTS:
     register_scheme(t)
 
 
