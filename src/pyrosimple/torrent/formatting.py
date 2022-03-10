@@ -117,7 +117,7 @@ def fmt_json(val):
 #
 # Displaying and filtering items
 #
-class OutputMapping(algo.AttributeMapping):
+class OutputMapping:
     """Map item fields for displaying them."""
 
     @classmethod
@@ -139,7 +139,8 @@ class OutputMapping(algo.AttributeMapping):
         @param defaults: default values
         @type defaults: dict
         """
-        super().__init__(obj, defaults)
+        self.obj = obj
+        self.defaults = defaults or {}
 
         # add percent sign so we can easily reference it in .ini files
         # (a better way is to use "%%%%" though, so regard this as deprecated)
@@ -201,7 +202,13 @@ class OutputMapping(algo.AttributeMapping):
             return "%" if key == "pc" else key.upper()
         else:
             # Return formatted value
-            val = super().__getitem__(key)
+            try:
+                val = getattr(self.obj, key)
+            except AttributeError as exc:
+                try:
+                    val = self.defaults[key]
+                except KeyError:
+                    raise AttributeError("%s for %r.%s" % (exc, self.obj, key)) from exc
             try:
                 return formatter(val) if formatter else val
             except (TypeError, ValueError, KeyError, IndexError, AttributeError) as exc:
