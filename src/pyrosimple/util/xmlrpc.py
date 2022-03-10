@@ -19,16 +19,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import json
-import socket
-import sys
-import time
 import urllib
 
 from xmlrpc import client as xmlrpclib
 
-from pyrosimple import config, error
 from pyrosimple.io import scgi
-from pyrosimple.util import fmt, os, pymagic
 
 
 NOHASH = (
@@ -62,6 +57,7 @@ ERRORS = (XmlRpcError,) + scgi.ERRORS
 
 
 class RTorrentProxy(xmlrpclib.ServerProxy):
+    # pylint: disable=super-init-not-called
     """Proxy to rTorrent's RPC interface.
 
     Method calls are built from attribute accesses, i.e. you can do
@@ -174,6 +170,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             if "error" in response:
                 raise ValueError(f"Received error: {response['error']}")
             return response["result"]
+        raise ValueError(f"Invalid RPC protocol '{self.__rpc_codec}'")
 
     def __repr__(self):
         return "<%s via %s for %s>" % (
@@ -181,113 +178,6 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             self.__rpc_codec,
             self.__uri,
         )
-
-    def __getattr__(self, name):
-        # magic method dispatcher
-        return xmlrpclib._Method(self.__request, name)
-
-    # note: to call a remote object with a non-standard name, use
-    # result getattr(server, "strange-python-name")(args)
-
-    def __call__(self, attr):
-        """A workaround to get special attributes on the ServerProxy
-        without interfering with the magic __getattr__
-        """
-        if attr == "close":
-            return self.__close
-        elif attr == "transport":
-            return self.__transport
-        raise AttributeError("Attribute %r not found" % (attr,))
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        self.__close()
-
-
-class RTorrentJsonProxy(xmlrpclib.ServerProxy):
-    """Proxy to rTorrent's RPC interface.
-
-    Method calls are built from attribute accesses, i.e. you can do
-    something like C{proxy.system.client_version()}.
-
-    All methods from ServerProxy are being overridden due to the combination
-    of self.__var name mangling and the __call__/__getattr__ magic.
-    """
-
-    def __init__(
-        self,
-        uri,
-        transport=None,
-        encoding=None,
-        verbose=False,
-        allow_none=False,
-        use_datetime=False,
-        use_builtin_types=False,
-        *,
-        headers=(),
-        context=None,
-    ):
-        # establish a "logical" server connection
-
-        # get the url
-        p = urllib.parse.urlsplit(uri)
-        if p.scheme not in ("http", "https", "scgi", "scgi+ssh"):
-            raise OSError("unsupported XML-RPC protocol")
-        self.__uri = uri
-        self.__host = p.netloc
-        self.__handler = urllib.parse.urlunsplit(["", "", *p[2:]])
-        if not self.__handler:
-            if p.scheme in ("http", "https"):
-                self.__handler = "/RPC2"
-            else:
-                self.__handler = ""
-
-        if transport is None:
-            handler = scgi.transport_from_url(uri)
-            transport = handler(
-                use_datetime=use_datetime,
-                use_builtin_types=use_builtin_types,
-                codec=json,
-                headers=headers,
-            )
-        self.__transport = transport
-        self.__encoding = encoding or "utf-8"
-        self.__verbose = verbose
-        self.__allow_none = allow_none
-
-    def __close(self):
-        self.__transport.close()
-
-    def __request(self, methodname, params):
-        # call a method on the remote server
-        if not params:
-            params = [""]
-
-        request = json.dumps(
-            {
-                "params": params,
-                "method": methodname,
-                "jsonrpc": "2.0",
-                "id": 4,
-            }
-        ).encode(self.__encoding, "xmlcharrefreplace")
-        if self.__verbose:
-            print("req: ", request)
-
-        response = self.__transport.request(
-            self.__host,
-            self.__handler,
-            request,
-            verbose=self.__verbose,
-            headers={"CONTENT_TYPE": "application/json"},
-        )
-
-        return response["result"]
-
-    def __repr__(self):
-        return "<%s for %s>" % (self.__class__.__name__, self.__uri)
 
     def __getattr__(self, name):
         # magic method dispatcher
