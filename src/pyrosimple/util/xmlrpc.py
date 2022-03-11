@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=I0011,W0212
 """ RTorrent client proxy.
 
     Copyright (c) 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -143,7 +142,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 response = response[0]
 
             return response
-        elif self.__rpc_codec == "json":
+        if self.__rpc_codec == "json":
             if not params:
                 params = [""]
 
@@ -175,11 +174,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         raise ValueError(f"Invalid RPC protocol '{self.__rpc_codec}'")
 
     def __repr__(self):
-        return "<%s via %s for %s>" % (
-            self.__class__.__name__,
-            self.__rpc_codec,
-            self.__uri,
-        )
+        return f"<{self.__class__.__name__} via {self.__rpc_codec} for {self.__uri}>"
 
     def __getattr__(self, name):
         # magic method dispatcher
@@ -194,9 +189,9 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         """
         if attr == "close":
             return self.__close
-        elif attr == "transport":
+        if attr == "transport":
             return self.__transport
-        raise AttributeError("Attribute %r not found" % (attr,))
+        raise AttributeError(f"Attribute {attr} not found")
 
     def __enter__(self):
         return self

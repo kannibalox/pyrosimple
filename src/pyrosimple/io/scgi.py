@@ -39,8 +39,7 @@ class RTorrentTransport(xmlrpclib.Transport):
     def parse_response(self, response):
         if self.codec == xmlrpclib:
             return super().parse_response(response)
-        else:
-            return self.codec.loads(response.read())
+        return self.codec.loads(response.read())
 
 
 class TCPTransport(RTorrentTransport):
@@ -95,9 +94,7 @@ def transport_from_url(url):
         url = "scgi://" + url
     elif url.startswith("/"):
         url = "scgi+unix://"
-    url = urlparse.urlsplit(
-        url, scheme="scgi", allow_fragments=False
-    )  # pylint: disable=redundant-keyword-arg
+    url = urlparse.urlsplit(url, scheme="scgi", allow_fragments=False)
 
     try:
         transport = TRANSPORTS[url.scheme.lower()]
@@ -105,11 +102,9 @@ def transport_from_url(url):
         # pylint: disable=raise-missing-from
         if not any((url.netloc, url.query)) and url.path.isdigit():
             # Support simplified "domain:port" URLs
-            return transport_from_url("scgi://%s:%s" % (url.scheme, url.path))
-        else:
-            raise URLError("Unsupported scheme in URL %r" % url.geturl())
-    else:
-        return transport
+            return transport_from_url(f"scgi://{url.scheme}:{url.path}")
+        raise URLError(f"Unsupported scheme in URL {url.geturl()}")
+    return transport
 
 
 #
@@ -151,17 +146,11 @@ def _parse_headers(headers: bytes) -> Dict[str, str]:
         result = {}
         for line in headers.splitlines():
             if line:
-                k, v = line.rstrip().split(b": ", 1)
-                result[k.decode("ascii")] = v.decode("ascii")
+                key, value = line.rstrip().split(b": ", 1)
+                result[key.decode("ascii")] = value.decode("ascii")
         return result
     except (TypeError, ValueError) as exc:
-        raise SCGIException(
-            "Error in SCGI headers %r (%s)"
-            % (
-                headers.decode(),
-                exc,
-            )
-        ) from exc
+        raise SCGIException(f"Error in SCGI headers {headers.decode()}") from exc
 
 
 def _parse_response(resp: bytes) -> Tuple[bytes, Dict[str, str]]:
@@ -178,11 +167,7 @@ def _parse_response(resp: bytes) -> Tuple[bytes, Dict[str, str]]:
         headers, payload = resp.split(b"\r\n\r\n", 1)
     except (TypeError, ValueError) as exc:
         raise SCGIException(
-            "No header delimiter in SCGI response of length %d (%s)"
-            % (
-                len(resp),
-                exc,
-            )
+            f"No header delimiter in SCGI response of length {len(resp)}"
         ) from exc
     parsed_headers = _parse_headers(headers)
 
