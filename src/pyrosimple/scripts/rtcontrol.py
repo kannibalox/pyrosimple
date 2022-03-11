@@ -793,6 +793,17 @@ class RtorrentControl(ScriptBaseWithConfig):
         )
         self.LOG.debug("Matcher is: %s", matcher)
 
+        # View handling
+        if self.options.append_view and self.options.alter_view:
+            self.fatal("You cannot combine --append-view with --alter-view")
+
+        if self.options.modify_view:
+            if self.options.from_view or self.options.to_view:
+                self.fatal(
+                    "You cannot combine --modify-view with --from-view or --to-view"
+                )
+            self.options.from_view = self.options.to_view = self.options.modify_view
+
         # Detach to background?
         # This MUST happen before the next step, when we connect to the torrent client
         dcontext = None
@@ -806,17 +817,6 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
                 dcontext.open()
             time.sleep(0.05)  # let things settle a little
-
-        # View handling
-        if self.options.append_view and self.options.alter_view:
-            self.fatal("You cannot combine --append-view with --alter-view")
-
-        if self.options.modify_view:
-            if self.options.from_view or self.options.to_view:
-                self.fatal(
-                    "You cannot combine --modify-view with --from-view or --to-view"
-                )
-            self.options.from_view = self.options.to_view = self.options.modify_view
 
         # Find matching torrents
         view = config.engine.view(self.options.from_view, matcher)
