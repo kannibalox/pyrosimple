@@ -19,17 +19,6 @@
 import logging
 
 
-# Maximum length of object representations
-MAX_DISPLAY_LEN = 99
-
-
-def shorten(text):
-    """Reduce text length for displaying / logging purposes."""
-    if len(text) >= MAX_DISPLAY_LEN:
-        text = text[: MAX_DISPLAY_LEN // 2] + "..." + text[-MAX_DISPLAY_LEN // 2 :]
-    return text
-
-
 def get_logfile(logger=None):
     """Return log file of first file handler associated with the (root) logger.
     None if no such handler is found.
