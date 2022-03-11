@@ -30,7 +30,7 @@ import tempita
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import algo, fmt, os, pymagic, templating
+from pyrosimple.util import fmt, os, pymagic, templating
 from pyrosimple.util.parts import Bunch
 
 
