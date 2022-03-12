@@ -28,7 +28,7 @@ import time
 
 from collections import namedtuple
 from functools import partial
-from typing import Callable, List, Set
+from typing import Callable, List, Set, Optional
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
@@ -353,7 +353,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
             self.start()
 
-    def set_custom(self, key: str, value: str | None = None):
+    def set_custom(self, key: str, value: Optional[str] = None):
         """Set a custom value. C{key} might have the form "key=value" when value is C{None}."""
         # Split combined key/value
         if value is None:
@@ -814,7 +814,7 @@ class RtorrentEngine(engine.TorrentEngine):
         """Fetch a single item by its info hash."""
         return next(self.items(infohash, prefetch, cache))
 
-    def items(self, view=None, prefetch: Set[str] | None = None, cache=True):
+    def items(self, view=None, prefetch: Optional[Set[str]] = None, cache=True):
         """Get list of download items.
 
         @param view: Name of the view.
