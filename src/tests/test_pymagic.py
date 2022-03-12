@@ -23,19 +23,18 @@ import unittest
 
 from pyrosimple.util import pymagic
 
+
 log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
 class ImportTest(unittest.TestCase):
-
     def test_import_name(self):
         docstr = pymagic.import_name("pyrosimple", "__doc__")
         assert "Core Package" in docstr
 
         docstr = pymagic.import_name("pyrosimple.util", "__doc__")
         assert "Utility Modules" in docstr
-
 
     def test_import_fail(self):
         try:
@@ -45,11 +44,9 @@ class ImportTest(unittest.TestCase):
         else:
             assert False, "Import MUST fail!"
 
-
     def test_import_colon(self):
         docstr = pymagic.import_name("pyrosimple:__doc__")
         assert "Core Package" in docstr
-
 
     def test_import_missing_colon(self):
         try:
@@ -61,7 +58,6 @@ class ImportTest(unittest.TestCase):
 
 
 class LogTest(unittest.TestCase):
-
     def test_get_class_logger(self):
         logger = pymagic.get_class_logger(self)
         assert logger.name == "tests.test_pymagic.LogTest"

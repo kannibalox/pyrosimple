@@ -28,7 +28,7 @@ import time
 
 from collections import namedtuple
 from functools import partial
-from typing import Callable, List, Set, Optional
+from typing import Callable, List, Optional, Set
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine

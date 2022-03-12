@@ -26,12 +26,14 @@ def test_bunch_janus():
     assert bunch["a"] == 1
     assert bunch.z == 2
 
+
 def test_bunch_repr():
     bunch = repr(parts.Bunch(a=1, z=2))
 
     assert bunch.startswith("Bunch(")
     assert "a=" in bunch
     assert bunch.index("a=") < bunch.index("z=")
+
 
 def test_bunch_no_attr():
     bunch = parts.Bunch()

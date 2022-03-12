@@ -23,12 +23,12 @@ import unittest
 
 from pyrosimple.util import xmlrpc
 
+
 log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
 class XmlRpcTest(unittest.TestCase):
-
     def test_xmlrpc(self):
         pass
 

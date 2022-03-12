@@ -23,6 +23,7 @@ import unittest
 
 from pyrosimple.torrent import engine
 
+
 log = logging.getLogger(__name__)
 log.debug("module loaded")
 
@@ -37,11 +38,12 @@ class IntervalTest(unittest.TestCase):
     def test_interval_sum(self):
         for interval, kwargs, expected in self.INTERVAL_DATA:
             result = engine._interval_sum(interval, **kwargs)
-            self.assertEqual(expected, result, "for interval=%r kw=%r" % (interval, kwargs))
+            self.assertEqual(
+                expected, result, "for interval=%r kw=%r" % (interval, kwargs)
+            )
 
 
 class EngineTest(unittest.TestCase):
-
     def test_engine(self):
         pass
 

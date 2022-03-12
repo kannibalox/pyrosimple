@@ -23,12 +23,12 @@ import unittest
 
 from pyrosimple import config
 
+
 log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
 class ConfigTest(unittest.TestCase):
-
     def test_config(self):
         pass
 

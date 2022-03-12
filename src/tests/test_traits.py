@@ -23,6 +23,7 @@ import unittest
 
 from pyrosimple.util import traits
 
+
 class TraitsTest(unittest.TestCase):
     def test_traits(self):
         pass

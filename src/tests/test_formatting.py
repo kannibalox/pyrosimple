@@ -23,12 +23,12 @@ import unittest
 
 from pyrosimple.torrent import formatting
 
+
 log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
 class FormattingTest(unittest.TestCase):
-
     def test_formatting(self):
         pass
 

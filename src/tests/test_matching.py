@@ -18,27 +18,27 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
-import time
 import logging
+import time
 import unittest
 
 import six
 
-from pyrosimple.util.parts import Bunch
 from pyrosimple.util import matching
+from pyrosimple.util.parts import Bunch
+
 
 log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
 def lookup(name):
-    """ Lookup for test fields.
-    """
+    """Lookup for test fields."""
     matchers = dict(
-        name = matching.PatternFilter,
-        num = matching.FloatFilter,
-        flag = matching.BoolFilter,
-        tags = matching.TaggedAsFilter,
+        name=matching.PatternFilter,
+        num=matching.FloatFilter,
+        flag=matching.BoolFilter,
+        tags=matching.TaggedAsFilter,
     )
     return {"matcher": matchers[name]} if name in matchers else None
 
@@ -77,7 +77,12 @@ class FilterTest(unittest.TestCase):
             keep = matching.ConditionParser(lookup, "name").parse(cond)
             result = set(i.name for i in self.DATA if keep(i))
             expected = set(expected.split())
-            assert result == expected, "Expected %r, but got %r, for '%s' [ %s ]" % (expected, result, cond, keep)
+            assert result == expected, "Expected %r, but got %r, for '%s' [ %s ]" % (
+                expected,
+                result,
+                cond,
+                keep,
+            )
 
 
 class MagicTest(unittest.TestCase):
@@ -99,24 +104,39 @@ class MagicTest(unittest.TestCase):
     ]
 
     def check(self, obj, expected, cond):
-        assert type(obj) is expected, "%s is not %s for '%s'" % (type(obj).__name__, expected.__name__, cond)
+        assert type(obj) is expected, "%s is not %s for '%s'" % (
+            type(obj).__name__,
+            expected.__name__,
+            cond,
+        )
 
     def test_magic(self):
         for cond, expected in self.CASES:
-            matcher = matching.ConditionParser(lambda _: {"matcher": matching.MagicFilter}, "f").parse(cond)
+            matcher = matching.ConditionParser(
+                lambda _: {"matcher": matching.MagicFilter}, "f"
+            ).parse(cond)
             log.debug("MAGIC: '%s' ==> %s" % (cond, type(matcher[0]._inner).__name__))
             self.check(matcher[0]._inner, expected, cond)
 
     def test_magic_negate(self):
-        matcher = matching.ConditionParser(lambda _: {"matcher": matching.MagicFilter}, "f").parse("!")
+        matcher = matching.ConditionParser(
+            lambda _: {"matcher": matching.MagicFilter}, "f"
+        ).parse("!")
         self.check(matcher[0], matching.NegateFilter, "!")
         self.check(matcher[0]._inner, matching.MagicFilter, "!")
         self.check(matcher[0]._inner._inner, matching.PatternFilter, "!")
 
     def test_magic_matching(self):
-        item = Bunch(name="foo", date=time.time() - 86401, one=1, year=2011, size=1024**2)
-        match = lambda c: matching.ConditionParser(
-            lambda _: {"matcher": matching.MagicFilter}, "name").parse(c).match(item)
+        item = Bunch(
+            name="foo", date=time.time() - 86401, one=1, year=2011, size=1024**2
+        )
+        match = (
+            lambda c: matching.ConditionParser(
+                lambda _: {"matcher": matching.MagicFilter}, "name"
+            )
+            .parse(c)
+            .match(item)
+        )
 
         assert match("f??")
         assert match("name=f*")
@@ -169,7 +189,10 @@ class ParserTest(unittest.TestCase):
         for cond, canonical in self.GOOD:
             matcher = matching.ConditionParser(lookup, "name").parse(cond)
             assert isinstance(matcher, matching.Filter), "Matcher is not a filter"
-            assert six.text_type(matcher) == canonical, "'%s' != '%s'" % (six.text_type(matcher), canonical)
+            assert six.text_type(matcher) == canonical, "'%s' != '%s'" % (
+                six.text_type(matcher),
+                canonical,
+            )
             assert matcher, "Matcher is empty"
 
     def test_bad_conditions(self):

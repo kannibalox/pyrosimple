@@ -4,6 +4,8 @@
 
     Copyright (c) 2009, 2010 The PyroScope Project <pyroscope.project@gmail.com>
 """
+import logging
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -18,10 +20,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import sys
-import logging
+
 
 # Add a level more detailed than DEBUG
-TRACE = logging.DEBUG-1
+TRACE = logging.DEBUG - 1
 
 
 class TestLogger(logging.Logger):
@@ -29,8 +31,7 @@ class TestLogger(logging.Logger):
 
     @classmethod
     def initialize(cls):
-        """ Register test logging.
-        """
+        """Register test logging."""
         logging.addLevelName(TRACE, "TRACE")
         logging.setLoggerClass(cls)
 
@@ -39,12 +40,9 @@ class TestLogger(logging.Logger):
         elif any(i in sys.argv for i in ("-q", "--quiet")):
             logging.getLogger().setLevel(logging.INFO)
 
-
     def trace(self, msg, *args, **kwargs):
-        """ Micro logging.
-        """
+        """Micro logging."""
         return self.log(TRACE, msg, *args, **kwargs)
-
 
     # FlexGet names
     debugall = trace
