@@ -154,7 +154,9 @@ class MagicTest(unittest.TestCase):
         assert not match("size=-1m")
 
 
-@pytest.mark.parametrize(('cond', 'canonical'), [
+@pytest.mark.parametrize(
+    ("cond", "canonical"),
+    [
         ("num=+1", "num=+1"),
         ("num>1", "num=+1"),
         ("num<=1", "num=!+1"),
@@ -167,7 +169,8 @@ class MagicTest(unittest.TestCase):
         ("foo bar", "name=foo name=bar"),
         ("foo,bar", "name=foo,bar"),
         ("foo OR bar", "[ name=foo OR name=bar ]"),
-])
+    ],
+)
 def test_good_conditions(cond, canonical):
     matcher = matching.ConditionParser(lookup, "name").parse(cond)
     assert isinstance(matcher, matching.Filter), "Matcher is not a filter"
@@ -177,7 +180,10 @@ def test_good_conditions(cond, canonical):
     )
     assert matcher, "Matcher is empty"
 
-@pytest.mark.parametrize('cond', [
+
+@pytest.mark.parametrize(
+    "cond",
+    [
         "",
         "num=foo",
         "num>-1",
@@ -191,7 +197,7 @@ def test_good_conditions(cond, canonical):
         "num=1 OR",
         "[ num=1 OR ]",
         "OR num=1",
-    ]
+    ],
 )
 def test_bad_conditions(cond):
     with pytest.raises(matching.FilterError):
