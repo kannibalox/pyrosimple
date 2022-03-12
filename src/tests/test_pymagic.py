@@ -64,7 +64,7 @@ class LogTest(unittest.TestCase):
 
     def test_get_class_logger(self):
         logger = pymagic.get_class_logger(self)
-        assert logger.name == "test_pymagic.LogTest"
+        assert logger.name == "tests.test_pymagic.LogTest"
 
 
 if __name__ == "__main__":

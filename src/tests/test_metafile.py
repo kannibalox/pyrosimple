@@ -20,7 +20,6 @@
 """
 
 import random
-import logging
 import unittest
 import copy
 import operator
@@ -28,10 +27,8 @@ from functools import reduce  # forward compatibility for Python 3
 from pathlib import Path
 
 from pyrosimple.util.metafile import * #@UnusedWildImport
+import pytest
 import bencode
-
-log = logging.getLogger(__name__)
-log.debug("module loaded")
 
 # helper methods to make tests easier to write
 def get_from_dict(data_dict, map_list):
@@ -82,25 +79,27 @@ class AssignTest(unittest.TestCase):
             continue
             self.assertEqual(initial)
 
-class CheckMetaTest(unittest.TestCase):
-    def test_metadicts(self):
-        bad_dicts = [
-            ['a'],
-            {'agsdg': 'asdga'},
-            {'announce', 3},
-        ]
-        for testcase in bad_dicts:
-            self.assertRaises(ValueError, check_meta, testcase)
-        dir_path = Path(__file__).parent
-        with Path(dir_path, 'multi.torrent').open('rb') as fh:
-            good_metainfo = bencode.decode(fh.read())
-        bad_meta_info_data = [
+@pytest.fixture
+def good_metainfo():
+    with Path(Path(__file__).parent, 'multi.torrent').open('rb') as fh:
+        return bencode.decode(fh.read())
+
+@pytest.mark.parametrize('data', [
+    ['a'],
+    {'agsdg': 'asdga'},
+    {'announce', 3},    
+])
+def test_bad_dicts(data):
+    with pytest.raises(ValueError):
+        check_meta(data)    
+
+@pytest.mark.parametrize(('key', 'data'), [
             ([], ['a']),
             (['pieces'], u"test"),
             (['piece length'], -1),
             (['name'], 5),
             (['name'], '/tmp/file'),
-            (['length'], good_metainfo['info']['files']),
+            (['length'], [{'length': 1, 'path': 'test'}]),
             (['length'], -1),
             (['files'], 1),
             (['files'], [1]),
@@ -114,13 +113,13 @@ class CheckMetaTest(unittest.TestCase):
                 {'length': 1, 'path': [u'file']},
                 {'length': 1, 'path': [u'file']},
             ]),
-        ]
-        for key, data in bad_meta_info_data:
-            meta = copy.deepcopy(good_metainfo)
-            set_in_dict(meta, ['info'] + key, data)
-            self.assertRaises(ValueError, check_meta, meta)
+])
+def test_bad_metadicts(good_metainfo, key, data):
+    meta = copy.deepcopy(good_metainfo)
+    set_in_dict(meta, ['info'] + key, data)
+    with pytest.raises(ValueError):
+        check_meta(meta)
 
-        self.assertEqual(good_metainfo, check_meta(good_metainfo))
 
 if __name__ == "__main__":
     unittest.main()

@@ -92,7 +92,7 @@ def transport_from_url(url):
     """Create a transport for the given URL."""
     if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
         url = "scgi://" + url
-    elif url.startswith("/"):
+    elif url.startswith("/") or url.startswith("~"):
         url = "scgi+unix://"
     url = urlparse.urlsplit(url, scheme="scgi", allow_fragments=False)
 
