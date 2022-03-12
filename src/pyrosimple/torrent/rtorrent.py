@@ -700,11 +700,11 @@ class RtorrentEngine(engine.TorrentEngine):
                     rc_vals[key] = val
 
         # Validate fields
-        if rc_vals.scgi_local:
+        if rc_vals.scgi_local and not rc_vals.scgi_port.startswith("scgi+unix://"):
             rc_vals.scgi_local = os.path.expanduser(rc_vals.scgi_local)
-            rc_vals.scgi_local = "scgi://" + rc_vals.scgi_local
-        if rc_vals.scgi_port and not rc_vals.scgi_port.startswith("scgi+unix://"):
-            rc_vals.scgi_port = "scgi+unix://" + rc_vals.scgi_port
+            rc_vals.scgi_local = "scgi+unix://" + rc_vals.scgi_local
+        if rc_vals.scgi_port and not rc_vals.scgi_port.startswith("scgi://"):
+            rc_vals.scgi_port = "scgi://" + rc_vals.scgi_port
 
         # Prefer UNIX domain sockets over TCP sockets
         namespace.scgi_url = rc_vals.scgi_local or rc_vals.scgi_port
@@ -881,8 +881,7 @@ class RtorrentEngine(engine.TorrentEngine):
                         self.LOG.info("!!! pre-filter: {}".format(pre_filter or "N/A"))
                         if pre_filter:
                             multi_call = self.open().d.multicall.filtered
-                            del args[0]
-                            args.insert(1, pre_filter)
+                            multi_args.insert(2, pre_filter)
                     raw_items = multi_call(*tuple(multi_args))
 
                 ##self.LOG.debug("multicall %r" % (args,))
