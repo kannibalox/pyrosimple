@@ -36,16 +36,6 @@ from pyrosimple.util import fmt, load_config, matching, os, traits, xmlrpc
 from pyrosimple.util.parts import Bunch
 
 
-class CommaLexer(shlex.shlex):
-    """Helper to split argument lists."""
-
-    def __init__(self, text):
-        shlex.shlex.__init__(self, text, None, True)
-        self.whitespace += ","
-        self.whitespace_split = True
-        self.commenters = ""
-
-
 class RtorrentItem(engine.TorrentProxy):
     """A single download item."""
 

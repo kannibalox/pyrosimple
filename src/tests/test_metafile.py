@@ -134,6 +134,9 @@ def test_bad_metadicts(good_metainfo, key, data):
     with pytest.raises(ValueError):
         check_meta(meta)
 
+def test_metafile_listing(good_metainfo):
+    meta = Metafile(Path(Path(__file__).parent, "multi.torrent"))
+    meta.listing()
 
 if __name__ == "__main__":
     unittest.main()

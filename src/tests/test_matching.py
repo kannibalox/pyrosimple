@@ -22,7 +22,7 @@ import logging
 import time
 import unittest
 
-import six
+import pytest
 
 from pyrosimple.util import matching
 from pyrosimple.util.parts import Bunch
@@ -154,8 +154,7 @@ class MagicTest(unittest.TestCase):
         assert not match("size=-1m")
 
 
-class ParserTest(unittest.TestCase):
-    GOOD = [
+@pytest.mark.parametrize(('cond', 'canonical'), [
         ("num=+1", "num=+1"),
         ("num>1", "num=+1"),
         ("num<=1", "num=!+1"),
@@ -168,8 +167,17 @@ class ParserTest(unittest.TestCase):
         ("foo bar", "name=foo name=bar"),
         ("foo,bar", "name=foo,bar"),
         ("foo OR bar", "[ name=foo OR name=bar ]"),
-    ]
-    BAD = [
+])
+def test_good_conditions(cond, canonical):
+    matcher = matching.ConditionParser(lookup, "name").parse(cond)
+    assert isinstance(matcher, matching.Filter), "Matcher is not a filter"
+    assert str(matcher) == canonical, "'%s' != '%s'" % (
+        str(matcher),
+        canonical,
+    )
+    assert matcher, "Matcher is empty"
+
+@pytest.mark.parametrize('cond', [
         "",
         "num=foo",
         "num>-1",
@@ -184,25 +192,10 @@ class ParserTest(unittest.TestCase):
         "[ num=1 OR ]",
         "OR num=1",
     ]
-
-    def test_good_conditions(self):
-        for cond, canonical in self.GOOD:
-            matcher = matching.ConditionParser(lookup, "name").parse(cond)
-            assert isinstance(matcher, matching.Filter), "Matcher is not a filter"
-            assert six.text_type(matcher) == canonical, "'%s' != '%s'" % (
-                six.text_type(matcher),
-                canonical,
-            )
-            assert matcher, "Matcher is empty"
-
-    def test_bad_conditions(self):
-        for cond in self.BAD:
-            try:
-                matcher = matching.ConditionParser(lookup).parse(cond)
-            except matching.FilterError as exc:
-                log.debug("BAD: '%s' ==> %s" % (cond, exc))
-            else:
-                assert False, "[ %s ] '%s' raised no error" % (matcher, cond)
+)
+def test_bad_conditions(cond):
+    with pytest.raises(matching.FilterError):
+        matcher = matching.ConditionParser(lookup).parse(cond)
 
 
 if __name__ == "__main__":
