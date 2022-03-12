@@ -311,7 +311,7 @@ def format_item(format_spec, item: Union[Dict, str], defaults=None) -> str:
     ):
         # Set item, or field names for column titles
         namespace: Dict[str, Any] = dict(headers=not bool(item))
-        if isinstance(item, str):
+        if item:
             namespace["d"] = item
         else:
             namespace["d"] = Bunch()
