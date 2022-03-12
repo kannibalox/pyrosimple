@@ -38,9 +38,7 @@ class IntervalTest(unittest.TestCase):
     def test_interval_sum(self):
         for interval, kwargs, expected in self.INTERVAL_DATA:
             result = engine._interval_sum(interval, **kwargs)
-            self.assertEqual(
-                expected, result, "for interval=%r kw=%r" % (interval, kwargs)
-            )
+            assert expected == result, "for interval=%r kw=%r" % (interval, kwargs)
 
 
 class EngineTest(unittest.TestCase):

@@ -67,19 +67,8 @@ class MaskTest(unittest.TestCase):
         for testcase in testcases:
             expected = testcase.replace("D", "*").replace("Z", "*")
             randomized = "".join(mapping.get(i, lambda: i)() for i in testcase)
-            self.assertNotEqual(expected, randomized)
-            self.assertEqual(expected, mask_keys(randomized))
-
-
-class AssignTest(unittest.TestCase):
-    def test_assign_fields(self):
-        # 4-elem tuples: initial, key, value, expected
-        tests = [
-            ({}, "test", "test", {"test", "test"}),
-        ]
-        for initial, key, value, expected in tests:
-            continue
-            self.assertEqual(initial)
+            assert expected != randomized
+            assert expected == mask_keys(randomized)
 
 
 @pytest.fixture
