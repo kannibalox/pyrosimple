@@ -22,7 +22,7 @@ jobs:
         poetry run pip install jinja2
     - name: Run unittests
       run: |
-        poetry run python -m unittest discover src/tests/
+        poetry run pytest
     - name: Analysing the code with pylint
       run: |
         poetry run pylint src/pyrosimple/
