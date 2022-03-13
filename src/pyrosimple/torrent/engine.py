@@ -358,6 +358,7 @@ class TorrentProxy:
         for factory in config.custom_field_factories:
             for field in factory():
                 setattr(cls, field.name, field)
+                FieldDefinition.FIELDS[field.name] = field
 
     def __init__(self):
         """Initialize object."""
