@@ -121,56 +121,66 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     def __close(self):
         self.__transport.close()
 
+    def __request_xml(self, methodname, params):
+        # Verbatim from parent method
+        request = xmlrpclib.dumps(
+            params,
+            methodname,
+            encoding=self.__encoding,
+            allow_none=self.__allow_none,
+        ).encode(self.__encoding, "xmlcharrefreplace")
+        if self.__verbose:
+            print("req: ", request)
+
+        response = self.__transport.request(
+            self.__host, self.__handler, request, verbose=self.__verbose
+        )
+
+        if len(response) == 1:
+            response = response[0]
+
+        return response
+
+    def __request_json(self, methodname, params):
+        if not params:
+            params = [""]
+
+        # This feels silly but there's not much need for anything better ATM.
+        rpc_id = random.randint(0, 100)
+        request = json.dumps(
+            {
+                "params": params,
+                "method": methodname,
+                "jsonrpc": "2.0",
+                "id": rpc_id,
+            }
+        ).encode(self.__encoding, "xmlcharrefreplace")
+        if self.__verbose:
+            print("req: ", request)
+
+        response = self.__transport.request(
+            self.__host,
+            self.__handler,
+            request,
+            verbose=self.__verbose,
+        )
+
+        if response["id"] != rpc_id:
+            raise ValueError(f"RPC IDs {rpc_id} and {response['id']} do not match")
+        if "error" in response:
+            raise ValueError(f"Received error: {response['error']}")
+        return response["result"]
+
     def __request(self, methodname, params):
         # call a method on the remote server
-        if self.__rpc_codec == "xml":
-            # Verbatim from parent method
-            request = xmlrpclib.dumps(
-                params,
-                methodname,
-                encoding=self.__encoding,
-                allow_none=self.__allow_none,
-            ).encode(self.__encoding, "xmlcharrefreplace")
-            if self.__verbose:
-                print("req: ", request)
-
-            response = self.__transport.request(
-                self.__host, self.__handler, request, verbose=self.__verbose
-            )
-
-            if len(response) == 1:
-                response = response[0]
-
-            return response
-        if self.__rpc_codec == "json":
-            if not params:
-                params = [""]
-
-            # This feels silly but there's not much need for anything better ATM.
-            rpc_id = random.randint(0, 100)
-            request = json.dumps(
-                {
-                    "params": params,
-                    "method": methodname,
-                    "jsonrpc": "2.0",
-                    "id": rpc_id,
-                }
-            ).encode(self.__encoding, "xmlcharrefreplace")
-            if self.__verbose:
-                print("req: ", request)
-
-            response = self.__transport.request(
-                self.__host,
-                self.__handler,
-                request,
-                verbose=self.__verbose,
-            )
-
-            if response["id"] != rpc_id:
-                raise ValueError(f"RPC IDs {rpc_id} and {response['id']} do not match")
-            if "error" in response:
-                raise ValueError(f"Received error: {response['error']}")
-            return response["result"]
+        try:
+            if self.__rpc_codec == "xml":
+                return self.__request_xml(methodname, params)
+            if self.__rpc_codec == "json":
+                return self.__request_json(methodname, params)
+        except xmlrpclib.Fault as exc:
+            if exc.faultString == "Could not find info-hash.":
+                raise HashNotFound(exc.faultString)
         raise ValueError(f"Invalid RPC protocol '{self.__rpc_codec}'")
 
     def __repr__(self):
