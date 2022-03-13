@@ -198,7 +198,7 @@ class MetafileHandler:
             if not self.job.config.quiet:
                 try:
                     name = self.job.proxy.d.name(self.ns.info_hash)
-                except xmlrpc.NOHASH:
+                except xmlrpc.HashNotFound:
                     name = "NOHASH"
                 msg = "%s: Loaded '%s' from '%s/'%s%s" % (
                     self.job.__class__.__name__,
