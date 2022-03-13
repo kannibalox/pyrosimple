@@ -808,7 +808,7 @@ class RtorrentEngine(engine.TorrentEngine):
 
     def log(self, msg: str):
         """Log a message in the torrent client."""
-        self.open().log(0, msg)
+        self.open().log(xmlrpc.NOHASH, msg)
 
     def item(self, infohash: str, prefetch=None, cache=False):
         """Fetch a single item by its info hash."""
@@ -937,7 +937,7 @@ class RtorrentEngine(engine.TorrentEngine):
         if not append and not disjoin:
             proxy.view.filter(xmlrpc.NOHASH, view, "false=")
             proxy.d.multicall2(xmlrpc.NOHASH, "default", "d.views.remove=" + view)
-        proxy.ui.current_view.set(view)
+        proxy.ui.current_view.set(xmlrpc.NOHASH, view)
 
         # Add items
         # TODO: should be a "system.multicall"

@@ -76,7 +76,6 @@ def _interval_split(interval, only=None, event_re=re.compile("[A-Z][0-9]+")):
 
     if hasattr(interval, "fetch"):
         interval = interval.fetch("custom_activations")
-    ##import sys; print >>sys.stderr, "!!!!!isplit", interval, event_re.findall(interval)
 
     return list(
         reversed(
@@ -101,11 +100,9 @@ def _interval_sum(interval, start=None, end=None):
     end = float(end) if end else time.time()
     events = _interval_split(interval)
     result = []
-    ##import sys; print >>sys.stderr, "!!!!!isum", interval.fetch("custom_activations"), events, start, end
 
     while events:
         event, resumed = events.pop()
-        ##print "~~~~~~~~~~", context, event, resumed
 
         if event != "R":
             # Ignore other events
@@ -121,8 +118,6 @@ def _interval_sum(interval, start=None, end=None):
             # Currently active, ends at time window
             paused = end
 
-        ##print "~~~~~~~~~~ R: %r, P: %r" % (resumed, paused)
-        ##print "~~~~~~~~~~ I: %r" % (paused - resumed)
         if resumed >= paused:
             # Ignore empty intervals
             continue
@@ -166,10 +161,6 @@ def _fmt_files(filelist):
                     if dirname != prev_name
                 ]
             )
-            # result.append("!!%r %r" % (indent, common))
-            # result.append("!!%r" % (prev_path,))
-            # result.append("!!%r" % (path,))
-
             while indent > common:
                 indent -= 1
                 result.append("%s%s/" % (base_indent, " " * indent))
@@ -180,7 +171,6 @@ def _fmt_files(filelist):
                 result.append("%s%s\\ %s" % (base_indent, " " * indent, dirname))
                 indent += 1
 
-        ##result.append("!!%r %r" % (path, name))
         result.append(
             "  %s %s %s %s| %s"
             % (

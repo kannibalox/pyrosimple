@@ -178,6 +178,8 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     def __getattr__(self, name):
         # magic method dispatcher
+        if name == "log":
+            name = "print"
         return xmlrpclib._Method(self.__request, name)
 
     # note: to call a remote object with a non-standard name, use
