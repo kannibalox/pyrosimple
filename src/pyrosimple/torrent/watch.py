@@ -82,7 +82,7 @@ class MetafileHandler:
 
         # Check whether item is already loaded
         try:
-            name = self.job.proxy.d.name(self.ns.info_hash, fail_silently=True)
+            name = self.job.proxy.d.name(self.ns.info_hash)
         except xmlrpc.HashNotFound:
             pass
         except xmlrpc.ERRORS as exc:
@@ -196,9 +196,13 @@ class MetafileHandler:
 
             # Announce new item
             if not self.job.config.quiet:
+                try:
+                    name = self.job.proxy.d.name(self.ns.info_hash)
+                except xmlrpc.NOHASH:
+                    name = "NOHASH"
                 msg = "%s: Loaded '%s' from '%s/'%s%s" % (
                     self.job.__class__.__name__,
-                    self.job.proxy.d.name(self.ns.info_hash, fail_silently=True),
+                    name,
                     os.path.dirname(self.ns.pathname).rstrip(os.sep),
                     " [queued]" if queue_it else "",
                     (" [startable]" if queue_it else " [started]")
@@ -335,7 +339,6 @@ class TreeWatch:
 
         # Get client proxy
         self.proxy = xmlrpc.RTorrentProxy(configuration.scgi_url)
-        self.proxy._set_mappings()  # pylint: disable=W0212
 
         if self.config.active:
             self.setup()
