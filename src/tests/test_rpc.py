@@ -21,15 +21,15 @@
 import logging
 import unittest
 
-from pyrosimple.util import xmlrpc
+from pyrosimple.util import rpc
 
 
 log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
-class XmlRpcTest(unittest.TestCase):
-    def test_xmlrpc(self):
+class RpcTest(unittest.TestCase):
+    def test_rpc(self):
         pass
 
 
