@@ -19,7 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from pyrosimple import config, error
-from pyrosimple.util import pymagic, xmlrpc
+from pyrosimple.util import pymagic, rpc
 
 
 class FilterJobBase:
@@ -41,7 +41,7 @@ class FilterJobBase:
             # TODO: select view into items
             items = []
             self.run_filter(items)
-        except (error.LoggableError, xmlrpc.ERRORS) as exc:
+        except (error.LoggableError, rpc.ERRORS) as exc:
             self.LOG.warning(str(exc))
 
     def run_filter(self, items):
@@ -54,7 +54,7 @@ class ActionRule(FilterJobBase):
 
     def run_filter(self, items):
         """Perform configured action on filtered items."""
-        # TODO: what actions? xmlrpc, delete, cull, stop, etc. for sure.
+        # TODO: what actions? rpc, delete, cull, stop, etc. for sure.
 
 
 class TorrentMirror(FilterJobBase):

@@ -145,7 +145,7 @@ def convert_strings_in_iter(obj):
     return obj
 
 
-def xmlrpc_result_to_string(result) -> str:
+def rpc_result_to_string(result) -> str:
     """Helper function to nicely format results"""
     result = convert_strings_in_iter(result)
 

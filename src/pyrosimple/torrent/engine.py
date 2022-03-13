@@ -26,7 +26,7 @@ from collections import defaultdict
 from typing import Any, Dict, Set
 
 from pyrosimple import config, error
-from pyrosimple.util import fmt, matching, metafile, os, pymagic, traits, xmlrpc
+from pyrosimple.util import fmt, matching, metafile, os, pymagic, rpc, traits
 
 
 #
@@ -794,7 +794,7 @@ class TorrentView:
         if self._check_hash_view():
             return 1
         else:
-            return self.engine.open().view.size(xmlrpc.NOHASH, self.viewname)
+            return self.engine.open().view.size(rpc.NOHASH, self.viewname)
 
     def items(self):
         """Get list of download items."""

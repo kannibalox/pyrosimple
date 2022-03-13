@@ -32,7 +32,7 @@ from typing import Callable, List, Optional, Set
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, load_config, matching, os, traits, xmlrpc
+from pyrosimple.util import fmt, load_config, matching, os, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
@@ -56,7 +56,7 @@ class RtorrentItem(engine.TorrentProxy):
         self._fields = dict(fields)
 
     def _make_it_so(self, command: str, calls: List[str], *args, **kwargs):
-        """Perform some error-checked XMLRPC calls."""
+        """Perform some error-checked RPC calls."""
         observer = kwargs.pop("observer", False)
         args = (self._fields["hash"],) + args
         try:
@@ -75,7 +75,7 @@ class RtorrentItem(engine.TorrentProxy):
                 result = getattr(namespace, call.lstrip(":"))(*args)
                 if observer:
                     observer(result)
-        except xmlrpc.ERRORS as exc:
+        except rpc.ERRORS as exc:
             raise error.EngineError(
                 "While %s torrent #%s: %s" % (command, self._fields["hash"], exc)
             )
@@ -106,7 +106,7 @@ class RtorrentItem(engine.TorrentProxy):
             for attr in attrs or []:
                 f_params.append("f.%s=" % attr)
             rpc_result = f_multicall(*tuple(f_params))
-        except xmlrpc.ERRORS as exc:
+        except rpc.ERRORS as exc:
             raise error.EngineError(
                 "While %s torrent #%s: %s"
                 % ("getting files for", self._fields["hash"], exc)
@@ -219,7 +219,7 @@ class RtorrentItem(engine.TorrentProxy):
                     )
                 else:
                     val = self._engine._rpc.d.custom(self._fields["hash"], key)
-            except xmlrpc.ERRORS as exc:
+            except rpc.ERRORS as exc:
                 raise error.EngineError("While accessing field %r: %s" % (name, exc))
         else:
             getter_name = (
@@ -233,7 +233,7 @@ class RtorrentItem(engine.TorrentProxy):
 
             try:
                 val = getter(self._fields["hash"])
-            except xmlrpc.ERRORS as exc:
+            except rpc.ERRORS as exc:
                 raise error.EngineError("While accessing field %r: %s" % (name, exc))
 
         # TODO: Currently, NOT caching makes no sense; in a demon, it does!
@@ -263,7 +263,7 @@ class RtorrentItem(engine.TorrentProxy):
             response = self._engine._rpc.t.multicall(
                 self._fields["hash"], 0, "t.url=", "t.is_enabled="
             )
-        except xmlrpc.ERRORS as exc:
+        except rpc.ERRORS as exc:
             raise error.EngineError(
                 "While getting announce URLs for #%s: %s" % (self._fields["hash"], exc)
             )
@@ -324,8 +324,8 @@ class RtorrentItem(engine.TorrentProxy):
             name = ""
 
         if name not in self._engine.known_throttle_names:
-            if self._engine._rpc.throttle.up.max(xmlrpc.NOHASH, name) == -1:
-                if self._engine._rpc.throttle.down.max(xmlrpc.NOHASH, name) == -1:
+            if self._engine._rpc.throttle.up.max(rpc.NOHASH, name) == -1:
+                if self._engine._rpc.throttle.down.max(rpc.NOHASH, name) == -1:
                     raise error.UserError("Unknown throttle name '{}'".format(name))
             self._engine.known_throttle_names.add(name)
 
@@ -388,7 +388,7 @@ class RtorrentItem(engine.TorrentProxy):
         self._make_it_so("hash-checking", ["check_hash"])
 
     def __print_result(self, data, method=None, args=None):
-        "Helper to print XMLRPC call results"
+        "Helper to print RPC call results"
         args_list = ""
         if args:
             args_list = '"' + '","'.join(args) + '"'
@@ -398,7 +398,7 @@ class RtorrentItem(engine.TorrentProxy):
         )
 
     def execute(self, commands):
-        """Execute XMLRPC command(s)."""
+        """Execute RPC command(s)."""
         try:
             commands = [i.strip() for i in commands.split(" ; ")]
         except (TypeError, AttributeError):
@@ -739,7 +739,7 @@ class RtorrentEngine(engine.TorrentEngine):
             try:
                 # Only works with rTorrent-PS at this time!
                 viewname = self.open().ui.current_view()
-            except xmlrpc.ERRORS as exc:
+            except rpc.ERRORS as exc:
                 raise error.EngineError("Can't get name of current view: %s" % (exc))
 
         return viewname
@@ -756,12 +756,12 @@ class RtorrentEngine(engine.TorrentEngine):
         # Reading abilities are on the downfall, so...
         if not config.scgi_url:
             raise error.UserError(
-                "You need to configure a XMLRPC connection, read"
+                "You need to configure a RPC connection, read"
                 " https://pyrosimple.readthedocs.io/en/latest/setup.html"
             )
 
         # Connect and get instance ID (also ensures we're connectable)
-        self._rpc = xmlrpc.RTorrentProxy(config.scgi_url)
+        self._rpc = rpc.RTorrentProxy(config.scgi_url)
         self.versions = (
             self._rpc.system.client_version(),
             self._rpc.system.library_version(),
@@ -808,7 +808,7 @@ class RtorrentEngine(engine.TorrentEngine):
 
     def log(self, msg: str):
         """Log a message in the torrent client."""
-        self.open().log(xmlrpc.NOHASH, msg)
+        self.open().log(rpc.NOHASH, msg)
 
     def item(self, infohash: str, prefetch=None, cache=False):
         """Fetch a single item by its info hash."""
@@ -904,7 +904,7 @@ class RtorrentEngine(engine.TorrentEngine):
                         )
                     )
                     yield items[-1]
-            except xmlrpc.ERRORS as exc:
+            except rpc.ERRORS as exc:
                 raise error.EngineError(
                     "While getting download items from %r: %s" % (self, exc)
                 )
@@ -931,13 +931,13 @@ class RtorrentEngine(engine.TorrentEngine):
 
         # Add view if needed
         if view not in proxy.view.list():
-            proxy.view.add(xmlrpc.NOHASH, view)
+            proxy.view.add(rpc.NOHASH, view)
 
         # Clear view and show it
         if not append and not disjoin:
-            proxy.view.filter(xmlrpc.NOHASH, view, "false=")
-            proxy.d.multicall2(xmlrpc.NOHASH, "default", "d.views.remove=" + view)
-        proxy.ui.current_view.set(xmlrpc.NOHASH, view)
+            proxy.view.filter(rpc.NOHASH, view, "false=")
+            proxy.d.multicall2(rpc.NOHASH, "default", "d.views.remove=" + view)
+        proxy.ui.current_view.set(rpc.NOHASH, view)
 
         # Add items
         # TODO: should be a "system.multicall"

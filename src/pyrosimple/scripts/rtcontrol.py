@@ -33,7 +33,7 @@ import daemon  # type: ignore
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import engine, formatting
-from pyrosimple.util import matching, os, pymagic, xmlrpc
+from pyrosimple.util import matching, os, pymagic, rpc
 from pyrosimple.util.parts import Bunch, DefaultBunch
 
 
@@ -261,10 +261,10 @@ class RtorrentControl(ScriptBaseWithConfig):
         Bunch(
             name="exec",
             label="EXEC",
-            options=("--exec", "--xmlrpc"),
+            options=("--exec", "--xmlrpc", "--RPC"),
             argshelp="CMD",
             method="execute",
-            help="execute XMLRPC command pattern",
+            help="execute RPC command pattern",
             interactive=True,
         ),
         # TODO: --move / --link output_format / the formatted result is the target path
@@ -929,7 +929,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         item.flush()
                     if self.options.view_only:
                         show_in_client = lambda x: config.engine.open().log(
-                            xmlrpc.NOHASH, x
+                            rpc.NOHASH, x
                         )
                         self.emit(item, defaults, to_log=show_in_client)
 
@@ -1073,8 +1073,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 view.size(),
             )
 
-        # XMLRPC stats
-        self.LOG.debug("XMLRPC stats: %s", config.engine._rpc)
+        self.LOG.debug("RPC stats: %s", config.engine._rpc)
 
         # Clean up daemon context
         if dcontext is not None:

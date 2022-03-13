@@ -42,7 +42,7 @@ import bencode  # type: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import fmt, xmlrpc
+from pyrosimple.util import fmt, rpc
 from pyrosimple.util.parts import Bunch
 
 
@@ -74,8 +74,8 @@ def read_blob(arg):
 class RtorrentXmlRpc(ScriptBaseWithConfig):
     ### Keep things wrapped to fit under this comment... ##############################
     """
-    Perform raw rTorrent XMLRPC calls, like "rtxmlrpc throttle.global_up.max_rate".
-    To enter a XMLRPC REPL, pass no arguments at all.
+    Perform raw rTorrent RPC calls, like "rtxmlrpc throttle.global_up.max_rate".
+    To enter a RPC REPL, pass no arguments at all.
 
     Start arguments with "+" or "-" to indicate they're numbers (type i4 or i8).
     Use "[1,2,..." for arrays. Use "@" to indicate binary data, which can be
@@ -132,10 +132,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 config.engine.load_config()
             if not config.scgi_url:
                 self.LOG.error(
-                    "You need to configure a XMLRPC connection, read"
+                    "You need to configure a RPC connection, read"
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
-            self.proxy = xmlrpc.RTorrentProxy(config.scgi_url)
+            self.proxy = rpc.RTorrentProxy(config.scgi_url)
             # self.proxy._set_mappings()
         return self.proxy
 
@@ -164,10 +164,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         return args
 
     def execute(self, proxy, method, args):
-        """Execute given XMLRPC call."""
+        """Execute given RPC call."""
         try:
             result = getattr(proxy, method)(*tuple(args))
-        except xmlrpc.ERRORS as exc:
+        except rpc.ERRORS as exc:
             self.LOG.error(
                 "While calling %s(%s): %s",
                 method,
@@ -186,7 +186,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 elif self.options.output_format == "json":
                     result = json.dumps(result)
                 else:
-                    result = fmt.xmlrpc_result_to_string(result)
+                    result = fmt.rpc_result_to_string(result)
                 print(result)
 
     def repl_usage(self):  # pylint: disable=no-self-use
@@ -194,13 +194,13 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         print(
             textwrap.dedent(
                 """
-            rTorrent XMLRPC REPL Help Summary
+            rTorrent RPC REPL Help Summary
             =================================
 
             ? / help            Show this help text.
             Ctrl-D              Exit the REPL and show call stats.
             stats               Show current call stats.
-            cmd=arg1,arg2,..    Call a XMLRPC command.
+            cmd=arg1,arg2,..    Call a RPC command.
         """.strip(
                     "\n"
                 )
@@ -208,7 +208,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         )
 
     def do_repl(self):
-        """REPL for rTorrent XMLRPC commands."""
+        """REPL for rTorrent RPC commands."""
         # pylint: disable=import-outside-toplevel
         try:
             from prompt_toolkit import prompt
@@ -274,7 +274,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     self.parser.error(
                         "File not found (or not a file): {}".format(import_file)
                     )
-                args = (xmlrpc.NOHASH, os.path.abspath(import_file))
+                args = (rpc.NOHASH, os.path.abspath(import_file))
             else:
                 script_text = "\n".join(self.args + [""])
                 if script_text == "@-\n":
@@ -285,7 +285,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 ) as handle:
                     handle.write(script_text.encode("utf-8"))
                     tmp_import = handle.name
-                args = (xmlrpc.NOHASH, tmp_import)
+                args = (rpc.NOHASH, tmp_import)
 
             self.execute(self.open(), "import", args)
         finally:
@@ -422,8 +422,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         else:
             self.do_command()
 
-        # XMLRPC stats
-        self.LOG.debug("XMLRPC stats: %s", self.open())
+        # RPC stats
+        self.LOG.debug("RPC stats: %s", self.open())
 
 
 def run():  # pragma: no cover

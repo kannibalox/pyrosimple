@@ -20,7 +20,7 @@
 
 from pyrosimple import config as config_ini
 from pyrosimple import error
-from pyrosimple.util import fmt, pymagic, xmlrpc
+from pyrosimple.util import fmt, pymagic, rpc
 from pyrosimple.util.parts import Bunch
 
 
@@ -45,7 +45,7 @@ class EngineStats:
                 ).strip(),
                 proxy,
             )
-        except (error.LoggableError, xmlrpc.ERRORS) as exc:
+        except (error.LoggableError, rpc.ERRORS) as exc:
             self.LOG.warning(str(exc))
 
 
@@ -60,7 +60,7 @@ def module_test():
         engine = connect()
         print("%s - %s" % (engine.engine_id, engine.open()))
 
-    except (error.LoggableError, xmlrpc.ERRORS) as torrent_exc:
+    except (error.LoggableError, rpc.ERRORS) as torrent_exc:
         print("ERROR: %s" % torrent_exc)
 
 

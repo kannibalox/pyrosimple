@@ -20,7 +20,7 @@
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import xmlrpc
+from pyrosimple.util import rpc
 
 
 class CategoryManager(ScriptBaseWithConfig):
@@ -64,7 +64,7 @@ class CategoryManager(ScriptBaseWithConfig):
                 print(
                     "{} {:5d} {}".format(
                         "*" if name == real_current_view else " ",
-                        proxy.view.size(xmlrpc.NOHASH, name),
+                        proxy.view.size(rpc.NOHASH, name),
                         name[self.PREFIX_LEN :],
                     )
                 )
@@ -85,7 +85,7 @@ class CategoryManager(ScriptBaseWithConfig):
             )
 
             # Update and switch to filtered view
-            proxy.pyro.category.update(xmlrpc.NOHASH, new_view[self.PREFIX_LEN :])
+            proxy.pyro.category.update(rpc.NOHASH, new_view[self.PREFIX_LEN :])
             proxy.ui.current_view.set(new_view)
 
         else:

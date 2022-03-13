@@ -22,7 +22,7 @@ import time
 from pyrosimple import config as config_ini
 from pyrosimple import error
 from pyrosimple.torrent import engine, formatting, matching
-from pyrosimple.util import pymagic, xmlrpc
+from pyrosimple.util import pymagic, rpc
 
 
 class QueueManager:
@@ -171,7 +171,7 @@ class QueueManager:
                 item.start()
                 if not self.config.quiet:
                     self.proxy.log(
-                        xmlrpc.NOHASH,
+                        rpc.NOHASH,
                         "%s: Started '%s' {%s}"
                         % (
                             self.__class__.__name__,
@@ -195,6 +195,6 @@ class QueueManager:
             # Handle found items
             self._start(items)
             self.LOG.debug("%s - %s", config_ini.engine.engine_id, self.proxy)
-        except (error.LoggableError, *xmlrpc.ERRORS) as exc:
+        except (error.LoggableError, *rpc.ERRORS) as exc:
             # only debug, let the statistics logger do its job
             self.LOG.debug(str(exc))

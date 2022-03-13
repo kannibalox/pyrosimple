@@ -30,7 +30,7 @@ from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import formatting, matching
-from pyrosimple.util import logutil, metafile, os, pymagic, traits, xmlrpc
+from pyrosimple.util import logutil, metafile, os, pymagic, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
@@ -83,9 +83,9 @@ class MetafileHandler:
         # Check whether item is already loaded
         try:
             name = self.job.proxy.d.name(self.ns.info_hash)
-        except xmlrpc.HashNotFound:
+        except rpc.HashNotFound:
             pass
-        except xmlrpc.ERRORS as exc:
+        except rpc.ERRORS as exc:
             if exc.faultString != "Could not find info-hash.":
                 self.job.LOG.error("While checking for #%s: %s", self.ns.info_hash, exc)
                 return False
@@ -191,14 +191,14 @@ class MetafileHandler:
                 )
             )
 
-            load_cmd(xmlrpc.NOHASH, self.ns.pathname, *tuple(self.ns.commands))
+            load_cmd(rpc.NOHASH, self.ns.pathname, *tuple(self.ns.commands))
             time.sleep(0.05)  # let things settle
 
             # Announce new item
             if not self.job.config.quiet:
                 try:
                     name = self.job.proxy.d.name(self.ns.info_hash)
-                except xmlrpc.HashNotFound:
+                except rpc.HashNotFound:
                     name = "NOHASH"
                 msg = "%s: Loaded '%s' from '%s/'%s%s" % (
                     self.job.__class__.__name__,
@@ -209,7 +209,7 @@ class MetafileHandler:
                     if start_it
                     else " [normal]",
                 )
-                self.job.proxy.log(xmlrpc.NOHASH, msg)
+                self.job.proxy.log(rpc.NOHASH, msg)
 
             # TODO: Evaluate fields and set client values
             # TODO: Add metadata to tied file if requested
@@ -219,7 +219,7 @@ class MetafileHandler:
             #   could also be done automatically from the path, see above under "flags" (autolabel = True)
             #   and add traits to the flags, too, in that case
 
-        except xmlrpc.ERRORS as exc:
+        except rpc.ERRORS as exc:
             self.job.LOG.error("While loading #%s: %s", self.ns.info_hash, exc)
 
     def handle(self):
@@ -338,7 +338,7 @@ class TreeWatch:
         self.LOG.debug("custom commands = %r", self.custom_cmds)
 
         # Get client proxy
-        self.proxy = xmlrpc.RTorrentProxy(configuration.scgi_url)
+        self.proxy = rpc.RTorrentProxy(configuration.scgi_url)
 
         if self.config.active:
             self.setup()
