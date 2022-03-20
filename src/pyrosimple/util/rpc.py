@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import json
+import logging
 import random
 import urllib
 
@@ -26,16 +27,19 @@ from xmlrpc import client as xmlrpclib
 from pyrosimple.io import scgi
 
 
+logger = logging.getLogger(__name__)
+
 NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
 
 
-class XmlRpcError(Exception):
+class XmlRpcError(xmlrpclib.Fault):
+    # pylint: disable=non-parent-init-called
     """Base class for XMLRPC protocol errors."""
 
     def __init__(self, msg, *args):
-        Exception.__init__(self, msg, *args)
+        super().__init__(self, msg, *args)
         self.message = msg.format(*args)
         self.faultString = self.message
         self.faultCode = -500
@@ -48,7 +52,7 @@ class HashNotFound(XmlRpcError):
     """Non-existing or disappeared hash."""
 
     def __init__(self, msg, *args):
-        XmlRpcError.__init__(self, msg, *args)
+        super().__init__(msg, *args)
         self.faultCode = -404
 
 
@@ -83,22 +87,16 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         # establish a "logical" server connection
 
         # get the url
-        p = urllib.parse.urlsplit(uri)
-        q = urllib.parse.parse_qs(p.query)
-        if p.scheme not in ("http", "https", "scgi", "scgi+ssh", "scgi+unix"):
+        parsed_url = urllib.parse.urlsplit(uri)
+        queries = urllib.parse.parse_qs(parsed_url.query)
+        if parsed_url.scheme not in ("http", "https", "scgi", "scgi+ssh", "scgi+unix"):
             raise OSError("unsupported XML-RPC protocol")
-        if "rpc" in q:
-            self.__rpc_codec = q["rpc"][0]
-        else:
-            self.__rpc_codec = "xml"
+        self.__rpc_codec = queries.get("rpc", ["xml"])[0]
         self.__uri = uri
-        self.__host = p.netloc
-        self.__handler = urllib.parse.urlunsplit(["", "", *p[2:]])
-        if not self.__handler:
-            if p.scheme in ("http", "https"):
-                self.__handler = "/RPC2"
-            else:
-                self.__handler = ""
+        self.__host = parsed_url.netloc
+        self.__handler = urllib.parse.urlunsplit(["", "", *parsed_url[2:]])
+        if not self.__handler and parsed_url.scheme in ("http", "https"):
+            self.__handler = "/RPC2"
 
         if transport is None:
             if self.__rpc_codec == "json":
@@ -173,6 +171,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     def __request(self, methodname, params):
         # call a method on the remote server
+        logger.debug("method '%s', params %s", methodname, params)
         try:
             if self.__rpc_codec == "xml":
                 return self.__request_xml(methodname, params)
@@ -180,9 +179,9 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 return self.__request_json(methodname, params)
         except xmlrpclib.Fault as exc:
             if exc.faultString == "Could not find info-hash.":
-                raise HashNotFound(
+                raise HashNotFound(  # pylint: disable=raise-missing-from
                     exc.faultString
-                )  # pylint: disable=raise-missing-from
+                )
             raise exc
         raise ValueError(f"Invalid RPC protocol '{self.__rpc_codec}'")
 

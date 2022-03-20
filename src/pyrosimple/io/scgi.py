@@ -1,11 +1,15 @@
-"""Handles transporting RPC methods over various transports"""
+"""Handles RPC methods over various transports"""
 import io
+import logging
 import socket
 
 from typing import Dict, List, Tuple
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
+
+
+logger = logging.getLogger(__name__)
 
 
 def register_scheme(scheme):
@@ -28,7 +32,7 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 
 
 class RTorrentTransport(xmlrpclib.Transport):
-    """Base class for handle transports. Primaarily exists to allow_fragments
+    """Base class for handle transports. Primaarily exists to allow
     using the same transport with a different underlying RPC mechanism"""
 
     def __init__(self, *args, codec=xmlrpclib, **kwargs):
@@ -44,8 +48,6 @@ class RTorrentTransport(xmlrpclib.Transport):
 
 class TCPTransport(RTorrentTransport):
     """Transport via TCP socket."""
-
-    CHUNK_SIZE: int = 32768
 
     def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
@@ -73,7 +75,7 @@ class UnixTransport(RTorrentTransport):
                 )
 
 
-class SSHTransport(xmlrpclib.Transport):
+class SSHTransport(RTorrentTransport):
     """Stub for removed SSH support"""
 
 
