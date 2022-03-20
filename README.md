@@ -4,7 +4,7 @@ A simplified and python-3 oriented version of the pyrocore tools.
 
 # Why should I use this?
 
-You probably shouldn't, the pyrocore tools are perfectly fine and better supported.
+You probably shouldn't, but if you really need python 3 support this should work.
 
 ## I really want to, though
 
@@ -30,3 +30,4 @@ tl;dr I want to move fast and break things.
 - Only supports python 3 and rtorrent 0.9.8
 - `lstor --raw` prints json
 - Support for jinja2 (tempita's use of eval can chew up a surprising amount of cpu)
+- Support for JSON-RPC (only implemented in https://github.com/jesec/rtorrent)
