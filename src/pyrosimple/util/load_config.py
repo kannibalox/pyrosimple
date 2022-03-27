@@ -46,10 +46,6 @@ def validate(key, val):
     """Validate a configuration value."""
     if val and val.startswith("~/"):
         return os.path.expanduser(val)
-    if key == "output_header_frequency":
-        return int(val, 10)
-    if key.endswith("_ecma48"):
-        return eval("'%s'" % val.replace("'", r"\'"))  # pylint: disable=eval-used
 
     return val
 

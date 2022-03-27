@@ -522,12 +522,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         if item_formatter:
             item_text = item_formatter(item_text)
 
-        # For a header, use configured escape codes on a terminal
-        if item is None and os.isatty(sys.stdout.fileno()):
-            item_text = "".join(
-                (config.output_header_ecma48.decode(), item_text, "\x1B[0m")
-            )
-
         # Dump to selected target
         if to_log:
             if callable(to_log):
@@ -1026,13 +1020,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             if not self.options.summary:
                 line_count = 0
                 for item in matches:
-                    # Emit a header line every 'output_header_frequency' lines
-                    if (
-                        self.options.column_headers
-                        and line_count % config.output_header_frequency == 0
-                    ):
-                        self.emit(None, stencil=stencil)
-
                     # Print matching item
                     line_count += self.emit(item, self.FORMATTER_DEFAULTS)
 
