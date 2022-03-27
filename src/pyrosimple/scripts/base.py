@@ -21,7 +21,6 @@
 
 import errno
 import logging.config
-import random
 import sys
 import textwrap
 import time
@@ -57,7 +56,6 @@ class ScriptBase:
     @classmethod
     def setup(cls, cron_cfg="cron"):
         """Set up the runtime environment."""
-        random.seed()
         logging_cfg = cls.LOGGING_CFG
         if "%s" in logging_cfg:
             logging_cfg = logging_cfg % (
@@ -216,14 +214,12 @@ class ScriptBase:
                 if self.options.debug:
                     raise
 
-                sys.stderr.write("\n\nAborted by CTRL-C!\n")
-                sys.stderr.flush()
+                print("\n\nAborted by CTRL-C!\n", file=sys.stderr)
                 sys.exit(error.EX_TEMPFAIL)
             except IOError as exc:
                 # [Errno 32] Broken pipe?
                 if exc.errno == errno.EPIPE:
-                    sys.stderr.write("\n%s, exiting!\n" % exc)
-                    sys.stderr.flush()
+                    print("\n%s, exiting!\n" % exc, file=sys.stderr)
 
                     # Monkey patch to prevent an exception during logging shutdown
                     try:
@@ -338,9 +334,6 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
 class PromptDecorator:
     """Decorator for interactive commands."""
 
-    # Return code for Q)uit choice
-    QUIT_RC = error.EX_TEMPFAIL
-
     def __init__(self, script_obj):
         """Initialize with containing tool object."""
         self.script = script_obj
@@ -361,7 +354,7 @@ class PromptDecorator:
     def ask_bool(self, question, default=True):
         """Ask the user for Y)es / N)o / Q)uit.
 
-        If "Q" ist entered, this method will exit with RC=3.
+        If "Q" is entered, this method will exit with RC=3.
         Else, the user's choice is returned.
 
         Note that the options --non-interactive and --defaults
@@ -396,4 +389,5 @@ class PromptDecorator:
     def quit(self):
         """Exit the program due to user's choices."""
         self.script.LOG.warn("Abort due to user choice!")
-        sys.exit(self.QUIT_RC)
+        sys.exit(error.EX_TEMPFAIL)
+

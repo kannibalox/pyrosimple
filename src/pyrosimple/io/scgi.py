@@ -3,7 +3,7 @@ import io
 import logging
 import socket
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Type
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
@@ -12,7 +12,7 @@ from xmlrpc import client as xmlrpclib
 logger = logging.getLogger(__name__)
 
 
-def register_scheme(scheme):
+def register_scheme(scheme: str):
     """Helper method to register protocols with urllib"""
     for method in filter(lambda s: s.startswith("uses_"), dir(urlparse)):
         getattr(urlparse, method).append(scheme)
@@ -90,22 +90,22 @@ for t in TRANSPORTS:
     register_scheme(t)
 
 
-def transport_from_url(url):
+def transport_from_url(url: str) -> Type[xmlrpclib.Transport]:
     """Create a transport for the given URL."""
     if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
         url = "scgi://" + url
     elif url.startswith("/") or url.startswith("~"):
         url = "scgi+unix://"
-    url = urlparse.urlsplit(url, scheme="scgi", allow_fragments=False)
+    parsed_url = urlparse.urlsplit(url, scheme="scgi", allow_fragments=False)
 
     try:
-        transport = TRANSPORTS[url.scheme.lower()]
+        transport = TRANSPORTS[parsed_url.scheme.lower()]
     except KeyError:
         # pylint: disable=raise-missing-from
-        if not any((url.netloc, url.query)) and url.path.isdigit():
+        if not any((parsed_url.netloc, parsed_url.query)) and parsed_url.path.isdigit():
             # Support simplified "domain:port" URLs
-            return transport_from_url(f"scgi://{url.scheme}:{url.path}")
-        raise URLError(f"Unsupported scheme in URL {url.geturl()}")
+            return transport_from_url(f"scgi://{parsed_url.scheme}:{parsed_url.path}")
+        raise URLError(f"Unsupported scheme in URL {parsed_url.geturl()}")
     return transport
 
 
@@ -127,7 +127,7 @@ def _encode_headers(headers: List[Tuple[str, str]]) -> bytes:
     )
 
 
-def _encode_payload(data: bytes, headers=None) -> bytes:
+def _encode_payload(data: bytes, headers: List[Tuple[str, str]]=None) -> bytes:
     "Wrap data in an SCGI request."
     prolog: bytes = b"CONTENT_LENGTH\0%d\0SCGI\x001\0" % len(data)
     if headers:

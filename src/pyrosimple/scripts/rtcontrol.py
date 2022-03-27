@@ -26,7 +26,7 @@ import subprocess
 import sys
 import time
 
-from typing import Optional
+from typing import Optional, Union, Callable
 
 import daemon  # type: ignore
 
@@ -513,7 +513,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         return item_text
 
     def emit(
-        self, item, defaults=None, stencil=None, to_log=False, item_formatter=None
+        self, item, defaults=None, stencil=None, to_log: Union[bool,Callable] =False, item_formatter=None
     ) -> int:
         """Print an item to stdout, or the log on INFO level."""
         item_text: str = self.format_item(item, defaults, stencil)
@@ -580,14 +580,13 @@ class RtorrentControl(ScriptBaseWithConfig):
         """Get field names from output template."""
         # Re-engineer list from output format
         # XXX TODO: Would be better to use a FieldRecorder class to catch the full field names
-        emit_fields = list(
-            i.lower() for i in re.sub(b"[^_A-Z]+", b" ", self.format_item(None)).split()
+        emit_fields: List[str] = list(
+            i.lower() for i in re.sub("[^_A-Z]+", " ", self.format_item(None)).split()
         )
 
         # Validate result
         result = []
         for name in emit_fields[:]:
-            name = name.decode()
             if name not in engine.FieldDefinition.FIELDS:
                 self.LOG.warning(
                     "Omitted unknown name '%s' from statistics and output format sorting",
