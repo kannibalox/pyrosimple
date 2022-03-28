@@ -409,7 +409,10 @@ class RtorrentControl(ScriptBaseWithConfig):
             help="enable query optimization (=: use config; 0: off; 1: safe; 2: danger seeker)",
         )
         self.add_value_option(
-            "--call", "CMD", help="call an OS command pattern in the shell"
+            "--call", "CMD",
+            action="append",
+            default=[],
+            help="call an OS command pattern in the shell",
         )
         self.add_value_option(
             "--spawn",
@@ -514,7 +517,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def emit(
         self, item, defaults=None, stencil=None, to_log: Union[bool,Callable] =False, item_formatter=None
-    ) -> int:
+    ):
         """Print an item to stdout, or the log on INFO level."""
         item_text: str = self.format_item(item, defaults, stencil)
 
@@ -532,8 +535,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             print(item_text, end="\0")
         else:
             print(item_text)
-
-        return item_text.count("\n") + 1
 
     # TODO: refactor to formatting.OutputMapping as a class method
     def validate_output_format(self, default_format):
@@ -620,7 +621,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.LOG.info("%s%s rTorrent view %r.", msg, action_name, targetname)
         config.engine.log(msg)
 
-    def anneal(self, mode, matches, orig_matches):
+    def anneal(self, mode, matches, orig_matches) -> bool:
         """Perform post-processing.
 
         Return True when any changes were applied.
@@ -939,9 +940,10 @@ class RtorrentControl(ScriptBaseWithConfig):
 
             template_cmds = []
             if self.options.call:
-                template_cmds.append(
-                    [formatting.preparse("{{#tempita}}" + self.options.call)]
-                )
+                for cmd in self.options.call:
+                    template_cmds.append(
+                        [formatting.preparse("{{#tempita}}" + cmd)]
+                    )
             else:
                 for cmd in self.options.spawn:
                     template_cmds.append(
@@ -952,13 +954,9 @@ class RtorrentControl(ScriptBaseWithConfig):
                     )
 
             for item in matches:
-                cmds = [
+                cmds: List[str] = [
                     [output_formatter(i, namespace=dict(item=item)) for i in k]
                     for k in template_cmds
-                ]
-                cmds = [
-                    [i.decode("utf-8") if isinstance(i, bytes) else i for i in k]
-                    for k in cmds
                 ]
 
                 if self.options.dry_run:
@@ -1018,10 +1016,9 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Show on console?
         elif self.options.output_format and str(self.options.output_format) != "-":
             if not self.options.summary:
-                line_count = 0
                 for item in matches:
                     # Print matching item
-                    line_count += self.emit(item, self.FORMATTER_DEFAULTS)
+                    self.emit(item, self.FORMATTER_DEFAULTS)
 
             # Print summary?
             if matches and summary:
