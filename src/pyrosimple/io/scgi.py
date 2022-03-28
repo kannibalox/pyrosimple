@@ -127,7 +127,7 @@ def _encode_headers(headers: List[Tuple[str, str]]) -> bytes:
     )
 
 
-def _encode_payload(data: bytes, headers: List[Tuple[str, str]]=None) -> bytes:
+def _encode_payload(data: bytes, headers: List[Tuple[str, str]] = None) -> bytes:
     "Wrap data in an SCGI request."
     prolog: bytes = b"CONTENT_LENGTH\0%d\0SCGI\x001\0" % len(data)
     if headers:

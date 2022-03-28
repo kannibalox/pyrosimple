@@ -390,4 +390,3 @@ class PromptDecorator:
         """Exit the program due to user's choices."""
         self.script.LOG.warn("Abort due to user choice!")
         sys.exit(error.EX_TEMPFAIL)
-

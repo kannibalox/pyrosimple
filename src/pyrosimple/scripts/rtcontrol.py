@@ -26,7 +26,7 @@ import subprocess
 import sys
 import time
 
-from typing import Optional, Union, Callable
+from typing import Callable, Optional, Union
 
 import daemon  # type: ignore
 
@@ -409,7 +409,8 @@ class RtorrentControl(ScriptBaseWithConfig):
             help="enable query optimization (=: use config; 0: off; 1: safe; 2: danger seeker)",
         )
         self.add_value_option(
-            "--call", "CMD",
+            "--call",
+            "CMD",
             action="append",
             default=[],
             help="call an OS command pattern in the shell",
@@ -516,7 +517,12 @@ class RtorrentControl(ScriptBaseWithConfig):
         return item_text
 
     def emit(
-        self, item, defaults=None, stencil=None, to_log: Union[bool,Callable] =False, item_formatter=None
+        self,
+        item,
+        defaults=None,
+        stencil=None,
+        to_log: Union[bool, Callable] = False,
+        item_formatter=None,
     ):
         """Print an item to stdout, or the log on INFO level."""
         item_text: str = self.format_item(item, defaults, stencil)
@@ -941,9 +947,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             template_cmds = []
             if self.options.call:
                 for cmd in self.options.call:
-                    template_cmds.append(
-                        [formatting.preparse("{{#tempita}}" + cmd)]
-                    )
+                    template_cmds.append([formatting.preparse("{{#tempita}}" + cmd)])
             else:
                 for cmd in self.options.spawn:
                     template_cmds.append(
