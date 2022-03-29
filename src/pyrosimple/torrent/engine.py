@@ -23,7 +23,7 @@ import re
 import time
 
 from collections import defaultdict
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional, Set, Callable
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, os, pymagic, rpc, traits
@@ -230,8 +230,8 @@ class FieldDefinition:
     def __init__(
         self,
         valtype,
-        name,
-        doc,
+        name: str,
+        doc: str,
         accessor=None,
         matcher=None,
         formatter=None,
@@ -286,6 +286,10 @@ class DynamicField(ImmutableField):
     """Read-only download item field with dynamic value."""
 
     # This cannot be cached
+    def __get__(self, obj, cls=None):
+        if obj and self.name not in obj._fields:
+            obj.fetch(self.name, self._engine_name)
+        return super().__get__(obj, cls)
 
 
 class OnDemandField(DynamicField):
@@ -293,10 +297,29 @@ class OnDemandField(DynamicField):
 
 class MutableField(FieldDefinition):
     """Writable download item field"""
+    def __init__(
+        self,
+        valtype,
+        name,
+        doc,
+        accessor=None,
+        matcher=None,
+        formatter=None,
+        engine_name=None,
+        setter: Callable =None,
+    ):
+        super().__init__(valtype, name, doc, accessor, matcher, formatter, engine_name)
+        self._setter=setter
 
-    def __set__(self, obj, val):
-        raise NotImplementedError()
+    def __set__(self, obj, val, cls=None):
+        if self._setter is None:
+            raise NotImplementedError
+        self._setter(obj, val)
 
+    def __get__(self, obj, cls=None):
+        if obj and self.name not in obj._fields:
+            obj.fetch(self.name, self._engine_name)
+        return super().__get__(obj, cls)
 
 #
 # [Somewhat] Generic Engine Interface (abstract base classes)
@@ -516,12 +539,13 @@ class TorrentProxy:
         matcher=matching.BoolFilter,
         formatter=lambda val: "DIR " if val else "FILE",
     )
-    is_ignored = DynamicField(
+    is_ignored = MutableField(
         bool,
         "is_ignored",
         "ignore commands?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "IGN!" if int(val) else "HEED",
+        setter=lambda o, val: o.ignore(int(val))
     )
     is_ghost = DynamicField(
         bool,
@@ -769,7 +793,7 @@ class TorrentView:
 
         return self._items
 
-    def _check_hash_view(self):
+    def _check_hash_view(self) -> Optional[str]:
         """Return infohash if view name refers to a single item, else None."""
         infohash = None
         if self.viewname.startswith("#"):
