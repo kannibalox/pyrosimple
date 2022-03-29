@@ -26,7 +26,7 @@ import subprocess
 import sys
 import time
 
-from typing import Callable, Optional, Union
+from typing import Callable, List, Optional, Union
 
 import daemon  # type: ignore
 

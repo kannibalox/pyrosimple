@@ -42,7 +42,7 @@ from pyrosimple import config, error
 from pyrosimple.util import os, pymagic
 
 
-def validate(key, val):
+def validate(val):
     """Validate a configuration value."""
     if val and val.startswith("~/"):
         return os.path.expanduser(val)
@@ -173,7 +173,7 @@ class ConfigLoader:
                 self._interpolation_escape(raw_vars)
             raw_vars.update(
                 dict(
-                    (key, validate(key, val))
+                    (key, validate(val))
                     for key, val in ini_file.items(section, vars=raw_vars)
                 )
             )

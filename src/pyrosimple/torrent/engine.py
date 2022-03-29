@@ -23,7 +23,7 @@ import re
 import time
 
 from collections import defaultdict
-from typing import Any, Dict, Set
+from typing import Any, Dict, Optional, Set
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, os, pymagic, rpc, traits
@@ -42,19 +42,19 @@ def ratio_float(intval: float) -> float:
     return intval / 1000.0
 
 
-def percent(floatval):
+def percent(floatval: float) -> float:
     """Convert float ratio to a percent value."""
     return floatval * 100.0
 
 
-def _duration(start, end):
+def _duration(start: Optional[float], end: Optional[float]) -> Optional[float]:
     """Return time delta."""
-    if start and end:
+    if start is not None and end is not None:
         if start > end:
             return None
         else:
             return end - start
-    elif start:
+    elif start is not None:
         return time.time() - start
     else:
         return None

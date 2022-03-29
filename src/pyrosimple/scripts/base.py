@@ -315,7 +315,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
             except ValueError as exc:
                 raise error.UserError("Bad config override %r (%s)" % (key_val, exc))
             else:
-                setattr(config, key, load_config.validate(key, val))
+                setattr(config, key, load_config.validate(val))
 
     def check_for_connection(self):
         """Scan arguments for a `@name` one."""
