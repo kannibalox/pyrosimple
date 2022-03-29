@@ -775,10 +775,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             except (ValueError, TypeError) as exc:
                 self.fatal("Bad selection '%s' (%s)" % (self.options.select, exc))
 
-        #        print repr(config.engine)
-        #        config.engine.open()
-        #        print repr(config.engine)
-
         # Preparation steps
         if self.options.fast_query != "=":
             config.fast_query = int(self.options.fast_query)
@@ -853,6 +849,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             stencil = formatting.format_item(
                 self.options.output_format, matches[0], self.FORMATTER_DEFAULTS
             ).split("\t")
+            self.emit(item=None, stencil=stencil)
 
         # Tee to ncurses view, if requested
         if self.options.tee_view and (self.options.to_view or self.options.view_only):
