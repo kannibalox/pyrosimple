@@ -631,7 +631,7 @@ class TorrentProxy:
         "uploaded",
         "amount of uploaded data",
         matcher=matching.ByteSizeFilter,
-        engine_name="up_total",
+        engine_name="up.total",
     )
     xfer = DynamicField(
         int,
