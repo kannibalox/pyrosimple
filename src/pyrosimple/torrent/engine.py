@@ -289,13 +289,7 @@ class DynamicField(ImmutableField):
 
 
 class OnDemandField(DynamicField):
-    """Field that is fetched on first access only."""
-
-    def __get__(self, obj, cls=None):
-        if obj and self.name not in obj._fields:
-            obj.fetch(self.name, self._engine_name)
-        return super().__get__(obj, cls)
-
+    """Only exists for backwards compatiblity."""
 
 class MutableField(FieldDefinition):
     """Writable download item field"""
@@ -320,7 +314,7 @@ class TorrentProxy:
             try:
                 return FieldDefinition.FIELDS[name]
             except KeyError:
-                field = OnDemandField(
+                field = DynamicField(
                     str,
                     name,
                     "custom attribute %r" % name.split("_", 1)[1],
@@ -337,7 +331,7 @@ class TorrentProxy:
                 limit = int(name[5:].lstrip("0") or "0", 10)
                 if limit > 100:
                     raise error.UserError("kind_N: N > 100 in %r" % name)
-                field = OnDemandField(
+                field = DynamicField(
                     set,
                     name,
                     "kinds of files that make up more than %d%% of this item's size"
@@ -460,7 +454,7 @@ class TorrentProxy:
         str, "name", "name (file or root directory)", matcher=matching.PatternFilter
     )
     size = ConstantField(int, "size", "data size", matcher=matching.ByteSizeFilter)
-    prio = OnDemandField(
+    prio = MutableField(
         int,
         "prio",
         "priority (0=off, 1=low, 2=normal, 3=high)",
@@ -482,7 +476,7 @@ class TorrentProxy:
         accessor=lambda o: o._memoize("alias", getattr, o, "tracker"),
     )
     # matcher=matching.PatternFilter, accessor=operator.attrgetter("tracker"))
-    message = OnDemandField(
+    message = DynamicField(
         str, "message", "current tracker message", matcher=matching.PatternFilter
     )
 
@@ -515,14 +509,14 @@ class TorrentProxy:
         matcher=matching.BoolFilter,
         formatter=lambda val: "DONE" if val else "PART",
     )
-    is_multi_file = OnDemandField(
+    is_multi_file = ConstantField(
         bool,
         "is_multi_file",
         "single- or multi-file download?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "DIR " if val else "FILE",
     )
-    is_ignored = OnDemandField(
+    is_ignored = DynamicField(
         bool,
         "is_ignored",
         "ignore commands?",
@@ -567,7 +561,7 @@ class TorrentProxy:
             * d.directory_base.set means set path PLUS basename together for a multi item (thus allowing a rename)
             * only d.directory.set behaves consistently for single+multi, regarding the end result in d.base_path
     """
-    directory = OnDemandField(
+    directory = DynamicField(
         str,
         "directory",
         "directory containing download data",
@@ -601,14 +595,14 @@ class TorrentProxy:
         matcher=matching.PatternFilter,
         accessor=lambda o: os.path.expanduser(str(o.fetch("session_file"))),
     )
-    files = OnDemandField(
+    files = ConstantField(
         list,
         "files",
         "list of files in this item",
         matcher=matching.FilesFilter,
         formatter=_fmt_files,
     )
-    fno = OnDemandField(
+    fno = ConstantField(
         int,
         "fno",
         "number of files in this item",
@@ -617,7 +611,7 @@ class TorrentProxy:
     )
 
     # Bandwidth & Data Transfer
-    done = OnDemandField(
+    done = DynamicField(
         percent, "done", "completion in percent", matcher=matching.FloatFilter
     )
     ratio = DynamicField(
@@ -626,7 +620,7 @@ class TorrentProxy:
         "normalized ratio (1:1 = 1.0)",
         matcher=matching.FloatFilter,
     )
-    uploaded = OnDemandField(
+    uploaded = DynamicField(
         int,
         "uploaded",
         "amount of uploaded data",
@@ -644,7 +638,7 @@ class TorrentProxy:
     #     accessor=lambda o: int(o.fetch("timestamp.last_xfer") or 0), formatter=fmt.iso_datetime_optional)
     down = DynamicField(int, "down", "download rate", matcher=matching.ByteSizeFilter)
     up = DynamicField(int, "up", "upload rate", matcher=matching.ByteSizeFilter)
-    throttle = OnDemandField(
+    throttle = DynamicField(
         str,
         "throttle",
         "throttle group name (NULL=unlimited, NONE=global)",
@@ -716,7 +710,7 @@ class TorrentProxy:
         accessor=lambda o: set(o.fetch("custom_tags").lower().split()),
         formatter=_fmt_tags,
     )
-    views = OnDemandField(
+    views = DynamicField(
         set,
         "views",
         "views this item is attached to",
