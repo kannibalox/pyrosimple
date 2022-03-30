@@ -191,6 +191,12 @@ class RtorrentItem(engine.TorrentProxy):
         """Return known fields."""
         return self._fields.copy()
 
+    def rpc_call(self, method: str, args: Optional[List] = None):
+        if args is None:
+            args = []
+        getter = getattr(self._engine._rpc.d, method)
+        return getter(self._fields["hash"], *args)
+
     def fetch(self, name, engine_name=None, cache: bool = True):
         """Get a field on demand."""
         # TODO: Get each on-demand field in a multicall for all other items, since
@@ -203,7 +209,6 @@ class RtorrentItem(engine.TorrentProxy):
                 pass
         if isinstance(name, int):
             name = "custom_%d" % name
-
         if name == "done":
             val = float(self.fetch("completed_chunks")) / self.fetch("size_chunks")
         elif name == "files":
@@ -283,9 +288,7 @@ class RtorrentItem(engine.TorrentProxy):
 
     def ignore(self, flag: int):
         """Set ignore status."""
-        self._make_it_so(
-            "setting ignore status for", ["ignore_commands.set"], flag
-        )
+        self._make_it_so("setting ignore status for", ["ignore_commands.set"], flag)
         self._fields["is_ignored"] = flag
 
     def set_prio(self, prio: int):
@@ -633,6 +636,7 @@ class RtorrentEngine(engine.TorrentEngine):
         is_ignored="ignore_commands",
         down="down.rate",
         up="up.rate",
+        uploaded="up.total",
         path="base_path",
         metafile="tied_to_file",
         size="size_bytes",

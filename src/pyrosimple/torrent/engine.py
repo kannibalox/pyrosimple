@@ -23,7 +23,7 @@ import re
 import time
 
 from collections import defaultdict
-from typing import Any, Dict, Optional, Set, Callable
+from typing import Any, Callable, Dict, Optional, Set
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, os, pymagic, rpc, traits
@@ -286,17 +286,15 @@ class DynamicField(ImmutableField):
     """Read-only download item field with dynamic value."""
 
     # This cannot be cached
-    def __get__(self, obj, cls=None):
-        if obj and self.name not in obj._fields:
-            obj.fetch(self.name, self._engine_name)
-        return super().__get__(obj, cls)
 
 
 class OnDemandField(DynamicField):
     """Only exists for backwards compatiblity."""
 
+
 class MutableField(FieldDefinition):
     """Writable download item field"""
+
     def __init__(
         self,
         valtype,
@@ -306,20 +304,16 @@ class MutableField(FieldDefinition):
         matcher=None,
         formatter=None,
         engine_name=None,
-        setter: Callable =None,
+        setter: Callable = None,
     ):
         super().__init__(valtype, name, doc, accessor, matcher, formatter, engine_name)
-        self._setter=setter
+        self._setter = setter
 
     def __set__(self, obj, val, cls=None):
         if self._setter is None:
             raise NotImplementedError
         self._setter(obj, val)
 
-    def __get__(self, obj, cls=None):
-        if obj and self.name not in obj._fields:
-            obj.fetch(self.name, self._engine_name)
-        return super().__get__(obj, cls)
 
 #
 # [Somewhat] Generic Engine Interface (abstract base classes)
@@ -545,7 +539,7 @@ class TorrentProxy:
         "ignore commands?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "IGN!" if int(val) else "HEED",
-        setter=lambda o, val: o.ignore(int(val))
+        setter=lambda o, val: o.ignore(int(val)),
     )
     is_ghost = DynamicField(
         bool,
@@ -625,31 +619,37 @@ class TorrentProxy:
         "list of files in this item",
         matcher=matching.FilesFilter,
         formatter=_fmt_files,
+        accessor=lambda o: o.fetch("files"),
     )
     fno = ConstantField(
         int,
         "fno",
         "number of files in this item",
         matcher=matching.FloatFilter,
-        engine_name="size_files",
+        accessor=lambda o: o.rpc_call("size_files"),
     )
 
     # Bandwidth & Data Transfer
     done = DynamicField(
-        percent, "done", "completion in percent", matcher=matching.FloatFilter
+        percent,
+        "done",
+        "completion in percent",
+        matcher=matching.FloatFilter,
+        accessor=lambda o: float(o.fetch("completed_bytes")) / o.fetch("size_bytes"),
     )
     ratio = DynamicField(
         ratio_float,
         "ratio",
         "normalized ratio (1:1 = 1.0)",
         matcher=matching.FloatFilter,
+        accessor=lambda o: o.rpc_call("ratio"),
     )
     uploaded = DynamicField(
         int,
         "uploaded",
         "amount of uploaded data",
         matcher=matching.ByteSizeFilter,
-        engine_name="up.total",
+        accessor=lambda o: o.rpc_call("up.total"),
     )
     xfer = DynamicField(
         int,
@@ -660,8 +660,20 @@ class TorrentProxy:
     )
     # last_xfer = DynamicField(int, "last_xfer", "last time data was transferred", matcher=matching.TimeFilter,
     #     accessor=lambda o: int(o.fetch("timestamp.last_xfer") or 0), formatter=fmt.iso_datetime_optional)
-    down = DynamicField(int, "down", "download rate", matcher=matching.ByteSizeFilter)
-    up = DynamicField(int, "up", "upload rate", matcher=matching.ByteSizeFilter)
+    down = DynamicField(
+        int,
+        "down",
+        "download rate",
+        matcher=matching.ByteSizeFilter,
+        accessor=lambda o: o.fetch("down"),
+    )
+    up = DynamicField(
+        int,
+        "up",
+        "upload rate",
+        matcher=matching.ByteSizeFilter,
+        accessor=lambda o: o._fields["up"],
+    )
     throttle = DynamicField(
         str,
         "throttle",
@@ -740,7 +752,7 @@ class TorrentProxy:
         "views this item is attached to",
         matcher=matching.TaggedAsFilter,
         formatter=_fmt_tags,
-        engine_name="=views",
+        accessor=lambda o: o.rpc_call("views"),
     )
     kind = DynamicField(
         set,
