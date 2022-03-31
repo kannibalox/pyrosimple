@@ -244,6 +244,8 @@ class FieldDefinition:
         self._accessor = accessor
         self._matcher = matcher
         self._formatter = formatter
+        if accessor is None:
+            self._accessor = lambda o: o.fetch(name)
 
         if name in FieldDefinition.FIELDS:
             raise RuntimeError("INTERNAL ERROR: Duplicate field definition")
@@ -619,7 +621,7 @@ class TorrentProxy:
         "list of files in this item",
         matcher=matching.FilesFilter,
         formatter=_fmt_files,
-        accessor=lambda o: o.fetch("files"),
+        accessor=lambda o: o._get_files(),
     )
     fno = ConstantField(
         int,
