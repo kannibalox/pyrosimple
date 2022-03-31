@@ -211,11 +211,7 @@ class RtorrentItem(engine.TorrentProxy):
                 pass
         if isinstance(name, int):
             name = "custom_%d" % name
-        if name == "done":
-            val = float(self.fetch("completed_chunks")) / self.fetch("size_chunks")
-        elif name == "files":
-            val = self._get_files()
-        elif name.startswith("kind_") and name[5:].isdigit():
+        if name.startswith("kind_") and name[5:].isdigit():
             val = self._get_kind(int(name[5:], 10))
         elif name.startswith("custom_"):
             key = name[7:]
