@@ -17,6 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import functools
 import json
 import logging
 import random
@@ -32,6 +33,18 @@ logger = logging.getLogger(__name__)
 NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
+
+# Store these results in a LRU cache
+# MUST be constant return values for all possible arguments
+# N.B. The inclusion of d.* methods means it's possible
+# for client code to get valid results for hashes that have
+# been removed.
+CACHE_METHOD = {
+    "d.size_bytes",
+    "d.size_files",
+    "d.name",
+    "d.chunk_size",
+}
 
 
 class XmlRpcError(xmlrpclib.Fault):
@@ -143,7 +156,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if not params:
             params = [""]
 
-        # This feels silly but there's not much need for anything better ATM.
+        # This feels silly but there's not much need for anything better at the moment.
         rpc_id = random.randint(0, 100)
         request = json.dumps(
             {
@@ -170,7 +183,20 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         return response["result"]
 
     def __request(self, methodname, params):
-        # call a method on the remote server
+        """Determines whether or not a request should be cached,
+        then passes it to the appropriate method"""
+        if methodname in CACHE_METHOD:
+            return self.__cached_request(methodname, params)
+        return self.__request_switch(methodname, params)
+
+    @functools.lru_cache(maxsize=32)
+    def __cached_request(self, methodname, params):
+        """Simpled cache pass-through method to more easily take advantage of functools.lru_cache"""
+        return self.__request_switch(methodname, params)
+
+    def __request_switch(self, methodname, params):
+        """Determines whether the request should go through
+        xml or json and calls the appropriate method."""
         logger.debug("method '%s', params %s", methodname, params)
         try:
             if self.__rpc_codec == "xml":
