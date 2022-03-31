@@ -53,7 +53,7 @@ class RtorrentItem(engine.TorrentProxy):
         """Initialize download item."""
         super().__init__()
         self._engine = engine_
-        self._fields = dict(fields)
+        self._fields = dict(fields)  # Acts a cache for the item
 
     def _make_it_so(self, command: str, calls: List[str], *args, **kwargs):
         """Perform some error-checked RPC calls."""
@@ -198,7 +198,9 @@ class RtorrentItem(engine.TorrentProxy):
         return getter(self._fields["hash"], *args)
 
     def fetch(self, name, engine_name=None, cache: bool = True):
-        """Get a field on demand."""
+        """Get a field on demand. By 'on demand', this means that the field may possibly be created
+        if it does not already exists (e.g. custom fields). It also allows directly controlling if the _fields cache
+        should be used"""
         # TODO: Get each on-demand field in a multicall for all other items, since
         # we likely need it anyway; another (more easy) way would be to pre-fetch dynamically
         # with the list of fields from filters and output formats
