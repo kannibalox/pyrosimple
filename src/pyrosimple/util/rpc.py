@@ -34,16 +34,22 @@ NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
 
-# Store these results in a LRU cache
+# Store these results in a LRU cache, primarily helps with code that
+# performs a method call in some sort of loop
 # MUST be constant return values for all possible arguments
 # N.B. The inclusion of d.* methods means it's possible
 # for client code to get valid results for hashes that have
 # been removed.
 CACHE_METHOD = {
-    "d.size_bytes",
-    "d.size_files",
-    "d.name",
     "d.chunk_size",
+    "d.is_private",
+    "d.name",
+    "d.size_bytes",
+    "d.size_chunks",
+    "d.size_files",
+    "system.api_version",
+    "system.client_version",
+    "system.library_version",
 }
 
 
