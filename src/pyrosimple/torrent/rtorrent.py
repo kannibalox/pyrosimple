@@ -192,12 +192,13 @@ class RtorrentItem(engine.TorrentProxy):
         return self._fields.copy()
 
     def rpc_call(self, method: str, args: Optional[List] = None):
+        """Directly call rpc for item-specific information"""
         if args is None:
             args = []
         getter = getattr(self._engine._rpc.d, method)
         return getter(self._fields["hash"], *args)
 
-    def fetch(self, name, cache: bool = True):
+    def fetch(self, name: str, cache: bool = True):
         """Get a field on demand. By 'on demand', this means that the field may possibly be created
         if it does not already exists (e.g. custom fields). It also allows directly controlling if the _fields cache
         should be used"""
@@ -847,10 +848,7 @@ class RtorrentEngine(engine.TorrentEngine):
             items = []
             try:
                 # Prepare multi-call arguments
-                args = [
-                    "d.%s%s" % ("" if field.startswith("is_") else "", field)
-                    for field in prefetch
-                ]
+                args = [f"d.{field}" for field in prefetch]
 
                 infohash = view._check_hash_view()
                 if infohash:

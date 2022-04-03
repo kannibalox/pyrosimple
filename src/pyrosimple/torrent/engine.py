@@ -92,7 +92,9 @@ def _interval_split(interval, only=None, event_re=re.compile("[A-Z][0-9]+")):
     )
 
 
-def _interval_sum(interval: str, start: Optional[float]=None, end: Optional[float]=None) -> Optional[int]:
+def _interval_sum(
+    interval: str, start: Optional[float] = None, end: Optional[float] = None
+) -> Optional[int]:
     """Return sum of intervals between "R"esume and "P"aused events
     in C{interval}, optionally limited by a time window defined
     by C{start} and C{end}. Return ``None`` if there's no sensible
@@ -239,12 +241,12 @@ class FieldDefinition:
         accessor=None,
         matcher=None,
         formatter=None,
-        engine_name=None,
+        requires=None,
     ):
         self.valtype = valtype
         self.name = name
         self.__doc__ = doc
-        self._engine_name = engine_name
+        self._requires = requires or []
         self._accessor = accessor
         self._matcher = matcher
         self._formatter = formatter
@@ -309,10 +311,10 @@ class MutableField(FieldDefinition):
         accessor=None,
         matcher=None,
         formatter=None,
-        engine_name=None,
+        requires=None,
         setter: Callable = None,
     ):
-        super().__init__(valtype, name, doc, accessor, matcher, formatter, engine_name)
+        super().__init__(valtype, name, doc, accessor, matcher, formatter, requires)
         self._setter = setter
 
     def __set__(self, obj, val, cls=None):
@@ -361,7 +363,7 @@ class TorrentProxy:
                     % limit,
                     matcher=matching.TaggedAsFilter,
                     formatter=_fmt_tags,
-                    engine_name="kind_%d" % limit,
+                    requires=["kind_%d" % limit],
                 )
                 setattr(cls, name, field)
 
@@ -420,10 +422,7 @@ class TorrentProxy:
         )
 
     def fetch(self, name, cache=False):
-        """Get a field on demand.
-
-        "engine_name" is the internal name of the client engine.
-        """
+        """Get a field on demand."""
         raise NotImplementedError()
 
     def datapath(self):
