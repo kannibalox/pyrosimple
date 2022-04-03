@@ -49,12 +49,16 @@ def percent(floatval: float) -> float:
 
 def _duration(start: Optional[float], end: Optional[float]) -> Optional[float]:
     """Return time delta."""
-    if start is not None and end is not None:
+    if start is None:
+        start = 0.0
+    if end is None:
+        end = 0.0
+    if start and end:
         if start > end:
             return None
         else:
             return end - start
-    elif start is not None:
+    elif start:
         return time.time() - start
     else:
         return None
@@ -88,7 +92,7 @@ def _interval_split(interval, only=None, event_re=re.compile("[A-Z][0-9]+")):
     )
 
 
-def _interval_sum(interval, start=None, end=None):
+def _interval_sum(interval: str, start: Optional[float]=None, end: Optional[float]=None) -> Optional[int]:
     """Return sum of intervals between "R"esume and "P"aused events
     in C{interval}, optionally limited by a time window defined
     by C{start} and C{end}. Return ``None`` if there's no sensible
@@ -415,7 +419,7 @@ class TorrentProxy:
             ),
         )
 
-    def fetch(self, name, engine_name=None, cache=False):
+    def fetch(self, name, cache=False):
         """Get a field on demand.
 
         "engine_name" is the internal name of the client engine.
