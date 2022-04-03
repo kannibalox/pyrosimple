@@ -1027,22 +1027,22 @@ class RtorrentControl(ScriptBaseWithConfig):
                 self.emit(
                     summary.total,
                     item_formatter=lambda i: i.rstrip()
-                    + b" [SUM of %d item(s)]" % len(matches),
+                    + " [SUM of %d item(s)]" % len(matches),
                 )
                 self.emit(
                     summary.min,
                     item_formatter=lambda i: i.rstrip()
-                    + b" [MIN of %d item(s)]" % len(matches),
+                    + " [MIN of %d item(s)]" % len(matches),
                 )
                 self.emit(
                     summary.average,
                     item_formatter=lambda i: i.rstrip()
-                    + b" [AVG of %d item(s)]" % len(matches),
+                    + " [AVG of %d item(s)]" % len(matches),
                 )
                 self.emit(
                     summary.max,
                     item_formatter=lambda i: i.rstrip()
-                    + b" [MAX of %d item(s)]" % len(matches),
+                    + " [MAX of %d item(s)]" % len(matches),
                 )
 
             self.LOG.info(
