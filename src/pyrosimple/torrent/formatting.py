@@ -29,7 +29,7 @@ from typing import Any, Dict, Union
 import tempita
 
 from pyrosimple import config, error
-from pyrosimple.torrent import engine
+from pyrosimple.torrent import engine, rtorrent
 from pyrosimple.util import fmt, os, pymagic, templating
 from pyrosimple.util.parts import Bunch
 
@@ -294,7 +294,7 @@ def expand_template(template: tempita.Template, namespace: Dict) -> str:
         )
 
 
-def format_item(format_spec, item: Union[Dict, str], defaults=None) -> str:
+def format_item(format_spec, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None) -> str:
     """Format an item according to the given output format.
     The format can be gioven as either an interpolation string,
     or a Tempita template (which has to start with "E{lb}E{lb}"),
@@ -345,7 +345,7 @@ def format_item(format_spec, item: Union[Dict, str], defaults=None) -> str:
         return str(format_spec % OutputMapping(item, defaults))
 
 
-def validate_field_list(fields, allow_fmt_specs=False, name_filter=None):
+def validate_field_list(fields: str, allow_fmt_specs=False, name_filter=None):
     """Make sure the fields in the given list exist.
 
     @param fields: List of fields (comma-/space-separated if a string).
