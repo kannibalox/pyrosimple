@@ -19,13 +19,21 @@
 
 import concurrent.futures
 import hashlib
+import os
 import shutil
 import time
+import xmlrpc.client
+
+from pathlib import Path
+from time import sleep
+from typing import Dict, List
+
+import bencode
 
 from pyrosimple import config as config_ini
 from pyrosimple import error
 from pyrosimple.torrent import engine, formatting, matching, rtorrent
-from pyrosimple.util import fmt, pymagic, rpc, templating
+from pyrosimple.util import fmt, metafile, pymagic, rpc, templating
 from pyrosimple.util.parts import Bunch
 
 
@@ -126,7 +134,8 @@ class PathMover:
             self.LOG.warning(str(exc))
 
 
-def nodes_by_hash_weight(meta_id: str, nodes: str):
+def nodes_by_hash_weight(meta_id: str, nodes: List[str]) -> Dict[str, int]:
+    """Weight nodes by hashing the meta_id"""
     result = {
         n: int.from_bytes(hashlib.sha256(meta_id.encode() + n.encode()).digest(), "big")
         for n in nodes
@@ -135,7 +144,7 @@ def nodes_by_hash_weight(meta_id: str, nodes: str):
 
 
 def get_custom_fields(infohash, proxy):
-    # Try rtorrent-ps commands, otherwise fall back to reading from a session file
+    """Try using rtorrent-ps commands to list custom keys, otherwise fall back to reading from a session file."""
     if "d.custom.keys" in proxy.system.listMethods():
         custom_fields = {}
         for key in proxy.d.custom.keys(infohash):
@@ -160,6 +169,7 @@ class Mover:
         keep_basedir=True,
         copy=False,
     ):
+        """Moves a torrent to a specific host"""
         if extra_cmds is None:
             extra_cmds = []
         self.LOG.debug(
@@ -190,7 +200,7 @@ class Mover:
             )
             metafile.add_fast_resume(torrent, self.proxy.d.directory_base(infohash))
 
-        xml_metafile = xmlrpc_client.Binary(bencode.bencode(torrent))
+        xml_metafile = xmlrpc.client.Binary(bencode.bencode(torrent))
 
         if not copy:
             self.proxy.d.stop(infohash)
@@ -218,9 +228,11 @@ class Mover:
         return True
 
     def __init__(self, config=None):
+        """Initalize torrent mover job"""
         self.config = config or Bunch()
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug("Statistics logger created with config %r", self.config)
+        self.proxy = None
 
     def run(self):
         """Statistics logger job callback."""
@@ -233,20 +245,15 @@ class Mover:
             view.matcher = matcher
             hosts = self.config.hosts.split(",")
             for i in config_ini.engine.items(view, cache=False):
-                if matcher(i):
-                    if len(hosts) == 1:
-                        rproxy = rpc.RTorrentProxy(hosts[0])
-                        self.move(i.hash, rproxy)
-                    else:
-                        for host in nodes_by_hash_weight(i.hash + i.alias, hosts):
-                            rproxy = rpc.RTorrentProxy(host)
-                            metahash = i.hash
-                            if self.move(metahash, rproxy):
-                                self.LOG.info(
-                                    "Archived {} to {}".format(
-                                        metahash, rproxy.system.hostname()
-                                    )
-                                )
-                                break
+                for host in nodes_by_hash_weight(i.hash + i.alias, hosts):
+                    rproxy = rpc.RTorrentProxy(host)
+                    metahash = i.hash
+                    if self.move(metahash, rproxy):
+                        self.LOG.info(
+                            "Archived {} to {}".format(
+                                metahash, rproxy.system.hostname()
+                            )
+                        )
+                        break
         except (error.LoggableError, *rpc.ERRORS) as exc:
             self.LOG.warning(str(exc))
