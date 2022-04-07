@@ -24,7 +24,7 @@ import operator
 import re
 import sys
 
-from typing import Any, Dict, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import tempita
 
@@ -53,7 +53,7 @@ def fmt_iso(timestamp: float) -> str:
         return "N/A".rjust(len(fmt.iso_datetime(0)))
 
 
-def fmt_duration(duration: int):
+def fmt_duration(duration: int) -> str:
     """Format a duration value in seconds to a readable form."""
     try:
         return fmt.human_duration(float(duration), 0, 2, True)
@@ -61,7 +61,7 @@ def fmt_duration(duration: int):
         return "N/A".rjust(len(fmt.human_duration(0, 0, 2, True)))
 
 
-def fmt_delta(timestamp):
+def fmt_delta(timestamp) -> str:
     """Format a UNIX timestamp to a delta (relative to now)."""
     try:
         return fmt.human_duration(float(timestamp), precision=2, short=True)
@@ -74,7 +74,7 @@ def fmt_pc(floatval: float):
     return round(float(floatval) * 100.0, 2)
 
 
-def fmt_strip(val):
+def fmt_strip(val: str) -> str:
     """Strip leading and trailing whitespace."""
     return str(val).strip()
 
@@ -89,17 +89,17 @@ def fmt_mtime(val: str) -> float:
     return os.path.getmtime(val) if val else 0.0
 
 
-def fmt_pathbase(val: str):
+def fmt_pathbase(val: str) -> str:
     """Base name of a path."""
     return os.path.basename(val or "")
 
 
-def fmt_pathname(val: str):
+def fmt_pathname(val: str) -> str:
     """Base name of a path, without its extension."""
     return os.path.splitext(os.path.basename(val or ""))[0]
 
 
-def fmt_pathext(val: str):
+def fmt_pathext(val: str) -> str:
     """Extension of a path (including the '.')."""
     return os.path.splitext(val or "")[1]
 
@@ -347,7 +347,11 @@ def format_item(
         return str(format_spec % OutputMapping(item, defaults))
 
 
-def validate_field_list(fields: str, allow_fmt_specs=False, name_filter=None):
+def validate_field_list(
+    fields: str,
+    allow_fmt_specs=False,
+    name_filter: Optional[Callable[[str], str]] = None,
+):
     """Make sure the fields in the given list exist.
 
     @param fields: List of fields (comma-/space-separated if a string).
@@ -358,15 +362,15 @@ def validate_field_list(fields: str, allow_fmt_specs=False, name_filter=None):
     formats = [i[4:] for i in globals() if i.startswith("fmt_")]
 
     try:
-        fields = [i.strip() for i in fields.replace(",", " ").split()]
+        split_fields = [i.strip() for i in fields.replace(",", " ").split()]
     except AttributeError:
         # Not a string, expecting an iterable
         pass
 
     if name_filter:
-        fields = [name_filter(name) for name in fields]
+        split_fields = [name_filter(name) for name in split_fields]
 
-    for name in fields:
+    for name in split_fields:
         if allow_fmt_specs and "." in name:
             fullname = name
             name, fmtspecs = name.split(".", 1)
@@ -393,7 +397,7 @@ def validate_sort_fields(sort_fields):
     # Allow descending order per field by prefixing with '-'
     descending = set()
 
-    def sort_order_filter(name):
+    def sort_order_filter(name: str) -> str:
         "Helper to remove flag and memoize sort order"
         if name.startswith("-"):
             name = name[1:]
