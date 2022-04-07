@@ -294,7 +294,9 @@ def expand_template(template: tempita.Template, namespace: Dict) -> str:
         )
 
 
-def format_item(format_spec, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None) -> str:
+def format_item(
+    format_spec, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
+) -> str:
     """Format an item according to the given output format.
     The format can be gioven as either an interpolation string,
     or a Tempita template (which has to start with "E{lb}E{lb}"),

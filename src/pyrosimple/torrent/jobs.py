@@ -18,14 +18,15 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import concurrent.futures
+import hashlib
 import shutil
 import time
 
 from pyrosimple import config as config_ini
 from pyrosimple import error
+from pyrosimple.torrent import engine, formatting, matching, rtorrent
 from pyrosimple.util import fmt, pymagic, rpc, templating
 from pyrosimple.util.parts import Bunch
-from pyrosimple.torrent import engine, matching, formatting, rtorrent
 
 
 class EngineStats:
@@ -121,5 +122,131 @@ class PathMover:
                     exc = future.result()
                     if exc is not None:
                         self.LOG.error("Could not move: %s: %s", future, exc)
+        except (error.LoggableError, *rpc.ERRORS) as exc:
+            self.LOG.warning(str(exc))
+
+
+def nodes_by_hash_weight(meta_id: str, nodes: str):
+    result = {
+        n: int.from_bytes(hashlib.sha256(meta_id.encode() + n.encode()).digest(), "big")
+        for n in nodes
+    }
+    return dict(sorted(result.items(), key=lambda item: item[1]))
+
+
+def get_custom_fields(infohash, proxy):
+    # Try rtorrent-ps commands, otherwise fall back to reading from a session file
+    if "d.custom.keys" in proxy.system.listMethods():
+        custom_fields = {}
+        for key in proxy.d.custom.keys(infohash):
+            custom_fields[key] = proxy.d.custom(infohash, key)
+    else:
+        info_file = Path(proxy.session.path(), "{}.torrent.rtorrent".format(infohash))
+        proxy.d.save_full_session(infohash)
+        with open(info_file, "rb") as fh:
+            custom_fields = bencode.bread(fh)["custom"]
+    return custom_fields
+
+
+class Mover:
+    """Move torrent to remote host(s)"""
+
+    def move(
+        self,
+        infohash,
+        remote_proxy,
+        fast_resume=True,
+        extra_cmds=None,
+        keep_basedir=True,
+        copy=False,
+    ):
+        if extra_cmds is None:
+            extra_cmds = []
+        self.LOG.debug(
+            "Attempting to %s %s",
+            "copy" if copy else "move",
+            infohash,
+        )
+        try:
+            remote_proxy.d.hash(infohash)
+        except rpc.HashNotFound:
+            pass
+        else:
+            self.LOG.warning("Hash exists remotely")
+            return False
+
+        torrent = bencode.bread(
+            os.path.join(self.proxy.session.path(), "{}.torrent".format(infohash))
+        )
+
+        if keep_basedir:
+            esc_basedir = self.proxy.d.directory_base(infohash).replace('"', '"')
+            extra_cmds.insert(0, 'd.directory_base.set="{}"'.format(esc_basedir))
+
+        if self.proxy.d.complete(infohash) == 1 and fast_resume:
+            self.LOG.debug(
+                "Setting fast resume data from %s",
+                self.proxy.d.directory_base(infohash),
+            )
+            metafile.add_fast_resume(torrent, self.proxy.d.directory_base(infohash))
+
+        xml_metafile = xmlrpc_client.Binary(bencode.bencode(torrent))
+
+        if not copy:
+            self.proxy.d.stop(infohash)
+        self.LOG.debug("Running extra commands on load: {}".format(extra_cmds))
+        remote_proxy.load.raw("", xml_metafile, *extra_cmds)
+        for _ in range(0, 5):
+            try:
+                remote_proxy.d.hash(infohash)
+            except rpc.HashNotFound:
+                sleep(1)
+        # After 10 seconds, let the exception happen
+        remote_proxy.d.hash(infohash)
+
+        # Keep custom values
+        for k, v in get_custom_fields(infohash, self.proxy).items():
+            remote_proxy.d.custom.set(infohash, k, v)
+        for key in range(1, 5):
+            value = getattr(self.proxy.d, "custom{}".format(key))(infohash)
+            getattr(remote_proxy.d, "custom{}.set".format(key))(infohash, value)
+
+        if fast_resume:
+            remote_proxy.d.start(infohash)
+        if not copy:
+            self.proxy.d.erase(infohash)
+        return True
+
+    def __init__(self, config=None):
+        self.config = config or Bunch()
+        self.LOG = pymagic.get_class_logger(self)
+        self.LOG.debug("Statistics logger created with config %r", self.config)
+
+    def run(self):
+        """Statistics logger job callback."""
+        try:
+            self.proxy = config_ini.engine.open()
+            matcher = matching.ConditionParser(
+                engine.FieldDefinition.lookup, "name"
+            ).parse(f"{self.config.matcher}")
+            view = engine.TorrentView(config_ini.engine, "default")
+            view.matcher = matcher
+            hosts = self.config.hosts.split(",")
+            for i in config_ini.engine.items(view, cache=False):
+                if matcher(i):
+                    if len(hosts) == 1:
+                        rproxy = rpc.RTorrentProxy(hosts[0])
+                        self.move(i.hash, rproxy)
+                    else:
+                        for host in nodes_by_hash_weight(i.hash + i.alias, hosts):
+                            rproxy = rpc.RTorrentProxy(host)
+                            metahash = i.hash
+                            if self.move(metahash, rproxy):
+                                self.LOG.info(
+                                    "Archived {} to {}".format(
+                                        metahash, rproxy.system.hostname()
+                                    )
+                                )
+                                break
         except (error.LoggableError, *rpc.ERRORS) as exc:
             self.LOG.warning(str(exc))
