@@ -386,7 +386,7 @@ def validate_field_list(
         ):
             raise error.UserError("Unknown field name %r" % (name,))
 
-    return fields
+    return split_fields
 
 
 def validate_sort_fields(sort_fields):
