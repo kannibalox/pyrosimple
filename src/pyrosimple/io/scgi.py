@@ -35,9 +35,10 @@ class RTorrentTransport(xmlrpclib.Transport):
     """Base class for handle transports. Primaarily exists to allow
     using the same transport with a different underlying RPC mechanism"""
 
-    def __init__(self, *args, codec=xmlrpclib, **kwargs):
+    def __init__(self, *args, codec=xmlrpclib, headers=(), **kwargs):
         self.codec = codec
         self.verbose = False
+        self._headers = list(headers)
         super().__init__(*args, **kwargs)
 
     def parse_response(self, response):
