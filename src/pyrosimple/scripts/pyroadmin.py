@@ -20,11 +20,11 @@
 
 import fnmatch
 import glob
+import os
 import pprint
 import re
 import shutil
 import sys
-import os
 
 from contextlib import closing
 from pathlib import Path

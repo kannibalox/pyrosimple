@@ -21,9 +21,9 @@
 import json
 import logging
 import operator
+import os
 import re
 import sys
-import os
 
 from typing import Any, Callable, Dict, Optional, Union
 

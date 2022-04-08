@@ -19,9 +19,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import operator
+import os
 import re
 import time
-import os
 
 from collections import defaultdict
 from typing import Any, Callable, Dict, Optional, Set

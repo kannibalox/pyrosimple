@@ -22,10 +22,10 @@ import errno
 import fnmatch
 import logging
 import operator
+import os
 import shlex
 import sys
 import time
-import os
 
 from collections import namedtuple
 from functools import partial

@@ -20,9 +20,9 @@
 
 import copy
 import hashlib
+import os
 import re
 import time
-import os
 import urllib.parse
 
 import bencode  # typing: ignore

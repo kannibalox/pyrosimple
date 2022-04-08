@@ -19,10 +19,10 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import errno
-import os
 import fnmatch
 import hashlib
 import math
+import os
 import pprint
 import re
 import stat

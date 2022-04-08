@@ -19,8 +19,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import glob
-import sys
 import os
+import sys
 
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 

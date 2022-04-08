@@ -21,10 +21,10 @@
 
 import errno
 import logging.config
+import os
 import sys
 import textwrap
 import time
-import os
 
 from argparse import ArgumentParser
 from typing import List
