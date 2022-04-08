@@ -24,6 +24,7 @@ import pprint
 import re
 import shutil
 import sys
+import os
 
 from contextlib import closing
 from pathlib import Path
@@ -36,7 +37,7 @@ from six.moves import xmlrpc_client as xmlrpclib
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import fmt, load_config, matching, metafile, os
+from pyrosimple.util import fmt, load_config, matching, metafile
 
 
 class AdminTool(ScriptBaseWithConfig):

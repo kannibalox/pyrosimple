@@ -20,9 +20,9 @@
 
 import glob
 import sys
+import os
 
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import os
 
 
 class ThemeSwitcher(ScriptBaseWithConfig):

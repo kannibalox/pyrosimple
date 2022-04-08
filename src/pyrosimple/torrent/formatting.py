@@ -23,6 +23,7 @@ import logging
 import operator
 import re
 import sys
+import os
 
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -30,7 +31,7 @@ import tempita
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine, rtorrent
-from pyrosimple.util import fmt, os, pymagic, templating
+from pyrosimple.util import fmt, pymagic, templating
 from pyrosimple.util.parts import Bunch
 
 

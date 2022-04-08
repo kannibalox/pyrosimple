@@ -21,12 +21,13 @@
 import operator
 import re
 import time
+import os
 
 from collections import defaultdict
 from typing import Any, Callable, Dict, Optional, Set
 
 from pyrosimple import config, error
-from pyrosimple.util import fmt, matching, metafile, os, pymagic, rpc, traits
+from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
 
 
 #

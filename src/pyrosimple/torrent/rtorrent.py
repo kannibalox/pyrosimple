@@ -25,6 +25,7 @@ import operator
 import shlex
 import sys
 import time
+import os
 
 from collections import namedtuple
 from functools import partial
@@ -32,7 +33,7 @@ from typing import Callable, List, Optional, Set
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, load_config, matching, os, rpc, traits
+from pyrosimple.util import fmt, load_config, matching, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 

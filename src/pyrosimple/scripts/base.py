@@ -24,12 +24,13 @@ import logging.config
 import sys
 import textwrap
 import time
+import os
 
 from argparse import ArgumentParser
 from typing import List
 
 from pyrosimple import config, error
-from pyrosimple.util import load_config, os, pymagic
+from pyrosimple.util import load_config, pymagic
 
 
 class ScriptBase:

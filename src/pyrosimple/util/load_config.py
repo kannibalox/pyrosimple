@@ -26,6 +26,7 @@ import glob
 import importlib
 import importlib.resources
 import io
+import os
 import re
 import sys
 
@@ -39,7 +40,7 @@ except AttributeError:
     resources_files = importlib_resources.files
 
 from pyrosimple import config, error
-from pyrosimple.util import os, pymagic
+from pyrosimple.util import pymagic
 
 
 def validate(val):

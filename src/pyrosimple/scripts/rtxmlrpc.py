@@ -33,6 +33,8 @@ from pprint import pformat
 
 try:
     import requests
+
+    requests_found = True
 except ImportError:
     requests_found = False
 

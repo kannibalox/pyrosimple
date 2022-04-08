@@ -22,13 +22,14 @@ import copy
 import hashlib
 import re
 import time
+import os
 import urllib.parse
 
 import bencode  # typing: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import metafile, os
+from pyrosimple.util import metafile
 
 
 def replace_fields(meta, patterns):

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=I0011,C0103
 """ rTorrent Watch Jobs.
 
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>
@@ -23,6 +22,7 @@
 import asyncio
 import logging
 import time
+import os
 
 from pathlib import Path
 
@@ -30,7 +30,7 @@ from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import formatting, matching
-from pyrosimple.util import logutil, metafile, os, pymagic, rpc, traits
+from pyrosimple.util import logutil, metafile, pymagic, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
@@ -361,8 +361,9 @@ class TreeWatch:
             mask = pyinotify.ALL_EVENTS
         else:
             mask = (
-                pyinotify.IN_CLOSE_WRITE | pyinotify.IN_MOVED_TO
-            )  # bogus pylint: disable=E1101
+                pyinotify.IN_CLOSE_WRITE  # pylint: disable=no-member
+                | pyinotify.IN_MOVED_TO  # pylint: disable=no-member
+            )
 
         # Add all configured base dirs
         for path in self.config.path:
@@ -466,7 +467,7 @@ class TreeWatchCommand(ScriptBaseWithConfig):
                 )
 
     @classmethod
-    def main(cls):  # pragma: no cover
+    def main(cls):
         """The entry point."""
         ScriptBase.setup()
         cls().run()

@@ -21,13 +21,14 @@
 import hashlib
 import random
 import re
+import os
 
 from urllib.parse import parse_qs
 
 import bencode
 
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import metafile, os
+from pyrosimple.util import metafile
 
 
 class MetafileCreator(ScriptBaseWithConfig):

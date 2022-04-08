@@ -21,6 +21,7 @@
 import json
 import logging
 import re
+import os
 import shlex
 import subprocess
 import sys
@@ -33,7 +34,7 @@ import daemon  # type: ignore
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import engine, formatting
-from pyrosimple.util import matching, os, pymagic, rpc
+from pyrosimple.util import matching, pymagic, rpc
 from pyrosimple.util.parts import Bunch, DefaultBunch
 
 

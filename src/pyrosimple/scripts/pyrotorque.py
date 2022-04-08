@@ -34,7 +34,7 @@ from daemon.pidfile import TimeoutPIDLockFile
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import logutil, matching, os, pymagic
+from pyrosimple.util import logutil, matching, pymagic
 from pyrosimple.util.parts import Bunch
 
 

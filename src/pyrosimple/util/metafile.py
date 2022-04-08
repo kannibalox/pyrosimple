@@ -19,6 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import errno
+import os
 import fnmatch
 import hashlib
 import math
@@ -35,7 +36,7 @@ from typing import Generator, List, Optional, Union
 import bencode  # typing: ignore
 
 from pyrosimple import config, error
-from pyrosimple.util import fmt, os, pymagic
+from pyrosimple.util import fmt, pymagic
 from pyrosimple.util.parts import Bunch
 
 

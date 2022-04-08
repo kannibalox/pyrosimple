@@ -20,11 +20,11 @@
 
 import logging
 import re
+import os
 
 from collections import defaultdict
 
 from pyrosimple import config
-from pyrosimple.util import os
 
 
 log = logging.getLogger(__name__)

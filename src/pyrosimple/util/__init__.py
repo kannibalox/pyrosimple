@@ -2,4 +2,3 @@
 
     Copyright (c) 2010 The PyroScope Project <pyroscope.project@gmail.com>
 """
-import os
