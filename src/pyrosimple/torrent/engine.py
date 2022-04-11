@@ -394,7 +394,8 @@ class TorrentProxy:
 
     def __repr__(self):
         """Return a representation of internal state."""
-
+        # TODO: Make this not magically fetch things, so that we can better use
+        # items in log messages
         def mask(key, val):
             "helper to hide sensitive stuff"
             if key in ("tracker", "custom_m_alias"):

@@ -521,7 +521,6 @@ class TimeFilter(NumericFilterBase):
         else:
             # Something human readable
             delta = self.TIMEDELTA_RE.match(self._value)
-            ##print self.TIMEDELTA_RE.pattern
             if delta:
                 # Time delta
                 for unit, val in delta.groupdict().items():
@@ -567,9 +566,6 @@ class TimeFilter(NumericFilterBase):
                     timestamp -= now
 
         self._value = timestamp
-        ##print time.time() - self._value
-        ##print time.localtime(time.time())
-        ##print time.localtime(self._value)
 
     def validate(self):
         """Validate filter condition (template method)."""
@@ -631,8 +627,8 @@ class ByteSizeFilter(NumericFilterBase):
             self._value = float(self._value)
         except (ValueError, TypeError) as exc:
             raise FilterError(
-                "Bad numerical value %r in %r (%s)"
-                % (self._value, self._condition, exc)
+                "Bad numerical value %r in %r"
+                % (self._value, self._condition)
             ) from exc
 
         # Scale to bytes

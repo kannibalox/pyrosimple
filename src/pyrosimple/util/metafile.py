@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=
 """ Metafile Support.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -25,13 +24,12 @@ import math
 import os
 import pprint
 import re
-import stat
 import sys
 import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import Generator, List, Optional, Union
+from typing import Generator, List, Optional, Union, Dict
 
 import bencode  # typing: ignore
 
@@ -98,7 +96,7 @@ def console_progress():
         return None
 
 
-def mask_keys(announce_url: str):
+def mask_keys(announce_url: str) -> str:
     """Mask any passkeys (hex sequences) in an announce URL."""
     return PASSKEY_RE.sub(
         lambda m: m.group() if m.group() in PASSKEY_OK else "*" * len(m.group()),
@@ -196,7 +194,7 @@ def check_meta(meta):
     return meta
 
 
-def clean_meta(meta, including_info=False, logger=None):
+def clean_meta(meta: Dict, including_info: bool =False, logger=None):
     """Clean meta dict. Optionally log changes using the given logger.
 
     @param logger: If given, a callable accepting a string message.
@@ -382,7 +380,7 @@ def data_size(metadata) -> int:
     return sum([f["length"] for f in info["files"]])
 
 
-def checked_open(filename, log=None, quiet=False):
+def checked_open(filename: str, log=None, quiet=False):
     """Open and validate the given metafile.
     Optionally provide diagnostics on the passed logger, for
     invalid metafiles, which then just cause a warning but no exception.
@@ -390,9 +388,8 @@ def checked_open(filename, log=None, quiet=False):
     """
     with open(filename, "rb") as handle:
         raw_data = handle.read()
-    data: bytes = bencode.decode(raw_data)
+    data: Dict = bencode.decode(raw_data)
 
-    # pylint: disable=
     try:
         check_meta(data)
         if raw_data != bencode.encode(data):
@@ -443,7 +440,7 @@ class Metafile:
 
         return self._datapath
 
-    def _set_datapath(self, datapath):
+    def _set_datapath(self, datapath: str):
         """Set a datapath."""
         if datapath:
             self._datapath = datapath.rstrip(os.sep)
@@ -470,15 +467,14 @@ class Metafile:
                     if not any(
                         fnmatch.fnmatch(filename, pattern) for pattern in self.ignore
                     ):
-                        # yield os.path.join(dirpath[len(self.datapath)+1:], filename)
-                        yield os.path.join(dirpath, filename)
+                        yield Path(dirpath, filename)
 
         # Single file
         else:
             # Yield the filename
-            yield self.datapath
+            yield Path(self.datapath)
 
-    def _calc_size(self):
+    def _calc_size(self) -> int:
         """Get total size of "self.datapath"."""
         return sum(os.path.getsize(filename) for filename in self.walk())
 
@@ -568,7 +564,7 @@ class Metafile:
         # Return validated info dict
         return check_info(metainfo), totalhashed
 
-    def _make_meta(self, tracker_url, root_name, private, progress):
+    def _make_meta(self, tracker_url: str, root_name, private, progress):
         """Create torrent dict."""
         total_size = self._calc_size()
         if total_size:
@@ -611,8 +607,8 @@ class Metafile:
         comment=None,
         root_name=None,
         created_by=None,
-        private=False,
-        no_date=False,
+        private: bool=False,
+        no_date: bool=False,
         progress=None,
         callback=None,
     ):
