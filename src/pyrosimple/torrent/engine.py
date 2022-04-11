@@ -679,8 +679,6 @@ class TorrentProxy:
 
     def __repr__(self):
         """Return a representation of internal state."""
-        # TODO: Make this not magically fetch things, so that we can better use
-        # items in log messages
         def mask(key, val):
             "helper to hide sensitive stuff"
             if key in ("tracker", "custom_m_alias"):
@@ -688,19 +686,11 @@ class TorrentProxy:
             else:
                 return key, val
 
-        attrs = set(
-            (
-                field.name
-                for field in FieldDefinition.FIELDS.values()
-                if field._accessor or field.name in self._fields
-            )
-        )
         return "<%s(%s)>" % (
             self.__class__.__name__,
             ", ".join(
                 sorted(
-                    ["%s=%r" % mask(i, getattr(self, i)) for i in attrs]
-                    + [
+                    [
                         "%s=%r" % mask(i, self._fields[i])
                         for i in (set(self._fields) - attrs)
                     ]
