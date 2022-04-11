@@ -1,7 +1,7 @@
 # pyrosimple
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kannibalox/pyrosimple/Pylint)
-![PyPI](https://img.shields.io/pypi/v/pyrosimple)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kannibalox/pyrosimple/Pylint)](https://github.com/kannibalox/pyrosimple/actions/workflows/pylint.yml)
+[![PyPI](https://img.shields.io/pypi/v/pyrosimple)](https://pypi.org/project/pyrosimple/)
 ![PyPI -	Python Version](https://img.shields.io/pypi/pyversions/pyrosimple)
 
 A simplified and python-3 oriented version of the [pyrocore tools](https://github.com/pyroscope/pyrocore), for working with the [rTorrent client](https://github.com/rakshasa/rtorrent).
