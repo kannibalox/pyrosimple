@@ -509,7 +509,7 @@ class RtorrentItem(engine.TorrentProxy):
                     self._fields["hash"],
                 )
             )
-        if self.fetch("=is_multi_file") and os.path.isdir(self.fetch("directory")):
+        if self.fetch("is_multi_file") and os.path.isdir(self.fetch("directory")):
             dirs.add(self.fetch("directory"))
 
         for item_file in item_files:
