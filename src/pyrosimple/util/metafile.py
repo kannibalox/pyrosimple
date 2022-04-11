@@ -29,7 +29,7 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import Generator, List, Optional, Union, Dict
+from typing import Dict, Generator, List, Optional, Union
 
 import bencode  # typing: ignore
 
@@ -194,7 +194,7 @@ def check_meta(meta):
     return meta
 
 
-def clean_meta(meta: Dict, including_info: bool =False, logger=None):
+def clean_meta(meta: Dict, including_info: bool = False, logger=None):
     """Clean meta dict. Optionally log changes using the given logger.
 
     @param logger: If given, a callable accepting a string message.
@@ -498,9 +498,7 @@ class Metafile:
         for filename in walker:
             # Assemble file info
             filesize = os.path.getsize(filename)
-            filepath = filename[
-                len(self.datapath) :
-            ].lstrip(os.sep)
+            filepath = filename[len(self.datapath) :].lstrip(os.sep)
             file_list.append(
                 {
                     "length": filesize,
@@ -576,9 +574,7 @@ class Metafile:
         piece_size = 2**piece_size_exp
 
         # Build info hash
-        info, totalhashed = self._make_info(
-            piece_size, progress, sorted(self.walk())
-        )
+        info, totalhashed = self._make_info(piece_size, progress, sorted(self.walk()))
 
         # Enforce unique hash per tracker
         info["x_cross_seed"] = hashlib.md5(tracker_url.encode("utf-8")).hexdigest()
@@ -607,8 +603,8 @@ class Metafile:
         comment=None,
         root_name=None,
         created_by=None,
-        private: bool=False,
-        no_date: bool=False,
+        private: bool = False,
+        no_date: bool = False,
         progress=None,
         callback=None,
     ):

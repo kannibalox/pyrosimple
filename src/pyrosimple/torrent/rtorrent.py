@@ -46,13 +46,17 @@ class CommaLexer(shlex.shlex):
 class RtorrentItem(engine.TorrentProxy):
     """A single download item."""
 
-    def __init__(self, engine_: RtorrentEngine, fields): # pylint: disable=used-before-assignment
+    def __init__(
+        self, engine_: RtorrentEngine, fields  # pylint: disable=used-before-assignment
+    ):
         """Initialize download item."""
         super().__init__()
         self._engine = engine_
         self._fields = dict(fields)  # Acts a cache for the item
 
-    def _make_it_so(self, command: str, calls: List[str], *args, observer: Optional[Callable] = None):
+    def _make_it_so(
+        self, command: str, calls: List[str], *args, observer: Optional[Callable] = None
+    ):
         """Perform some error-checked RPC calls."""
         args = (self._fields["hash"],) + args
         try:
@@ -76,7 +80,7 @@ class RtorrentItem(engine.TorrentProxy):
                 "While %s torrent #%s: %s" % (command, self._fields["hash"], exc)
             )
 
-    def _get_files(self, attrs: Optional[List[str]]=None):
+    def _get_files(self, attrs: Optional[List[str]] = None):
         """Get a list of all files in this download; each entry has the
         attributes C{path} (relative to root), C{size} (in bytes),
         C{mtime}, C{prio} (0=off, 1=normal, 2=high), C{created},
@@ -805,7 +809,12 @@ class RtorrentEngine(engine.TorrentEngine):
         """Fetch a single item by its info hash."""
         return next(self.items(infohash, prefetch, cache))
 
-    def items(self, view: Optional[Union[engine.TorrentView,str]]=None, prefetch: Optional[Set[str]] = None, cache: bool=True):
+    def items(
+        self,
+        view: Optional[Union[engine.TorrentView, str]] = None,
+        prefetch: Optional[Set[str]] = None,
+        cache: bool = True,
+    ):
         """Get list of download items.
 
         @param view: Name of the view.
@@ -905,7 +914,11 @@ class RtorrentEngine(engine.TorrentEngine):
                 yield item
 
     def show(
-        self, items, view: Optional[str] =None, append: bool=False, disjoin: bool=False
+        self,
+        items,
+        view: Optional[str] = None,
+        append: bool = False,
+        disjoin: bool = False,
     ):  # pylint: disable=arguments-differ
         """Visualize a set of items (search result), and return the view name."""
         proxy = self.open()

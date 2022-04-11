@@ -69,7 +69,9 @@ def truth(val, context) -> bool:
         )
 
 
-def unquote_pre_filter(pre_filter: str, _regex: re.Pattern=re.compile(r"[\\]+")) -> str:
+def unquote_pre_filter(
+    pre_filter: str, _regex: re.Pattern = re.compile(r"[\\]+")
+) -> str:
     """Unquote a pre-filter condition."""
     if pre_filter.startswith('"') and pre_filter.endswith('"'):
         # Unquote outer level
@@ -627,8 +629,7 @@ class ByteSizeFilter(NumericFilterBase):
             self._value = float(self._value)
         except (ValueError, TypeError) as exc:
             raise FilterError(
-                "Bad numerical value %r in %r"
-                % (self._value, self._condition)
+                "Bad numerical value %r in %r" % (self._value, self._condition)
             ) from exc
 
         # Scale to bytes
