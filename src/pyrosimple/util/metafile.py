@@ -431,7 +431,6 @@ class Metafile:
         self.progress = None
         self.datapath = datapath
         self._datapath = None
-        self._fifo = None
         self.ignore = self.IGNORE_GLOB[:]
         self.LOG = pymagic.get_class_logger(self)
 
@@ -448,34 +447,15 @@ class Metafile:
         """Set a datapath."""
         if datapath:
             self._datapath = datapath.rstrip(os.sep)
-            self._fifo = int(stat.S_ISFIFO(os.stat(self.datapath).st_mode))
         else:
             self._datapath = None
-            self._fifo = False
 
     datapath = property(_get_datapath, _set_datapath)
 
     def walk(self) -> Generator[Path, None, None]:
         """Generate paths in "self.datapath"."""
-        # FIFO?
-        if self._fifo:
-            if self._fifo > 1:
-                raise RuntimeError("INTERNAL ERROR: FIFO read twice!")
-            self._fifo += 1
-
-            # Read paths relative to directory containing the FIFO
-            with open(self.datapath, "rb") as fifo:
-                while True:
-                    relpath = fifo.readline().rstrip(b"\n")
-                    if not relpath:  # EOF?
-                        break
-                    self.LOG.debug("Read relative path %r from FIFO...", relpath)
-                    yield Path(Path(self.datapath).parent, relpath.decode())
-
-            self.LOG.debug("FIFO %r closed!", self.datapath)
-
         # Directory?
-        elif os.path.isdir(self.datapath):
+        if os.path.isdir(self.datapath):
             # Walk the directory tree
             for dirpath, dirnames, filenames in os.walk(
                 self.datapath
@@ -510,7 +490,7 @@ class Metafile:
 
         # Initialize progress state
         hashing_secs = time.time()
-        totalsize = -1 if self._fifo else self._calc_size()
+        totalsize = self._calc_size()
         totalhashed = 0
 
         # Start a new piece
@@ -523,7 +503,7 @@ class Metafile:
             # Assemble file info
             filesize = os.path.getsize(filename)
             filepath = filename[
-                len(os.path.dirname(self.datapath) if self._fifo else self.datapath) :
+                len(self.datapath) :
             ].lstrip(os.sep)
             file_list.append(
                 {
@@ -572,7 +552,7 @@ class Metafile:
         }
 
         # Handle directory/FIFO vs. single file
-        if self._fifo or os.path.isdir(self.datapath):
+        if os.path.isdir(self.datapath):
             metainfo["files"] = file_list
         else:
             metainfo["length"] = totalhashed
@@ -590,24 +570,18 @@ class Metafile:
 
     def _make_meta(self, tracker_url, root_name, private, progress):
         """Create torrent dict."""
-        # Calculate piece size
-        if self._fifo:
-            # TODO we need to add a (command line) param, probably for total data size
-            # for now, always 1MB
-            piece_size_exp = 20
+        total_size = self._calc_size()
+        if total_size:
+            piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
         else:
-            total_size = self._calc_size()
-            if total_size:
-                piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
-            else:
-                piece_size_exp = 0
+            piece_size_exp = 0
 
         piece_size_exp = min(max(15, piece_size_exp), 24)
         piece_size = 2**piece_size_exp
 
         # Build info hash
         info, totalhashed = self._make_info(
-            piece_size, progress, self.walk() if self._fifo else sorted(self.walk())
+            piece_size, progress, sorted(self.walk())
         )
 
         # Enforce unique hash per tracker
@@ -691,7 +665,7 @@ class Metafile:
             self.LOG.info(
                 "Creating %r for %s %r...",
                 output_name,
-                "filenames read from" if self._fifo else "data in",
+                "filenames read from",
                 self.datapath,
             )
             meta, _ = self._make_meta(tracker_url, root_name, private, progress)
