@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=
 """ Torrent Engine Interface.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -18,16 +17,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import operator
 import os
 import re
 import time
 
-from collections import defaultdict
 from typing import Any, Callable, Dict, Optional, Set
 
 from pyrosimple import config, error
-from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
+from pyrosimple.util import fmt, matching, metafile, rpc, traits
 
 
 #
@@ -325,6 +322,7 @@ class MutableField(FieldDefinition):
 
 
 def core_fields():
+    """Generate built-in field definitions"""
     yield ConstantField(
         bool,
         "is_private",
@@ -367,7 +365,6 @@ def core_fields():
     )
 
     # Basic fields
-    yield ConstantField(str, "hash", "info hash", matcher=matching.PatternFilter)
     yield ConstantField(
         str, "name", "name (file or root directory)", matcher=matching.PatternFilter
     )
@@ -393,7 +390,6 @@ def core_fields():
         matcher=matching.PatternFilter,
         accessor=lambda o: o._memoize("alias", getattr, o, "tracker"),
     )
-    # matcher=matching.PatternFilter, accessor=operator.attrgetter("tracker"))
     yield DynamicField(
         str, "message", "current tracker message", matcher=matching.PatternFilter
     )
@@ -679,6 +675,8 @@ class TorrentProxy:
         """Compare items based on their infohash."""
         return other and self.hash == getattr(other, "hash", None)
 
+    hash = ConstantField(str, "hash", "info hash", matcher=matching.PatternFilter)
+
     def __repr__(self):
         """Return a representation of internal state."""
         # TODO: Make this not magically fetch things, so that we can better use
@@ -721,6 +719,7 @@ class TorrentProxy:
 
     # TODO: created (metafile creation date, i.e. the bencoded field; same as downloaded if missing; cached by hash)
     # add .age formatter (age = " 1y 6m", " 2w 6d", "12h30m", etc.)
+
 
 # TODO: Can this go somewhere better?
 TorrentProxy.add_core_fields()

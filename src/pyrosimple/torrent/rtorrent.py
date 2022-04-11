@@ -295,7 +295,7 @@ class RtorrentItem(engine.TorrentProxy):
         """Add or remove tags."""
         # Get tag list and add/remove given tags
         tags = tags.lower()
-        previous = self.tagged
+        previous = self.fetch("tagged")
         tagset = previous.copy()
         for tag in tags.replace(",", " ").split():
             if tag.startswith("-"):
@@ -327,15 +327,15 @@ class RtorrentItem(engine.TorrentProxy):
                     raise error.UserError("Unknown throttle name '{}'".format(name))
             self._engine.known_throttle_names.add(name)
 
-        if (name or "NONE") == self.throttle:
+        if (name or "NONE") == self.fetch("throttle"):
             self._engine.LOG.debug(
                 "Keeping throttle %r on torrent #%s",
-                self.throttle,
+                self.fetch("throttle"),
                 self._fields["hash"],
             )
             return
 
-        active = self.is_active
+        active = self.fetch("is_active")
         if active:
             self._engine.LOG.debug(
                 "Torrent #%s stopped for throttling", self._fields["hash"]
@@ -422,7 +422,7 @@ class RtorrentItem(engine.TorrentProxy):
     def delete(self):
         """Remove torrent from client."""
         self.stop()
-        if self.metafile:
+        if self.fetch("metafile"):
             self._make_it_so("removing metafile of", ["delete_tied"])
         self._make_it_so("erasing", ["erase"])
 
@@ -491,10 +491,10 @@ class RtorrentItem(engine.TorrentProxy):
 
         # Assemble doomed files and directories
         files, dirs = set(), set()
-        base_path = os.path.expanduser(self.directory)
+        base_path = os.path.expanduser(self.fetch("directory"))
         item_files = list(self._get_files(attrs=attrs))
 
-        if not self.directory:
+        if not self.fetch("directory"):
             raise error.EngineError(
                 "Directory for item #%s is empty,"
                 " you might want to add a filter 'directory=!'"
@@ -505,12 +505,12 @@ class RtorrentItem(engine.TorrentProxy):
                 "Directory '%s' for item #%s is not absolute, which is a bad idea;"
                 " fix your .rtorrent.rc, and use 'directory.default.set = /...'"
                 % (
-                    self.directory,
+                    self.fetch("directory"),
                     self._fields["hash"],
                 )
             )
-        if self.fetch("=is_multi_file") and os.path.isdir(self.directory):
-            dirs.add(self.directory)
+        if self.fetch("=is_multi_file") and os.path.isdir(self.fetch("directory")):
+            dirs.add(self.fetch("directory"))
 
         for item_file in item_files:
             if file_filter and not file_filter(item_file):
