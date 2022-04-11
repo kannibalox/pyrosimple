@@ -1,33 +1,43 @@
-# What is this?
+# pyrosimple
 
-A simplified and python-3 oriented version of the pyrocore tools.
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kannibalox/pyrosimple/Pylint)
+![PyPI](https://img.shields.io/pypi/v/pyrosimple)
+![PyPI -	Python Version](https://img.shields.io/pypi/pyversions/pyrosimple)
 
-# Why should I use this?
+A simplified and python-3 oriented version of the [pyrocore tools](https://github.com/pyroscope/pyrocore), for working with the [rTorrent client](https://github.com/rakshasa/rtorrent).
 
-You probably shouldn't, but if you really need python 3 support this should work.
-
-## I really want to, though
+## Installation
 
 ```bash
 pip install pyrosimple
 ```
 
-Usage is pretty much the same as regular pyroscope
+Usage is pretty much the same as regular pyroscope: https://github.com/pyroscope/pyrocore/blob/master/README.md
 
-# What's the point of this then?
+## What's the point of this?
 
-I needed something simpler for use with personal tools, this allows me to keep the code base mostly compatible while
-completely dropping features I have no need for. There are also several changes that would break existing
-integrations, and as such aren't easily suitable for upstream changes.
+I needed something simpler for use with personal tools, and this allows me to keep the code base *mostly* compatible while
+dropping more experimental features. There are also several changes that aren't easily suitable for upstream incorporation.
 
-tl;dr I want to move fast and break things.
+## Significant differences from pyrocore
 
-# Significant changes
+The following lists are not exhaustive, and don't cover many of the internal improvements and refactoring.
 
+- Only supports python 3 and rtorrent 0.9.8 (0.9.6/0.9.7 should still work, just not officially supported)
 - Simpler poetry-based build/install system
-- Everything in one package, no separate pyrobase
+- Everything in one package (no separate pyrobase)
   - Use external lib for bencode
-- Only supports python 3 and rtorrent 0.9.8
-- `lstor --raw` prints json
-- Support for jinja2 (tempita's use of eval can chew up a surprising amount of cpu)
-- Support for JSON-RPC (only implemented in https://github.com/jesec/rtorrent)
+
+### Added
+- Jinja2 templatiing if package is present (tempita's use of eval can chew up a surprising amount of cpu)
+- Support for JSON-RPC (only implemented by https://github.com/jesec/rtorrent)
+- pyrotorque job to move torrents between hosts
+- pyrotorque job to move torrent paths
+
+### Removed/deprecated
+- the `rtsweep`, `rtmv`, and `rtevent` commands
+- `pyrotorque`'s guard file, influxdb job and web server
+- Connecting via SSH (planned to be re-added)
+
+### Changed
+- `rtxmlrpc`'s `--raw` now outputs JSON
