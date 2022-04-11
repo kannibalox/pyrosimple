@@ -324,6 +324,286 @@ class MutableField(FieldDefinition):
         self._setter(obj, val)
 
 
+def core_fields():
+    yield ConstantField(
+        bool,
+        "is_private",
+        "private flag set (no DHT/PEX)?",
+        matcher=matching.BoolFilter,
+        formatter=lambda val: "PRV" if val else "PUB",
+    )
+    # Classification
+    yield DynamicField(
+        set,
+        "tagged",
+        "has certain tags? (not related to the 'tagged' view)",
+        matcher=matching.TaggedAsFilter,
+        accessor=lambda o: set(o.fetch("custom_tags").lower().split()),
+        formatter=_fmt_tags,
+    )
+    yield DynamicField(
+        set,
+        "views",
+        "views this item is attached to",
+        matcher=matching.TaggedAsFilter,
+        formatter=_fmt_tags,
+        accessor=lambda o: o.rpc_call("views"),
+    )
+    yield DynamicField(
+        set,
+        "kind",
+        "ALL kinds of files in this item (the same as kind_0)",
+        matcher=matching.TaggedAsFilter,
+        formatter=_fmt_tags,
+        accessor=lambda o: o.fetch("kind_0"),
+    )
+    yield DynamicField(
+        list,
+        "traits",
+        "automatic classification of this item (audio, video, tv, movie, etc.)",
+        matcher=matching.TaggedAsFilter,
+        formatter=lambda v: "/".join(v or ["misc", "other"]),
+        accessor=detect_traits,
+    )
+
+    # Basic fields
+    yield ConstantField(str, "hash", "info hash", matcher=matching.PatternFilter)
+    yield ConstantField(
+        str, "name", "name (file or root directory)", matcher=matching.PatternFilter
+    )
+    yield ConstantField(int, "size", "data size", matcher=matching.ByteSizeFilter)
+    yield MutableField(
+        int,
+        "prio",
+        "priority (0=off, 1=low, 2=normal, 3=high)",
+        matcher=matching.FloatFilter,
+        formatter=lambda val: "X- +"[val],
+    )
+    yield ConstantField(
+        str,
+        "tracker",
+        "first in the list of announce URLs",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: (o.announce_urls(default=[None]) or [None])[0],
+    )
+    yield ConstantField(
+        config.map_announce2alias,
+        "alias",
+        "tracker alias or domain",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: o._memoize("alias", getattr, o, "tracker"),
+    )
+    # matcher=matching.PatternFilter, accessor=operator.attrgetter("tracker"))
+    yield DynamicField(
+        str, "message", "current tracker message", matcher=matching.PatternFilter
+    )
+
+    # State
+    yield DynamicField(
+        bool,
+        "is_open",
+        "download open?",
+        matcher=matching.BoolFilter,
+        formatter=lambda val: "OPN" if val else "CLS",
+    )
+    yield DynamicField(
+        bool,
+        "is_active",
+        "download active?",
+        matcher=matching.BoolFilter,
+        formatter=lambda val: "ACT" if val else "STP",
+    )
+    yield DynamicField(
+        bool,
+        "is_complete",
+        "download complete?",
+        matcher=matching.BoolFilter,
+        formatter=lambda val: "DONE" if val else "PART",
+    )
+    yield ConstantField(
+        bool,
+        "is_multi_file",
+        "single- or multi-file download?",
+        matcher=matching.BoolFilter,
+        formatter=lambda val: "DIR " if val else "FILE",
+    )
+    yield MutableField(
+        bool,
+        "is_ignored",
+        "ignore commands?",
+        matcher=matching.BoolFilter,
+        formatter=lambda val: "IGN!" if int(val) else "HEED",
+        setter=lambda o, val: o.ignore(int(val)),
+    )
+    yield DynamicField(
+        bool,
+        "is_ghost",
+        "has no data file or directory?",
+        matcher=matching.BoolFilter,
+        accessor=lambda o: not os.path.exists(o.datapath()) if o.datapath() else None,
+        formatter=lambda val: "GHST" if val else "DATA",
+    )
+
+    # Paths
+    yield DynamicField(
+        str,
+        "directory",
+        "directory containing download data",
+        matcher=matching.PatternFilter,
+    )
+    yield DynamicField(
+        str,
+        "path",
+        "path to download data",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: o.datapath(),
+    )
+    yield DynamicField(
+        str,
+        "realpath",
+        "real path to download data",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: os.path.realpath(o.datapath()),
+    )
+    yield ConstantField(
+        str,
+        "metafile",
+        "path to torrent file",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: os.path.expanduser(str(o._fields["metafile"])),
+    )
+    yield ConstantField(
+        str,
+        "sessionfile",
+        "path to session file",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: os.path.expanduser(str(o.fetch("session_file"))),
+    )
+    yield ConstantField(
+        list,
+        "files",
+        "list of files in this item",
+        matcher=matching.FilesFilter,
+        formatter=_fmt_files,
+        accessor=lambda o: o._get_files(),
+    )
+    yield ConstantField(
+        int,
+        "fno",
+        "number of files in this item",
+        matcher=matching.FloatFilter,
+        accessor=lambda o: o.rpc_call("size_files"),
+    )
+
+    # Bandwidth & Data Transfer
+    yield DynamicField(
+        percent,
+        "done",
+        "completion in percent",
+        matcher=matching.FloatFilter,
+        accessor=lambda o: float(o.fetch("completed_bytes")) / o.fetch("size_bytes"),
+    )
+    yield DynamicField(
+        ratio_float,
+        "ratio",
+        "normalized ratio (1:1 = 1.0)",
+        matcher=matching.FloatFilter,
+        accessor=lambda o: o.rpc_call("ratio"),
+    )
+    yield DynamicField(
+        int,
+        "uploaded",
+        "amount of uploaded data",
+        matcher=matching.ByteSizeFilter,
+        accessor=lambda o: o.rpc_call("up.total"),
+    )
+    yield DynamicField(
+        int,
+        "xfer",
+        "transfer rate",
+        matcher=matching.ByteSizeFilter,
+        accessor=lambda o: o.fetch("up") + o.fetch("down"),
+    )
+    # last_xfer = DynamicField(int, "last_xfer", "last time data was transferred", matcher=matching.TimeFilter,
+    #     accessor=lambda o: int(o.fetch("timestamp.last_xfer") or 0), formatter=fmt.iso_datetime_optional)
+    yield DynamicField(
+        int,
+        "down",
+        "download rate",
+        matcher=matching.ByteSizeFilter,
+        accessor=lambda o: o.fetch("down"),
+    )
+    yield DynamicField(
+        int,
+        "up",
+        "upload rate",
+        matcher=matching.ByteSizeFilter,
+        accessor=lambda o: o._fields["up"],
+    )
+    yield DynamicField(
+        str,
+        "throttle",
+        "throttle group name (NULL=unlimited, NONE=global)",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: o._fields["throttle"] or "NONE",
+    )
+
+    # Lifecyle
+    yield DynamicField(
+        int,
+        "loaded",
+        "time metafile was loaded",
+        matcher=matching.TimeFilterNotNull,
+        accessor=lambda o: int(o.fetch("custom_tm_loaded") or "0", 10),
+        formatter=fmt.iso_datetime_optional,
+    )
+    yield DynamicField(
+        int,
+        "started",
+        "time download was FIRST started",
+        matcher=matching.TimeFilterNotNull,
+        accessor=lambda o: int(o.fetch("custom_tm_started") or "0", 10),
+        formatter=fmt.iso_datetime_optional,
+    )
+    yield DynamicField(
+        untyped,
+        "leechtime",
+        "time taken from start to completion",
+        matcher=matching.DurationFilter,
+        accessor=lambda o: _interval_sum(o, end=o.completed)
+        or _duration(o.started, o.completed),
+        formatter=_fmt_duration,
+    )
+    yield DynamicField(
+        int,
+        "completed",
+        "time download was finished",
+        matcher=matching.TimeFilterNotNull,
+        accessor=lambda o: int(o.fetch("custom_tm_completed") or "0", 10),
+        formatter=fmt.iso_datetime_optional,
+    )
+    yield DynamicField(
+        untyped,
+        "seedtime",
+        "total seeding time after completion",
+        matcher=matching.DurationFilter,
+        accessor=lambda o: _interval_sum(o, start=o.completed)
+        if o.is_complete
+        else None,
+        formatter=_fmt_duration,
+    )
+    # active = DynamicField(int, "active", "last time a peer was connected", matcher=matching.TimeFilter,
+    #    accessor=lambda o: int(o.fetch("timestamp.last_active") or 0), formatter=fmt.iso_datetime_optional)
+    yield DynamicField(
+        int,
+        "stopped",
+        "time download was last stopped or paused",
+        matcher=matching.TimeFilterNotNull,
+        accessor=lambda o: (_interval_split(o, only="P") + [(0, 0)])[0][1],
+        formatter=fmt.iso_datetime_optional,
+    )
+
+
 #
 # [Somewhat] Generic Engine Interface (abstract base classes)
 #
@@ -380,6 +660,13 @@ class TorrentProxy:
                 setattr(cls, field.name, field)
                 FieldDefinition.FIELDS[field.name] = field
 
+    @classmethod
+    def add_core_fields(cls, *_, **__):
+        """Add any custom fields defined in the configuration."""
+        for field in core_fields():
+            setattr(cls, field.name, field)
+            FieldDefinition.FIELDS[field.name] = field
+
     def __init__(self):
         """Initialize object."""
         self._fields = {}
@@ -423,362 +710,6 @@ class TorrentProxy:
             ),
         )
 
-    def fetch(self, name, cache=False):
-        """Get a field on demand."""
-        raise NotImplementedError()
-
-    def datapath(self):
-        """Get an item's data path."""
-        raise NotImplementedError()
-
-    def announce_urls(self, default=[]):  # pylint: disable=dangerous-default-value
-        """Get a list of all announce URLs."""
-        raise NotImplementedError()
-
-    def start(self):
-        """(Re-)start downloading or seeding."""
-        raise NotImplementedError()
-
-    def stop(self):
-        """Stop and close download."""
-        raise NotImplementedError()
-
-    def ignore(self, flag):
-        """Set ignore status."""
-        raise NotImplementedError()
-
-    def tag(self, tags):
-        """Add or remove tags."""
-        raise NotImplementedError()
-
-    def set_throttle(self, name):
-        """Assign to throttle group."""
-        # TODO: A better way would be to have a MutableField class, i.e. item.throttle = "name"
-        raise NotImplementedError()
-
-    def set_custom(self, key, value=None):
-        """Set a custom value. C{key} might have the form "key=value" when value is C{None}."""
-        raise NotImplementedError()
-
-    def hash_check(self):
-        """Hash check a download."""
-        raise NotImplementedError()
-
-    def delete(self):
-        """Remove torrent from client."""
-        raise NotImplementedError()
-
-    def flush(self):
-        """Write volatile data to disk."""
-        # This can be empty in derived classes
-
-    # Basic fields
-    hash = ConstantField(str, "hash", "info hash", matcher=matching.PatternFilter)
-    name = ConstantField(
-        str, "name", "name (file or root directory)", matcher=matching.PatternFilter
-    )
-    size = ConstantField(int, "size", "data size", matcher=matching.ByteSizeFilter)
-    prio = MutableField(
-        int,
-        "prio",
-        "priority (0=off, 1=low, 2=normal, 3=high)",
-        matcher=matching.FloatFilter,
-        formatter=lambda val: "X- +"[val],
-    )
-    tracker = ConstantField(
-        str,
-        "tracker",
-        "first in the list of announce URLs",
-        matcher=matching.PatternFilter,
-        accessor=lambda o: (o.announce_urls(default=[None]) or [None])[0],
-    )
-    alias = ConstantField(
-        config.map_announce2alias,
-        "alias",
-        "tracker alias or domain",
-        matcher=matching.PatternFilter,
-        accessor=lambda o: o._memoize("alias", getattr, o, "tracker"),
-    )
-    # matcher=matching.PatternFilter, accessor=operator.attrgetter("tracker"))
-    message = DynamicField(
-        str, "message", "current tracker message", matcher=matching.PatternFilter
-    )
-
-    # State
-    is_private = ConstantField(
-        bool,
-        "is_private",
-        "private flag set (no DHT/PEX)?",
-        matcher=matching.BoolFilter,
-        formatter=lambda val: "PRV" if val else "PUB",
-    )
-    is_open = DynamicField(
-        bool,
-        "is_open",
-        "download open?",
-        matcher=matching.BoolFilter,
-        formatter=lambda val: "OPN" if val else "CLS",
-    )
-    is_active = DynamicField(
-        bool,
-        "is_active",
-        "download active?",
-        matcher=matching.BoolFilter,
-        formatter=lambda val: "ACT" if val else "STP",
-    )
-    is_complete = DynamicField(
-        bool,
-        "is_complete",
-        "download complete?",
-        matcher=matching.BoolFilter,
-        formatter=lambda val: "DONE" if val else "PART",
-    )
-    is_multi_file = ConstantField(
-        bool,
-        "is_multi_file",
-        "single- or multi-file download?",
-        matcher=matching.BoolFilter,
-        formatter=lambda val: "DIR " if val else "FILE",
-    )
-    is_ignored = MutableField(
-        bool,
-        "is_ignored",
-        "ignore commands?",
-        matcher=matching.BoolFilter,
-        formatter=lambda val: "IGN!" if int(val) else "HEED",
-        setter=lambda o, val: o.ignore(int(val)),
-    )
-    is_ghost = DynamicField(
-        bool,
-        "is_ghost",
-        "has no data file or directory?",
-        matcher=matching.BoolFilter,
-        accessor=lambda o: not os.path.exists(o.datapath()) if o.datapath() else None,
-        formatter=lambda val: "GHST" if val else "DATA",
-    )
-
-    # Paths
-    """ Shining a light on the naming and paths mess:
-
-        hash=xxx
-        for i in d.name d.base_filename d.base_path d.directory d.directory_base d.is_multi_file; do \
-            echo -n "$(printf '%20.20s ' $i)"; rtxmlrpc $i $hash
-        done
-
-        Basics:
-            * d.base_filename is always the basename of d.base_path
-            * d.directory_base and d.directory are always the same
-            * d.base_filename and d.base_path are empty on closed items, after a restart, i.e. not too useful (since 0.9.1 or so)
-
-        Behaviour of d.directory.set + d.directory_base.set (tested with 0.9.4):
-            * d.base_path always remains unchanged, and item gets closed
-            * d.start sets d.base_path if resume data ok
-            * single:
-                * d.directory[_base].set → d.name NEVER appended (only in d.base_path)
-                * after start, d.base_path := d.directory/d.name
-            * multi:
-                * d.directory.set → d.name is appended
-                * d.directory_base.set → d.name is NOT appended (i.e. item renamed to last path part)
-                * after start, d.base_path := d.directory
-
-        Making sense of it (trying to at least):
-            * d.directory is *always* a directory (thus, single items auto-append d.name in d.base_path and cannot be renamed)
-            * d.directory_base.set means set path PLUS basename together for a multi item (thus allowing a rename)
-            * only d.directory.set behaves consistently for single+multi, regarding the end result in d.base_path
-    """
-    directory = DynamicField(
-        str,
-        "directory",
-        "directory containing download data",
-        matcher=matching.PatternFilter,
-    )
-    path = DynamicField(
-        str,
-        "path",
-        "path to download data",
-        matcher=matching.PatternFilter,
-        accessor=lambda o: o.datapath(),
-    )
-    realpath = DynamicField(
-        str,
-        "realpath",
-        "real path to download data",
-        matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.realpath(o.datapath()),
-    )
-    metafile = ConstantField(
-        str,
-        "metafile",
-        "path to torrent file",
-        matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(str(o._fields["metafile"])),
-    )
-    sessionfile = ConstantField(
-        str,
-        "sessionfile",
-        "path to session file",
-        matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(str(o.fetch("session_file"))),
-    )
-    files = ConstantField(
-        list,
-        "files",
-        "list of files in this item",
-        matcher=matching.FilesFilter,
-        formatter=_fmt_files,
-        accessor=lambda o: o._get_files(),
-    )
-    fno = ConstantField(
-        int,
-        "fno",
-        "number of files in this item",
-        matcher=matching.FloatFilter,
-        accessor=lambda o: o.rpc_call("size_files"),
-    )
-
-    # Bandwidth & Data Transfer
-    done = DynamicField(
-        percent,
-        "done",
-        "completion in percent",
-        matcher=matching.FloatFilter,
-        accessor=lambda o: float(o.fetch("completed_bytes")) / o.fetch("size_bytes"),
-    )
-    ratio = DynamicField(
-        ratio_float,
-        "ratio",
-        "normalized ratio (1:1 = 1.0)",
-        matcher=matching.FloatFilter,
-        accessor=lambda o: o.rpc_call("ratio"),
-    )
-    uploaded = DynamicField(
-        int,
-        "uploaded",
-        "amount of uploaded data",
-        matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.rpc_call("up.total"),
-    )
-    xfer = DynamicField(
-        int,
-        "xfer",
-        "transfer rate",
-        matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.fetch("up") + o.fetch("down"),
-    )
-    # last_xfer = DynamicField(int, "last_xfer", "last time data was transferred", matcher=matching.TimeFilter,
-    #     accessor=lambda o: int(o.fetch("timestamp.last_xfer") or 0), formatter=fmt.iso_datetime_optional)
-    down = DynamicField(
-        int,
-        "down",
-        "download rate",
-        matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.fetch("down"),
-    )
-    up = DynamicField(
-        int,
-        "up",
-        "upload rate",
-        matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o._fields["up"],
-    )
-    throttle = DynamicField(
-        str,
-        "throttle",
-        "throttle group name (NULL=unlimited, NONE=global)",
-        matcher=matching.PatternFilter,
-        accessor=lambda o: o._fields["throttle"] or "NONE",
-    )
-
-    # Lifecyle
-    loaded = DynamicField(
-        int,
-        "loaded",
-        "time metafile was loaded",
-        matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: int(o.fetch("custom_tm_loaded") or "0", 10),
-        formatter=fmt.iso_datetime_optional,
-    )
-    started = DynamicField(
-        int,
-        "started",
-        "time download was FIRST started",
-        matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: int(o.fetch("custom_tm_started") or "0", 10),
-        formatter=fmt.iso_datetime_optional,
-    )
-    leechtime = DynamicField(
-        untyped,
-        "leechtime",
-        "time taken from start to completion",
-        matcher=matching.DurationFilter,
-        accessor=lambda o: _interval_sum(o, end=o.completed)
-        or _duration(o.started, o.completed),
-        formatter=_fmt_duration,
-    )
-    completed = DynamicField(
-        int,
-        "completed",
-        "time download was finished",
-        matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: int(o.fetch("custom_tm_completed") or "0", 10),
-        formatter=fmt.iso_datetime_optional,
-    )
-    seedtime = DynamicField(
-        untyped,
-        "seedtime",
-        "total seeding time after completion",
-        matcher=matching.DurationFilter,
-        accessor=lambda o: _interval_sum(o, start=o.completed)
-        if o.is_complete
-        else None,
-        formatter=_fmt_duration,
-    )
-    # active = DynamicField(int, "active", "last time a peer was connected", matcher=matching.TimeFilter,
-    #    accessor=lambda o: int(o.fetch("timestamp.last_active") or 0), formatter=fmt.iso_datetime_optional)
-    stopped = DynamicField(
-        int,
-        "stopped",
-        "time download was last stopped or paused",
-        matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: (_interval_split(o, only="P") + [(0, 0)])[0][1],
-        formatter=fmt.iso_datetime_optional,
-    )
-
-    # Classification
-    tagged = DynamicField(
-        set,
-        "tagged",
-        "has certain tags? (not related to the 'tagged' view)",
-        matcher=matching.TaggedAsFilter,
-        accessor=lambda o: set(o.fetch("custom_tags").lower().split()),
-        formatter=_fmt_tags,
-    )
-    views = DynamicField(
-        set,
-        "views",
-        "views this item is attached to",
-        matcher=matching.TaggedAsFilter,
-        formatter=_fmt_tags,
-        accessor=lambda o: o.rpc_call("views"),
-    )
-    kind = DynamicField(
-        set,
-        "kind",
-        "ALL kinds of files in this item (the same as kind_0)",
-        matcher=matching.TaggedAsFilter,
-        formatter=_fmt_tags,
-        accessor=lambda o: o.fetch("kind_0"),
-    )
-    traits = DynamicField(
-        list,
-        "traits",
-        "automatic classification of this item (audio, video, tv, movie, etc.)",
-        matcher=matching.TaggedAsFilter,
-        formatter=lambda v: "/".join(v or ["misc", "other"]),
-        accessor=detect_traits,
-    )
-    # = DynamicField(, "", "")
-
     # TODO: metafile data cache (sqlite, shelve or maybe .ini)
     # cache data indexed by hash
     # store ctime per cache entry
@@ -790,6 +721,9 @@ class TorrentProxy:
 
     # TODO: created (metafile creation date, i.e. the bencoded field; same as downloaded if missing; cached by hash)
     # add .age formatter (age = " 1y 6m", " 2w 6d", "12h30m", etc.)
+
+# TODO: Can this go somewhere better?
+TorrentProxy.add_core_fields()
 
 
 class TorrentView:
@@ -826,9 +760,8 @@ class TorrentView:
                 infohash = self.viewname
         return infohash
 
-    def size(self):
+    def size(self) -> int:
         """Total unfiltered size of view."""
-        # return len(self._fetch_items())
         if self._check_hash_view():
             return 1
         else:

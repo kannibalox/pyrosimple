@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=I0011
 """ Configuration Loader.
 
     For details, see https://pyrosimple.readthedocs.io/en/latest/setup.html
