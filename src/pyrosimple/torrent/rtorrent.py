@@ -24,12 +24,13 @@ import os
 import shlex
 import time
 
+from collections import defaultdict
 from functools import partial
 from typing import Callable, List, Optional, Set, Union
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, matching, rpc, traits
+from pyrosimple.util import fmt, matching, pymagic, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
@@ -46,9 +47,7 @@ class CommaLexer(shlex.shlex):
 class RtorrentItem(engine.TorrentProxy):
     """A single download item."""
 
-    def __init__(
-        self, engine_: RtorrentEngine, fields  # pylint: disable=used-before-assignment
-    ):
+    def __init__(self, engine_, fields):
         """Initialize download item."""
         super().__init__()
         self._engine = engine_
@@ -570,7 +569,7 @@ class RtorrentItem(engine.TorrentProxy):
         self._make_it_so("saving session data of", ["save_resume"])
 
 
-class RtorrentEngine(engine.TorrentEngine):
+class RtorrentEngine:
     """The rTorrent backend proxy."""
 
     # keys we read from rTorrent's configuration
@@ -644,7 +643,9 @@ class RtorrentEngine(engine.TorrentEngine):
 
     def __init__(self):
         """Initialize proxy."""
-        super().__init__()
+        self.LOG = pymagic.get_class_logger(self)
+        self.engine_id = "N/A"  # ID of the instance we're connecting to
+        self.engine_software = "rTorrent"  # Name and version of software
         self.versions = (None, None)
         self.version_info = (0,)
         self.startup = time.time()
@@ -653,6 +654,32 @@ class RtorrentEngine(engine.TorrentEngine):
         self._download_dir = None
         self._item_cache = {}
         self.known_throttle_names = {"", "NULL"}
+
+    def view(self, viewname="default", matcher=None):
+        """Get list of download items."""
+        return engine.TorrentView(self, viewname, matcher)
+
+    def group_by(self, fields, items=None):
+        """Returns a dict of lists of items, grouped by the given fields.
+
+        ``fields`` can be a string (one field) or an iterable of field names.
+        """
+        result = defaultdict(list)
+        if items is None:
+            items = self.items()
+
+        try:
+            key = operator.attrgetter(fields + "")
+        except TypeError:
+
+            def key(obj, names=tuple(fields)):
+                "Helper to return group key tuple"
+                return tuple(getattr(obj, x) for x in names)
+
+        for item in items:
+            result[key(item)].append(item)
+
+        return result
 
     def load_config(self, namespace=None, rcfile=None):
         """Load file given in "rcfile"."""
