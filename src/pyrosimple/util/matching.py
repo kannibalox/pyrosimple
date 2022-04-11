@@ -69,14 +69,7 @@ def truth(val, context) -> bool:
         )
 
 
-def _time_ym_delta(timestamp, delta, months):
-    """Helper to add a year or month delta to a timestamp."""
-    timestamp = list(time.localtime(timestamp))
-    timestamp[int(months)] += delta
-    return time.mktime(tuple(timestamp))
-
-
-def unquote_pre_filter(pre_filter, _regex=re.compile(r"[\\]+")):
+def unquote_pre_filter(pre_filter: str, _regex: re.Pattern=re.compile(r"[\\]+")) -> str:
     """Unquote a pre-filter condition."""
     if pre_filter.startswith('"') and pre_filter.endswith('"'):
         # Unquote outer level
@@ -483,12 +476,12 @@ class TimeFilter(NumericFilterBase):
     """Filter UNIX timestamp values."""
 
     TIMEDELTA_UNITS = dict(
-        y=lambda t, d: _time_ym_delta(t, -d, False),
-        m=lambda t, d: _time_ym_delta(t, -d, True),
+        y=lambda t, d: t - d * 365 * 86400,
+        M=lambda t, d: t - d * 30 * 86400,
         w=lambda t, d: t - d * 7 * 86400,
         d=lambda t, d: t - d * 86400,
         h=lambda t, d: t - d * 3600,
-        i=lambda t, d: t - d * 60,
+        m=lambda t, d: t - d * 60,
         s=lambda t, d: t - d,
     )
     TIMEDELTA_RE = re.compile(

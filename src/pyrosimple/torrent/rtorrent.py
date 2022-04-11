@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=locally-disabled
 """ rTorrent Proxy.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -20,20 +19,17 @@
 
 import errno
 import fnmatch
-import logging
 import operator
 import os
 import shlex
-import sys
 import time
 
-from collections import namedtuple
 from functools import partial
-from typing import Callable, List, Optional, Set
+from typing import Callable, List, Optional, Set, Union
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, load_config, matching, rpc, traits
+from pyrosimple.util import fmt, matching, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
@@ -50,15 +46,14 @@ class CommaLexer(shlex.shlex):
 class RtorrentItem(engine.TorrentProxy):
     """A single download item."""
 
-    def __init__(self, engine_, fields):
+    def __init__(self, engine_: RtorrentEngine, fields): # pylint: disable=used-before-assignment
         """Initialize download item."""
         super().__init__()
         self._engine = engine_
         self._fields = dict(fields)  # Acts a cache for the item
 
-    def _make_it_so(self, command: str, calls: List[str], *args, **kwargs):
+    def _make_it_so(self, command: str, calls: List[str], *args, observer: Optional[Callable] = None):
         """Perform some error-checked RPC calls."""
-        observer = kwargs.pop("observer", False)
         args = (self._fields["hash"],) + args
         try:
             for call in calls:
@@ -74,14 +69,14 @@ class RtorrentItem(engine.TorrentProxy):
                 else:
                     namespace = self._engine._rpc.d
                 result = getattr(namespace, call.lstrip(":"))(*args)
-                if observer:
+                if observer is not None:
                     observer(result)
         except rpc.ERRORS as exc:
             raise error.EngineError(
                 "While %s torrent #%s: %s" % (command, self._fields["hash"], exc)
             )
 
-    def _get_files(self, attrs=None):
+    def _get_files(self, attrs: Optional[List[str]]=None):
         """Get a list of all files in this download; each entry has the
         attributes C{path} (relative to root), C{size} (in bytes),
         C{mtime}, C{prio} (0=off, 1=normal, 2=high), C{created},
@@ -316,7 +311,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
             self._fields["custom_tags"] = tagset
 
-    def set_throttle(self, name):
+    def set_throttle(self, name: str):
         """Assign to throttle group."""
         if name.lower() == "null":
             name = "NULL"
@@ -437,7 +432,6 @@ class RtorrentItem(engine.TorrentProxy):
 
         def partial_file(item):
             "Filter out partial files"
-            # print "???", repr(item)
             return item.completed_chunks < item.size_chunks
 
         self.cull(file_filter=partial_file, attrs=["completed_chunks", "size_chunks"])
@@ -518,7 +512,6 @@ class RtorrentItem(engine.TorrentProxy):
         for item_file in item_files:
             if file_filter and not file_filter(item_file):
                 continue
-            # print repr(item_file)
             path = os.path.join(base_path, item_file.path)
             files.add(path)
             if "/" in item_file.path:
@@ -541,7 +534,6 @@ class RtorrentItem(engine.TorrentProxy):
                 if any(fnmatch.fnmatch(i, pat) for pat in config.waif_pattern_list)
                 # or os.path.join(path, i) in doomed
             )
-            ##print "---", residue - ignorable
             if residue and residue != ignorable:
                 self._engine.LOG.info(
                     "Keeping non-empty directory '%s' with %d %s%s!",
@@ -551,7 +543,6 @@ class RtorrentItem(engine.TorrentProxy):
                     (" (%d ignorable)" % len(ignorable)) if ignorable else "",
                 )
             else:
-                ##print "---", ignorable
                 for waif in ignorable:  # - doomed:
                     waif = os.path.join(path, waif)
                     self._engine.LOG.debug("Deleting waif '%s'" % (waif,))
@@ -734,7 +725,7 @@ class RtorrentEngine(engine.TorrentEngine):
         """rTorrent's uptime."""
         return time.time() - self.startup
 
-    def _resolve_viewname(self, viewname):
+    def _resolve_viewname(self, viewname: str) -> str:
         """Check for special view names and return existing rTorrent one."""
         if viewname == "-":
             try:
@@ -796,16 +787,15 @@ class RtorrentEngine(engine.TorrentEngine):
         self.LOG.debug("%s", repr(self))
         return self._rpc
 
-    def multicall(self, viewname, fields):
+    def multicall(self, viewname: str, fields: List[str]) -> Bunch:
         """Query the given fields of items in the given view.
 
         The result list contains named tuples,
         so you can access the fields directly by their name.
         """
         commands = tuple("d.{}=".format(x) for x in fields)
-        result_type = namedtuple("DownloadItem", [x.replace(".", "_") for x in fields])
         items = self.open().d.multicall2("", viewname, *commands)
-        return [result_type(*x) for x in items]
+        return Bunch(dict(zip([x.replace(".", "_") for x in fields], items)))
 
     def log(self, msg: str):
         """Log a message in the torrent client."""
@@ -815,7 +805,7 @@ class RtorrentEngine(engine.TorrentEngine):
         """Fetch a single item by its info hash."""
         return next(self.items(infohash, prefetch, cache))
 
-    def items(self, view=None, prefetch: Optional[Set[str]] = None, cache=True):
+    def items(self, view: Optional[Union[engine.TorrentView,str]]=None, prefetch: Optional[Set[str]] = None, cache: bool=True):
         """Get list of download items.
 
         @param view: Name of the view.
@@ -829,6 +819,7 @@ class RtorrentEngine(engine.TorrentEngine):
         # fields for one hash might be done by a special view
         # (filter: $d.hash == hashvalue)
 
+        multi_args: List
         if view is None:
             view = engine.TorrentView(self, "default")
         elif isinstance(view, str):
@@ -882,8 +873,6 @@ class RtorrentEngine(engine.TorrentEngine):
                             multi_args.insert(2, pre_filter)
                     raw_items = multi_call(*tuple(multi_args))
 
-                ##self.LOG.debug("multicall %r" % (args,))
-                ##import pprint; self.LOG.debug(pprint.pformat(raw_items))
                 self.LOG.debug(
                     "Got %d items with %d attributes from %r [%s]",
                     len(raw_items),
@@ -916,46 +905,35 @@ class RtorrentEngine(engine.TorrentEngine):
                 yield item
 
     def show(
-        self, items, view=None, append=False, disjoin=False
+        self, items, view: Optional[str] =None, append: bool=False, disjoin: bool=False
     ):  # pylint: disable=arguments-differ
         """Visualize a set of items (search result), and return the view name."""
         proxy = self.open()
-        view = self._resolve_viewname(view or "rtcontrol")
+        view_name: str = self._resolve_viewname(view or "rtcontrol")
 
         if append and disjoin:
             raise error.EngineError(
-                "Cannot BOTH append to / disjoin from view '{}'".format(view)
+                "Cannot BOTH append to / disjoin from view '{}'".format(view_name)
             )
 
         # Add view if needed
         if view not in proxy.view.list():
-            proxy.view.add(rpc.NOHASH, view)
+            proxy.view.add(rpc.NOHASH, view_name)
 
         # Clear view and show it
         if not append and not disjoin:
-            proxy.view.filter(rpc.NOHASH, view, "false=")
-            proxy.d.multicall2(rpc.NOHASH, "default", "d.views.remove=" + view)
-        proxy.ui.current_view.set(rpc.NOHASH, view)
+            proxy.view.filter(rpc.NOHASH, view_name, "false=")
+            proxy.d.multicall2(rpc.NOHASH, "default", "d.views.remove=" + view_name)
+        proxy.ui.current_view.set(rpc.NOHASH, view_name)
 
         # Add items
         # TODO: should be a "system.multicall"
         for item in items:
             if disjoin:
-                proxy.d.views.remove(item.hash, view)
-                proxy.view.set_not_visible(item.hash, view)
+                proxy.d.views.remove(item.hash, view_name)
+                proxy.view.set_not_visible(item.hash, view_name)
             else:
-                proxy.d.views.push_back_unique(item.hash, view)
-                proxy.view.set_visible(item.hash, view)
+                proxy.d.views.push_back_unique(item.hash, view_name)
+                proxy.view.set_visible(item.hash, view_name)
 
         return view
-
-
-def run():
-    """Module level test."""
-    logging.basicConfig(level=logging.DEBUG)
-    load_config.ConfigLoader().load()
-    print(repr(config.engine.item(sys.argv[1])))
-
-
-if __name__ == "__main__":
-    run()
