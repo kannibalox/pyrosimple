@@ -36,9 +36,6 @@ from pyrosimple.util import load_config, pymagic
 class ScriptBase:
     """Base class for command line interfaces."""
 
-    # logging configuration
-    LOGGING_CFG = "~/.pyroscope/logging.%s.ini"
-
     # log level for user-visible standard logging
     STD_LOG_LEVEL = logging.INFO
 
@@ -55,22 +52,9 @@ class ScriptBase:
     VERSION = None
 
     @classmethod
-    def setup(cls, cron_cfg="cron"):
+    def setup(cls, _=None):
         """Set up the runtime environment."""
-        logging_cfg = cls.LOGGING_CFG
-        if "%s" in logging_cfg:
-            logging_cfg = logging_cfg % (
-                cron_cfg if "--cron" in sys.argv[1:] else "scripts",
-            )
-        logging_cfg = os.path.expanduser(logging_cfg)
-
-        if os.path.exists(logging_cfg):
-            logging.HERE = os.path.dirname(logging_cfg)
-            logging.config.fileConfig(logging_cfg)
-        else:
-            logging.basicConfig(level=logging.INFO)
-
-        logging.getLogger().debug("Logging config read from '%s'", logging_cfg)
+        logging.basicConfig(level=logging.WARNING)
 
     def __init__(self):
         """Initialize CLI."""
@@ -146,11 +130,28 @@ class ScriptBase:
 
     def get_options(self):
         """Get program options."""
-        self.add_bool_option("-q", "--quiet", help="omit informational logging")
-        self.add_bool_option("-v", "--verbose", help="increase informational logging")
-        self.add_bool_option("--debug", help="always show stack-traces for errors")
-        self.add_bool_option(
-            "--cron", help="run in cron mode (with different logging configuration)"
+        self.parser.add_argument(
+            "-q",
+            "--quiet",
+            help="silence warnings",
+            dest="log_level",
+            action="store_const",
+            const=logging.CRITICAL,
+        )
+        self.parser.add_argument(
+            "--debug",
+            help="show detailed messages",
+            dest="log_level",
+            action="store_const",
+            const=logging.DEBUG,
+        )
+        self.parser.add_argument(
+            "-v",
+            "--verbose",
+            help="show additional information",
+            dest="log_level",
+            action="store_const",
+            const=logging.INFO,
         )
 
         # Template method to add options of derived class
@@ -159,20 +160,8 @@ class ScriptBase:
         self.options = self.parser.parse_args()
         self.args = self.options.args
 
-        # Override logging options in debug mode
-        if self.options.debug:
-            self.options.verbose = True
-            self.options.quiet = False
-
-        # Set logging levels
-        if self.options.cron:
-            self.STD_LOG_LEVEL = logging.DEBUG  # pylint: disable=invalid-name
-        if self.options.verbose and self.options.quiet:
-            self.parser.error("Don't know how to be quietly verbose!")
-        elif self.options.quiet:
-            logging.getLogger().setLevel(logging.WARNING)
-        elif self.options.verbose:
-            logging.getLogger().setLevel(logging.DEBUG)
+        if self.options.log_level:
+            logging.getLogger().setLevel(self.options.log_level)
 
         self.LOG.debug(
             "Options: %s",
@@ -183,7 +172,7 @@ class ScriptBase:
         """Exit on a fatal error."""
         if exc is not None:
             self.LOG.fatal("%s (%s)", msg, exc)
-            if self.options.debug:
+            if logging.getLogger().isEnabledFor(logging.DEBUG):
                 return  # let the caller re-raise it
         else:
             self.LOG.fatal(msg)
@@ -307,7 +296,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         load_config.ConfigLoader(self.config_dir).load(
             self.OPTIONAL_CFG_FILES + self.options.config_file
         )
-        if self.options.debug:
+        if logging.getLogger().isEnabledFor(logging.DEBUG):
             config.debug = True
 
         for key_val in self.options.defines:

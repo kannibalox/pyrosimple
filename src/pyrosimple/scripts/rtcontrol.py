@@ -297,9 +297,12 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.prompt.add_options()
 
         # output control
-        output_group = self.parser.add_argument_group('output')
+        output_group = self.parser.add_argument_group("output")
         output_group.add_argument(
-            "-S", "--shell", help="escape output following shell rules", action="store_true"
+            "-S",
+            "--shell",
+            help="escape output following shell rules",
+            action="store_true",
         )
         output_group.add_argument(
             "-0",
@@ -308,15 +311,18 @@ class RtorrentControl(ScriptBaseWithConfig):
             action="store_true",
             help="use a NUL character instead of a linebreak after items",
         )
-        output_group.add_argument("-c", "--column-headers", help="print column headers",
-                                  action="store_true"
-                                  )
         output_group.add_argument(
-            "-+", "--stats", help="add sum / avg / median of numerical fields",
+            "-c", "--column-headers", help="print column headers", action="store_true"
+        )
+        output_group.add_argument(
+            "-+",
+            "--stats",
+            help="add sum / avg / median of numerical fields",
             action="store_true",
         )
         output_group.add_argument(
-            "--summary", help="print only statistical summary, without the items",
+            "--summary",
+            help="print only statistical summary, without the items",
             action="store_true",
         )
         output_group.add_argument(
@@ -344,9 +350,12 @@ class RtorrentControl(ScriptBaseWithConfig):
             default=[],
             help="fields used for sorting, descending if prefixed with a '-'; '-s*' uses output field list",
         )
-        output_group.add_argument("-r", "--reverse-sort", help="reverse the sort order",
-                             action="store_true",
-                             )
+        output_group.add_argument(
+            "-r",
+            "--reverse-sort",
+            help="reverse the sort order",
+            action="store_true",
+        )
         self.add_value_option(
             "-A",
             "--anneal",
@@ -409,7 +418,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             choices=("=", "0", "1", "2"),
             help="enable query optimization (=: use config; 0: off; 1: safe; 2: danger seeker)",
         )
-        action_group = self.parser.add_argument_group('actions')
+        action_group = self.parser.add_argument_group("actions")
         action_group.add_argument(
             "--call",
             metavar="CMD",
@@ -425,7 +434,10 @@ class RtorrentControl(ScriptBaseWithConfig):
             help="execute OS command pattern(s) directly",
         )
         action_group.add_argument(
-            "-F", "--flush", help="flush changes immediately (save session data)", action="store_true"
+            "-F",
+            "--flush",
+            help="flush changes immediately (save session data)",
+            action="store_true",
         )
 
         # torrent state change (actions)
@@ -441,16 +453,16 @@ class RtorrentControl(ScriptBaseWithConfig):
                     **{
                         "metavar": action.argshelp,
                         "help": action.help
-                        + (" (implies -i)" if action.interactive else "")
+                        + (" (implies -i)" if action.interactive else ""),
                     }
                 )
             else:
                 action_group.add_argument(
                     *action.options,
                     **{
-                        "action": 'store_true',
+                        "action": "store_true",
                         "help": action.help
-                        + (" (implies -i)" if action.interactive else "")
+                        + (" (implies -i)" if action.interactive else ""),
                     }
                 )
         action_group.add_argument(
@@ -781,7 +793,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         raw_output_format = self.options.output_format
         default_output_format = "default"
         if actions:
-            default_output_format = "action_cron" if self.options.cron else "action"
+            default_output_format = "action"
         self.validate_output_format(default_output_format)
         sort_key = self.validate_sort_fields()
         matcher = matching.ConditionParser(engine.FieldDefinition.lookup, "name").parse(
@@ -866,8 +878,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Execute action?
         if actions:
             action = actions[0]  # TODO: loop over it
-            self.LOG.log(
-                logging.DEBUG if self.options.cron else logging.INFO,
+            self.LOG.info(
                 "%s %s %d out of %d torrents.",
                 "Would" if self.options.dry_run else "About to",
                 action.label,
@@ -893,7 +904,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     and not self.options.view_only
                     and str(self.options.output_format) != "-"
                 ):
-                    self.emit(item, defaults, to_log=self.options.cron)
+                    self.emit(item, defaults, to_log=True)
 
                 args = tuple(
                     output_formatter(i, namespace=dict(item=item))

@@ -23,13 +23,13 @@ from pyrosimple.scripts.base import ScriptBase
 from pyrosimple.util import load_config
 
 
-def connect(config_dir=None, optional_config_files=None, cron_cfg="cron"):
+def connect(config_dir=None, optional_config_files=None):
     """Initialize everything for interactive use.
 
     Returns a ready-to-use RtorrentEngine object.
     """
 
-    ScriptBase.setup(cron_cfg=cron_cfg)
+    ScriptBase.setup()
     load_config.ConfigLoader(config_dir).load(optional_config_files or [])
 
     config.engine.open()
@@ -41,7 +41,6 @@ def view(
     matcher=None,
     config_dir=None,
     optional_config_files=None,
-    cron_cfg="cron",
 ):
     """Helper for interactive / high-level API use."""
-    return connect(config_dir, optional_config_files, cron_cfg).view(viewname, matcher)
+    return connect(config_dir, optional_config_files).view(viewname, matcher)

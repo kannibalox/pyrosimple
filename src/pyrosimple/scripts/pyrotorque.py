@@ -287,7 +287,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup(cron_cfg="torque")
+    ScriptBase.setup()
     RtorrentQueueManager().run()
 
 
