@@ -297,49 +297,56 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.prompt.add_options()
 
         # output control
-        self.add_bool_option(
-            "-S", "--shell", help="escape output following shell rules"
+        output_group = self.parser.add_argument_group('output')
+        output_group.add_argument(
+            "-S", "--shell", help="escape output following shell rules", action="store_true"
         )
-        self.add_bool_option(
+        output_group.add_argument(
             "-0",
             "--nul",
             "--print0",
+            action="store_true",
             help="use a NUL character instead of a linebreak after items",
         )
-        self.add_bool_option("-c", "--column-headers", help="print column headers")
-        self.add_bool_option(
-            "-+", "--stats", help="add sum / avg / median of numerical fields"
+        output_group.add_argument("-c", "--column-headers", help="print column headers",
+                                  action="store_true"
+                                  )
+        output_group.add_argument(
+            "-+", "--stats", help="add sum / avg / median of numerical fields",
+            action="store_true",
         )
-        self.add_bool_option(
-            "--summary", help="print only statistical summary, without the items"
+        output_group.add_argument(
+            "--summary", help="print only statistical summary, without the items",
+            action="store_true",
         )
-        # self.add_bool_option("-f", "--full",
-        #    help="print full torrent details")
-        self.add_bool_option(
+        output_group.add_argument(
             "--json",
             help="dump default fields of all items as JSON (use '-o f1,f2,...' to specify fields)",
+            action="store_true",
         )
-        self.add_value_option(
+        output_group.add_argument(
             "-o",
             "--output-format",
-            "FORMAT",
+            metavar="FORMAT",
             help="specify display format (use '-o-' to disable item display)",
         )
-        self.add_value_option(
+        output_group.add_argument(
             "-O",
             "--output-template",
-            "FILE",
+            metavar="FILE",
             help="pass control of output formatting to the specified template",
         )
-        self.add_value_option(
+        output_group.add_argument(
             "-s",
             "--sort-fields",
-            "FIELD",
+            metavar="FIELD",
             action="append",
             default=[],
             help="fields used for sorting, descending if prefixed with a '-'; '-s*' uses output field list",
         )
-        self.add_bool_option("-r", "--reverse-sort", help="reverse the sort order")
+        output_group.add_argument("-r", "--reverse-sort", help="reverse the sort order",
+                             action="store_true",
+                             )
         self.add_value_option(
             "-A",
             "--anneal",
@@ -402,19 +409,23 @@ class RtorrentControl(ScriptBaseWithConfig):
             choices=("=", "0", "1", "2"),
             help="enable query optimization (=: use config; 0: off; 1: safe; 2: danger seeker)",
         )
-        self.add_value_option(
+        action_group = self.parser.add_argument_group('actions')
+        action_group.add_argument(
             "--call",
-            "CMD",
+            metavar="CMD",
             action="append",
             default=[],
             help="call an OS command pattern in the shell",
         )
-        self.add_value_option(
+        action_group.add_argument(
             "--spawn",
-            "CMD [--spawn ...]",
+            metavar="CMD [--spawn ...]",
             action="append",
             default=[],
             help="execute OS command pattern(s) directly",
+        )
+        action_group.add_argument(
+            "-F", "--flush", help="flush changes immediately (save session data)", action="store_true"
         )
 
         # torrent state change (actions)
@@ -425,37 +436,32 @@ class RtorrentControl(ScriptBaseWithConfig):
             action.setdefault("argshelp", "")
             action.setdefault("args", ())
             if action.argshelp:
-                self.add_value_option(
-                    *action.options + (action.argshelp,),
+                action_group.add_argument(
+                    *action.options,
                     **{
+                        "metavar": action.argshelp,
                         "help": action.help
                         + (" (implies -i)" if action.interactive else "")
                     }
                 )
             else:
-                self.add_bool_option(
+                action_group.add_argument(
                     *action.options,
                     **{
+                        "action": 'store_true',
                         "help": action.help
                         + (" (implies -i)" if action.interactive else "")
                     }
                 )
-        self.add_value_option(
+        action_group.add_argument(
             "--ignore",
-            "|".join(self.IGNORE_OPTIONS),
-            type="choice",
             choices=self.IGNORE_OPTIONS,
             help="set 'ignore commands' status on torrent",
         )
-        self.add_value_option(
+        action_group.add_argument(
             "--prio",
-            "|".join(self.PRIO_OPTIONS),
-            type="choice",
             choices=self.PRIO_OPTIONS,
             help="set priority of torrent",
-        )
-        self.add_bool_option(
-            "-F", "--flush", help="flush changes immediately (save session data)"
         )
 
     def help_completion_fields(self):
@@ -784,9 +790,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.LOG.debug("Matcher is: %s", matcher)
 
         # View handling
-        if self.options.append_view and self.options.alter_view:
-            self.fatal("You cannot combine --append-view with --alter-view")
-
         if self.options.modify_view:
             if self.options.from_view or self.options.to_view:
                 self.fatal(
