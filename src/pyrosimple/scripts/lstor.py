@@ -77,10 +77,6 @@ class MetafileLister(ScriptBase):
                     data = metafile.checked_open(
                         filename,
                         log=self.LOG if self.options.skip_validation else None,
-                        quiet=(
-                            self.options.quiet
-                            and (self.options.output or self.options.raw)
-                        ),
                     )
                 except EnvironmentError as exc:
                     self.fatal(
@@ -143,11 +139,10 @@ class MetafileLister(ScriptBase):
                 else:
                     listing = "\n".join(torrent.listing(masked=not self.options.reveal))
             except (ValueError, KeyError, bencode.BencodeDecodeError) as exc:
-                if self.options.debug:
-                    raise
-                self.LOG.warning(
-                    "Bad metafile %r (%s: %s)" % (filename, type(exc).__name__, exc)
+                self.LOG.error(
+                    "Bad metafile %r (%s: %s)", filename, type(exc).__name__, exc
                 )
+                raise
             else:
                 if listing is not None:
                     print(listing)

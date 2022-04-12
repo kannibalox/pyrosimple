@@ -19,7 +19,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import json
-import logging
 import re
 import shlex
 import subprocess
@@ -816,9 +815,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
         if self.options.anneal:
-            if not self.options.quiet and set(self.options.anneal).difference(
-                set(["invert", "unique"])
-            ):
+            if set(self.options.anneal).difference(set(["invert", "unique"])):
                 if self.options.from_view not in (None, "default"):
                     self.LOG.warning(
                         "Mixing --anneal with a view other than 'default' might yield unexpected results!"
@@ -962,8 +959,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                             logged_cmd = cmd[0]
                         else:
                             logged_cmd = '"%s"' % ('" "'.join(cmd),)
-                        if self.options.verbose:
-                            self.LOG.info("Calling: %s", logged_cmd)
+                        self.LOG.info("Calling: %s", logged_cmd)
                         try:
                             if self.options.call:
                                 subprocess.check_call(cmd[0], shell=True)

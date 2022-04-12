@@ -25,6 +25,7 @@ import os
 import sys
 import textwrap
 import time
+import traceback
 
 from argparse import ArgumentParser
 from typing import List
@@ -190,21 +191,10 @@ class ScriptBase:
                 # Template method with the tool's main loop
                 self.mainloop()
             except error.LoggableError as exc:
-                if self.options.debug:
-                    raise
-
-                # Log errors caused by invalid user input
-                try:
-                    msg = str(exc)
-                except UnicodeError:
-                    msg = str(exc, "UTF-8")
-                self.LOG.error(msg)
+                traceback.print_exception(exc)
                 sys.exit(error.EX_SOFTWARE)
             except KeyboardInterrupt:
-                if self.options.debug:
-                    raise
-
-                print("\n\nAborted by CTRL-C!\n", file=sys.stderr)
+                self.LOG.critical("\n\nAborted by CTRL-C!\n", file=sys.stderr)
                 sys.exit(error.EX_TEMPFAIL)
             except IOError as exc:
                 # [Errno 32] Broken pipe?

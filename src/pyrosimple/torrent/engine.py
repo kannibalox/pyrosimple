@@ -689,9 +689,7 @@ class TorrentProxy:
 
         return "<%s(%s)>" % (
             self.__class__.__name__,
-            ", ".join(
-                sorted(["%s=%r" % mask(k, v) for k, v in self._fields.items()])
-            ),
+            ", ".join(sorted(["%s=%r" % mask(k, v) for k, v in self._fields.items()])),
         )
 
     # TODO: metafile data cache (sqlite, shelve or maybe .ini)
@@ -750,7 +748,7 @@ class TorrentView:
         if self._check_hash_view():
             return 1
         else:
-            return self.engine.open().view.size(rpc.NOHASH, self.viewname)
+            return int(self.engine.open().view.size(rpc.NOHASH, self.viewname))
 
     def items(self):
         """Get list of download items."""

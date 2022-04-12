@@ -20,6 +20,7 @@
 import errno
 import fnmatch
 import hashlib
+import logging
 import math
 import os
 import pprint
@@ -380,7 +381,7 @@ def data_size(metadata) -> int:
     return sum([f["length"] for f in info["files"]])
 
 
-def checked_open(filename: str, log=None, quiet=False):
+def checked_open(filename: str, log: logging.Logger = None):
     """Open and validate the given metafile.
     Optionally provide diagnostics on the passed logger, for
     invalid metafiles, which then just cause a warning but no exception.
@@ -396,9 +397,7 @@ def checked_open(filename: str, log=None, quiet=False):
             raise ValueError("Bad bencoded data - dict keys out of order?")
     except ValueError as exc:
         if log:
-            # Warn about it, unless it's a quiet value query
-            if not quiet:
-                log.warning("%s: %s" % (filename, exc))
+            log.warning("%s: %s" % (filename, exc))
         else:
             raise
 

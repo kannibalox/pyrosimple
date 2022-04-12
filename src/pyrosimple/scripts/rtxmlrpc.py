@@ -182,14 +182,13 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 else error.EX_DATAERR
             )
         else:
-            if not self.options.quiet:
-                if self.options.output_format == "repr":
-                    result = pformat(result)
-                elif self.options.output_format == "json":
-                    result = json.dumps(result)
-                else:
-                    result = fmt.rpc_result_to_string(result)
-                print(result)
+            if self.options.output_format == "repr":
+                result = pformat(result)
+            elif self.options.output_format == "json":
+                result = json.dumps(result)
+            else:
+                result = fmt.rpc_result_to_string(result)
+            print(result)
 
     def repl_usage(self):  # pylint: disable=no-self-use
         """Print a short REPL usage summary."""
@@ -221,7 +220,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             self.LOG.critical("prompt_toolkit must be installed to use the REPL!")
             raise
 
-        self.options.quiet = False
         proxy = self.open()
         ps1 = proxy.session.name() + "> "
         words = ["help", "stats", "exit"]

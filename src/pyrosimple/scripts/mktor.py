@@ -19,6 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import hashlib
+import logging
 import os
 import random
 import re
@@ -199,7 +200,9 @@ class MetafileCreator(ScriptBaseWithConfig):
         meta = torrent.create(
             datapath,
             self.args[1:],
-            progress=None if self.options.quiet else metafile.console_progress(),
+            progress=None
+            if logging.getLogger().isEnabledFor(logging.WARNING)
+            else metafile.console_progress(),
             root_name=self.options.root_name,
             private=self.options.private,
             no_date=self.options.no_date,
