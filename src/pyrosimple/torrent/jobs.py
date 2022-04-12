@@ -82,7 +82,7 @@ class PathMover:
         i.ignore(1)
         i.stop()
         for _ in range(0, 5):
-            if i.is_open:
+            if i.fetch("is_open"):
                 time.sleep(0.1)
             else:
                 break
@@ -95,7 +95,7 @@ class PathMover:
         """Conditionally move data"""
         template = templating.preparse(self.config.target)
         target = formatting.format_item(template, i)
-        if i.directory == target:
+        if i.fetch("directory") == target:
             self.LOG.debug("%s already moved, skipping", i.hash)
             return
         if target:
