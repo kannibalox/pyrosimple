@@ -20,7 +20,6 @@
 
 import json
 import logging
-import os
 import re
 import shlex
 import subprocess
@@ -28,8 +27,6 @@ import sys
 import time
 
 from typing import Callable, List, Optional, Union
-
-import daemon  # type: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
@@ -297,7 +294,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.add_bool_option(
             "-n", "--dry-run", help="don't commit changes, just tell what would happen"
         )
-        self.add_bool_option("--detach", help="run the process in the background")
         self.prompt.add_options()
 
         # output control
@@ -368,9 +364,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             "--to",
             "NAME",
             help="show search result only in named ncurses view",
-        )
-        self.add_bool_option(
-            "--append-view", "--append", help="DEPRECATED: use '--alter append' instead"
         )
         self.add_value_option(
             "--alter-view",
@@ -609,7 +602,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def show_in_view(self, sourceview, matches, targetname=None):
         """Show search result in ncurses view."""
-        append = self.options.append_view or self.options.alter_view == "append"
+        append = self.options.alter_view == "append"
         remove = self.options.alter_view == "remove"
         action_name = (
             ", appending to" if append else ", removing from" if remove else " into"
@@ -800,20 +793,6 @@ class RtorrentControl(ScriptBaseWithConfig):
                     "You cannot combine --modify-view with --from-view or --to-view"
                 )
             self.options.from_view = self.options.to_view = self.options.modify_view
-
-        # Detach to background?
-        # This MUST happen before the next step, when we connect to the torrent client
-        dcontext = None
-        if self.options.detach:
-            config.engine.load_config()
-            daemon_log = os.path.join(config.config_dir, "log", "rtcontrol.log")
-            with open(daemon_log, "ab+") as log_handle:
-                self.LOG.debug("Daemonizing process")
-                dcontext = daemon.DaemonContext(
-                    stderr=log_handle, stdout=log_handle, umask=0o022
-                )
-                dcontext.open()
-            time.sleep(0.05)  # let things settle a little
 
         # Find matching torrents
         view = config.engine.view(self.options.from_view, matcher)
@@ -1059,10 +1038,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             )
 
         self.LOG.debug("RPC stats: %s", config.engine._rpc)
-
-        # Clean up daemon context
-        if dcontext is not None:
-            dcontext.close()
 
 
 def run():  # pragma: no cover
