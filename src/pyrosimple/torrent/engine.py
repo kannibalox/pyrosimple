@@ -679,6 +679,7 @@ class TorrentProxy:
 
     def __repr__(self):
         """Return a representation of internal state."""
+
         def mask(key, val):
             "helper to hide sensitive stuff"
             if key in ("tracker", "custom_m_alias"):
@@ -689,12 +690,7 @@ class TorrentProxy:
         return "<%s(%s)>" % (
             self.__class__.__name__,
             ", ".join(
-                sorted(
-                    [
-                        "%s=%r" % mask(i, self._fields[i])
-                        for i in (set(self._fields) - attrs)
-                    ]
-                )
+                sorted(["%s=%r" % mask(i, self._fields[i]) for i in self._fields])
             ),
         )
 
