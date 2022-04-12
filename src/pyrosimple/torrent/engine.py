@@ -690,7 +690,7 @@ class TorrentProxy:
         return "<%s(%s)>" % (
             self.__class__.__name__,
             ", ".join(
-                sorted(["%s=%r" % mask(i, self._fields[i]) for i in self._fields])
+                sorted(["%s=%r" % mask(k, v) for k, v in self._fields.items()])
             ),
         )
 
