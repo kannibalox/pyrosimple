@@ -1,13 +1,13 @@
-tempita package
-===============
+pyrosimple.io package
+=====================
 
 Submodules
 ----------
 
-tempita.compat3 module
-----------------------
+pyrosimple.io.scgi module
+-------------------------
 
-.. automodule:: tempita.compat3
+.. automodule:: pyrosimple.io.scgi
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ tempita.compat3 module
 Module contents
 ---------------
 
-.. automodule:: tempita
+.. automodule:: pyrosimple.io
    :members:
    :undoc-members:
    :show-inheritance:
