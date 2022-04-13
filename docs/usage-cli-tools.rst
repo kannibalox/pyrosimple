@@ -186,19 +186,6 @@ normally, all the context information but ``specs`` would be lost on the
 receiving side. Just don't forget to provide a symlink in your download
 directory with the chosen name that points to the actual data directory.
 
-Very few people will ever need that, but another advanced feature is
-concurrent hashing — if the first argument is a named pipe (see the
-``mkfifo`` man page), the filenames to be hashed are read from that
-pipe. These names must be relative to the directory the named pipe
-resides in, or put another way, the named pipe has to be created in the
-same directory as the files to be hashed. For example, this makes it
-possible to hash files as they arrive via FTP or are transcoded from one
-audio format to another, reducing overall latency. See `the fifotest script`_
-for a demonstration of the concept.
-
-.. _`the fifotest script`: https://github.com/pyroscope/pyrocore/blob/master/src/tests/fifotest.sh
-
-
 .. _lstor:
 
 lstor
@@ -503,71 +490,6 @@ The :ref:`RtXmlRpcExamples` section shows some typical examples for querying glo
 and controlling rTorrent behaviour.
 
 
-.. _rtsweep:
-
-rtsweep
-^^^^^^^
-
-**NOT IMPLEMENTED YET!**  https://github.com/pyroscope/pyrocore/issues/7
-
-The :ref:`cli-usage-rtsweep` command provides means to perform automatic disk space management.
-It does so by deleting items loaded into rTorrent, including their data,
-following rules in the configuration that define an order of what to remove first.
-
-The required space is passed as the first argument, either in bytes or
-qualified with a unit character (K=KiB, M=MiB, G=GiB).
-Alternatively, you can pass a metafile path, with the requirement calculated from its content size.
-
-``rtsweep`` has these options::
-
-    -n, --dry-run         do not remove anything, just tell what would happen
-    -p PATH, --path=PATH  path into the filesystem to sweep (else the default download location)
-    -r RULESET [-r ...], --rules=RULESET [-r ...]
-                          name the ruleset(s) to use, instead of the default ones
-
-Use ``rtsweep show`` to list the active rules, ordered by their priority.
-To only display built-in rules, call ``rtsweep -r builtin show``.
-
-
-.. rubric:: Sweeping Rules
-
-Rules are defined in the ``[SWEEP_RULES_CUSTOM]`` section,
-as shown here including some further explanations:
-
-.. literalinclude:: setup.rst
-   :language: ini
-   :start-at: [SWEEP_RULES_CUSTOM]
-   :end-before: [ANNOUNCE]
-   :dedent: 4
-
-Rules are applied in the order of their priority.
-If a rule fails to provide more items to delete, the next rule is tried,
-until there are no more configured rules.
-Finally, if there is still not enough free space, *any* unprotected item is fair game,
-using the default order from ``SWEEP::default_order``.
-
-Also keep in mind that only items stored on the targeted file system are considered.
-It is defined by the ``--path`` option;
-rTorrent's default download location is used when no explicit path is provided.
-
-The built-in rules are these:
-
-.. literalinclude:: ../src/pyrocore/data/config/config.ini
-   :language: ini
-   :start-at: [SWEEP_RULES_BUILTIN]
-   :end-before: [ANNOUNCE]
-
-.. rubric:: Other `rtsweep` Configuration
-
-You can also change some fundamental settings regarding the behaviour of ``rtsweep``,
-of which ``space_min_free`` is the most likely you want to adapt:
-
-.. literalinclude:: ../src/pyrocore/data/config/config.ini
-   :language: ini
-   :start-at: [SWEEP]
-   :end-before: [SWEEP_RULES_CUSTOM]
-
-
 .. _rtmv:
 
 rtmv
@@ -615,15 +537,3 @@ haywire and create directory structures just anywhere.
     and fixing the download directory in rTorrent (like classical rtorrent
     completion event handling), and moving across devices (i.e. copying and
     then deleting).
-
-
-.. _rtevent:
-
-rtevent
-^^^^^^^
-
-**Not yet implemented**
-
-:ref:`cli-usage-rtevent` handles rTorrent events and provides common implementations
-for them, like completion moving. See EventHandling for details on using
-it.

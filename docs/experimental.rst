@@ -109,21 +109,6 @@ For example, the following queries the remote instance ID using ``rtxmlrpc``:
 This typically takes several seconds due to the necessary authentication.
 
 
-.. _monitoring:
-
-Using the Monitoring Web Service
---------------------------------
-
-.. include:: advanced-monitoring.rst
-
-
-Event Handling
---------------
-
-**TODO**
-– see `the old docs <https://github.com/pyroscope/pyroscope/tree/wiki/>`_ for anything not yet moved.
-
-
 Queue Manager: Planned Features
 -------------------------------
 
