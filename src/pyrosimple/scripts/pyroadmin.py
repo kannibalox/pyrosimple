@@ -23,21 +23,13 @@ import glob
 import os
 import pprint
 import re
-import shutil
-import sys
+import xmlrpc.client as xmlrpclib
 
-from contextlib import closing
 from pathlib import Path
-from zipfile import ZipFile
-
-import six
-
-from six.moves import StringIO, urllib
-from six.moves import xmlrpc_client as xmlrpclib
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import fmt, load_config, matching, metafile
+from pyrosimple.util import fmt, load_config, metafile
 
 
 class AdminTool(ScriptBaseWithConfig):
@@ -89,30 +81,6 @@ class AdminTool(ScriptBaseWithConfig):
             help="show config internals and full announce URL including keys",
         )
 
-    def download_resource(self, download_url, target, guard):
-        """Helper to download and install external resources."""
-        download_url = download_url.strip()
-        if not os.path.isabs(target):
-            target = os.path.join(config.config_dir, target)
-
-        if os.path.exists(os.path.join(target, guard)):
-            self.LOG.info("Already have '%s' in '%s'..." % (download_url, target))
-            return
-
-        if not os.path.isdir(target):
-            os.makedirs(target)
-
-        self.LOG.info("Downloading '%s' to '%s'..." % (download_url, target))
-        with closing(urllib.request.urlopen(download_url)) as url_handle:
-            if download_url.endswith(".zip"):
-                with closing(
-                    ZipFile(StringIO(url_handle.read()))
-                ) as zip_handle:  # pylint: disable=no-member
-                    zip_handle.extractall(target)  # pylint: disable=no-member
-            else:
-                with open(os.path.join(target, guard), "wb") as file_handle:
-                    shutil.copyfileobj(url_handle, file_handle)
-
     def mainloop(self):
         """The main loop."""
         self.check_for_connection()
@@ -128,17 +96,6 @@ class AdminTool(ScriptBaseWithConfig):
                 if not os.path.isdir(dirpath):
                     self.LOG.info("Creating %r..." % (dirpath,))
                     os.mkdir(dirpath)
-
-            # Initialize webserver stuff
-            if matching.truth(
-                getattr(config, "torque", {}).get("httpd.active", "False"),
-                "httpd.active",
-            ):
-                self.download_resource(
-                    config.torque["httpd.download_url.smoothie"],
-                    "htdocs/js",
-                    "smoothie.js",
-                )
 
         elif self.options.dump_config or self.options.output:
             config.engine.load_config()
@@ -362,15 +319,9 @@ class AdminTool(ScriptBaseWithConfig):
                         if name in builtins:
                             print("{}.set = {}".format(name, definition))
                         else:
-                            if six.PY2:
-                                rctype = {
-                                    str: "string",
-                                    int: "value",
-                                }.get(objtype, "simple")
-                            else:
-                                rctype = {str: "string", int: "value"}.get(
-                                    objtype, "simple"
-                                )
+                            rctype = {str: "string", int: "value"}.get(
+                                objtype, "simple"
+                            )
                             if const:
                                 rctype += "|const"
                                 const = None
