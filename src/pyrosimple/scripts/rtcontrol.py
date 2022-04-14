@@ -356,16 +356,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             action="store_true",
         )
         self.add_value_option(
-            "-A",
-            "--anneal",
-            "MODE",
-            type="choice",
-            action="append",
-            default=[],
-            choices=("dupes+", "dupes-", "dupes=", "invert", "unique"),
-            help="modify result set using some pre-defined methods",
-        )
-        self.add_value_option(
             "-/",
             "--select",
             "[N-]M",
@@ -638,69 +628,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.LOG.info("%s%s rTorrent view %r.", msg, action_name, targetname)
         config.engine.log(msg)
 
-    def anneal(self, mode, matches, orig_matches) -> bool:
-        """Perform post-processing.
-
-        Return True when any changes were applied.
-        """
-        changed = False
-
-        def dupes_in_matches():
-            """Generator for index of matches that are dupes."""
-            items_by_path = config.engine.group_by("realpath")
-            hashes = {x.hash for x in matches}
-            for idx, item in enumerate(matches):
-                same_path_but_not_in_matches = any(
-                    x.hash not in hashes for x in items_by_path.get(item.realpath, [])
-                )
-                if item.realpath and same_path_but_not_in_matches:
-                    yield idx
-
-        if mode == "dupes+":
-            items_by_path = config.engine.group_by("realpath")
-            hashes = {x.hash for x in matches}
-            dupes = []
-            for item in matches:
-                if item.realpath:
-                    # Add all items with the same path that are missing
-                    for dupe in items_by_path.get(item.realpath, []):
-                        if dupe.hash not in hashes:
-                            changed = True
-                            dupes.append(dupe)
-                            hashes.add(dupe.hash)
-            matches.extend(dupes)
-        elif mode == "dupes-":
-            for idx in reversed(list(dupes_in_matches())):
-                changed = True
-                del matches[idx]
-        elif mode == "dupes=":
-            items_by_path = config.engine.group_by("realpath")
-            dupes = list(
-                i
-                for i in matches
-                if i.realpath and len(items_by_path.get(i.realpath, [])) > 1
-            )
-            if len(dupes) != len(matches):
-                changed = True
-                matches[:] = dupes
-        elif mode == "invert":
-            hashes = {x.hash for x in matches}
-            changed = True
-            matches[:] = list(i for i in orig_matches if i.hash not in hashes)
-        elif mode == "unique":
-            seen, dupes = set(), []
-            for i, item in enumerate(matches):
-                if item.name in seen:
-                    changed = True
-                    dupes.append(i)
-                seen.add(item.name)
-            for i in reversed(dupes):
-                del matches[i]
-        else:
-            raise RuntimeError("Internal Error: Unknown anneal mode " + mode)
-
-        return changed
-
     def mainloop(self):
         """The main loop."""
         # Print field definitions?
@@ -813,20 +740,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         matches = list(view.items())
         orig_matches = matches[:]
         matches.sort(key=sort_key, reverse=self.options.reverse_sort)
-
-        if self.options.anneal:
-            if set(self.options.anneal).difference(set(["invert", "unique"])):
-                if self.options.from_view not in (None, "default"):
-                    self.LOG.warning(
-                        "Mixing --anneal with a view other than 'default' might yield unexpected results!"
-                    )
-                if int(config.fast_query):
-                    self.LOG.warning(
-                        "Using --anneal together with the query optimizer might yield unexpected results!"
-                    )
-            for mode in self.options.anneal:
-                if self.anneal(mode, matches, orig_matches):
-                    matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
         if selection:
             matches = matches[selection[0] - 1 : selection[1]]
