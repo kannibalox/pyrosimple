@@ -398,11 +398,10 @@ class RtorrentControl(ScriptBaseWithConfig):
             "NAME",
             help="get items from given view and write result back to it (short-cut to combine --from-view and --to-view)",
         )
-        self.add_value_option(
+        self.parser.add_argument(
             "-Q",
             "--fast-query",
-            "LEVEL",
-            type="choice",
+            metavar="LEVEL",
             default="=",
             choices=("=", "0", "1", "2"),
             help="enable query optimization (=: use config; 0: off; 1: safe; 2: danger seeker)",
@@ -410,7 +409,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         action_group = self.parser.add_argument_group("actions")
         action_group.add_argument(
             "--call",
-            metavar="CMD",
+            metavar="CMD [--call]",
             action="append",
             default=[],
             help="call an OS command pattern in the shell",
@@ -578,7 +577,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.options.output_format = formatting.preparse(output_format)
 
     # TODO: refactor to engine.FieldDefinition as a class method
-    def get_output_fields(self):
+    def get_output_fields(self) -> List[str]:
         """Get field names from output template."""
         # Re-engineer list from output format
         # XXX TODO: Would be better to use a FieldRecorder class to catch the full field names
@@ -738,7 +737,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Find matching torrents
         view = config.engine.view(self.options.from_view, matcher)
         matches = list(view.items())
-        orig_matches = matches[:]
         matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
         if selection:
