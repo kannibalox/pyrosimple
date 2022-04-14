@@ -39,7 +39,7 @@ class RTorrentTransport(xmlrpclib.Transport):
         self.codec = codec
         self.verbose = False
         self._headers = list(headers)
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, headers=self._headers, **kwargs)
 
     def parse_response(self, response):
         if self.codec == xmlrpclib:
