@@ -17,67 +17,13 @@ The following commands help you with managing metafiles:
  * :command:`lstor` safely lists their contents in various formats.
  * :command:`mktor` creates them, with support for painless cross-seeding.
  * :command:`chtor` changes existing metafiles, e.g. to add fast-resume information.
- * :command:`hashcheck` simply checks data against a given metafile's piece hashes.
 
 :command:`pyrotorque` is a companion daemon process to rTorrent that handles
 automation tasks like queue management, instant metafile loading from
 a directory tree via file system notifications, and other background tasks.
 
-:command:`rtsweep` cleans up disk space following rules in a given order.
-These rules are part of the configuration and determine what to delete first
-when disk space is needed for new items.
-
 :command:`pyroadmin` is a helper for administrative tasks (mostly configuration handling).
-and :command:`rtevent` is experimental and incomplete.
 
-
-Bash Completion
-^^^^^^^^^^^^^^^
-
-If you don't know what :command:`bash` completion is, or want to handle this later,
-you can skip to :ref:`common-options`.
-
-
-Using completion
-""""""""""""""""
-
-In case you don't know what :command:`bash` completion looks like, watch this…
-
-.. image:: videos/bash-completion.gif
-
-Every time you're unsure what options you have, you can press :kbd:`TAB↹` twice
-to get a menu of choices, and if you already know roughly what you want,
-you can start typing and save keystrokes by pressing :kbd:`TAB↹` once, to
-complete whatever you provided so far.
-
-So for example, enter a partial command name like :kbd:`rtco` and then :kbd:`TAB↹` to
-get ``rtcontrol``, then type :kbd:`--` followed by 2 times :kbd:`TAB↹` to get a list of
-possible command line options.
-
-
-Activating completion
-"""""""""""""""""""""
-
-To add `pyrocore`'s completion definitions to your shell, call these commands:
-
-.. code-block:: shell
-
-    pyroadmin --create-config
-    touch ~/.bash_completion
-    grep /\.pyroscope/ ~/.bash_completion >/dev/null || \
-        echo >>.bash_completion ". ~/.pyroscope/bash-completion.default"
-    . /etc/bash_completion
-
-After that, completion should work, see the above section for things to try out.
-
-.. note::
-
-    On `Ubuntu`, you need to have the ``bash-completion`` package
-    installed on your machine. Other Linux systems will have a similar
-    pre-condition.
-
-
-.. _common-options:
 
 Common Options
 ^^^^^^^^^^^^^^
@@ -92,7 +38,7 @@ All commands share some common options.
 
     Show the command's help information and exit.
 
-.. option:: -q, --quiet
+.. option:: -q, --quiet, --cron
 
     Omit informational logging, like the time it took to run the command.
 
@@ -123,9 +69,138 @@ comprehensive listing of all the current options.
 
     .. versionadded:: 0.6.1
 
-    This environment variable can be used to change the default :file:`~/.pyrocscope`
+    This environment variable can be used to change the default :file:`~/.pyroscope`
     of the :option:`--config-dir` option, for the duration of a shell session,
     or within a `systemd` unit.
+
+
+
+
+.. _rtxmlrpc:
+
+rtxmlrpc
+^^^^^^^^
+
+:ref:`cli-usage-rtxmlrpc` allows you to call raw XMLRPC methods on the rTorrent
+instance that you have specified in your configuration. See the
+:ref:`usage information <cli-usage-rtxmlrpc>` for available options.
+
+The method name and optional arguments are provided using standard shell
+rules, i.e. where you would use ``^X throttle_down=slow,120`` in
+rTorrent you just list the arguments in the usual shell way
+(``rtxmlrpc throttle_down slow 120``). The rTorrent format is also
+recognized though, but without any escaping rules (i.e. you cannot have
+a ``,`` in your arguments then).
+
+Remember that almost all commands require a ‘target’ as the first parameter
+in newer rTorrent versions, and you have to provide that explicitly.
+Thus, it must be ``rtxmlrpc view.size '' main``, with an extra empty argument
+– otherwise you'll get a ``Unsupported target type found`` fault.
+
+There are some special ways to write arguments of certain types:
+``+‹number›`` and ``-‹number›`` send an integer value,
+``@‹filename›``, ``@‹URL›``, or ``@-`` (for stdin) reads the argument's content into a XMLRPC binary value,
+and finally ``[‹item1›〈,‹item2›,…〉`` produces an array of strings.
+These typed arguments only cover some common use-cases,
+at some point you have to write Python code to build up more intricate data structures.
+
+The ``@‹URL›`` form supports ``http``, ``https``, and ``ftp``, here is an example call:
+
+.. code-block:: console
+
+    $ rtxmlrpc load.raw_verbose '' \
+      @"https://cdimage.debian.org/debian-cd/current/amd64/bt-cd/debian-9.0.0-amd64-netinst.iso.torrent"
+    0
+
+To get a list of available methods, just call ``rtxmlrpc system.listMethods``.
+The :ref:`RtXmlRpcExamples` section shows some typical examples for querying global information
+and controlling rTorrent behaviour.
+
+.. _rtcontrol:
+
+rtcontrol
+^^^^^^^^^
+
+Purpose
+"""""""
+
+:ref:`cli-usage-rtcontrol` allows you to select torrents loaded into rTorrent using
+various filter conditions. You can then either display the matches found
+in any rTorrent view for further inspection,
+list them to the console using flexible output formatting,
+or perform some management action like starting and stopping torrents.
+:ref:`RtXmlRpcExamples` shows examples for sending commands
+that don't target a specific item.
+
+For example, the command ``rtcontrol up=+0 up=-10k`` will list all
+torrents that are currently uploading any data, but at a rate of below
+10 KiB/s. See the :ref:`rtcontrol-examples` for more real-world examples,
+and the following section on basics regarding the filter conditions.
+
+
+.. _filter-conditions:
+
+Filter Conditions
+"""""""""""""""""
+
+Filter conditions take the form ``‹field›=‹value›``, and by default
+all given conditions must be met (AND). If a field name is omitted,
+``name`` is assumed. Multiple values separated by a comma indicate
+several possible choices (OR). ``!`` in front of a filter value
+negates it (NOT). Use uppercase ``OR`` to combine multiple alternative
+sets of conditions. And finally brackets can be used to group conditions
+and alter the default "AND before OR" behaviour; be sure to separate
+both the opening and closing bracket by white space from surrounding
+text. ``NOT`` at the start of a bracket pair inverts the contained condition.
+
+
+For string fields, the value is a
+`glob pattern <http://docs.python.org/library/fnmatch.html>`_
+which you are used to from shell filename patterns (``*``, ``?``, ``[a-z]``,
+``[!a-z]``); glob patterns must match the whole field value, i.e. use
+``*...*`` for 'contains' type searches. To use
+`regex matches <http://docs.python.org/howto/regex.html>`_ instead of globbing,
+enclose the pattern in slashes (``/regex/``). Since regex can express
+anchoring the match at the head (``^``) or tail (``$``), they're by
+default of the 'contains' type.
+All string comparisons are case-ignoring.
+
+If a string field's filter value starts with ``{{`` or ends with ``}}``,
+it is evaluated as a template for each item before matching it with the current field value.
+See :ref:`rtcontrol-filter-templates` for a practical use of that.
+
+For numeric fields, a leading ``+`` means greater than, a leading
+``-`` means less than (just like with the standard ``find`` command).
+
+Selection on fields that are lists of tags or names (e.g. ``tagged`` and
+``views``) works by just providing the tags you want to search for. The
+difference to the glob patterns for string fields is that tagged search
+respects word boundaries (whitespace), and to get a match the given tag
+just has to appear anywhere in the list (``bar`` matches on
+``foo bar baz``).
+
+In time filtering conditions (e.g. for the ``completed`` and ``loaded``
+fields), you have three possible options to specify the value:
+
+    #. time deltas in the form "``<number><unit>...``", where unit is a single
+       upper- or lower-case letter and one of ``Y``\ ear, ``M``\ onth, ``W``\ eek,
+       ``D``\ ay, ``H``\ our, m\ ``I``\ nute, or ``S``\ econd. The order is important
+       (``y`` before ``m``), and a ``+`` before the delta means *older than*,
+       while ``-`` means *younger than*.
+
+       Example: ``-1m2w3d``
+    #. a certain date and time in human readable form, where the date can be given in ISO
+       (``Y-M-D``), American (``M/D/Y``), or European (``D.M.Y``) format.
+       A date can be followed by a time, with minutes and seconds optional and
+       separated by ``:``. Put either a space or a ``T`` between the date and
+       the time.
+
+       Example: ``+2010-08-15t14:50``
+    #. absolute numerical UNIX timestamp, i.e. what ``ls -l --time-style '+%s'`` returns.
+
+       Example: ``+1281876597``
+
+See :ref:`useful-filter-conditions` for some concrete examples with an explanation of what they do.
 
 
 .. _mktor:
@@ -309,231 +384,50 @@ very sure you provide only those files you actually want to be changed.
 changes are first written to a temporary file, which is then renamed.
 
 
-.. _rtcontrol:
+Bash Completion
+^^^^^^^^^^^^^^^
 
-rtcontrol
-^^^^^^^^^
-
-Purpose
-"""""""
-
-:ref:`cli-usage-rtcontrol` allows you to select torrents loaded into rTorrent using
-various filter conditions. You can then either display the matches found
-in any rTorrent view for further inspection,
-list them to the console using flexible output formatting,
-or perform some management action like starting and stopping torrents.
-:ref:`RtXmlRpcExamples` shows examples for sending commands
-that don't target a specific item.
-
-For example, the command ``rtcontrol up=+0 up=-10k`` will list all
-torrents that are currently uploading any data, but at a rate of below
-10 KiB/s. See the :ref:`rtcontrol-examples` for more real-world examples,
-and the following section on basics regarding the filter conditions.
+If you don't know what :command:`bash` completion is, or want to handle this later,
+you can skip to :ref:`common-options`.
 
 
-.. _filter-conditions:
+Using completion
+""""""""""""""""
 
-Filter Conditions
-"""""""""""""""""
+In case you don't know what :command:`bash` completion looks like, watch this…
 
-Filter conditions take the form ``‹field›=‹value›``, and by default
-all given conditions must be met (AND). If a field name is omitted,
-``name`` is assumed. Multiple values separated by a comma indicate
-several possible choices (OR). ``!`` in front of a filter value
-negates it (NOT). Use uppercase ``OR`` to combine multiple alternative
-sets of conditions. And finally brackets can be used to group conditions
-and alter the default "AND before OR" behaviour; be sure to separate
-both the opening and closing bracket by white space from surrounding
-text. ``NOT`` at the start of a bracket pair inverts the contained condition.
+.. image:: videos/bash-completion.gif
 
+Every time you're unsure what options you have, you can press :kbd:`TAB↹` twice
+to get a menu of choices, and if you already know roughly what you want,
+you can start typing and save keystrokes by pressing :kbd:`TAB↹` once, to
+complete whatever you provided so far.
 
-For string fields, the value is a
-`glob pattern <http://docs.python.org/library/fnmatch.html>`_
-which you are used to from shell filename patterns (``*``, ``?``, ``[a-z]``,
-``[!a-z]``); glob patterns must match the whole field value, i.e. use
-``*...*`` for 'contains' type searches. To use
-`regex matches <http://docs.python.org/howto/regex.html>`_ instead of globbing,
-enclose the pattern in slashes (``/regex/``). Since regex can express
-anchoring the match at the head (``^``) or tail (``$``), they're by
-default of the 'contains' type.
-All string comparisons are case-ignoring.
-
-If a string field's filter value starts with ``{{`` or ends with ``}}``,
-it is evaluated as a template for each item before matching it with the current field value.
-See :ref:`rtcontrol-filter-templates` for a practical use of that.
-
-For numeric fields, a leading ``+`` means greater than, a leading
-``-`` means less than (just like with the standard ``find`` command).
-
-Selection on fields that are lists of tags or names (e.g. ``tagged`` and
-``views``) works by just providing the tags you want to search for. The
-difference to the glob patterns for string fields is that tagged search
-respects word boundaries (whitespace), and to get a match the given tag
-just has to appear anywhere in the list (``bar`` matches on
-``foo bar baz``).
-
-In time filtering conditions (e.g. for the ``completed`` and ``loaded``
-fields), you have three possible options to specify the value:
-
-    #. time deltas in the form "``<number><unit>...``", where unit is a single
-       upper- or lower-case letter and one of ``Y``\ ear, ``M``\ onth, ``W``\ eek,
-       ``D``\ ay, ``H``\ our, m\ ``I``\ nute, or ``S``\ econd. The order is important
-       (``y`` before ``m``), and a ``+`` before the delta means *older than*,
-       while ``-`` means *younger than*.
-
-       Example: ``-1m2w3d``
-    #. a certain date and time in human readable form, where the date can be given in ISO
-       (``Y-M-D``), American (``M/D/Y``), or European (``D.M.Y``) format.
-       A date can be followed by a time, with minutes and seconds optional and
-       separated by ``:``. Put either a space or a ``T`` between the date and
-       the time.
-
-       Example: ``+2010-08-15t14:50``
-    #. absolute numerical UNIX timestamp, i.e. what ``ls -l --time-style '+%s'`` returns.
-
-       Example: ``+1281876597``
-
-See :ref:`useful-filter-conditions` for some concrete examples with an explanation of what they do.
+So for example, enter a partial command name like :kbd:`rtco` and then :kbd:`TAB↹` to
+get ``rtcontrol``, then type :kbd:`--` followed by 2 times :kbd:`TAB↹` to get a list of
+possible command line options.
 
 
-.. _anneal-option:
+Activating completion
+"""""""""""""""""""""
 
-Annealing Results
-"""""""""""""""""
+To add `pyrocore`'s completion definitions to your shell, call these commands:
 
-Using the ``--anneal`` option, you can add some pre-defined post-processing steps that
-modify the current result set. You can use this option several times to combine processing
-steps in the order given on the command line. Sorting is done first, and if anything changes,
-the modified result is sorted again before applying the next step. Note that any ``--select``
-restrictions are applied *after* annealing.
+.. code-block:: shell
 
-The available processing methods are these:
+    pyroadmin --create-config
+    touch ~/.bash_completion
+    grep /\.pyroscope/ ~/.bash_completion >/dev/null || \
+        echo >>.bash_completion ". ~/.pyroscope/bash-completion.default"
+    . /etc/bash_completion
 
-dupes+
-    Adds any loaded item that shares the same base directory with any existing result item,
-    or points to the same file. Note that symlinks are followed, but hardlinks are always
-    considered independent (which they are when deleted).
-    This is especially useful in combination with ``--cull`` to avoid leaving items
-    with some or all of their files gone.
-
-dupes-
-    Removes items from the result that share the same path with any other loaded item,
-    as described for ``dupes+``, that is not *also* part of the result.
-    Again, combination with ``--cull`` is a typical use-case,
-    to avoid deleting data of items that still need to be seeded,
-    when only some of a set of duplicated items meet the deletion criteria.
-
-dupes=
-    Removes any items from the result that are *not* dupes, as defined above,
-    leaving only the dupes. Combine with ``invert`` to only get singular items.
-
-invert
-    Invert the current selection, i.e. select any item in the *original* result
-    (before any annealing happened) that is not in the *current* selection.
-
-unique
-    Ensures that only the *first* item in the result set having the same name
-    as other items *in the result set* is kept. The others are removed.
-    Note that unlike with ‘dupes’, the scope here is only the current result set,
-    not *all* loaded items.
-
-See :ref:`rtcontrol-alter` for a practical example using this.
-
-.. warning::
-
-    If you use options that cause ``rtcontrol`` to request only a subset of
-    all loaded items, then all ``dupes*`` methods will produce results that
-    might be unexpected, since they look at *all* available items, not just
-    the selected ones. And ‘all’ is different if you change the view, or
-    use the ``-Q`` option – for that reason, you'll get a warning if you mix
-    ``-A`` with these.
-
-
-.. _rtxmlrpc:
-
-rtxmlrpc
-^^^^^^^^
-
-:ref:`cli-usage-rtxmlrpc` allows you to call raw XMLRPC methods on the rTorrent
-instance that you have specified in your configuration. See the
-:ref:`usage information <cli-usage-rtxmlrpc>` for available options.
-
-The method name and optional arguments are provided using standard shell
-rules, i.e. where you would use ``^X throttle_down=slow,120`` in
-rTorrent you just list the arguments in the usual shell way
-(``rtxmlrpc throttle_down slow 120``). The rTorrent format is also
-recognized though, but without any escaping rules (i.e. you cannot have
-a ``,`` in your arguments then).
-
-Remember that almost all commands require a ‘target’ as the first parameter
-in newer rTorrent versions, and you have to provide that explicitly.
-Thus, it must be ``rtxmlrpc view.size '' main``, with an extra empty argument
-– otherwise you'll get a ``Unsupported target type found`` fault.
-
-There are some special ways to write arguments of certain types:
-``+‹number›`` and ``-‹number›`` send an integer value,
-``@‹filename›``, ``@‹URL›``, or ``@-`` (for stdin) reads the argument's content into a XMLRPC binary value,
-and finally ``[‹item1›〈,‹item2›,…〉`` produces an array of strings.
-These typed arguments only cover some common use-cases,
-at some point you have to write Python code to build up more intricate data structures.
-
-The ``@‹URL›`` form supports ``http``, ``https``, and ``ftp``, here is an example call:
-
-.. code-block:: console
-
-    $ rtxmlrpc load.raw_verbose '' \
-      @"https://cdimage.debian.org/debian-cd/current/amd64/bt-cd/debian-9.0.0-amd64-netinst.iso.torrent"
-    0
-
-To get a list of available methods, just call ``rtxmlrpc system.listMethods``.
-The :ref:`RtXmlRpcExamples` section shows some typical examples for querying global information
-and controlling rTorrent behaviour.
-
-
-.. _rtmv:
-
-rtmv
-^^^^
-
-With :ref:`cli-usage-rtmv`, you can move actively seeded data around at will.
-Currently, it only knows one mode of operation, namely moving the data
-directory or file and leave a symlink behind in its place (or fixing the
-symlink if you move data around a second time). Watch this example that
-shows what's going on internally::
-
-    ~/bt/rtorrent/work$ rtmv lab-rats /tmp/ -v
-    DEBUG    Found "lab-rats" for 'lab-rats'
-    INFO     Moving to "/tmp/lab-rats"...
-    DEBUG    Symlinking "~/bt/rtorrent/work/lab-rats"
-    DEBUG    rename("~/bt/rtorrent/work/lab-rats", "/tmp/lab-rats")
-    DEBUG    symlink("/tmp/lab-rats", "~/bt/rtorrent/work/lab-rats")
-    INFO     Moved 1 path (skipped 0)
-
-    $ rtmv /tmp/lab-rats /tmp/lab-mice -v
-    DEBUG    Item path "~/bt/rtorrent/work/lab-rats" resolved to "/tmp/lab-rats"
-    DEBUG    Found "lab-rats" for '/tmp/lab-rats'
-    INFO     Moving to "/tmp/lab-mice"...
-    DEBUG    Re-linking "~/bt/rtorrent/work/lab-rats"
-    DEBUG    rename("/tmp/lab-rats", "/tmp/lab-mice")
-    DEBUG    remove("~/bt/rtorrent/work/lab-rats")
-    DEBUG    symlink("/tmp/lab-mice", "~/bt/rtorrent/work/lab-rats")
-
-
-From the second example you can see that you can rename actively seeding
-downloads in mid-flight, i.e. to fix a bad root directory name.
-
-You can use ``rtmv`` in combination with ``rtcontrol --call`` for very flexible completion moving.
-To facilitate this, if there is a double slash ``//`` in the
-target path, it is always interpreted as a directory (i.e. you cannot
-rename the source file in that case), and the partial path after the
-``//`` is automatically created. This can be used in completion moving,
-to create hierarchies for dynamic paths built from ``rtcontrol`` fields.
-Since the part before the ``//`` has to exist beforehand, this won't go
-haywire and create directory structures just anywhere.
+After that, completion should work, see the above section for things to try out.
 
 .. note::
 
-    Future modes of operation will include copying instead of moving, moving
-    and fixing the download directory in rTorrent (like classical rtorrent
-    completion event handling), and moving across devices (i.e. copying and
-    then deleting).
+    On `Ubuntu`, you need to have the ``bash-completion`` package
+    installed on your machine. Other Linux systems will have a similar
+    pre-condition.
+
+
+.. _common-options:

@@ -12,8 +12,6 @@
 # serve to show the default.
 
 import os
-import re
-import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -21,8 +19,7 @@ import sys
 #sys.path.insert(0, os.path.abspath('.'))
 
 project_root = os.path.dirname(os.path.dirname(__file__))
-project_version = open(os.path.join(project_root, 'debian', 'changelog')).readline().strip()
-project_version = re.match(r'.*\(([^)]+)\).*', project_version).group(1)
+project_version = '0'
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if not on_rtd:
@@ -32,8 +29,8 @@ if not on_rtd:
 
 # https://docs.readthedocs.io/en/latest/guides/adding-custom-css.html
 def setup(app):
-    app.add_stylesheet('css/custom.css')
-    app.add_javascript('js/custom.js')
+    app.add_css_file('css/custom.css')
+    app.add_js_file('js/custom.js')
 
 # -- General configuration -----------------------------------------------------
 
@@ -46,8 +43,6 @@ extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
     'sphinx.ext.coverage', 'sphinx.ext.ifconfig', 'sphinx.ext.viewcode',
 ]
-if 0 and not on_rtd and os.environ.get('NOUML', '').lower() not in ('1', 'yes', 'y'):
-    extensions.append('sphinx_pyreverse')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -62,8 +57,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'pyrocore'
-copyright = u'2015 - 2018, PyroScope Project'
+project = 'pyrosimple'
+copyright = ''
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -213,7 +208,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'pyrocore.tex', u'pyrocore Documentation', u'pyroscope', 'manual'),
+    ('index', 'pyrocore.tex', 'pyrocore Documentation', 'pyroscope', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -242,7 +237,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pyrocore', u'pyrocore Documentation', [u'pyroscope'], 1)
+    ('index', 'pyrocore', 'pyrocore Documentation', ['pyroscope'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -255,8 +250,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'pyrocore', u'pyrocore Documentation',
-     u'pyroscope', 'pyrocore', 'One line description of project.',
+    ('index', 'pyrocore', 'pyrocore Documentation',
+     'pyroscope', 'pyrocore', 'One line description of project.',
      'Miscellaneous'),
 ]
 

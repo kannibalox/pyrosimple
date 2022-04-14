@@ -3,7 +3,7 @@
 API Documentation
 =================
 
-This is the full ``pyrocore`` API documentation, generated from source.
+This is the full ``pyrosimple`` API documentation, generated from source.
 
 Packages & Modules
 ------------------
@@ -11,7 +11,7 @@ Packages & Modules
 .. toctree::
    :maxdepth: 4
 
-   apidoc/pyrocore
+   apidoc/pyrosimple
 
 .. include : : include-api-uml.rst
 

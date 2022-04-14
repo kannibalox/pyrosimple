@@ -53,6 +53,7 @@ Contents of This Manual
     installation
     setup
     usage
+    migrating
 
 ..  toctree::
     :maxdepth: 2
@@ -67,7 +68,6 @@ Contents of This Manual
     :caption: Other Topics
 
     troubleshooting
-    updating
     tempita
     references
     license
