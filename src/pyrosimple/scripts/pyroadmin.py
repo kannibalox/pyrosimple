@@ -88,8 +88,6 @@ class AdminTool(ScriptBaseWithConfig):
             "--reveal",
             help="show config internals and full announce URL including keys",
         )
-        self.add_bool_option("--screenlet", help="create screenlet stub")
-
     def download_resource(self, download_url, target, guard):
         """Helper to download and install external resources."""
         download_url = download_url.strip()
@@ -387,32 +385,6 @@ class AdminTool(ScriptBaseWithConfig):
                             )
                     if const:
                         print("method.const.enable = {}".format(name))
-
-        elif self.options.screenlet:
-            # Create screenlet stub
-            stub_dir = os.path.expanduser("~/.screenlets/PyroScope")
-            if os.path.exists(stub_dir):
-                self.fatal("Screenlet stub %r already exists" % stub_dir)
-
-            stub_template = os.path.join(
-                os.path.dirname(config.__file__), "data", "screenlet"
-            )
-            shutil.copytree(stub_template, stub_dir)
-
-            py_stub = os.path.join(stub_dir, "PyroScopeScreenlet.py")
-            with open(py_stub, "w", encoding="utf-8") as handle:
-                handle.write(
-                    "\n".join(
-                        [
-                            "#! %s" % sys.executable,
-                            "from pyrosimple.screenlet.rtorrent import PyroScopeScreenlet, run",
-                            "if __name__ == '__main__':",
-                            "    run()",
-                            "",
-                        ]
-                    )
-                )
-            os.chmod(py_stub, 0o755)
 
         else:
             # Print usage
