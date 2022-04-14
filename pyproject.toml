@@ -41,12 +41,14 @@ lstor = "pyrosimple.scripts.lstor:run"
 chtor = "pyrosimple.scripts.chtor:run"
 mktor = "pyrosimple.scripts.mktor:run"
 pyrotorque = "pyrosimple.scripts.pyrotorque:run"
+pyroadmin = "pyrosimple.scripts.pyroadmin:run"
 
 [tool.poetry.dev-dependencies]
 coverage = "^6.3.2"
 pylint = "^2.12.2"
 pytest = "^7.0.1"
 typing-extensions = "^4.1.1"
+Sphinx = "^4.5.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
