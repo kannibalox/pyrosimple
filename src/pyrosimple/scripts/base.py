@@ -134,7 +134,7 @@ class ScriptBase:
         self.parser.add_argument(
             "-q",
             "--quiet",
-            "--cron", # For backwards compatibility
+            "--cron",  # For backwards compatibility
             help="silence warnings",
             dest="log_level",
             action="store_const",

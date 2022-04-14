@@ -88,6 +88,7 @@ class AdminTool(ScriptBaseWithConfig):
             "--reveal",
             help="show config internals and full announce URL including keys",
         )
+
     def download_resource(self, download_url, target, guard):
         """Helper to download and install external resources."""
         download_url = download_url.strip()

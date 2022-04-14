@@ -182,13 +182,16 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 else error.EX_DATAERR
             )
         else:
-            if self.options.output_format == "repr":
-                result = pformat(result)
-            elif self.options.output_format == "json":
-                result = json.dumps(result)
-            else:
-                result = fmt.rpc_result_to_string(result)
-            print(result)
+            if self.LOG.isEnabledFor(
+                logging.WARNING
+            ):  # Hack to hide output when `-q` is in effect
+                if self.options.output_format == "repr":
+                    result = pformat(result)
+                elif self.options.output_format == "json":
+                    result = json.dumps(result)
+                else:
+                    result = fmt.rpc_result_to_string(result)
+                print(result)
 
     def repl_usage(self):  # pylint: disable=no-self-use
         """Print a short REPL usage summary."""
