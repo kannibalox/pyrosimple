@@ -541,7 +541,7 @@ def core_fields():
         "throttle",
         "throttle group name (NULL=unlimited, NONE=global)",
         matcher=matching.PatternFilter,
-        accessor=lambda o: o._fields["throttle"] or "NONE",
+        accessor=lambda o: o._fields["throttle"] if "throttle" in o._fields else "NONE",
     )
 
     # Lifecyle
