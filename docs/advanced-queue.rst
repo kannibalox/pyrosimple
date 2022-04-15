@@ -318,7 +318,7 @@ can/must be provided (see below for a list of built-in handlers and what they
 do).
 
 Details on the ``schedule`` parameter can be found
-`here <https://apscheduler.readthedocs.io/en/v2.1.2/cronschedule.html>`_.
+`here <https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html>`_.
 Multiple fields must be separated by spaces, so if a field value
 contains a space, it must be quoted, e.g. ``hour=12 "day=3rd sun"``.
 The ``handler`` parameter tells the system where to look for the job

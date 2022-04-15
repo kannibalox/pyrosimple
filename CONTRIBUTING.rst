@@ -18,7 +18,7 @@ If you never opened an issue on GitHub before, consult the
 Before creating a bug report, please read the `Trouble-Shooting Guide`_
 and also see ``contribution-guide.org``'s `Submitting Bugs`_.
 
-.. _`Mastering Issues`: https://guides.github.com/features/issues/
+.. _`Mastering Issues`: https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues
 .. _`contribution-guide.org`: http://www.contribution-guide.org/
 .. _`Submitting Bugs`: http://www.contribution-guide.org/#submitting-bugs
 .. _`Trouble-Shooting Guide`: https://pyrocore.readthedocs.org/en/latest/troubleshooting.html
