@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=
 """ Color theme support.
 
     Copyright (c) 2017 The PyroScope Project <pyroscope.project@gmail.com>

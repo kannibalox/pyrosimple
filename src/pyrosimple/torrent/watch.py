@@ -39,7 +39,7 @@ try:
 except ImportError:
     pyinotify = Bunch(
         WatchManager=None, ProcessEvent=object
-    )  # bogus pylint: disable=C0103
+    )
 
 
 class MetafileHandler:
@@ -254,7 +254,7 @@ class TreeWatchHandler(pyinotify.ProcessEvent):
     METAFILE_EXT = (".torrent", ".load", ".start", ".queue")
 
     def my_init(self, **kw):
-        self.job = kw["job"]  # pylint: disable=W0201
+        self.job = kw["job"]
 
     def handle_path(self, event):
         """Handle a path-related event."""
@@ -351,7 +351,7 @@ class TreeWatch:
         if not pyinotify.WatchManager:
             raise error.UserError(
                 "You need to install 'pyinotify' to use %s!" % (self.__class__.__name__)
-            )  # pylint: disable=E1101, W0212
+            )
 
         self.manager = pyinotify.WatchManager()
         self.handler = TreeWatchHandler(job=self)

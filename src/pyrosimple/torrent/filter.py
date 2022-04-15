@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=I0011
 """ rTorrent Item Filter Jobs.
 
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>

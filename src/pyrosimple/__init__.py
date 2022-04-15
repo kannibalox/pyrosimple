@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=
 """ Python Torrent Tools Core Package.
 
     Copyright (c) 2010 The PyroScope Project <pyroscope.project@gmail.com>

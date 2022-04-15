@@ -946,7 +946,7 @@ class RtorrentEngine:
         view: Optional[str] = None,
         append: bool = False,
         disjoin: bool = False,
-    ):  # pylint: disable=arguments-differ
+    ):
         """Visualize a set of items (search result), and return the view name."""
         proxy = self.open()
         view_name: str = self._resolve_viewname(view or "rtcontrol")

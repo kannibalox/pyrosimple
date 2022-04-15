@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=no-member
 """ Command Line Script Support.
 
     Copyright (c) 2009, 2010 The PyroScope Project <pyroscope.project@gmail.com>
@@ -68,7 +67,7 @@ class ScriptBase:
         self.return_code = 0
 
         try:
-            import importlib.metadata  # pylint: disable=import-outside-toplevel,no-member
+            import importlib.metadata  # pylint: disable=import-outside-toplevel
 
             self.__version__ = importlib.metadata.version("pyrosimple")
         except ImportError:

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=
 """ Metafile Lister.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -97,7 +96,7 @@ class MetafileLister(ScriptBase):
                             len(data["info"]["pieces"])
                             / len(
                                 hashlib.sha1().digest()
-                            )  # bogus pylint: disable=E1101
+                            )
                         )
 
                     class BencodeJSONEncoder(json.JSONEncoder):

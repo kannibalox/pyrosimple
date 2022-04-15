@@ -54,7 +54,6 @@ CACHE_METHOD = {
 
 
 class XmlRpcError(xmlrpclib.Fault):
-    # pylint: disable=non-parent-init-called
     """Base class for XMLRPC protocol errors."""
 
     def __init__(self, msg, *args):
@@ -102,14 +101,13 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         *,
         headers=(),
         context=None,
-    ):  # pylint: disable=unused-argument
-        # establish a "logical" server connection
-
-        # get the url
+    ):
+        # Get the url
         parsed_url = urllib.parse.urlsplit(uri)
         queries = urllib.parse.parse_qs(parsed_url.query)
         if parsed_url.scheme not in ("http", "https", "scgi", "scgi+ssh", "scgi+unix"):
             raise OSError("unsupported XML-RPC protocol")
+        # Config the connection details
         self.__rpc_codec = queries.get("rpc", ["xml"])[0]
         self.__uri = uri
         self.__host = parsed_url.netloc

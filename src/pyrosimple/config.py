@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=I0011,C0103,W0404
 """ Configuration.
 
     For details, see https://pyrosimple.readthedocs.io/en/latest/setup.html
