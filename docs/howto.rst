@@ -168,7 +168,7 @@ Alternatively, you can also set the ``scgi_url`` value directly, like in this ex
 For convenient use on the command line, you can give those connection URLs alias names
 in the ``[CONNECTIONS]`` section of the configuration, like in this example:
 
-.. code-block:: initial
+.. code-block:: ini
 
     [CONNECTIONS]
 
@@ -419,7 +419,7 @@ The basic pattern works like this:
     guard="handled"
     …
 
-    rtcontrol --from-view complete -qohash --anneal unique tagged=\!$guard | \
+    rtcontrol --from-view complete -qohash tagged=\!$guard | sort -u | \
     while read hash; do
         …
 
@@ -429,8 +429,6 @@ The basic pattern works like this:
 
 The ``--from-view $hash //`` is an efficient way to select a specific item by hash,
 in case you wondered. ``hash=‹infohash›`` in contrast loads all items, then filters out just one.
-And ``--anneal unique`` prevents items duplicated by name to be processed several times
-(by ignoring the duplicates).
 
 A variant of this is to use a flag file in the download's directory –
 such a file can be created and checked by simply poking the file system, which
@@ -602,8 +600,6 @@ This simple way would remove the data of actively seeding duplicates though, mak
 So the second command removes active seeds from the first result that was stored in the ``rtcontrol`` view.
 For that, we select the active items in the initial result, add any dupes of *those*,
 and then *take out* that subset using ``--alter remove``.
-Note that ``views=rtcontrol`` is used instead of ``--from rtcontrol``,
-because otherwise ``--anneal`` doesn't work correctly (see the warning at :ref:`anneal-option` for details).
 
 Now, the reduced result set is culled, leaving the active dupes and their data untouched.
 Finally, left-overs from the target tracker are just deleted.
@@ -613,8 +609,5 @@ Finally, left-overs from the target tracker are just deleted.
 
 The other choice for ``--alter`` is ``append``,
 which can be used to incrementally assemble filter results into a view.
-While you can also combine filters using ``OR``,
-this way helps in some situations where that is not possible
-– especially when using ``--anneal`` or ``--select``, options that apply to *all* results within *one* command call.
 
 .. end howto.rst

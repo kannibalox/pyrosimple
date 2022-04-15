@@ -153,7 +153,7 @@ Another example regarding data paths is this:
 
 .. code-block:: bash
 
-    rtcontrol --from stopped // --anneal dupes= --exec 'directory.set={{item.directory}}-{{item.hash}}'
+    rtcontrol --from stopped // --exec 'directory.set={{item.directory}}-{{item.hash}}'
 
 That command ensures that items that would download into the same path get a unique name by appending the info hash,
 and assumes those items weren't started yet (i.e. added via ``load.normal``).

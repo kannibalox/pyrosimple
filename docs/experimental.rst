@@ -65,11 +65,6 @@ and the less selective one is used for the pre-filter:
     INFO     !!! pre-filter: equal=d.ignore_commands=,value=0
     DEBUG    Got 117 items with 20 attributes …
 
-Be careful when mixing ``--anneal`` and ``--fast-query``, since most of the post-processing steps also look
-at deselected items, and produce unexpected results if they are missing due to pre-filtering. Put another way,
-always include ``-Q0`` when you use ``--anneal``, to be on the safe side.
-
-
 Connecting via SSH
 ------------------
 

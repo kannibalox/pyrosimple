@@ -276,8 +276,6 @@ rtcontrol
       -s [-]FIELD[,...] [-s...], --sort-fields=[-]FIELD[,...] [-s...]
                             fields used for sorting, descending if prefixed with a '-'; '-s*' uses output field list
       -r, --reverse-sort    reverse the sort order
-      -A MODE [-A...], --anneal=MODE [-A...]
-                            modify result set using some pre-defined methods
       -/ [N-]M, --select=[N-]M
                             select result subset by item position (counting from 1)
       -V, --view-only       show search result only in default ncurses view

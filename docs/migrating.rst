@@ -13,4 +13,4 @@ The easiest thing to do is to copy your existing configuration to pyrosimple's d
 
     cp -r ~/.pyroscope ~/.config/pyrosimple
 
-Edit the config files to 
+Edit the config files to use ``pyrosimple`` instead of ``pyrocore``
