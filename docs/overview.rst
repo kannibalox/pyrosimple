@@ -94,7 +94,5 @@ Further Information & Customization
     There are more ways for adding your own custom logic,
     amongst them :ref:`CustomFields` for adding user-defined fields,
     available in ``rtcontrol`` just like built-in ones.
-  * :doc:`updating` explains how to get newer versions
-    of this software after the initial installation.
   * :doc:`references` provides details on technical background topics
     like XMLRPC, and links into the web with related information.

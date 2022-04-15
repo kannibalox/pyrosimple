@@ -59,11 +59,11 @@ to improve your basic know-how, in case you have trouble following some parts of
 * `Free Python Books`_
 
 .. _The Debian Administrator's Handbook: https://debian-handbook.info/browse/stable/
-.. _The Linux Command Line: http://linuxcommand.org/tlcl.php
+.. _The Linux Command Line: https://linuxcommand.org/tlcl.php
 .. _The Art of Command Line: https://github.com/jlevy/the-art-of-command-line#the-art-of-command-line
 .. _Ansible Documentation: https://docs.ansible.com/#ansible-documentation
 
-.. _`The Hitchhiker’s Guide to Python`: http://docs.python-guide.org/
+.. _`The Hitchhiker’s Guide to Python`: https://docs.python-guide.org/
 .. _`Free Python Books`: https://github.com/TechBookHunter/Free-Python-Books#free-python-books
 
 

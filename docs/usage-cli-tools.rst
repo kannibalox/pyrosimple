@@ -155,11 +155,11 @@ text. ``NOT`` at the start of a bracket pair inverts the contained condition.
 
 
 For string fields, the value is a
-`glob pattern <http://docs.python.org/library/fnmatch.html>`_
+`glob pattern <https://docs.python.org/library/fnmatch.html>`_
 which you are used to from shell filename patterns (``*``, ``?``, ``[a-z]``,
 ``[!a-z]``); glob patterns must match the whole field value, i.e. use
 ``*...*`` for 'contains' type searches. To use
-`regex matches <http://docs.python.org/howto/regex.html>`_ instead of globbing,
+`regex matches <https://docs.python.org/howto/regex.html>`_ instead of globbing,
 enclose the pattern in slashes (``/regex/``). Since regex can express
 anchoring the match at the head (``^``) or tail (``$``), they're by
 default of the 'contains' type.

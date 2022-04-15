@@ -40,7 +40,6 @@ Some noteworthy facts:
 * ``pyrocore.config`` is imported as ``config_ini``, to not clash with the ``config`` dict passed into jobs.
 * create a ``LOG`` attribute as shown, for your logging needs.
 * to interact with *rTorrent*, open a proxy connection in ``run``.
-* the :any:`InfluxDB` job shows how to access config parameters, e.g. ``self.config.dbname``.
 * raise :any:`UserError` in the initializer to report configuration mishaps and prevent ``pyrotorque`` from starting.
 
 More complex jobs that you can look at are the

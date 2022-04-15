@@ -8,7 +8,9 @@ current_dir := $(patsubst %/,%,$(dir $(mkfile_path)))
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = poetry run sphinx-build
+SPHINXAPIDOC   = poetry run sphinx-apidoc
+SPHINXAUTOBUILD   = poetry run sphinx-autobuild
 PAPER         =
 BUILDDIR      = $(current_dir)/_build
 
@@ -54,6 +56,17 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)
+
+
+.PHONY: apidoc
+apidoc:
+#       Easier to run manually, but basically will never change
+#       $(SPHINXAPIDOC) -o apidoc -f -T $(dirname $(python -c 'import tempita; print(tempita.__file__)'))
+	$(SPHINXAPIDOC) -o apidoc -f -T ../src/pyrosimple
+
+.PHONY: autobuild
+autobuild:
+	$(SPHINXAUTOBUILD) --ignore '.*' --ignore '*.log' --ignore '*.txt' --port 8008 $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 .PHONY: latexpdf
 latexpdf:

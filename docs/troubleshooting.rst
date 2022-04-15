@@ -28,7 +28,7 @@ use the mailing list or IRC for that.
     Eventually, someone will notice you – IRC is a global medium, and
     people *do* live in different time zones than you.
 
-    Put up any logs on `0bin <http://0bin.net/>`_ or any other pastebin
+    Put up any logs on `0bin <https://0bin.net/>`_ or any other pastebin
     service, and **make sure you removed any personal information** you
     don't want to be publically known. Copy the pastebin link into IRC
     or into your post.
@@ -36,7 +36,7 @@ use the mailing list or IRC for that.
 The following helps with querying your system environment, e.g. the
 version of Python and your OS.
 
-.. _`pyroscope-users`: http://groups.google.com/group/pyroscope-users
+.. _`pyroscope-users`: https://groups.google.com/group/pyroscope-users
 .. _`open an issue`: https://github.com/pyroscope/pyrocore/issues
 .. _`search box`: https://help.github.com/articles/searching-issues/
 
