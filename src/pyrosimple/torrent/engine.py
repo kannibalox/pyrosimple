@@ -497,7 +497,7 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
-        accessor=lambda o: float(o.fetch("completed_bytes")) / o.fetch("size_bytes"),
+        accessor=lambda o: float(o.rpc_call("completed_bytes")) / o.rpc_call("size_bytes"),
     )
     yield DynamicField(
         ratio_float,
@@ -527,14 +527,14 @@ def core_fields():
         "down",
         "download rate",
         matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.fetch("down"),
+        accessor=lambda o: o.rpc_call("down.rate"),
     )
     yield DynamicField(
         int,
         "up",
         "upload rate",
         matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o._fields["up"],
+        accessor=lambda o: o.rpc_call("up.rate"),
     )
     yield DynamicField(
         str,
