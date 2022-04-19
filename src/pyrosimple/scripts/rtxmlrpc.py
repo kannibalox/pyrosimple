@@ -122,8 +122,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             help="restore session state from .rtorrent session file(s)",
         )
 
-        # TODO: Tempita with "result" object in namespace
-        # self.add_value_option("-o", "--output-format", "FORMAT",
+        # TODO: Template with "result" object in namespace
+        # self.add_value_option("-O", "--output-template", "FORMAT",
         #    help="pass result to a template for formatting")
 
     def open(self):

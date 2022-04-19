@@ -37,9 +37,7 @@ from pyrosimple.util.parts import Bunch
 try:
     import pyinotify
 except ImportError:
-    pyinotify = Bunch(
-        WatchManager=None, ProcessEvent=object
-    )
+    pyinotify = Bunch(WatchManager=None, ProcessEvent=object)
 
 
 class MetafileHandler:
@@ -147,7 +145,7 @@ class MetafileHandler:
         self.ns.commands = []
         for key, cmd in sorted(self.job.custom_cmds.items()):
             try:
-                self.ns.commands.append(formatting.expand_template(cmd, self.ns))
+                self.ns.commands.append(formatting.format_item(cmd, self.ns))
             except error.LoggableError as exc:
                 self.job.LOG.error(
                     "While expanding '%s' custom command: %s" % (key, exc)
@@ -253,9 +251,6 @@ class TreeWatchHandler(pyinotify.ProcessEvent):
 
     METAFILE_EXT = (".torrent", ".load", ".start", ".queue")
 
-    def my_init(self, **kw):
-        self.job = kw["job"]
-
     def handle_path(self, event):
         """Handle a path-related event."""
         self.job.LOG.debug("Notification %r" % event)
@@ -334,7 +329,7 @@ class TreeWatch:
                         " (%r already registered, you also added %r)!"
                         % (key, self.custom_cmds[key], val)
                     )
-                self.custom_cmds[key] = formatting.preparse(val)
+                self.custom_cmds[key] = val
         self.LOG.debug("custom commands = %r", self.custom_cmds)
 
         # Get client proxy

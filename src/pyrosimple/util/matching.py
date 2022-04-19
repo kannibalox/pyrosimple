@@ -290,7 +290,7 @@ class PatternFilter(FieldFilter):
                 ##print('!!!', val, '~~~', pattern, '???')
                 return fnmatch.fnmatchcase(val, pattern.lower())
 
-            self._template = pyrosimple.torrent.formatting.preparse(self._value)
+            self._template = self._value
             self._matcher = _template_globber
         else:
             self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)

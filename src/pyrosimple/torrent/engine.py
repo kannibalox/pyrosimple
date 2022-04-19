@@ -497,7 +497,8 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
-        accessor=lambda o: float(o.rpc_call("completed_bytes")) / o.rpc_call("size_bytes"),
+        accessor=lambda o: float(o.rpc_call("completed_bytes"))
+        / o.rpc_call("size_bytes"),
     )
     yield DynamicField(
         ratio_float,

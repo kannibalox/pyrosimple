@@ -22,16 +22,15 @@ import logging
 import operator
 import os
 import re
-import sys
 
-from typing import Any, Callable, Dict, Optional, Union
+from pathlib import Path
+from typing import Callable, Dict, Optional, Union
 
-import tempita
+from jinja2 import Environment, FileSystemLoader
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine, rtorrent
-from pyrosimple.util import fmt, pymagic, templating
-from pyrosimple.util.parts import Bunch
+from pyrosimple.util import fmt, pymagic
 
 
 #
@@ -86,7 +85,11 @@ def fmt_subst(regex, subst):
 
 def fmt_mtime(val: str) -> float:
     """Modification time of a path."""
-    return os.path.getmtime(val) if val else 0.0
+    p = Path(str(val))
+    if p.exists():
+        return p.stat().st_mtime
+    else:
+        return 0.0
 
 
 def fmt_pathbase(val: str) -> str:
@@ -97,6 +100,21 @@ def fmt_pathbase(val: str) -> str:
 def fmt_pathname(val: str) -> str:
     """Base name of a path, without its extension."""
     return os.path.splitext(os.path.basename(val or ""))[0]
+
+
+def fmt_raw(val):
+    """A little magic to allow showing the raw value of a field in rtcontrol"""
+    return val
+
+
+def fmt_fmt(val, field):
+    """Apply a field-specific formatter (if present)"""
+    if field not in engine.FieldDefinition.FIELDS:
+        return val
+    formatter = engine.FieldDefinition.FIELDS[field]._formatter
+    if formatter:
+        return formatter(val)
+    return val
 
 
 def fmt_pathext(val: str) -> str:
@@ -114,237 +132,60 @@ def fmt_json(val):
     return json.dumps(val, cls=pymagic.JSONEncoder)
 
 
-#
-# Displaying and filtering items
-#
-class OutputMapping:
-    """Map item fields for displaying them."""
-
-    @classmethod
-    def formatter_help(cls):
-        """Return a list of format specifiers and their documentation."""
-        result = [("raw", "Switch off the default field formatter.")]
-
-        for name, method in globals().items():
-            if name.startswith("fmt_"):
-                result.append((name[4:], method.__doc__.strip()))
-
-        return result
-
-    def __init__(self, obj, defaults=None):
-        """Store object we want to map, and any default values.
-
-        @param obj: the wrapped object
-        @type obj: object
-        @param defaults: default values
-        @type defaults: dict
-        """
-        self.obj = obj
-        self.defaults = defaults or {}
-
-        # add percent sign so we can easily reference it in .ini files
-        # (a better way is to use "%%%%" though, so regard this as deprecated)
-        # or maybe not deprecated, header queries return '%' now...
-        self.defaults.setdefault("pc", "%")
-
-    def __getitem__(self, key):
-        """Return object attribute named C{key}. Additional formatting is provided
-        by adding modifiers like ".sz" (byte size formatting) to the normal field name.
-
-        If the wrapped object is None, the upper-case C{key} (without any modifiers)
-        is returned instead, to allow the formatting of a header line.
-        """
-        # Check for formatter specifications
-        formatter = None
-        have_raw = False
-        if "." in key:
-            key, formats = key.split(".", 1)
-            formats = formats.split(".")
-
-            have_raw = formats[0] == "raw"
-            if have_raw:
-                formats = formats[1:]
-
-            for fmtname in formats:
-                try:
-                    fmtfunc = globals()["fmt_" + fmtname]
-                except KeyError:
-                    # pylint: disable=raise-missing-from
-                    raise error.UserError(
-                        "Unknown formatting spec %r for %r" % (fmtname, key)
-                    )
-                else:
-                    formatter = (
-                        (lambda val, f=fmtfunc, k=formatter: f(k(val)))
-                        if formatter
-                        else fmtfunc
-                    )
-
-        # Check for a field formatter
-        try:
-            field = engine.FieldDefinition.FIELDS[key]
-        except KeyError as exc:
-            if (
-                key not in self.defaults
-                and not engine.TorrentProxy.add_manifold_attribute(key)
-            ):
-                raise error.UserError("Unknown field %r" % (key,)) from exc
-        else:
-            if field._formatter and not have_raw:
-                formatter = (
-                    (lambda val, f=formatter: f(field._formatter(val)))
-                    if formatter
-                    else field._formatter
-                )
-
-        if self.obj is None:
-            # Return column name
-            return "%" if key == "pc" else key.upper()
-        else:
-            # Return formatted value
-            try:
-                val = getattr(self.obj, key)
-            except AttributeError as exc:
-                try:
-                    val = self.defaults[key]
-                except KeyError:
-                    raise AttributeError("%s for %r.%s" % (exc, self.obj, key)) from exc
-            try:
-                return formatter(val) if formatter else val
-            except (TypeError, ValueError, KeyError, IndexError, AttributeError) as exc:
-                raise error.LoggableError(
-                    "While formatting %s=%r: %s" % (key, val, exc)
-                )
-
-
-def preparse(output_format):
-    """Do any special processing of a template, and return the result."""
-    try:
-        return templating.preparse(
-            output_format,
-            lambda path: os.path.join(config.config_dir, "templates", path),
-        )
-    except ImportError as exc:
-        if "tempita" in str(exc):
-            raise error.UserError(
-                "To be able to use Tempita templates, install the 'tempita' package (%s)\n"
-                "    Possibly USING THE FOLLOWING COMMAND:\n"
-                "        %s/easy_install tempita"
-                % (exc, os.path.dirname(sys.executable))
-            )
-        raise
-    except IOError as exc:
-        raise error.LoggableError("Cannot read template: {}".format(exc))
-
+env = Environment(
+    loader=FileSystemLoader([Path("~/.pyroscope/templates").expanduser()]),
+)
+env.filters.update(
+    dict(
+        (name[4:], method)
+        for name, method in globals().items()
+        if name.startswith("fmt_")
+    )
+)
 
 # TODO: All constant stuff should be calculated once, make this a class or something
 # Also parse the template only once (possibly in config validation)!
-def expand_template(template: tempita.Template, namespace: Dict) -> str:
+def expand_template(template_path: str, namespace: Dict) -> str:
     """Expand the given (preparsed) template.
-    Currently, only Tempita templates are supported.
+    Currently, only jinja2 templates are supported.
 
-    @param template: The template, in preparsed form, or as a string (which then will be preparsed).
+    @param template: The name of the template, to be loaded by the jinja2 loaders.
     @param namespace: Custom namespace that is added to the predefined defaults
         and takes precedence over those.
     @return: The expanded template.
     @raise LoggableError: In case of typical errors during template execution.
     """
+    template = env.get_template(template_path)
     # Create helper namespace
     formatters = dict(
         (name[4:], method)
         for name, method in globals().items()
         if name.startswith("fmt_")
     )
-    helpers = Bunch()
-    helpers.update(formatters)
-
     # Default templating namespace
-    variables = dict(h=helpers, c=config.custom_template_helpers)
+    variables = dict(c=config.custom_template_helpers)
     variables.update(formatters)  # redundant, for backwards compatibility
 
     # Provided namespace takes precedence
     variables.update(namespace)
 
     # Expand template
-    try:
-        template = preparse(template)
-        return str(template.substitute(**variables))
-    except (AttributeError, ValueError, NameError, TypeError) as exc:
-        hint = ""
-        if "column" in str(exc):
-            try:
-                col = int(str(exc).split("column")[1].split()[0])
-            except (TypeError, ValueError):
-                pass
-            else:
-                hint = "%svVv\n" % (" " * (col + 4))
-
-        content = getattr(template, "content", template)
-        raise error.LoggableError(
-            "%s: %s in template:\n%s%s"
-            % (
-                type(exc).__name__,
-                exc,
-                hint,
-                "\n".join(
-                    "%3d: %s" % (i + 1, line)
-                    for i, line in enumerate(content.splitlines())
-                ),
-            )
-        )
+    return template.render(**variables)
 
 
 def format_item(
-    format_spec, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
+    format_spec: str, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
 ) -> str:
     """Format an item according to the given output format.
-    The format can be gioven as either an interpolation string,
-    or a Tempita template (which has to start with "E{lb}E{lb}"),
 
     @param format_spec: The output format.
     @param item: The object, which is automatically wrapped for interpolation.
     @param defaults: Optional default values.
     """
-    template_engine = getattr(format_spec, "__engine__", None)
-
-    # TODO: Make differences between engines transparent
-    if template_engine == "tempita" or (
-        not template_engine and format_spec.startswith("{{")
-    ):
-        # Set item, or field names for column titles
-        namespace: Dict[str, Any] = dict(headers=not bool(item))
-        if item:
-            namespace["d"] = item
-        else:
-            namespace["d"] = Bunch()
-            for name in engine.FieldDefinition.FIELDS:
-                namespace["d"][name] = name.upper()
-
-            # Justify headers to width of a formatted value
-            namespace.update(
-                (name[4:], lambda x, m=method: str(x).rjust(len(str(m(0)))))
-                for name, method in globals().items()
-                if name.startswith("fmt_")
-            )
-
-        return expand_template(format_spec, namespace)
-    elif template_engine == "jinja2" or (
-        not template_engine and format_spec.startswith("{#")
-    ):
-        return str(format_spec.render(d=item))
-    else:
-        # Interpolation
-        format_spec = getattr(format_spec, "fmt", format_spec)
-
-        if item is None:
-            # For headers, ensure we only have string formats
-            format_spec = re.sub(
-                r"(\([_.a-zA-Z0-9]+\)[-#+0 ]?[0-9]*?)[.0-9]*[diouxXeEfFgG]",
-                lambda m: m.group(1) + "s",
-                format_spec,
-            )
-
-        return str(format_spec % OutputMapping(item, defaults))
+    if defaults is None:
+        defaults = {}
+    template = env.from_string(format_spec)
+    return str(template.render(d=item, **defaults))
 
 
 def validate_field_list(

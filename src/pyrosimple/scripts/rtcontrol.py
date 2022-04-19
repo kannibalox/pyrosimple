@@ -64,22 +64,6 @@ def print_help_fields():
         )
     )
 
-    print("")
-    print("Format specifiers are:")
-    print(
-        "\n".join(
-            [
-                "  %-21s %s" % (name, doc)
-                for name, doc in sorted(formatting.OutputMapping.formatter_help())
-            ]
-        )
-    )
-    print("")
-    print(
-        "Append format specifiers using a '.' to field names in '-o' lists,\n"
-        "e.g. 'size.sz' or 'completed.raw.delta'."
-    )
-
 
 class FieldStatistics:
     """Collect statistical values for the fields of a search result."""
@@ -553,14 +537,23 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Check if it's a custom output format from configuration
         # (they take precedence over field names, so name them wisely)
-        output_format = config.formats.get(output_format, output_format)
+        if output_format in config.formats:
+            output_format = config.formats.get(output_format).replace("%%", "%")
 
         # Expand plain field list to usable form
+        # "name,size.sz" would become "{{d.name}}\t{{d.size|sz}}"
         if re.match(r"^[,._0-9a-zA-Z]+$", output_format):
             self.plain_output_format = True
-            output_format = "%%(%s)s" % ")s\t%(".join(
-                formatting.validate_field_list(output_format, allow_fmt_specs=True)
-            )
+            outputs = []
+            for field in formatting.validate_field_list(
+                output_format, allow_fmt_specs=True
+            ):
+                field = field.replace(".", "|")
+                if len(field.split("|")) == 1:
+                    outputs += ["{{d.%s|fmt('%s')}}" % (field, field)]
+                else:
+                    outputs += ["{{d.%s}}" % field]
+            output_format = "\t".join(outputs)
 
         # Replace some escape sequences
         output_format = (
@@ -571,10 +564,8 @@ class RtorrentControl(ScriptBaseWithConfig):
             .replace("$(", "%(")
             .replace("\0", "$")
             .replace(r"\ ", " ")  # to prevent stripping in config file
-            # .replace(r"\", "\")
         )
-
-        self.options.output_format = formatting.preparse(output_format)
+        self.options.output_format = output_format
 
     # TODO: refactor to engine.FieldDefinition as a class method
     def get_output_fields(self) -> List[str]:
@@ -800,10 +791,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 self.emit(None, stencil=stencil)
 
             # Perform chosen action on matches
-            template_args = [
-                formatting.preparse("{{#tempita}}" + i if "{{" in i else i)
-                for i in action.args
-            ]
+            template_args = [("{##}" + i if "{{" in i else i) for i in action.args]
             for item in matches:
                 if not self.prompt.ask_bool("%s item %s" % (action.label, item.name)):
                     continue
@@ -846,20 +834,19 @@ class RtorrentControl(ScriptBaseWithConfig):
             template_cmds = []
             if self.options.call:
                 for cmd in self.options.call:
-                    template_cmds.append([formatting.preparse("{{#tempita}}" + cmd)])
+                    template_cmds.append(["{##}" + cmd])
             else:
                 for cmd in self.options.spawn:
                     template_cmds.append(
                         [
-                            formatting.preparse("{{#tempita}}" + i if "{{" in i else i)
+                            ("{##}" + i if "{{" in i else i)
                             for i in shlex.split(str(cmd))
                         ]
                     )
 
             for item in matches:
                 cmds: List[str] = [
-                    [output_formatter(i, namespace=dict(item=item)) for i in k]
-                    for k in template_cmds
+                    [formatting.format_item(i, item) for i in k] for k in template_cmds
                 ]
 
                 if self.options.dry_run:
@@ -909,8 +896,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Show via template?
         elif self.options.output_template:
             output_template = self.options.output_template
-            if not output_template.startswith("file:"):
-                output_template = "file:" + output_template
 
             sys.stdout.write(output_formatter(output_template))
             sys.stdout.flush()

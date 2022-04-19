@@ -33,7 +33,7 @@ import bencode
 from pyrosimple import config as config_ini
 from pyrosimple import error
 from pyrosimple.torrent import engine, formatting, matching, rtorrent
-from pyrosimple.util import fmt, metafile, pymagic, rpc, templating
+from pyrosimple.util import fmt, metafile, pymagic, rpc
 from pyrosimple.util.parts import Bunch
 
 
@@ -93,8 +93,7 @@ class PathMover:
 
     def check_and_move(self, i: rtorrent.RtorrentItem):
         """Conditionally move data"""
-        template = templating.preparse(self.config.target)
-        target = formatting.format_item(template, i)
+        target = formatting.format_item(self.config.target, i)
         if i.fetch("directory") == target:
             self.LOG.debug("%s already moved, skipping", i.hash)
             return
