@@ -4,17 +4,18 @@ Introduction
 ^^^^^^^^^^^^
 
 One of the output formatting options described in the :ref:`rtcontrol-examples`
-section are Tempita templates. Compared to the other options, they offer
+section are jinja2 templates. Compared to the other options, they offer
 more versatile formatting because you can use conditionals and loops,
 e.g. coloring the output based on some value thresholds (see the example
-below). The reference chapter :doc:`tempita` provides a full description of :ref:`tempita-lang`.
+below). The `jinja2 documentation`_ is an excellent resource to learn the full
+capabilities.
 
-Note that in order for them to be recognized as such, Tempita templates
-**MUST** start with two braces ``{{``, use ``{{#}}`` (an empty template
+Note that in order for them to be recognized as such, jinja2 templates
+**MUST** start with two braces ``{{``, or use ``{##}`` (an empty template
 comment) if you want to start the output with some literal text.
 
 
-Using Tempita to format single items
+Using jinja2 to format single items
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The most common form of using Tempita for formatting a single output
@@ -33,7 +34,7 @@ The ``colored`` predefined format is a typical example:
         }} {{str(pc(d.ratio)).rjust(8)}}{{chr(37)}}{{if type(d.ratio) is float}}{{ESC}}[0m{{endif}}{{#
         }} {{(d.alias or '').ljust(8)}} {{d.name or ''}}
 
-The main reason to use Tempita here are the if conditions that color the
+The main reason to use template here are the if conditions that color the
 output depending on threshold values, for the ratio and seed time
 columns. Additionally to what Tempita provides, the global namespace of
 the template contains the usual format specifiers (see the output of the
@@ -57,7 +58,7 @@ have in the final output, which looks like this:
     :alt: rtcontrol coloured output example
 
 
-Using Tempita for full output control
+Using jinja2 for full output control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you use the ``--output-template`` option of ``rtcontrol``, flow
@@ -188,3 +189,4 @@ Use ``mv -n -t ‹directory›`` instead of the ``du`` command to move orphans a
 .. _conkyrc: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/templates/conky/conkyrc
 .. _conky rtorstat template: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/templates/conky/rtorstat.txt
 .. _rtorstat.html: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/templates/rtorstat.html
+.. _`jinja2 documentation`: https://jinja.palletsprojects.com/en/3.0.x/
