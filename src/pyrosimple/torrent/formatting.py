@@ -26,7 +26,7 @@ import re
 from pathlib import Path
 from typing import Callable, Dict, Optional, Union
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine, rtorrent
@@ -174,17 +174,17 @@ def expand_template(template_path: str, namespace: Dict) -> str:
 
 
 def format_item(
-    format_spec: str, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
+    template: Template, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
 ) -> str:
-    """Format an item according to the given output format.
+    """Format an item according to the given output template.
 
-    @param format_spec: The output format.
+    @param format_spec: The output template.
     @param item: The object, which is automatically wrapped for interpolation.
     @param defaults: Optional default values.
     """
     if defaults is None:
         defaults = {}
-    template = env.from_string(format_spec)
+    # otemplate = env.from_string(format_spec)
     return str(template.render(d=item, **defaults))
 
 

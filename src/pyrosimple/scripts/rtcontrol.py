@@ -479,7 +479,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         try:
             item_text: str = formatting.format_item(
-                self.options.output_format, item, defaults
+                self.options.output_format_template, item, defaults
             )
         except (NameError, ValueError, TypeError) as exc:
             self.fatal(
@@ -566,6 +566,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             .replace(r"\ ", " ")  # to prevent stripping in config file
         )
         self.options.output_format = output_format
+        self.options.output_format_template = formatting.env.from_string(output_format)
 
     # TODO: refactor to engine.FieldDefinition as a class method
     def get_output_fields(self) -> List[str]:
@@ -741,7 +742,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         stencil: Optional[str] = None
         if self.options.column_headers and self.plain_output_format and matches:
             stencil = formatting.format_item(
-                self.options.output_format, matches[0], self.FORMATTER_DEFAULTS
+                self.options.output_format_template, matches[0], self.FORMATTER_DEFAULTS
             ).split("\t")
             self.emit(item=None, stencil=stencil)
 
