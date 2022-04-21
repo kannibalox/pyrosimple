@@ -93,7 +93,7 @@ class AdminTool(ScriptBaseWithConfig):
             for dirname in self.CONFIG_DIRS:
                 dirpath = os.path.join(config_loader.config_dir, dirname)
                 if not os.path.isdir(dirpath):
-                    self.LOG.info("Creating %r..." % (dirpath,))
+                    self.LOG.info("Creating %r...", dirpath)
                     os.mkdir(dirpath)
 
         elif self.options.dump_config or self.options.output:
@@ -149,7 +149,7 @@ class AdminTool(ScriptBaseWithConfig):
                                     raise KeyError(key)
                     except (IndexError, KeyError) as exc:
                         if default is None:
-                            self.LOG.error("Field %r not found (%s)" % (field, exc))
+                            self.LOG.error("Field %r not found (%s)", field, exc)
                             break
                         values.append(default)
                     else:
@@ -205,7 +205,7 @@ class AdminTool(ScriptBaseWithConfig):
                 for name in sorted(files):
                     conf_rc.append('import = "{}{}{}"'.format(folder, os.sep, name))
 
-                self.LOG.info("Creating %r..." % (folder + "/.import.rc",))
+                self.LOG.info("Creating %r...", folder + "/.import.rc")
                 with Path(folder + "/.import.rc").expanduser().open(
                     "wt", encoding="utf-8"
                 ) as handle:

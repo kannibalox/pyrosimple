@@ -125,7 +125,7 @@ class MetafileLister(ScriptBase):
                                 val = val[key]
                         except KeyError as exc:
                             self.LOG.error(
-                                "%s: Field %r not found (%s)" % (filename, field, exc)
+                                "%s: Field %r not found (%s)", filename, field, exc
                             )
                             break
                         else:

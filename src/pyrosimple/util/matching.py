@@ -62,11 +62,11 @@ def truth(val, context) -> bool:
         return True
     elif lower_val in FALSE:
         return False
-    else:
-        raise FilterError(
-            "Bad boolean value %r in %r (expected one of '%s', or '%s')"
-            % (val, context, "' '".join(TRUE), "' '".join(FALSE))
-        )
+
+    raise FilterError(
+        "Bad boolean value %r in %r (expected one of '%s', or '%s')"
+        % (val, context, "' '".join(TRUE), "' '".join(FALSE))
+    )
 
 
 def unquote_pre_filter(
@@ -143,8 +143,7 @@ class CompoundFilterAny(CompoundFilterBase):
             and len(set(i._name for i in self)) == 1
         ):
             return "%s,%s" % (str(self[0]), ",".join(i._condition for i in self[1:]))
-        else:
-            return "[ %s ]" % " OR ".join(str(i) for i in self)
+        return "[ %s ]" % " OR ".join(str(i) for i in self)
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
@@ -169,8 +168,7 @@ class NegateFilter(Filter):
             return str("%s=!%s" % tuple(str(self._inner).split("=", 1)))
         elif isinstance(self._inner, CompoundFilterBase):
             return "[ NOT [ %s ] ]" % str(self._inner)
-        else:
-            return "[ NOT %s ]" % str(self._inner)
+        return "[ NOT %s ]" % str(self._inner)
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
@@ -183,8 +181,7 @@ class NegateFilter(Filter):
             else:
                 inner = "$" + inner
             return "not=" + inner
-        else:
-            return ""
+        return ""
 
     def match(self, item):
         """Return True if filter matches item."""

@@ -189,8 +189,8 @@ class MetafileChanger(ScriptBaseWithConfig):
                 )
             )
             self.LOG.info(
-                "Filtering for metafiles with announce URL prefix %r..."
-                % filter_url_prefix
+                "Filtering for metafiles with announce URL prefix %r...",
+                filter_url_prefix
             )
 
         if self.options.reannounce_all:
@@ -227,8 +227,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                 old_metainfo = bencode.bencode(metainfo)
             except (EnvironmentError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.LOG.warning(
-                    "Skipping bad metafile %r (%s: %s)"
-                    % (filename, type(exc).__name__, exc)
+                    "Skipping bad metafile %r (%s: %s)", filename, type(exc).__name__, exc
                 )
                 bad += 1
             else:
@@ -237,11 +236,9 @@ class MetafileChanger(ScriptBaseWithConfig):
                     metafile.check_meta(metainfo)
                 except ValueError as exc:
                     self.LOG.warning(
-                        "Metafile %r failed integrity check: %s"
-                        % (
-                            filename,
-                            exc,
-                        )
+                        "Metafile %r failed integrity check: %s",
+                        filename,
+                        exc,
                     )
                     if not self.options.no_skip:
                         continue
@@ -251,11 +248,9 @@ class MetafileChanger(ScriptBaseWithConfig):
                     filter_url_prefix
                 ):
                     self.LOG.warning(
-                        "Skipping metafile %r no tracked by %r!"
-                        % (
-                            filename,
-                            filter_url_prefix,
-                        )
+                        "Skipping metafile %r no tracked by %r!",
+                        filename,
+                        filter_url_prefix,
                     )
                     continue
 
@@ -306,7 +301,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                 if self.options.clean_rtorrent:
                     for key in self.RT_RESUMT_KEYS:
                         if key in metainfo:
-                            self.LOG.info("Removing key %r..." % (key,))
+                            self.LOG.info("Removing key %r...", key)
                             del metainfo[key]
 
                 # Change announce URL?
@@ -347,7 +342,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                     try:
                         metafile.add_fast_resume(metainfo, datadir)
                     except EnvironmentError as exc:
-                        self.fatal("Error making fast-resume data (%s)" % (exc,))
+                        self.fatal("Error making fast-resume data (%s)", exc)
                         raise
 
                 # Set specific keys?
@@ -361,7 +356,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                         filename = os.path.join(
                             self.options.output_directory, os.path.basename(filename)
                         )
-                        self.LOG.info("Writing %r..." % filename)
+                        self.LOG.info("Will write %r...", filename)
 
                         if not self.options.dry_run:
                             with open(filename, "wb") as fh:
@@ -372,10 +367,10 @@ class MetafileChanger(ScriptBaseWithConfig):
                                     ".torrent", "-no-resume.torrent"
                                 )
                                 del metainfo["libtorrent_resume"]
-                                self.LOG.info("Writing %r..." % filename)
+                                self.LOG.info("Writing %r...", filename)
                                 bencode.bwrite(filename, metainfo)
                     else:
-                        self.LOG.info("Changing %r..." % filename)
+                        self.LOG.info("Changing %r...", filename)
 
                         if not self.options.dry_run:
                             # Write to temporary file
@@ -383,7 +378,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                                 os.path.dirname(filename),
                                 "." + os.path.basename(filename),
                             )
-                            self.LOG.debug("Writing %r..." % tempname)
+                            self.LOG.debug("Writing %r...", tempname)
                             bencode.bwrite(tempname, metainfo)
 
                             # Replace existing file
@@ -396,8 +391,8 @@ class MetafileChanger(ScriptBaseWithConfig):
                             except EnvironmentError as exc:
                                 # TODO: Try to write directly, keeping a backup!
                                 raise error.LoggableError(
-                                    "Can't rename tempfile %r to %r (%s)"
-                                    % (tempname, filename, exc)
+                                    "Can't rename tempfile %r to %r (%s)" %
+                                    (tempname, filename, exc)
                                 )
 
                     changed += 1
@@ -405,11 +400,11 @@ class MetafileChanger(ScriptBaseWithConfig):
         # Print summary
         if changed:
             self.LOG.info(
-                "%s %d metafile(s)."
-                % ("Would've changed" if self.options.dry_run else "Changed", changed)
+                "%s %d metafile(s).",
+                "Would've changed" if self.options.dry_run else "Changed", changed
             )
         if bad:
-            self.LOG.warning("Skipped %d bad metafile(s)!" % (bad))
+            self.LOG.warning("Skipped %d bad metafile(s)!", bad)
 
 
 def run():  # pragma: no cover

@@ -156,19 +156,10 @@ def expand_template(template_path: str, namespace: Dict) -> str:
     @raise LoggableError: In case of typical errors during template execution.
     """
     template = env.get_template(template_path)
-    # Create helper namespace
-    formatters = dict(
-        (name[4:], method)
-        for name, method in globals().items()
-        if name.startswith("fmt_")
-    )
     # Default templating namespace
     variables = dict(c=config.custom_template_helpers)
-    variables.update(formatters)  # redundant, for backwards compatibility
-
     # Provided namespace takes precedence
     variables.update(namespace)
-
     # Expand template
     return template.render(**variables)
 
@@ -178,7 +169,7 @@ def format_item(
 ) -> str:
     """Format an item according to the given output template.
 
-    @param format_spec: The output template.
+    @param format_spec: The output template, preparsed by jinja2.
     @param item: The object, which is automatically wrapped for interpolation.
     @param defaults: Optional default values.
     """

@@ -137,17 +137,15 @@ class MetafileCreator(ScriptBaseWithConfig):
         meta_path = os.path.join(
             self.options.magnet_watch, "magnet-%s.torrent" % meta_name
         )
-        self.LOG.debug("Writing magnet-uri metafile %r..." % (meta_path,))
+        self.LOG.debug("Writing magnet-uri metafile %r...", meta_path)
 
         try:
             bencode.bwrite(meta_path, meta)
         except EnvironmentError as exc:
             self.fatal(
-                "Error writing magnet-uri metafile %r (%s)"
-                % (
-                    meta_path,
-                    exc,
-                )
+                "Error writing magnet-uri metafile %r (%s)",
+                (meta_path,
+                exc)
             )
             raise
 
@@ -219,7 +217,7 @@ class MetafileCreator(ScriptBaseWithConfig):
                 raise
 
             hashed_path = re.sub(r"\.torrent$", "", metapath) + "-resume.torrent"
-            self.LOG.info("Writing fast-resume metafile %r..." % (hashed_path,))
+            self.LOG.info("Writing fast-resume metafile %r...", hashed_path)
             try:
                 bencode.bwrite(hashed_path, meta)
             except EnvironmentError as exc:
