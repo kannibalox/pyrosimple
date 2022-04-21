@@ -142,11 +142,7 @@ class MetafileCreator(ScriptBaseWithConfig):
         try:
             bencode.bwrite(meta_path, meta)
         except EnvironmentError as exc:
-            self.fatal(
-                "Error writing magnet-uri metafile %r (%s)",
-                (meta_path,
-                exc)
-            )
+            self.fatal("Error writing magnet-uri metafile %r (%s)", (meta_path, exc))
             raise
 
     def mainloop(self):

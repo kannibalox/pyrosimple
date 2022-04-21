@@ -190,7 +190,7 @@ class MetafileChanger(ScriptBaseWithConfig):
             )
             self.LOG.info(
                 "Filtering for metafiles with announce URL prefix %r...",
-                filter_url_prefix
+                filter_url_prefix,
             )
 
         if self.options.reannounce_all:
@@ -227,7 +227,10 @@ class MetafileChanger(ScriptBaseWithConfig):
                 old_metainfo = bencode.bencode(metainfo)
             except (EnvironmentError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.LOG.warning(
-                    "Skipping bad metafile %r (%s: %s)", filename, type(exc).__name__, exc
+                    "Skipping bad metafile %r (%s: %s)",
+                    filename,
+                    type(exc).__name__,
+                    exc,
                 )
                 bad += 1
             else:
@@ -391,8 +394,8 @@ class MetafileChanger(ScriptBaseWithConfig):
                             except EnvironmentError as exc:
                                 # TODO: Try to write directly, keeping a backup!
                                 raise error.LoggableError(
-                                    "Can't rename tempfile %r to %r (%s)" %
-                                    (tempname, filename, exc)
+                                    "Can't rename tempfile %r to %r (%s)"
+                                    % (tempname, filename, exc)
                                 )
 
                     changed += 1
@@ -401,7 +404,8 @@ class MetafileChanger(ScriptBaseWithConfig):
         if changed:
             self.LOG.info(
                 "%s %d metafile(s).",
-                "Would've changed" if self.options.dry_run else "Changed", changed
+                "Would've changed" if self.options.dry_run else "Changed",
+                changed,
             )
         if bad:
             self.LOG.warning("Skipped %d bad metafile(s)!", bad)
