@@ -35,7 +35,7 @@ NOHASH = (
 )
 
 # Store these results in a LRU cache, primarily helps with code that
-# performs a method call in some sort of loop
+# performs a method call in some sort of loop.
 # MUST be constant return values for all possible arguments
 # N.B. The inclusion of d.* methods means it's possible
 # for client code to get valid results for hashes that have
@@ -160,7 +160,16 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if not params:
             params = [""]
 
-        # This feels silly but there's not much need for anything better at the moment.
+        # Gross hack, see about getting call implemented upstream
+        if methodname == "system.multicall":
+            results = []
+            for i in params[0]:
+                m = i["methodName"]
+                p = i["params"]
+                results.append([self.__request_json(m, p)])
+            return results
+
+        # This random ID feels silly but there's not much need for anything better at the moment.
         rpc_id = random.randint(0, 100)
         request = json.dumps(
             {
@@ -220,6 +229,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     def __getattr__(self, name):
         # magic method dispatcher
+        # Hardcode the most useful alias
         if name == "log":
             name = "print"
         return xmlrpclib._Method(self.__request, name)

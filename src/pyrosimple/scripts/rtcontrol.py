@@ -539,7 +539,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Check if it's a custom output format from configuration
         # (they take precedence over field names, so name them wisely)
         if output_format in config.formats:
-            output_format = '{##}' + config.formats.get(output_format).replace(
+            output_format = config.formats.get(output_format).replace(
                 "%%", "%"
             )  # Python's ini module doubles % in raw loads
 

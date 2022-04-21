@@ -26,7 +26,8 @@ import time
 
 from collections import defaultdict
 from functools import partial
-from typing import Callable, List, Optional, Set, Union
+from typing import Callable, Dict, List, Optional, Set, Union
+from xmlrpc import client as xmlrpclib
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
@@ -650,8 +651,7 @@ class RtorrentEngine:
         self.version_info = (0,)
         self.startup = time.time()
         self.rpc = None
-        self._session_dir = None
-        self._download_dir = None
+        self.properties = {}
         self._item_cache = {}
         self.known_throttle_names = {"", "NULL"}
 
@@ -767,6 +767,18 @@ class RtorrentEngine:
 
         return viewname
 
+    def system_multicall(self, methods: Dict[str, List]) -> Dict:
+        """Helper method for system.multicall"""
+        results = {}
+        call = []
+        for method, params in methods.items():
+            call.append({"methodName": method, "params": params})
+        for index, r in enumerate(self.rpc.system.multicall(call)):
+            if len(r) == 1:
+                result = r[0]
+            results[list(methods.keys())[index]] = result
+        return results
+
     def open(self):
         """Open connection."""
         # Only connect once
@@ -785,12 +797,18 @@ class RtorrentEngine:
 
         # Connect and get instance ID (also ensures we're connectable)
         self.rpc = rpc.RTorrentProxy(config.scgi_url)
-        self.versions = (
-            self.rpc.system.client_version(),
-            self.rpc.system.library_version(),
+        self.properties = self.system_multicall(
+            {
+                "system.client_version": [],
+                "system.library_version": [],
+                "system.time_usec": [],
+                "session.name": [],
+                "directory.default": [],
+                "session.path": [],
+            }
         )
-        self.engine_id = self.rpc.session.name()
-        time_usec = self.rpc.system.time_usec()
+        self.engine_id = self.properties["session.name"]
+        time_usec = self.properties["system.time_usec"]
 
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
@@ -801,17 +819,17 @@ class RtorrentEngine:
             )
 
         # Get other manifest values
-        self.engine_software = "rTorrent %s/%s" % self.versions
+        self.engine_software = f"rTorrent {self.properties['system.library_version']}/{self.properties['system.client_version']}"
 
         if "+ssh:" in config.scgi_url:
             self.startup = int(self.rpc.startup_time() or time.time())
         else:
-            self._session_dir = self.rpc.session.path()
-            self._download_dir = os.path.expanduser(self.rpc.directory.default())
-            lockfile = os.path.join(self._session_dir, "rtorrent.lock")
-            if os.path.exists(lockfile):
-                self.startup = os.path.getmtime(lockfile)
-            else:
+            lockfile = os.path.join(self.properties["session.path"], "rtorrent.lock")
+            try:
+                self.startup = int(
+                    self.rpc.execute.capture("", ["stat", "-c", "%Y", lockfile])
+                )
+            except (ValueError, xmlrpclib.Fault):
                 self.startup = time.time()
 
         # Return connection
