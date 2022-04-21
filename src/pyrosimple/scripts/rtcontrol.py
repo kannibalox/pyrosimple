@@ -426,7 +426,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         "metavar": action.argshelp,
                         "help": action.help
                         + (" (implies -i)" if action.interactive else ""),
-                    }
+                    },
                 )
             else:
                 action_group.add_argument(
@@ -435,7 +435,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         "action": "store_true",
                         "help": action.help
                         + (" (implies -i)" if action.interactive else ""),
-                    }
+                    },
                 )
         action_group.add_argument(
             "--ignore",
@@ -538,7 +538,9 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Check if it's a custom output format from configuration
         # (they take precedence over field names, so name them wisely)
         if output_format in config.formats:
-            output_format = config.formats.get(output_format).replace("%%", "%")
+            output_format = config.formats.get(output_format).replace(
+                "%%", "%"
+            )  # Python's ini module doubles % in raw loads
 
         # Expand plain field list to usable form
         # "name,size.sz" would become "{{d.name}}\t{{d.size|sz}}"
@@ -565,7 +567,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             .replace("\0", "$")
             .replace(r"\ ", " ")  # to prevent stripping in config file
         )
-        self.options.output_format = output_format
         self.options.output_format_template = formatting.env.from_string(output_format)
 
     # TODO: refactor to engine.FieldDefinition as a class method
@@ -573,9 +574,11 @@ class RtorrentControl(ScriptBaseWithConfig):
         """Get field names from output template."""
         # Re-engineer list from output format
         # XXX TODO: Would be better to use a FieldRecorder class to catch the full field names
-        emit_fields: List[str] = list(
-            i.lower() for i in re.sub("[^_A-Z]+", " ", self.format_item(None)).split()
-        )
+        if not self.plain_output_format:
+            return []
+        emit_fields: List[str] = [
+            o.split(".")[0] for o in self.options.output_format.split(",")
+        ]
 
         # Validate result
         result = []
@@ -910,27 +913,13 @@ class RtorrentControl(ScriptBaseWithConfig):
 
             # Print summary?
             if matches and summary:
-                self.emit(None, stencil=stencil)
+                print(f"TOTALS:\t{len(matches)} out of {view.size()} torrents")
+                self.emit(summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip())
+                self.emit(summary.min, item_formatter=lambda i: "MIN:\t" + i.rstrip())
                 self.emit(
-                    summary.total,
-                    item_formatter=lambda i: i.rstrip()
-                    + " [SUM of %d item(s)]" % len(matches),
+                    summary.average, item_formatter=lambda i: "AVG:\t" + i.rstrip()
                 )
-                self.emit(
-                    summary.min,
-                    item_formatter=lambda i: i.rstrip()
-                    + " [MIN of %d item(s)]" % len(matches),
-                )
-                self.emit(
-                    summary.average,
-                    item_formatter=lambda i: i.rstrip()
-                    + " [AVG of %d item(s)]" % len(matches),
-                )
-                self.emit(
-                    summary.max,
-                    item_formatter=lambda i: i.rstrip()
-                    + " [MAX of %d item(s)]" % len(matches),
-                )
+                self.emit(summary.max, item_formatter=lambda i: "MAX:\t" + i.rstrip())
 
             self.LOG.info(
                 "Dumped %d out of %d torrents.",
