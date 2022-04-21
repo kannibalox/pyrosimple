@@ -247,7 +247,7 @@ class FieldDefinition:
         self._requires = requires or []
         self._accessor = accessor
         self._matcher = matcher
-        self._formatter = formatter
+        self.formatter = formatter
         if accessor is None:
             self._accessor = lambda o: o.fetch(name)
 

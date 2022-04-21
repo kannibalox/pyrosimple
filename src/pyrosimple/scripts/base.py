@@ -200,20 +200,6 @@ class ScriptBase:
                 # [Errno 32] Broken pipe?
                 if exc.errno == errno.EPIPE:
                     print("\n%s, exiting!\n" % exc, file=sys.stderr)
-
-                    # Monkey patch to prevent an exception during logging shutdown
-                    try:
-                        handlers = logging._handlerList
-                    except AttributeError:
-                        pass
-                    else:
-                        for handler in handlers:
-                            try:
-                                handler.flush = lambda *_: None
-                            except AttributeError:
-                                pass  # skip special handlers
-
-                    log_total = False
                     sys.exit(error.EX_IOERR)
                 else:
                     raise

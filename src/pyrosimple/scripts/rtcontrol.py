@@ -933,7 +933,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 view.size(),
             )
 
-        self.LOG.debug("RPC stats: %s", config.engine._rpc)
+        self.LOG.debug("RPC stats: %s", config.engine.rpc)
 
 
 def run():  # pragma: no cover

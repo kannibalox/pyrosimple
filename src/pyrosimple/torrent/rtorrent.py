@@ -68,9 +68,9 @@ class RtorrentItem(engine.TorrentProxy):
                     call,
                 )
                 if call.startswith(":") or call[:2].endswith("."):
-                    namespace = self._engine._rpc
+                    namespace = self._engine.rpc
                 else:
-                    namespace = self._engine._rpc.d
+                    namespace = self._engine.rpc.d
                 result = getattr(namespace, call.lstrip(":"))(*args)
                 if observer is not None:
                     observer(result)
@@ -91,7 +91,7 @@ class RtorrentItem(engine.TorrentProxy):
         """
         try:
             # Get info for all files
-            f_multicall = self._engine._rpc.f.multicall
+            f_multicall = self._engine.rpc.f.multicall
             f_params = [
                 self._fields["hash"],
                 0,
@@ -194,7 +194,7 @@ class RtorrentItem(engine.TorrentProxy):
         """Directly call rpc for item-specific information"""
         if args is None:
             args = []
-        getter = getattr(self._engine._rpc.d, method)
+        getter = getattr(self._engine.rpc.d, method)
         return getter(self._fields["hash"], *args)
 
     def fetch(self, name: str, cache: bool = True):
@@ -217,18 +217,18 @@ class RtorrentItem(engine.TorrentProxy):
             key = name[7:]
             try:
                 if len(key) == 1 and key in "12345":
-                    val = getattr(self._engine._rpc.d, "custom" + key)(
+                    val = getattr(self._engine.rpc.d, "custom" + key)(
                         self._fields["hash"]
                     )
                 else:
-                    val = self._engine._rpc.d.custom(self._fields["hash"], key)
+                    val = self._engine.rpc.d.custom(self._fields["hash"], key)
             except rpc.ERRORS as exc:
                 raise error.EngineError("While accessing field %r: %s" % (name, exc))
         else:
             getter_name = RtorrentEngine.PYRO2RT_MAPPING.get(name, name)
             if getter_name[0] == "=":
                 getter_name = getter_name[1:]
-            getter = getattr(self._engine._rpc.d, getter_name)
+            getter = getattr(self._engine.rpc.d, getter_name)
 
             try:
                 val = getter(self._fields["hash"])
@@ -259,7 +259,7 @@ class RtorrentItem(engine.TorrentProxy):
         Returns `default` if no trackers are found at all.
         """
         try:
-            response = self._engine._rpc.t.multicall(
+            response = self._engine.rpc.t.multicall(
                 self._fields["hash"], 0, "t.url=", "t.is_enabled="
             )
         except rpc.ERRORS as exc:
@@ -322,8 +322,8 @@ class RtorrentItem(engine.TorrentProxy):
             name = ""
 
         if name not in self._engine.known_throttle_names:
-            if self._engine._rpc.throttle.up.max(rpc.NOHASH, name) == -1:
-                if self._engine._rpc.throttle.down.max(rpc.NOHASH, name) == -1:
+            if self._engine.rpc.throttle.up.max(rpc.NOHASH, name) == -1:
+                if self._engine.rpc.throttle.down.max(rpc.NOHASH, name) == -1:
                     raise error.UserError("Unknown throttle name '{}'".format(name))
             self._engine.known_throttle_names.add(name)
 
@@ -649,7 +649,7 @@ class RtorrentEngine:
         self.versions = (None, None)
         self.version_info = (0,)
         self.startup = time.time()
-        self._rpc = None
+        self.rpc = None
         self._session_dir = None
         self._download_dir = None
         self._item_cache = {}
@@ -734,7 +734,7 @@ class RtorrentEngine:
 
     def __repr__(self):
         """Return a representation of internal state."""
-        if self._rpc:
+        if self.rpc:
             # Connected state
             return "%s connected to %s [%s, up %s] via %r" % (
                 self.__class__.__name__,
@@ -770,8 +770,8 @@ class RtorrentEngine:
     def open(self):
         """Open connection."""
         # Only connect once
-        if self._rpc is not None:
-            return self._rpc
+        if self.rpc is not None:
+            return self.rpc
 
         # Get connection URL from rtorrent.rc
         self.load_config()
@@ -784,13 +784,13 @@ class RtorrentEngine:
             )
 
         # Connect and get instance ID (also ensures we're connectable)
-        self._rpc = rpc.RTorrentProxy(config.scgi_url)
+        self.rpc = rpc.RTorrentProxy(config.scgi_url)
         self.versions = (
-            self._rpc.system.client_version(),
-            self._rpc.system.library_version(),
+            self.rpc.system.client_version(),
+            self.rpc.system.library_version(),
         )
-        self.engine_id = self._rpc.session.name()
-        time_usec = self._rpc.system.time_usec()
+        self.engine_id = self.rpc.session.name()
+        time_usec = self.rpc.system.time_usec()
 
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
@@ -804,10 +804,10 @@ class RtorrentEngine:
         self.engine_software = "rTorrent %s/%s" % self.versions
 
         if "+ssh:" in config.scgi_url:
-            self.startup = int(self._rpc.startup_time() or time.time())
+            self.startup = int(self.rpc.startup_time() or time.time())
         else:
-            self._session_dir = self._rpc.session.path()
-            self._download_dir = os.path.expanduser(self._rpc.directory.default())
+            self._session_dir = self.rpc.session.path()
+            self._download_dir = os.path.expanduser(self.rpc.directory.default())
             lockfile = os.path.join(self._session_dir, "rtorrent.lock")
             if os.path.exists(lockfile):
                 self.startup = os.path.getmtime(lockfile)
@@ -816,7 +816,7 @@ class RtorrentEngine:
 
         # Return connection
         self.LOG.debug("%s", repr(self))
-        return self._rpc
+        return self.rpc
 
     def multicall(self, viewname: str, fields: List[str]) -> Bunch:
         """Query the given fields of items in the given view.

@@ -111,7 +111,7 @@ def fmt_fmt(val, field):
     """Apply a field-specific formatter (if present)"""
     if field not in engine.FieldDefinition.FIELDS:
         return val
-    formatter = engine.FieldDefinition.FIELDS[field]._formatter
+    formatter = engine.FieldDefinition.FIELDS[field].formatter
     if formatter:
         return formatter(val)
     return val
