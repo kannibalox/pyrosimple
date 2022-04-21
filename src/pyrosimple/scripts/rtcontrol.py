@@ -530,6 +530,7 @@ class RtorrentControl(ScriptBaseWithConfig):
     def validate_output_format(self, default_format):
         """Prepare output format for later use."""
         output_format = self.options.output_format
+        self.original_output_format = output_format
 
         # Use default format if none is given
         if output_format is None:
@@ -538,7 +539,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Check if it's a custom output format from configuration
         # (they take precedence over field names, so name them wisely)
         if output_format in config.formats:
-            output_format = config.formats.get(output_format).replace(
+            output_format = '{##}' + config.formats.get(output_format).replace(
                 "%%", "%"
             )  # Python's ini module doubles % in raw loads
 
@@ -567,6 +568,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             .replace("\0", "$")
             .replace(r"\ ", " ")  # to prevent stripping in config file
         )
+        self.options.output_format = output_format
         self.options.output_format_template = formatting.env.from_string(output_format)
 
     # TODO: refactor to engine.FieldDefinition as a class method
@@ -577,7 +579,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         if not self.plain_output_format:
             return []
         emit_fields: List[str] = [
-            o.split(".")[0] for o in self.options.output_format.split(",")
+            o.split(".")[0] for o in self.original_output_format.split(",")
         ]
 
         # Validate result

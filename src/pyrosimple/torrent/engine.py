@@ -244,7 +244,7 @@ class FieldDefinition:
         self.valtype = valtype
         self.name = name
         self.__doc__ = doc
-        self._requires = requires or []
+        self.requires = requires or []
         self._accessor = accessor
         self._matcher = matcher
         self.formatter = formatter
