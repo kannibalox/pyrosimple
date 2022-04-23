@@ -682,23 +682,18 @@ class RtorrentEngine:
 
         return result
 
-    def load_config(self, namespace=None, rcfile=None):
-        """Load file given in "rcfile"."""
-        if namespace is None:
-            namespace = config
-        if namespace.scgi_url:
+    def load_config(self):
+        """Load file given in "rcfile" if SCGI URL is not set."""
+        if config.settings.get("SCGI_URL"):
             return  # already have the connection to rTorrent
 
         # Get and check config file name
-        if not rcfile:
-            rcfile = Path(config.settings.RTORRENT_RC).expanduser()
-        if not rcfile:
-            raise error.UserError("No 'rtorrent_rc' path defined in configuration!")
+        rcfile = Path(config.settings.RTORRENT_RC).expanduser()
         if not os.path.isfile(rcfile):
             raise error.UserError("Config file %r doesn't exist!" % (rcfile,))
 
         # Parse the file
-        self.LOG.debug("Loading rtorrent config from %r", rcfile)
+        self.LOG.debug("Loading rtorrent config from '%s'", rcfile)
         rc_vals = Bunch(scgi_local="", scgi_port="")
         with open(rcfile, "r", encoding="utf-8") as handle:
             continued = False
@@ -731,8 +726,7 @@ class RtorrentEngine:
             rc_vals.scgi_port = "scgi://" + rc_vals.scgi_port
 
         # Prefer UNIX domain sockets over TCP socketsj
-        if not config.settings.get("SCGI_URL"):
-            config.settings.set("SCGI_URL", rc_vals.scgi_local or rc_vals.scgi_port)
+        config.settings.set("SCGI_URL", rc_vals.scgi_local or rc_vals.scgi_port)
 
     def __repr__(self):
         """Return a representation of internal state."""

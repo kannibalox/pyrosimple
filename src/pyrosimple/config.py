@@ -28,6 +28,7 @@ import functools
 from dynaconf import Dynaconf, Validator
 
 from pyrosimple.util.parts import Bunch
+from pyrosimple.util import pymagic
 
 
 settings = Dynaconf(
