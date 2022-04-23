@@ -538,10 +538,8 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Check if it's a custom output format from configuration
         # (they take precedence over field names, so name them wisely)
-        if output_format in config.formats:
-            output_format = config.formats.get(output_format).replace(
-                "%%", "%"
-            )  # Python's ini module doubles % in raw loads
+        if output_format in config.settings.FORMATS:
+            output_format = config.settings.FORMATS.get(output_format)
 
         # Expand plain field list to usable form
         # "name,size.sz" would become "{{d.name}}\t{{d.size|sz}}"
