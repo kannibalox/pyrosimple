@@ -27,8 +27,8 @@ import importlib.resources
 import io
 import os
 import re
-import sys
 
+from pathlib import Path
 
 try:
     resources_files = importlib.resources.files
@@ -40,14 +40,6 @@ except AttributeError:
 
 from pyrosimple import config, error
 from pyrosimple.util import pymagic
-
-
-def validate(val):
-    """Validate a configuration value."""
-    if val and val.startswith("~/"):
-        return os.path.expanduser(val)
-
-    return val
 
 
 def walk_resources(package_or_requirement, resource_name, recurse=True, base=""):
@@ -84,7 +76,6 @@ class ConfigLoader:
     """Populates this module's dictionary with the user-defined configuration values."""
 
     CONFIG_INI = "config.ini"
-    CONFIG_PY = "config.py"
     INTERPOLATION_ESCAPE = re.compile(r"(?<!%)%[^%(]")
 
     def __init__(self, config_dir=None):
@@ -113,22 +104,12 @@ class ConfigLoader:
         # Update config values (so other code can access them in the bootstrap phase)
         self._update_config(namespace)
 
-        # Validate announce URLs
-        for key, val in namespace["announce"].items():
-            if isinstance(val, str):
-                namespace["announce"][key] = val.split()
-
         # Re-escape output formats
         self._interpolation_escape(namespace["formats"])
 
-        # Create objects from module specs
-        for factory in ("engine",):
-            if isinstance(namespace[factory], str):
-                namespace[factory] = (
-                    pymagic.import_name(namespace[factory])()
-                    if namespace[factory]
-                    else None
-                )
+        # Create engine from module specs
+        namespace["engine"] = pymagic.import_name(config.settings.ENGINE)()
+        namespace["config_validator_callbacks"] = pymagic.import_name(config.settings.CONFIG_VALIDATOR_CALLBACKS)
 
         # Do some standard type conversions
         for key in namespace:
@@ -173,7 +154,7 @@ class ConfigLoader:
                 self._interpolation_escape(raw_vars)
             raw_vars.update(
                 dict(
-                    (key, validate(val))
+                    (key, val)
                     for key, val in ini_file.items(section, vars=raw_vars)
                 )
             )
@@ -224,9 +205,6 @@ class ConfigLoader:
         """Load scripted configuration."""
         if config_file and os.path.isfile(config_file):
             self.LOG.debug("Loading %r...", config_file)
-            p = importlib.import_module("pyrosimple")
-            sys.modules["pyrocore"] = p
-            sys.modules["pyrobase"] = p
             with open(config_file, "rb") as handle:
                 # pylint: disable=exec-used
                 exec(
@@ -261,11 +239,12 @@ class ConfigLoader:
                     self._load_ini(namespace, cfg_file)
 
             self._validate_namespace(namespace)
-            self._load_py(namespace, namespace["config_script"])
+            pyconfig = Path(config.settings.get('CONFIG_PY')).expanduser()
+            if pyconfig.exists():
+                self._load_py(namespace, pyconfig)
             self._validate_namespace(namespace)
 
-            for callback in namespace["config_validator_callbacks"]:
-                callback()
+            pymagic.import_name(config.settings.CONFIG_VALIDATOR_CALLBACKS)()
         except ConfigParser.ParsingError as exc:
             raise error.UserError(exc)
 

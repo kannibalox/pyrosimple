@@ -21,14 +21,33 @@
 
 import urllib
 
+from pathlib import Path
 from typing import Any, Dict, List
+
+from dynaconf import Dynaconf, Validator
 
 from pyrosimple.util.parts import Bunch
 
 
+settings = Dynaconf(
+    settings_files=[Path("~/.config/pyrosimple/config.toml").expanduser()],
+    envvar="PYRO_CONF",
+    envvar_prefix="PYRO",
+    validators=[
+        Validator("RTORRENT_RC", default="~/.rtorrent.rc"),
+        Validator("CONFIG_PY", default=Path("~/.config/pyrosimple/config.py").expanduser()),
+        Validator("SORT_FIELDS", default="name,alias"),
+        Validator("CONFIG_VALIDATOR_CALLBACKS", default="pyrosimple.torrent.engine:TorrentProxy.add_custom_fields"),
+        Validator("ENGINE", default="pyrocore.torrent.rtorrent:RtorrentEngine"),
+        Validator("FAST_QUERY", gte=0, lte=2, default=0),
+        Validator("ALIASES", default={}),
+        Validator("SCGI_URL", default=""),
+    ]
+)
+
 def lookup_announce_alias(name):
     """Get canonical alias name and announce URL list for the given alias."""
-    for alias, urls in announce.items():
+    for alias, urls in settings['ALIASES'].items():
         if alias.lower() == name.lower():
             return alias, urls
 
@@ -39,7 +58,7 @@ def map_announce2alias(url):
     """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
 
     # Try to find an exact alias URL match and return its label
-    for alias, urls in announce.items():
+    for alias, urls in settings['ALIASES'].items():
         if any(i == url for i in urls):
             return alias
 
@@ -49,8 +68,14 @@ def map_announce2alias(url):
         (parts.scheme, parts.netloc, "/", None, None, None)
     )
 
-    for alias, urls in announce.items():
+    for alias, urls in settings['ALIASES'].items():
         if any(i.startswith(server) for i in urls):
+            return alias
+
+    # Try to find based on domain
+    domain = '.'.join(parts.netloc.split(':')[0].split('.')[-2:])
+    for alias, urls in settings['ALIASES'].items():
+        if any(i == domain for i in urls):
             return alias
 
     # Return 2nd level domain name if no alias found
@@ -59,26 +84,17 @@ def map_announce2alias(url):
     except IndexError:
         return parts.netloc
 
-
 # Remember predefined names
 _PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))
 
 # Set some defaults to shut up pydev / pylint;
 # these later get overwritten by loading the config
-debug = False
-config_dir = None
 scgi_url = ""
 engine = Bunch(open=lambda: None)
-fast_query = 0
 formats: Dict[Any, Any] = {}
-sort_fields = ""
-announce: Dict[Any, Any] = {}
 config_validator_callbacks: List[Any] = []
 custom_field_factories: List[Any] = []
 custom_template_helpers = Bunch()
-xmlrpc: Dict[Any, Any] = {}
-output_header_ecma48 = b""
-output_header_frequency = 1
 waif_pattern_list: List[Any] = []
 traits_by_alias: Dict[Any, Any] = {}
 connections: List[str] = []

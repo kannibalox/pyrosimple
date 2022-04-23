@@ -24,6 +24,7 @@ import os
 import shlex
 import time
 
+from pathlib import Path
 from collections import defaultdict
 from functools import partial
 from typing import Callable, Dict, List, Optional, Set, Union
@@ -690,7 +691,7 @@ class RtorrentEngine:
 
         # Get and check config file name
         if not rcfile:
-            rcfile = getattr(config, "rtorrent_rc", None)
+            rcfile = Path(config.settings.RTORRENT_RC).expanduser()
         if not rcfile:
             raise error.UserError("No 'rtorrent_rc' path defined in configuration!")
         if not os.path.isfile(rcfile):
@@ -729,8 +730,9 @@ class RtorrentEngine:
         if rc_vals.scgi_port and not rc_vals.scgi_port.startswith("scgi://"):
             rc_vals.scgi_port = "scgi://" + rc_vals.scgi_port
 
-        # Prefer UNIX domain sockets over TCP sockets
-        namespace.scgi_url = rc_vals.scgi_local or rc_vals.scgi_port
+        # Prefer UNIX domain sockets over TCP socketsj
+        if not config.settings.get("SCGI_URL"):
+            config.settings.set("SCGI_URL", rc_vals.scgi_local or rc_vals.scgi_port)
 
     def __repr__(self):
         """Return a representation of internal state."""
@@ -741,14 +743,14 @@ class RtorrentEngine:
                 self.engine_id,
                 self.engine_software,
                 fmt.human_duration(self.uptime, 0, 2, True).strip(),
-                config.scgi_url,
+                config.settings.SCGI_URL,
             )
         else:
             # Unconnected state
             self.load_config()
             return "%s connectable via %r" % (
                 self.__class__.__name__,
-                config.scgi_url,
+                config.settings.SCGI_URL,
             )
 
     @property
@@ -789,14 +791,14 @@ class RtorrentEngine:
         self.load_config()
 
         # Reading abilities are on the downfall, so...
-        if not config.scgi_url:
+        if not config.settings.SCGI_URL:
             raise error.UserError(
                 "You need to configure a RPC connection, read"
                 " https://pyrosimple.readthedocs.io/en/latest/setup.html"
             )
 
         # Connect and get instance ID (also ensures we're connectable)
-        self.rpc = rpc.RTorrentProxy(config.scgi_url)
+        self.rpc = rpc.RTorrentProxy(config.settings.SCGI_URL)
         self.properties = self.system_multicall(
             {
                 "system.client_version": [],
@@ -821,7 +823,7 @@ class RtorrentEngine:
         # Get other manifest values
         self.engine_software = f"rTorrent {self.properties['system.library_version']}/{self.properties['system.client_version']}"
 
-        if "+ssh:" in config.scgi_url:
+        if "+ssh:" in config.settings.SCGI_URL:
             self.startup = int(self.rpc.startup_time() or time.time())
         else:
             lockfile = os.path.join(self.properties["session.path"], "rtorrent.lock")
@@ -917,7 +919,7 @@ class RtorrentEngine:
                     multi_args = ["", view.viewname] + [
                         field if "=" in field else field + "=" for field in args
                     ]
-                    if view.matcher and int(config.fast_query):
+                    if view.matcher and config.settings.get('FAST_QUERY'):
                         pre_filter = matching.unquote_pre_filter(
                             view.matcher.pre_filter()
                         )
