@@ -574,15 +574,6 @@ class RtorrentItem(engine.TorrentProxy):
 class RtorrentEngine:
     """The rTorrent backend proxy."""
 
-    # keys we read from rTorrent's configuration
-    RTORRENT_RC_KEYS = ("scgi_local", "scgi_port")
-
-    # mapping from new to old commands, and thus our config keys
-    RTORRENT_RC_ALIASES = {
-        "network.scgi.open_local": "scgi_local",
-        "network.scgi.open_port": "scgi_port",
-    }
-
     # rTorrent names of fields that never change
     CONSTANT_FIELDS = set(
         (
@@ -694,7 +685,8 @@ class RtorrentEngine:
 
         # Parse the file
         self.LOG.debug("Loading rtorrent config from '%s'", rcfile)
-        rc_vals = Bunch(scgi_local="", scgi_port="")
+        scgi_local: str = ""
+        scgi_port: str = ""
         with open(rcfile, "r", encoding="utf-8") as handle:
             continued = False
             for line in handle.readlines():
@@ -708,25 +700,26 @@ class RtorrentEngine:
                 try:
                     key, val = line.split("=", 1)
                 except ValueError:
-                    self.LOG.warning("Ignored invalid line %r in %r!", line, rcfile)
+                    self.LOG.debug("Ignored invalid line %r in %r!", line, rcfile)
                     continue
                 key, val = key.strip(), val.strip()
-                key = self.RTORRENT_RC_ALIASES.get(key, key).replace(".", "_")
 
                 # Copy values we're interested in
-                if key in self.RTORRENT_RC_KEYS:
+                if key in ["network.scgi.open_port", "scgi_port"]:
                     self.LOG.debug("rtorrent.rc: %s = %s", key, val)
-                    rc_vals[key] = val
+                    scgi_port = val
+                if key in ["network.scgi.open_local", "scgi_local"]:
+                    self.LOG.debug("rtorrent.rc: %s = %s", key, val)
+                    scgi_local = val
 
         # Validate fields
-        if rc_vals.scgi_local and not rc_vals.scgi_port.startswith("scgi+unix://"):
-            rc_vals.scgi_local = os.path.expanduser(rc_vals.scgi_local)
-            rc_vals.scgi_local = "scgi+unix://" + rc_vals.scgi_local
-        if rc_vals.scgi_port and not rc_vals.scgi_port.startswith("scgi://"):
-            rc_vals.scgi_port = "scgi://" + rc_vals.scgi_port
+        if scgi_local and not scgi_port.startswith("scgi+unix://"):
+            scgi_local = "scgi+unix://" + os.path.expanduser(scgi_local)
+        if scgi_port and not scgi_port.startswith("scgi://"):
+            scgi_port = "scgi://" + scgi_port
 
         # Prefer UNIX domain sockets over TCP socketsj
-        config.settings.set("SCGI_URL", rc_vals.scgi_local or rc_vals.scgi_port)
+        config.settings.set("SCGI_URL", scgi_local or scgi_port)
 
     def __repr__(self):
         """Return a representation of internal state."""
