@@ -526,19 +526,13 @@ class RtorrentItem(engine.TorrentProxy):
         if not dry_run:
             self.stop()
         for path in sorted(files):
-            ##self._engine.LOG.debug("Deleting file '%s'" % (path,))
             remove_with_links(path)
 
         # Prune empty directories (longer paths first)
         doomed = files | dirs
         for path in sorted(dirs, reverse=True):
             residue = set(os.listdir(path) if os.path.exists(path) else [])
-            ignorable = set(
-                i
-                for i in residue
-                if any(fnmatch.fnmatch(i, pat) for pat in config.waif_pattern_list)
-                # or os.path.join(path, i) in doomed
-            )
+            ignorable = set()
             if residue and residue != ignorable:
                 self._engine.LOG.info(
                     "Keeping non-empty directory '%s' with %d %s%s!",
@@ -559,7 +553,6 @@ class RtorrentItem(engine.TorrentProxy):
                                 "Problem deleting waif '%s' (%s)" % (waif, exc)
                             )
 
-                ##self._engine.LOG.debug("Deleting empty directory '%s'" % (path,))
                 doomed.update(remove_with_links(path))
 
         # Delete item from engine

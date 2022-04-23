@@ -94,6 +94,5 @@ _PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))
 # these later get overwritten by loading the config
 engine = Bunch(open=lambda: None)
 custom_template_helpers = Bunch()
-waif_pattern_list: List[Any] = []
 traits_by_alias: Dict[Any, Any] = {}
 torque: Dict[Any, Any] = {}
