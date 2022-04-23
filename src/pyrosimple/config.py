@@ -92,13 +92,8 @@ _PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))
 
 # Set some defaults to shut up pydev / pylint;
 # these later get overwritten by loading the config
-scgi_url = ""
 engine = Bunch(open=lambda: None)
-formats: Dict[Any, Any] = {}
-config_validator_callbacks: List[Any] = []
-custom_field_factories: List[Any] = []
 custom_template_helpers = Bunch()
 waif_pattern_list: List[Any] = []
 traits_by_alias: Dict[Any, Any] = {}
-connections: List[str] = []
 torque: Dict[Any, Any] = {}
