@@ -82,15 +82,15 @@ def map_announce2alias(url):
         if any(i.startswith(server) for i in urls):
             return alias
 
-    # Try to find based on domain
-    domain = ".".join(parts.netloc.split(":")[0].split(".")[-2:])
-    for alias, urls in settings["ALIASES"].items():
-        if any(i == domain for i in urls):
-            return alias
 
     # Return 2nd level domain name if no alias found
     try:
-        return ".".join(parts.netloc.split(":")[0].split(".")[-2:])
+        # Try to find based on domain
+        domain = ".".join(parts.netloc.split(":")[0].split(".")[-2:])
+        for alias, urls in settings["ALIASES"].items():
+            if any(i == domain for i in urls):
+                return alias
+        return domain
     except IndexError:
         return parts.netloc
 
