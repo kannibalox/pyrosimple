@@ -30,6 +30,7 @@ pyinotify = {version = "^0.9.6", optional = true}
 Jinja2 = {version = "^3.0.3", optional = true}
 python-daemon = "^2.3.0"
 importlib-resources = { version = "^5.4.0", python = "<3.9" }
+dynaconf = {extras = ["toml"], version = "^3.1.8"}
 
 [tool.poetry.extras]
 torque = ["APScheduler", "pyinotify"]
