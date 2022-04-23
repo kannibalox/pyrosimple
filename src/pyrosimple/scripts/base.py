@@ -20,7 +20,6 @@
 
 import errno
 import logging.config
-import os
 import sys
 import textwrap
 import time
@@ -194,7 +193,8 @@ class ScriptBase:
                 traceback.print_exception(exc)
                 sys.exit(error.EX_SOFTWARE)
             except KeyboardInterrupt:
-                self.LOG.critical("\n\nAborted by CTRL-C!\n", file=sys.stderr)
+                print()
+                self.LOG.critical("Aborted by CTRL-C!\n")
                 sys.exit(error.EX_TEMPFAIL)
             except IOError as exc:
                 # [Errno 32] Broken pipe?
