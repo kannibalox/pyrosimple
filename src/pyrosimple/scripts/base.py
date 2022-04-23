@@ -227,61 +227,12 @@ class ScriptBase:
 class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
     """CLI tool with configuration support."""
 
-    CONFIG_DIR_DEFAULT = "~/.pyroscope"
     OPTIONAL_CFG_FILES: List[str] = []
-
-    def add_options(self):
-        """Add configuration options."""
-        super().add_options()
-
-        self.add_value_option(
-            "--config-dir",
-            "DIR",
-            help="configuration directory [{}]".format(
-                os.environ.get("PYRO_CONFIG_DIR", self.CONFIG_DIR_DEFAULT)
-            ),
-        )
-        self.add_value_option(
-            "--config-file",
-            "PATH",
-            action="append",
-            default=[],
-            help="additional config file(s) to read",
-        )
-        self.add_value_option(
-            "-D",
-            "--define",
-            "KEY=VAL",
-            default=[],
-            action="append",
-            dest="defines",
-            help="override configuration attributes",
-        )
 
     def get_options(self):
         """Get program options."""
         super().get_options()
-
-        self.config_dir = os.path.abspath(
-            os.path.expanduser(
-                self.options.config_dir
-                or os.environ.get("PYRO_CONFIG_DIR", None)
-                or self.CONFIG_DIR_DEFAULT
-            )
-        )
-        load_config.ConfigLoader(self.config_dir).load(
-            self.OPTIONAL_CFG_FILES + self.options.config_file
-        )
-        if logging.getLogger().isEnabledFor(logging.DEBUG):
-            config.debug = True
-
-        for key_val in self.options.defines:
-            try:
-                key, val = key_val.split("=", 1)
-            except ValueError as exc:
-                raise error.UserError("Bad config override %r (%s)" % (key_val, exc))
-            else:
-                setattr(config, key, load_config.validate(val))
+        load_config.ConfigLoader().load()
 
 class PromptDecorator:
     """Decorator for interactive commands."""
