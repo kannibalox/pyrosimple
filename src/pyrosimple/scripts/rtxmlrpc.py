@@ -28,7 +28,7 @@ import tempfile
 import textwrap
 
 from pprint import pformat
-
+from pathlib import Path
 
 try:
     import requests
@@ -224,7 +224,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         ps1 = proxy.session.name() + "> "
         words = ["help", "stats", "exit"]
         words += [x + "=" for x in proxy.system.listMethods()]
-        history_file = os.path.join(config.config_dir, ".rtxmlrpc_history")
+        history_file = Path("~/.rtxmlrpc_history").expanduser()
 
         while True:
             try:
