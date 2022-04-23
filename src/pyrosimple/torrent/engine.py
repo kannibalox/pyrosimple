@@ -388,7 +388,7 @@ def core_fields():
         "alias",
         "tracker alias or domain",
         matcher=matching.PatternFilter,
-        accessor=lambda o: o._memoize("alias", getattr, o, "tracker"),
+        accessor=lambda o: o.memoize("alias", getattr, o, "tracker"),
     )
     yield DynamicField(
         str, "message", "current tracker message", matcher=matching.PatternFilter

@@ -134,7 +134,7 @@ class RtorrentItem(engine.TorrentProxy):
 
             return result
 
-    def _memoize(self, name: str, getter: Callable, *args, **kwargs):
+    def memoize(self, name: str, getter: Callable, *args, **kwargs):
         """Cache a stable expensive-to-get item value for later (optimized) retrieval."""
         field = "custom_m_" + name
         cached = self.fetch(field)

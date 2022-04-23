@@ -115,13 +115,14 @@ def lookup_announce_alias(name):
 
 
 @functools.cache
-def map_announce2alias(url):
+def map_announce2alias(url: str) -> str:
     """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
-
+    if url in settings["ALIASES"].items():
+        return url
     # Try to find an exact alias URL match and return its label
     for alias, urls in settings["ALIASES"].items():
         if any(i == url for i in urls):
-            return alias
+            return str(alias)
 
     # Try to find an alias URL prefix and return its label
     parts = urllib.parse.urlparse(url)
@@ -131,7 +132,7 @@ def map_announce2alias(url):
 
     for alias, urls in settings["ALIASES"].items():
         if any(i.startswith(server) for i in urls):
-            return alias
+            return str(alias)
 
     # Return 2nd level domain name if no alias found
     try:
@@ -139,7 +140,7 @@ def map_announce2alias(url):
         domain = ".".join(parts.netloc.split(":")[0].split(".")[-2:])
         for alias, urls in settings["ALIASES"].items():
             if any(i == domain for i in urls):
-                return alias
+                return str(alias)
         return domain
     except IndexError:
         return parts.netloc
