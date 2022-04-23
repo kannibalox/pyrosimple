@@ -39,7 +39,7 @@ settings = Dynaconf(
     validators=[
         Validator("RTORRENT_RC", default="~/.rtorrent.rc"),
         Validator(
-            "CONFIG_PY", default=Path("~/.config/pyrosimple/config.py").expanduser()
+            "CONFIG_PY", default="~/.config/pyrosimple/config.py"
         ),
         Validator("SORT_FIELDS", default="name,alias"),
         Validator(
@@ -146,6 +146,19 @@ def map_announce2alias(url):
     except IndexError:
         return parts.netloc
 
+py_loaded = False
+def load_custom_py():
+    if py_loaded:
+        return
+    log = logging.getLogger(__name__)
+    config_file = Path(settings.CONFIG_PY).expanduser()
+    if config_file.exists():
+        log.debug("Loading %r...", config_file)
+        with open(config_file, "rb") as handle:
+            # pylint: disable=exec-used
+            exec(handle.read())
+    else:
+        log.warning("Configuration file %r not found!", config_file)
 
 # Remember predefined names
 _PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))

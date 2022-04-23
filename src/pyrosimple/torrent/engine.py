@@ -650,12 +650,10 @@ class TorrentProxy:
             return None
 
     @classmethod
-    def add_custom_fields(cls, *_, **__):
-        """Add any custom fields defined in the configuration."""
-        for factory in config.custom_field_factories:
-            for field in factory():
-                setattr(cls, field.name, field)
-                FieldDefinition.FIELDS[field.name] = field
+    def add_field(cls, field):
+        """Add a custom field to the class"""
+        setattr(cls, field.name, field)
+        FieldDefinition.FIELDS[field.name] = field
 
     @classmethod
     def add_core_fields(cls, *_, **__):
