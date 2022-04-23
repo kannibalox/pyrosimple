@@ -23,6 +23,7 @@ import urllib
 
 from pathlib import Path
 from typing import Any, Dict, List
+import functools
 
 from dynaconf import Dynaconf, Validator
 
@@ -54,6 +55,7 @@ def lookup_announce_alias(name):
     raise KeyError("Unknown alias %s" % (name,))
 
 
+@functools.cache
 def map_announce2alias(url):
     """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
 
