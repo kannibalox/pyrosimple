@@ -21,7 +21,6 @@
 
 import configparser as ConfigParser
 import errno
-import glob
 import importlib
 import importlib.resources
 import io
@@ -250,55 +249,3 @@ class ConfigLoader:
 
         # Ready to go...
         self._loaded = True
-
-    def create(self, remove_all_rc_files=False):
-        """Create default configuration files at either the default location or the given directory."""
-        # Check and create configuration directory
-        if os.path.exists(self.config_dir):
-            self.LOG.debug(
-                "Configuration directory %r already exists!", self.config_dir
-            )
-        else:
-            os.mkdir(self.config_dir)
-
-        if remove_all_rc_files:
-            for subdir in (".", "rtorrent.d"):
-                config_files = list(
-                    glob.glob(
-                        os.path.join(os.path.abspath(self.config_dir), subdir, "*.rc")
-                    )
-                )
-                config_files += list(
-                    glob.glob(
-                        os.path.join(
-                            os.path.abspath(self.config_dir), subdir, "*.rc.default"
-                        )
-                    )
-                )
-                for config_file in config_files:
-                    self.LOG.info("Removing %r!", config_file)
-                    os.remove(config_file)
-
-        # Create default configuration files
-        for filepath in sorted(walk_resources("pyrosimple", "data/config")):
-            # Load from package data
-            with resources_files("pyrosimple").joinpath("data/config", filepath).open(
-                "rb"
-            ) as handle:
-                text: bytes = handle.read()
-
-            # Create missing subdirs
-            config_file = self.config_dir + filepath
-            if not os.path.exists(os.path.dirname(config_file)):
-                os.makedirs(os.path.dirname(config_file))
-
-            # Write configuration files
-            config_trail = [".default"]
-            if os.path.exists(config_file):
-                self.LOG.debug("Configuration file %r already exists!", config_file)
-            else:
-                config_trail.append("")
-            for i in config_trail:
-                with open(config_file + i, "wb") as handle:
-                    handle.write(text)
-                self.LOG.info("Configuration file %r written!", (config_file + i))

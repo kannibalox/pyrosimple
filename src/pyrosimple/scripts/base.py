@@ -229,9 +229,18 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
 
     OPTIONAL_CFG_FILES: List[str] = []
 
+    def add_options(self):
+        super().add_options()
+        self.parser.add_argument('-U', '--url', help='URL to rtorrent instance')
+
     def get_options(self):
         """Get program options."""
         super().get_options()
+        if self.options.url:
+            url = self.options.url
+            if url.startswith('@'):
+                url = config.settings['CONNECTIONS'][url[1:]]
+            config.settings['SCGI_URL'] = url
         load_config.ConfigLoader().load()
 
 class PromptDecorator:
