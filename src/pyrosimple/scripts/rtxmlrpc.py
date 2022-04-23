@@ -44,7 +44,6 @@ import bencode  # type: ignore
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.util import fmt, rpc
-from pyrosimple.util.parts import Bunch
 
 
 def read_blob(arg):
@@ -137,7 +136,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
             self.proxy = rpc.RTorrentProxy(config.scgi_url)
-            # self.proxy._set_mappings()
         return self.proxy
 
     def cooked(self, raw_args):
@@ -351,7 +349,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             try:
                 with open(filename, "rb") as handle:
                     raw_data = handle.read()
-                data = Bunch(bencode.bdecode(raw_data))
+                data = bencode.bdecode(raw_data)
             except EnvironmentError as exc:
                 self.LOG.warning(
                     "Can't read '%s' (%s)",
@@ -367,25 +365,25 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
             # Restore metadata
             was_active = proxy.d.is_active(infohash)
-            proxy.d.ignore_commands.set(infohash, data.ignore_commands)
-            proxy.d.priority.set(infohash, data.priority)
+            proxy.d.ignore_commands.set(infohash, data["ignore_commands"])
+            proxy.d.priority.set(infohash, data["priority"])
 
-            if proxy.d.throttle_name(infohash) != data.throttle_name:
+            if proxy.d.throttle_name(infohash) != data["throttle_name"]:
                 proxy.d.pause(infohash)
-                proxy.d.throttle_name.set(infohash, data.throttle_name)
+                proxy.d.throttle_name.set(infohash, data["throttle_name"])
 
-            if proxy.d.directory(infohash) != data.directory:
+            if proxy.d.directory(infohash) != data["directory"]:
                 proxy.d.stop(infohash)
-                proxy.d.directory_base.set(infohash, data.directory)
+                proxy.d.directory_base.set(infohash, data["directory"])
 
             for i in range(5):
                 key = "custom%d" % (i + 1)
                 getattr(proxy.d, key).set(infohash, data[key])
 
-            for key, val in data.custom.items():
+            for key, val in data["custom"].items():
                 proxy.d.custom.set(infohash, key, val)
 
-            for name in data.views:
+            for name in data["views"]:
                 try:
                     proxy.view.set_visible(infohash, name)
                 except xmlrpc_client.Fault as exc:
