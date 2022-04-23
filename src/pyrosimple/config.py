@@ -42,8 +42,10 @@ settings = Dynaconf(
         Validator("CONFIG_VALIDATOR_CALLBACKS", default="pyrosimple.torrent.engine:TorrentProxy.add_custom_fields"),
         Validator("ENGINE", default="pyrocore.torrent.rtorrent:RtorrentEngine"),
         Validator("FAST_QUERY", gte=0, lte=2, default=0),
-        Validator("ALIASES", default={}),
         Validator("SCGI_URL", default=""),
+        # TOML sections
+        Validator("ALIASES", default={}),
+        Validator("CONNECTIONS", default={}),
     ]
 )
 
