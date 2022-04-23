@@ -197,11 +197,13 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
     def mainloop(self):
         """The main loop."""
         self._validate_config()
-        config.engine.load_config()
+        config.autoload_scgi_url()
 
         # Defaults for process control paths
         if not self.options.no_fork and not self.options.guard_file:
-            self.options.guard_file = Path(self.RUNTIME_DIR, "pyrotorque.guard").expanduser()
+            self.options.guard_file = Path(
+                self.RUNTIME_DIR, "pyrotorque.guard"
+            ).expanduser()
         if not self.options.pid_file:
             self.options.pid_file = TimeoutPIDLockFile(
                 Path(self.RUNTIME_DIR, "pyrotorque.pid").expanduser()

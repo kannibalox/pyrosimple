@@ -20,8 +20,8 @@ import time
 
 from pyrosimple import config as config_ini
 from pyrosimple import error
-from pyrosimple.torrent import engine, formatting, matching
-from pyrosimple.util import pymagic, rpc
+from pyrosimple.torrent import engine, formatting, rtorrent
+from pyrosimple.util import matching, pymagic, rpc
 
 
 class QueueManager:
@@ -32,6 +32,7 @@ class QueueManager:
         self.config = config or {}
         self.proxy = None
         self.last_start = 0
+        self.engine = None
         self.LOG = pymagic.get_class_logger(self)
         if "log_level" in self.config:
             self.LOG.setLevel(config.log_level)
@@ -182,10 +183,11 @@ class QueueManager:
     def run(self):
         """Queue manager job callback."""
         try:
-            self.proxy = config_ini.engine.open()
+            self.engine = rtorrent.RtorrentEngine()
+            self.proxy = self.engine.open()
 
             # Get items from 'pyrotorque' view
-            items = list(config_ini.engine.items(self.config.viewname, cache=False))
+            items = list(self.engine.items(self.config.viewname, cache=False))
 
             if self.sort_key:
                 items.sort(key=self.sort_key)
@@ -193,7 +195,7 @@ class QueueManager:
 
             # Handle found items
             self._start(items)
-            self.LOG.debug("%s - %s", config_ini.engine.engine_id, self.proxy)
+            self.LOG.debug("%s - %s", self.engine.engine_id, self.proxy)
         except (error.LoggableError, *rpc.ERRORS) as exc:
             # only debug, let the statistics logger do its job
             self.LOG.debug(str(exc))

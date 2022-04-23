@@ -29,8 +29,8 @@ from pathlib import Path
 from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.torrent import formatting, matching
-from pyrosimple.util import logutil, metafile, pymagic, rpc, traits
+from pyrosimple.torrent import formatting
+from pyrosimple.util import logutil, matching, metafile, pymagic, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
@@ -410,8 +410,6 @@ class TreeWatchCommand(ScriptBaseWithConfig):
             self.parser.error(
                 "You have to provide the root directory of your watch tree, or a metafile path!"
             )
-
-        configuration.engine.load_config()
 
         pathname = os.path.abspath(self.args[0])
         if os.path.isdir(pathname):

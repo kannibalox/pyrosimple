@@ -25,7 +25,6 @@ import time
 
 from collections import defaultdict
 from functools import partial
-from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Union
 from xmlrpc import client as xmlrpclib
 
@@ -626,7 +625,7 @@ class RtorrentEngine:
     # inverse mapping of rTorrent names to ours
     RT2PYRO_MAPPING = dict((v, k) for k, v in PYRO2RT_MAPPING.items())
 
-    def __init__(self):
+    def __init__(self, uri=None):
         """Initialize proxy."""
         self.LOG = pymagic.get_class_logger(self)
         self.engine_id = "N/A"  # ID of the instance we're connecting to
@@ -638,6 +637,10 @@ class RtorrentEngine:
         self.properties = {}
         self._item_cache = {}
         self.known_throttle_names = {"", "NULL"}
+        if uri is None:
+            config.autoload_scgi_url()
+        else:
+            config.settings.SCGI_URL = uri
 
     def view(self, viewname="default", matcher=None):
         """Get list of download items."""
@@ -665,54 +668,6 @@ class RtorrentEngine:
 
         return result
 
-    def load_config(self):
-        """Load file given in "rcfile" if SCGI URL is not set."""
-        if config.settings.get("SCGI_URL"):
-            return  # already have the connection to rTorrent
-
-        # Get and check config file name
-        rcfile = Path(config.settings.RTORRENT_RC).expanduser()
-        if not os.path.isfile(rcfile):
-            raise error.UserError("Config file %r doesn't exist!" % (rcfile,))
-
-        # Parse the file
-        self.LOG.debug("Loading rtorrent config from '%s'", rcfile)
-        scgi_local: str = ""
-        scgi_port: str = ""
-        with open(rcfile, "r", encoding="utf-8") as handle:
-            continued = False
-            for line in handle.readlines():
-                # Skip comments, continuations, and empty lines
-                line = line.strip()
-                continued, was_continued = line.endswith("\\"), continued
-                if not line or was_continued or line.startswith("#"):
-                    continue
-
-                # Be lenient about errors, after all it's not our own config file
-                try:
-                    key, val = line.split("=", 1)
-                except ValueError:
-                    self.LOG.debug("Ignored invalid line %r in %r!", line, rcfile)
-                    continue
-                key, val = key.strip(), val.strip()
-
-                # Copy values we're interested in
-                if key in ["network.scgi.open_port", "scgi_port"]:
-                    self.LOG.debug("rtorrent.rc: %s = %s", key, val)
-                    scgi_port = val
-                if key in ["network.scgi.open_local", "scgi_local"]:
-                    self.LOG.debug("rtorrent.rc: %s = %s", key, val)
-                    scgi_local = val
-
-        # Validate fields
-        if scgi_local and not scgi_port.startswith("scgi+unix://"):
-            scgi_local = "scgi+unix://" + os.path.expanduser(scgi_local)
-        if scgi_port and not scgi_port.startswith("scgi://"):
-            scgi_port = "scgi://" + scgi_port
-
-        # Prefer UNIX domain sockets over TCP socketsj
-        config.settings.set("SCGI_URL", scgi_local or scgi_port)
-
     def __repr__(self):
         """Return a representation of internal state."""
         if self.rpc:
@@ -726,7 +681,6 @@ class RtorrentEngine:
             )
         else:
             # Unconnected state
-            self.load_config()
             return "%s connectable via %r" % (
                 self.__class__.__name__,
                 config.settings.SCGI_URL,
@@ -765,9 +719,6 @@ class RtorrentEngine:
         # Only connect once
         if self.rpc is not None:
             return self.rpc
-
-        # Get connection URL from rtorrent.rc
-        self.load_config()
 
         # Reading abilities are on the downfall, so...
         if not config.settings.SCGI_URL:

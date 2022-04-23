@@ -20,6 +20,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import functools
+import logging
 import urllib
 
 from pathlib import Path
@@ -27,6 +28,7 @@ from typing import Any, Dict
 
 from dynaconf import Dynaconf, Validator
 
+from pyrosimple import error
 from pyrosimple.util.parts import Bunch
 
 
@@ -52,6 +54,57 @@ settings = Dynaconf(
         Validator("CONNECTIONS", default={}),
     ],
 )
+
+
+def autoload_scgi_url() -> str:
+    """Load and return SCGI URL, auto-resolving it if necessary"""
+    if settings.SCGI_URL:
+        return settings.SCGI_URL
+    log = logging.getLogger(__name__)
+    # Get and check config file name
+    rcfile = Path(settings.RTORRENT_RC).expanduser()
+    if not rcfile.exists():
+        raise error.UserError("Config file %r doesn't exist!" % (rcfile,))
+
+    # Parse the file
+    log.debug("Loading rtorrent config from '%s'", rcfile)
+    scgi_local: str = ""
+    scgi_port: str = ""
+    with open(rcfile, "r", encoding="utf-8") as handle:
+        continued = False
+        for line in handle.readlines():
+            # Skip comments, continuations, and empty lines
+            line = line.strip()
+            continued, was_continued = line.endswith("\\"), continued
+            if not line or was_continued or line.startswith("#"):
+                continue
+
+            # Be lenient about errors, after all it's not our own config file
+            try:
+                key, val = line.split("=", 1)
+            except ValueError:
+                log.debug("Ignored invalid line %r in %r!", line, rcfile)
+                continue
+            key, val = key.strip(), val.strip()
+
+            # Copy values we're interested in
+            if key in ["network.scgi.open_port", "scgi_port"]:
+                log.debug("rtorrent.rc: %s = %s", key, val)
+                scgi_port = val
+            if key in ["network.scgi.open_local", "scgi_local"]:
+                abs.debug("rtorrent.rc: %s = %s", key, val)
+                scgi_local = val
+
+    # Validate fields
+    if scgi_local and not scgi_port.startswith("scgi+unix://"):
+        scgi_local = "scgi+unix://" + Path(scgi_local).expanduser()
+    if scgi_port and not scgi_port.startswith("scgi://"):
+        scgi_port = "scgi://" + scgi_port
+
+    # Prefer UNIX domain sockets over TCP socketsj
+    settings.set("SCGI_URL", scgi_local or scgi_port)
+
+    return settings.SCGI_URL
 
 
 def lookup_announce_alias(name):
@@ -82,7 +135,6 @@ def map_announce2alias(url):
         if any(i.startswith(server) for i in urls):
             return alias
 
-
     # Return 2nd level domain name if no alias found
     try:
         # Try to find based on domain
@@ -100,7 +152,6 @@ _PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))
 
 # Set some defaults to shut up pydev / pylint;
 # these later get overwritten by loading the config
-engine = Bunch(open=lambda: None)
 custom_template_helpers = Bunch()
 traits_by_alias: Dict[Any, Any] = {}
 torque: Dict[Any, Any] = {}

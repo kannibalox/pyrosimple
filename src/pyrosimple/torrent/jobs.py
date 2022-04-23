@@ -30,10 +30,9 @@ from typing import Dict, List
 
 import bencode
 
-from pyrosimple import config as config_ini
 from pyrosimple import error
-from pyrosimple.torrent import engine, formatting, matching, rtorrent
-from pyrosimple.util import fmt, metafile, pymagic, rpc
+from pyrosimple.torrent import engine, formatting, rtorrent
+from pyrosimple.util import fmt, matching, metafile, pymagic, rpc
 from pyrosimple.util.parts import Bunch
 
 
@@ -45,16 +44,18 @@ class EngineStats:
         self.config = config or Bunch()
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug("Statistics logger created with config %r", self.config)
+        self.engine = None
 
     def run(self):
         """Statistics logger job callback."""
         try:
-            proxy = config_ini.engine.open()
+            self.engine = rtorrent.RtorrentEngine()
+            proxy = engine.rpc
             self.LOG.info(
                 "Stats for %s - up %s, %s",
-                config_ini.engine.engine_id,
+                self.engine.engine_id,
                 fmt.human_duration(
-                    proxy.system.time() - config_ini.engine.startup, 0, 2, True
+                    self.engine.rpc.system.time() - self.engine.startup, 0, 2, True
                 ).strip(),
                 proxy,
             )
@@ -74,6 +75,7 @@ class PathMover:
         except AttributeError:
             self.config.max_workers = 1
         self.proxy = None
+        self.engine = None
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug("Path mover created with config %r", self.config)
 
@@ -110,18 +112,19 @@ class PathMover:
     def run(self):
         """Check if any torrents need to be moved"""
         try:
-            self.proxy = config_ini.engine.open()
+            self.engine = rtorrent.RtorrentEngine()
+            self.proxy = self.engine.rpc
             matcher = matching.ConditionParser(
                 engine.FieldDefinition.lookup, "name"
             ).parse(self.config.matcher)
-            view = engine.TorrentView(config_ini.engine, "default")
+            view = engine.TorrentView(self.engine, "default")
             view.matcher = matcher
             futures = []
             with concurrent.futures.ThreadPoolExecutor(
                 max_workers=self.config.max_workers
             ) as executor:
                 # Submit tasks
-                for i in config_ini.engine.items(view, cache=False):
+                for i in self.engine.items(view, cache=False):
                     if matcher(i):
                         futures.append(executor.submit(self.check_and_move, i))
                 # Wait and check for exceptions
@@ -232,18 +235,20 @@ class Mover:
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug("Statistics logger created with config %r", self.config)
         self.proxy = None
+        self.engine = None
 
     def run(self):
         """Statistics logger job callback."""
         try:
-            self.proxy = config_ini.engine.open()
+            self.engine = rtorrent.RtorrentEngine()
+            self.proxy = self.engine.open()
             matcher = matching.ConditionParser(
                 engine.FieldDefinition.lookup, "name"
             ).parse(f"{self.config.matcher}")
-            view = engine.TorrentView(config_ini.engine, "default")
+            view = engine.TorrentView(self.engine, "default")
             view.matcher = matcher
             hosts = self.config.hosts.split(",")
-            for i in config_ini.engine.items(view, cache=False):
+            for i in self.engine.items(view, cache=False):
                 for host in nodes_by_hash_weight(i.hash + i.alias, hosts):
                     rproxy = rpc.RTorrentProxy(host)
                     metahash = i.hash

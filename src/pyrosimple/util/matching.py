@@ -24,9 +24,7 @@ import re
 import shlex
 import time
 
-import pyrosimple
-
-from pyrosimple import config, error
+from pyrosimple import config, error, torrent
 
 
 TRUE = {
@@ -281,9 +279,9 @@ class PatternFilter(FieldFilter):
 
             def _template_globber(val, item):
                 """Helper."""
-                pattern = pyrosimple.torrent.formatting.format_item(
-                    self._template, item
-                ).replace("[", "[[]")
+                pattern = torrent.formatting.format_item(self._template, item).replace(
+                    "[", "[[]"
+                )
                 ##print('!!!', val, '~~~', pattern, '???')
                 return fnmatch.fnmatchcase(val, pattern.lower())
 

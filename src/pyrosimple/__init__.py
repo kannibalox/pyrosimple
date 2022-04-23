@@ -17,29 +17,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from pyrosimple import config
-from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import load_config
+from pyrosimple.torrent import rtorrent
 
 
-def connect(config_dir=None, optional_config_files=None):
+def connect(uri=None):
     """Initialize everything for interactive use.
 
     Returns a ready-to-use RtorrentEngine object.
     """
-
-    ScriptBase.setup()
-    load_config.ConfigLoader(config_dir).load(optional_config_files or [])
-
-    config.engine.open()
-    return config.engine
+    return rtorrent.RtorrentEngine(uri)
 
 
 def view(
     viewname="default",
     matcher=None,
-    config_dir=None,
-    optional_config_files=None,
 ):
     """Helper for interactive / high-level API use."""
-    return connect(config_dir, optional_config_files).view(viewname, matcher)
+    return connect().view(viewname, matcher)

@@ -78,7 +78,6 @@ class ConfigLoader:
         self._interpolation_escape(namespace["formats"])
 
         # Create engine from module specs
-        namespace["engine"] = pymagic.import_name(config.settings.ENGINE)()
         namespace["config_validator_callbacks"] = pymagic.import_name(
             config.settings.CONFIG_VALIDATOR_CALLBACKS
         )

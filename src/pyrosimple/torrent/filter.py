@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from pyrosimple import config, error
+from pyrosimple import error
 from pyrosimple.util import pymagic, rpc
 
 
@@ -36,7 +36,6 @@ class FilterJobBase:
         """Filter job callback."""
 
         try:
-            config.engine.open()
             # TODO: select view into items
             items = []
             self.run_filter(items)

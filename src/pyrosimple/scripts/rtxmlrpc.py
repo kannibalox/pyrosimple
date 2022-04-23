@@ -130,7 +130,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         """Open connection and return proxy."""
         if not self.proxy:
             if not config.settings["SCGI_URL"]:
-                config.engine.load_config()
+                config.autoload_scgi_url()
             if not config.settings["SCGI_URL"]:
                 self.LOG.error(
                     "You need to configure a RPC connection, read"

@@ -265,6 +265,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         self.prompt = PromptDecorator(self)
         self.plain_output_format = False
+        self.original_output_format = None
 
     def add_options(self):
         """Add program options."""
@@ -610,7 +611,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         action_name = (
             ", appending to" if append else ", removing from" if remove else " into"
         )
-        targetname = config.engine.show(
+        targetname = self.engine.show(
             matches,
             targetname or self.options.to_view or "rtcontrol",
             append=append,
@@ -622,7 +623,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             sourceview.matcher,
         )
         self.LOG.info("%s%s rTorrent view %r.", msg, action_name, targetname)
-        config.engine.log(msg)
+        self.engine.log(msg)
 
     def mainloop(self):
         """The main loop."""
@@ -731,7 +732,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             self.options.from_view = self.options.to_view = self.options.modify_view
 
         # Find matching torrents
-        view = config.engine.view(self.options.from_view, matcher)
+        view = self.engine.view(self.options.from_view, matcher)
         matches = list(view.items())
         matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
@@ -770,7 +771,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             "Output formatting helper"
             full_ns = dict(
                 version=None,
-                proxy=config.engine.open(),
+                proxy=self.engine.open(),
                 view=view,
                 query=matcher,
                 matches=matches,
@@ -820,9 +821,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     if self.options.flush:
                         item.flush()
                     if self.options.view_only:
-                        show_in_client = lambda x: config.engine.open().log(
-                            rpc.NOHASH, x
-                        )
+                        show_in_client = lambda x: self.engine.open().log(rpc.NOHASH, x)
                         self.emit(item, defaults, to_log=show_in_client)
 
         # Show in ncurses UI?
@@ -934,7 +933,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 view.size(),
             )
 
-        self.LOG.debug("RPC stats: %s", config.engine.rpc)
+        self.LOG.debug("RPC stats: %s", self.engine.rpc)
 
 
 def run():  # pragma: no cover

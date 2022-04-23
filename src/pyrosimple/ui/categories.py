@@ -17,8 +17,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from pyrosimple import config, error
+from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.torrent import rtorrent
 from pyrosimple.util import rpc
 
 
@@ -45,7 +46,7 @@ class CategoryManager(ScriptBaseWithConfig):
     def mainloop(self):
         """Manage category views."""
         # Get client state
-        proxy = config.engine.open()
+        proxy = rtorrent.RtorrentEngine().open()
         views = [x for x in sorted(proxy.view.list()) if x.startswith(self.PREFIX)]
 
         current_view = real_current_view = proxy.ui.current_view()

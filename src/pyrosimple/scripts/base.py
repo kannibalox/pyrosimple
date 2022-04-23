@@ -29,7 +29,8 @@ from argparse import ArgumentParser
 from typing import List
 
 from pyrosimple import config, error
-from pyrosimple.util import load_config, pymagic
+from pyrosimple.torrent import rtorrent
+from pyrosimple.util import pymagic
 
 
 class ScriptBase:
@@ -64,6 +65,7 @@ class ScriptBase:
         self.args = None
         self.options = None
         self.return_code = 0
+        self.engine = None
 
         try:
             import importlib.metadata  # pylint: disable=import-outside-toplevel
@@ -241,7 +243,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
             if url.startswith("@"):
                 url = config.settings["CONNECTIONS"][url[1:]]
             config.settings["SCGI_URL"] = url
-        load_config.ConfigLoader().load()
+        self.engine = rtorrent.RtorrentEngine()
 
 
 class PromptDecorator:
