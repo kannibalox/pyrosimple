@@ -51,6 +51,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
     POLL_TIMEOUT = 1.0
 
+    RUNTIME_DIR = os.getenv("XDG_RUNTIME_DIR") or "~/.pyrosimple/run/"
+
     def add_options(self):
         """Add program options."""
         super().add_options()
@@ -199,10 +201,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         # Defaults for process control paths
         if not self.options.no_fork and not self.options.guard_file:
-            self.options.guard_file = os.path.join(config.config_dir, "run/pyrotorque")
+            self.options.guard_file = Path(self.RUNTIME_DIR, "pyrotorque.guard").expanduser()
         if not self.options.pid_file:
             self.options.pid_file = TimeoutPIDLockFile(
-                Path(config.config_dir, "run/pyrotorque.pid")
+                Path(self.RUNTIME_DIR, "pyrotorque.pid").expanduser()
             )
 
         # Process control

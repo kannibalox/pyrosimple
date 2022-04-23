@@ -333,7 +333,7 @@ class TreeWatch:
         self.LOG.debug("custom commands = %r", self.custom_cmds)
 
         # Get client proxy
-        self.proxy = rpc.RTorrentProxy(configuration.scgi_url)
+        self.proxy = rpc.RTorrentProxy(config.settings.SCGI_URL)
 
         if self.config.active:
             self.setup()
