@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import errno
+import fnmatch
 import operator
 import os
 import shlex
@@ -530,7 +531,7 @@ class RtorrentItem(engine.TorrentProxy):
         doomed = files | dirs
         for path in sorted(dirs, reverse=True):
             residue = set(os.listdir(path) if os.path.exists(path) else [])
-            ignorable = set()
+            ignorable = set(fnmatch.filter(residue, config.settings.CULL_WAIFS))
             if residue and residue != ignorable:
                 self._engine.LOG.info(
                     "Keeping non-empty directory '%s' with %d %s%s!",

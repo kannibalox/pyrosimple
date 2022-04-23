@@ -57,7 +57,7 @@ settings = Dynaconf(
 def autoload_scgi_url() -> str:
     """Load and return SCGI URL, auto-resolving it if necessary"""
     if settings.SCGI_URL:
-        return settings.SCGI_URL
+        return str(settings.SCGI_URL)
     log = logging.getLogger(__name__)
     # Get and check config file name
     rcfile = Path(settings.RTORRENT_RC).expanduser()
@@ -90,19 +90,19 @@ def autoload_scgi_url() -> str:
                 log.debug("rtorrent.rc: %s = %s", key, val)
                 scgi_port = val
             if key in ["network.scgi.open_local", "scgi_local"]:
-                abs.debug("rtorrent.rc: %s = %s", key, val)
+                log.debug("rtorrent.rc: %s = %s", key, val)
                 scgi_local = val
 
     # Validate fields
     if scgi_local and not scgi_port.startswith("scgi+unix://"):
-        scgi_local = "scgi+unix://" + Path(scgi_local).expanduser()
+        scgi_local = "scgi+unix://" + str(Path(scgi_local).expanduser())
     if scgi_port and not scgi_port.startswith("scgi://"):
         scgi_port = "scgi://" + scgi_port
 
     # Prefer UNIX domain sockets over TCP socketsj
     settings.set("SCGI_URL", scgi_local or scgi_port)
 
-    return settings.SCGI_URL
+    return str(settings.SCGI_URL)
 
 
 def lookup_announce_alias(name):
