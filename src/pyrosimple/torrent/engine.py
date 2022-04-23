@@ -383,12 +383,16 @@ def core_fields():
         matcher=matching.PatternFilter,
         accessor=lambda o: (o.announce_urls(default=[None]) or [None])[0],
     )
+
+    def _alias_accessor(o):
+        return config.map_announce2alias(o.tracker)
+
     yield ConstantField(
-        config.map_announce2alias,
+        str,
         "alias",
         "tracker alias or domain",
         matcher=matching.PatternFilter,
-        accessor=lambda o: o.memoize("alias", getattr, o, "tracker"),
+        accessor=lambda o: o.memoize("alias", _alias_accessor, o),
     )
     yield DynamicField(
         str, "message", "current tracker message", matcher=matching.PatternFilter

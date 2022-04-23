@@ -136,7 +136,7 @@ class RtorrentItem(engine.TorrentProxy):
 
     def memoize(self, name: str, getter: Callable, *args, **kwargs):
         """Cache a stable expensive-to-get item value for later (optimized) retrieval."""
-        field = "custom_m_" + name
+        field = "custom_memo_" + name
         cached = self.fetch(field)
         if cached:
             value = cached
@@ -261,7 +261,7 @@ class RtorrentItem(engine.TorrentProxy):
         """
         try:
             response = self._engine.rpc.t.multicall(
-                self._fields["hash"], 0, "t.url=", "t.is_enabled="
+                self._fields["hash"], "", "t.url=", "t.is_enabled="
             )
         except rpc.ERRORS as exc:
             raise error.EngineError(
@@ -598,7 +598,7 @@ class RtorrentEngine:
             "down.rate",
             "down.total",
             "base_path",
-            "custom=m_alias",
+            "custom=memo_alias",
             "custom=tm_completed",
             "custom=tm_loaded",
             "custom=tm_started",
@@ -617,7 +617,7 @@ class RtorrentEngine:
         size="size_bytes",
         prio="priority",
         throttle="throttle_name",
-        custom_m_alias="custom=m_alias",
+        custom_memo_alias="custom=memo_alias",
         custom_tm_completed="custom=tm_completed",
         custom_tm_loaded="custom=tm_loaded",
         custom_tm_started="custom=tm_started",
