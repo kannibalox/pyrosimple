@@ -599,7 +599,9 @@ class RtorrentControl(ScriptBaseWithConfig):
         if sort_fields == "*":
             sort_fields = self.get_output_fields()
 
-        return formatting.validate_sort_fields(sort_fields or config.settings.SORT_FIELDS)
+        return formatting.validate_sort_fields(
+            sort_fields or config.settings.SORT_FIELDS
+        )
 
     def show_in_view(self, sourceview, matches, targetname=None):
         """Show search result in ncurses view."""
@@ -708,7 +710,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Preparation steps
         if self.options.fast_query != "=":
-            config.settings.set('FAST_QUERY', int(self.options.fast_query))
+            config.settings.set("FAST_QUERY", int(self.options.fast_query))
         raw_output_format = self.options.output_format
         default_output_format = "default"
         if actions:

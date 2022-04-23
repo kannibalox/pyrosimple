@@ -19,16 +19,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import functools
 import urllib
 
 from pathlib import Path
-from typing import Any, Dict, List
-import functools
+from typing import Any, Dict
 
 from dynaconf import Dynaconf, Validator
 
 from pyrosimple.util.parts import Bunch
-from pyrosimple.util import pymagic
 
 
 settings = Dynaconf(
@@ -37,21 +36,27 @@ settings = Dynaconf(
     envvar_prefix="PYRO",
     validators=[
         Validator("RTORRENT_RC", default="~/.rtorrent.rc"),
-        Validator("CONFIG_PY", default=Path("~/.config/pyrosimple/config.py").expanduser()),
+        Validator(
+            "CONFIG_PY", default=Path("~/.config/pyrosimple/config.py").expanduser()
+        ),
         Validator("SORT_FIELDS", default="name,alias"),
-        Validator("CONFIG_VALIDATOR_CALLBACKS", default="pyrosimple.torrent.engine:TorrentProxy.add_custom_fields"),
+        Validator(
+            "CONFIG_VALIDATOR_CALLBACKS",
+            default="pyrosimple.torrent.engine:TorrentProxy.add_custom_fields",
+        ),
         Validator("ENGINE", default="pyrocore.torrent.rtorrent:RtorrentEngine"),
         Validator("FAST_QUERY", gte=0, lte=2, default=0),
         Validator("SCGI_URL", default=""),
         # TOML sections
         Validator("ALIASES", default={}),
         Validator("CONNECTIONS", default={}),
-    ]
+    ],
 )
+
 
 def lookup_announce_alias(name):
     """Get canonical alias name and announce URL list for the given alias."""
-    for alias, urls in settings['ALIASES'].items():
+    for alias, urls in settings["ALIASES"].items():
         if alias.lower() == name.lower():
             return alias, urls
 
@@ -63,7 +68,7 @@ def map_announce2alias(url):
     """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
 
     # Try to find an exact alias URL match and return its label
-    for alias, urls in settings['ALIASES'].items():
+    for alias, urls in settings["ALIASES"].items():
         if any(i == url for i in urls):
             return alias
 
@@ -73,13 +78,13 @@ def map_announce2alias(url):
         (parts.scheme, parts.netloc, "/", None, None, None)
     )
 
-    for alias, urls in settings['ALIASES'].items():
+    for alias, urls in settings["ALIASES"].items():
         if any(i.startswith(server) for i in urls):
             return alias
 
     # Try to find based on domain
-    domain = '.'.join(parts.netloc.split(':')[0].split('.')[-2:])
-    for alias, urls in settings['ALIASES'].items():
+    domain = ".".join(parts.netloc.split(":")[0].split(".")[-2:])
+    for alias, urls in settings["ALIASES"].items():
         if any(i == domain for i in urls):
             return alias
 
@@ -88,6 +93,7 @@ def map_announce2alias(url):
         return ".".join(parts.netloc.split(":")[0].split(".")[-2:])
     except IndexError:
         return parts.netloc
+
 
 # Remember predefined names
 _PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))

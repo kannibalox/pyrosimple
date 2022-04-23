@@ -122,7 +122,7 @@ class CompoundFilterAll(CompoundFilterBase):
             ]
             result = [x for x in result if x]
             if result:
-                if int(config.settings.get('FAST_QUERY')) == 1:
+                if int(config.settings.get("FAST_QUERY")) == 1:
                     return result[0]  # using just one simple expression is safer
                 else:
                     # TODO: make this purely value-based (is.nz=…)

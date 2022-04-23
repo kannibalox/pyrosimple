@@ -18,15 +18,14 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import errno
-import fnmatch
 import operator
 import os
 import shlex
 import time
 
-from pathlib import Path
 from collections import defaultdict
 from functools import partial
+from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Union
 from xmlrpc import client as xmlrpclib
 
@@ -899,7 +898,7 @@ class RtorrentEngine:
                     multi_args = ["", view.viewname] + [
                         field if "=" in field else field + "=" for field in args
                     ]
-                    if view.matcher and config.settings.get('FAST_QUERY'):
+                    if view.matcher and config.settings.get("FAST_QUERY"):
                         pre_filter = matching.unquote_pre_filter(
                             view.matcher.pre_filter()
                         )

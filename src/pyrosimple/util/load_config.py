@@ -29,6 +29,7 @@ import re
 
 from pathlib import Path
 
+
 try:
     resources_files = importlib.resources.files
 except AttributeError:
@@ -78,7 +79,9 @@ class ConfigLoader:
 
         # Create engine from module specs
         namespace["engine"] = pymagic.import_name(config.settings.ENGINE)()
-        namespace["config_validator_callbacks"] = pymagic.import_name(config.settings.CONFIG_VALIDATOR_CALLBACKS)
+        namespace["config_validator_callbacks"] = pymagic.import_name(
+            config.settings.CONFIG_VALIDATOR_CALLBACKS
+        )
 
         # Do some standard type conversions
         for key in namespace:
@@ -122,10 +125,7 @@ class ConfigLoader:
             if section == "FORMATS":
                 self._interpolation_escape(raw_vars)
             raw_vars.update(
-                dict(
-                    (key, val)
-                    for key, val in ini_file.items(section, vars=raw_vars)
-                )
+                dict((key, val) for key, val in ini_file.items(section, vars=raw_vars))
             )
 
         # Update global values
@@ -208,7 +208,7 @@ class ConfigLoader:
                     self._load_ini(namespace, cfg_file)
 
             self._validate_namespace(namespace)
-            pyconfig = Path(config.settings.get('CONFIG_PY')).expanduser()
+            pyconfig = Path(config.settings.get("CONFIG_PY")).expanduser()
             if pyconfig.exists():
                 self._load_py(namespace, pyconfig)
             self._validate_namespace(namespace)

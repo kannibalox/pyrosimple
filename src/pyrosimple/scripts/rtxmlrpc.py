@@ -27,8 +27,9 @@ import sys
 import tempfile
 import textwrap
 
-from pprint import pformat
 from pathlib import Path
+from pprint import pformat
+
 
 try:
     import requests
@@ -128,14 +129,14 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def open(self):
         """Open connection and return proxy."""
         if not self.proxy:
-            if not config.settings['SCGI_URL']:
+            if not config.settings["SCGI_URL"]:
                 config.engine.load_config()
-            if not config.settings['SCGI_URL']:
+            if not config.settings["SCGI_URL"]:
                 self.LOG.error(
                     "You need to configure a RPC connection, read"
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
-            self.proxy = rpc.RTorrentProxy(config.settings['SCGI_URL'])
+            self.proxy = rpc.RTorrentProxy(config.settings["SCGI_URL"])
         return self.proxy
 
     def cooked(self, raw_args):
