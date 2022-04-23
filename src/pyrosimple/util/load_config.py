@@ -41,36 +41,6 @@ from pyrosimple import config, error
 from pyrosimple.util import pymagic
 
 
-def walk_resources(package_or_requirement, resource_name, recurse=True, base=""):
-    """Yield paths of files in the given resource directory, all paths start with '/'."""
-    base = base.rstrip("/") + "/"
-    resource_base = (resource_name.rstrip("/") + "/" + base.strip("/")).rstrip("/")
-
-    # Create default configuration files
-    for filename in resources_files(
-        package_or_requirement + "." + resource_base
-    ).iterdir():
-        # Skip hidden and other trashy names
-        if filename.startswith(".") or any(
-            filename.endswith(i) for i in (".pyc", ".pyo", "~")
-        ):
-            continue
-
-        # Handle subdirectories
-        if (
-            resources_files(package_or_requirement + "." + resource_base)
-            .joinpath(filename)
-            .is_dir()
-        ):
-            if recurse:
-                for i in walk_resources(
-                    package_or_requirement, resource_name, recurse, base=base + filename
-                ):
-                    yield i
-        else:
-            yield base + filename
-
-
 class ConfigLoader:
     """Populates this module's dictionary with the user-defined configuration values."""
 
