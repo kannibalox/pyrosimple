@@ -33,7 +33,7 @@ from pyrosimple import config, error
 from pyrosimple.torrent import engine
 from pyrosimple.util import fmt, matching, pymagic, rpc, traits
 from pyrosimple.util.parts import Bunch
-
+from pyrosimple.util.cache import ExpiringCache
 
 class CommaLexer(shlex.shlex):
     """Helper to split argument lists."""
@@ -48,11 +48,16 @@ class CommaLexer(shlex.shlex):
 class RtorrentItem(engine.TorrentProxy):
     """A single download item."""
 
-    def __init__(self, engine_, fields):
+    def __init__(self, engine_, fields, rpc_fields: Optional[Dict] = None):
         """Initialize download item."""
         super().__init__()
         self._engine = engine_
-        self._fields = dict(fields)  # Acts a cache for the item
+        self._fields = ExpiringCache(static_keys=engine.FieldDefinition.CONSTANT_FIELDS)  # Acts a cache for the item
+        self._fields.update(dict(fields))
+        self._rpc_cache = ExpiringCache(static_keys={"name", "size_bytes", "size_chunks"})
+        if rpc_fields is not None:
+            self._rpc_cache.update(rpc_fields)
+
 
     def _make_it_so(
         self, command: str, calls: List[str], *args, observer: Optional[Callable] = None
@@ -191,12 +196,20 @@ class RtorrentItem(engine.TorrentProxy):
         """Return known fields."""
         return self._fields.copy()
 
-    def rpc_call(self, method: str, args: Optional[List] = None):
+    def rpc_call(self, method: str, args: Optional[List] = None, cache: bool = False):
         """Directly call rpc for item-specific information"""
+        cache_key = method
+        if args:
+            cache_key += ','.join(args)
+        val = self._rpc_cache.get(cache_key, None)
+        if val is not None:
+            return val
         if args is None:
             args = []
         getter = getattr(self._engine.rpc.d, method)
-        return getter(self._fields["hash"], *args)
+        val = getter(self._fields["hash"], *args)
+        self._rpc_cache[cache_key] = val
+        return val
 
     def fetch(self, name: str, cache: bool = True):
         """Get a field on demand. By 'on demand', this means that the field may possibly be created
@@ -872,9 +885,10 @@ class RtorrentEngine:
                     items.append(
                         RtorrentItem(
                             self,
-                            zip(
+                            fields=zip(
                                 [self.RT2PYRO_MAPPING.get(i, i) for i in prefetch], item
                             ),
+                            rpc_fields=dict(zip(prefetch, item))
                         )
                     )
                     yield items[-1]

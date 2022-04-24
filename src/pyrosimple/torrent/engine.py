@@ -216,6 +216,7 @@ class FieldDefinition:
     """Download item field."""
 
     FIELDS: Dict[str, Any] = {}
+    CONSTANT_FIELDS = set(["hash"])
 
     @classmethod
     def lookup(cls, name):
@@ -658,6 +659,8 @@ class TorrentProxy:
         """Add a custom field to the class"""
         setattr(cls, field.name, field)
         FieldDefinition.FIELDS[field.name] = field
+        if isinstance(field, ConstantField):
+            FieldDefinition.CONSTANT_FIELDS.add(field.name)
 
     @classmethod
     def add_core_fields(cls, *_, **__):
@@ -665,6 +668,8 @@ class TorrentProxy:
         for field in core_fields():
             setattr(cls, field.name, field)
             FieldDefinition.FIELDS[field.name] = field
+            if isinstance(field, ConstantField):
+                FieldDefinition.CONSTANT_FIELDS.add(field.name)
 
     def __init__(self):
         """Initialize object."""
