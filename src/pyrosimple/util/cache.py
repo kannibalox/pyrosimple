@@ -1,17 +1,15 @@
 """Helper classes to deal with caching various data"""
-from collections import abc
 import time
-from typing import Optional, Dict, Any
 
+from collections import abc
 from threading import RLock
+from typing import Any, Dict, Optional
+
 
 class ExpiringCache(abc.MutableMapping):
     """Caches items for a fixed time, with an optional exlusionary list"""
 
-    # Everything not static is considered expirable.
-    STATIC_FIELDS = {}
-
-    def __init__(self, items: Optional[Dict] =None, expires=5, static_keys=None):
+    def __init__(self, items: Optional[Dict] = None, expires=5, static_keys=None):
         self.expires = expires
         self.data: Dict[str, tuple[float, Any]] = {}
         self.lock = RLock()
@@ -23,7 +21,6 @@ class ExpiringCache(abc.MutableMapping):
                 else:
                     expire_at = self.expires + time.time()
                 self.data[key] = (expire_at, val)
-
 
     def __delitem__(self, key):
         with self.lock:
@@ -50,7 +47,7 @@ class ExpiringCache(abc.MutableMapping):
                 raise KeyError(key)
 
     def __contains__(self, key):
-        """ Return True if the dict has a key, else return False. """
+        """Return True if the dict has a key, else return False."""
         try:
             with self.lock:
                 expires_at, _ = self.data.get(key)

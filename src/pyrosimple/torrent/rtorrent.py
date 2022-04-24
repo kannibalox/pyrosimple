@@ -32,8 +32,9 @@ from xmlrpc import client as xmlrpclib
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
 from pyrosimple.util import fmt, matching, pymagic, rpc, traits
-from pyrosimple.util.parts import Bunch
 from pyrosimple.util.cache import ExpiringCache
+from pyrosimple.util.parts import Bunch
+
 
 class CommaLexer(shlex.shlex):
     """Helper to split argument lists."""
@@ -52,12 +53,15 @@ class RtorrentItem(engine.TorrentProxy):
         """Initialize download item."""
         super().__init__()
         self._engine = engine_
-        self._fields = ExpiringCache(static_keys=engine.FieldDefinition.CONSTANT_FIELDS)  # Acts a cache for the item
+        self._fields = ExpiringCache(
+            static_keys=engine.FieldDefinition.CONSTANT_FIELDS
+        )  # Acts a cache for the item
         self._fields.update(dict(fields))
-        self._rpc_cache = ExpiringCache(static_keys={"name", "size_bytes", "size_chunks"})
+        self._rpc_cache = ExpiringCache(
+            static_keys={"name", "size_bytes", "size_chunks"}
+        )
         if rpc_fields is not None:
             self._rpc_cache.update(rpc_fields)
-
 
     def _make_it_so(
         self, command: str, calls: List[str], *args, observer: Optional[Callable] = None
@@ -200,9 +204,9 @@ class RtorrentItem(engine.TorrentProxy):
         """Directly call rpc for item-specific information"""
         cache_key = method
         if args:
-            cache_key += ','.join(args)
+            cache_key += "=" + ",".join(args)
         val = self._rpc_cache.get(cache_key, None)
-        if val is not None:
+        if cache and val is not None:
             return val
         if args is None:
             args = []
@@ -888,7 +892,7 @@ class RtorrentEngine:
                             fields=zip(
                                 [self.RT2PYRO_MAPPING.get(i, i) for i in prefetch], item
                             ),
-                            rpc_fields=dict(zip(prefetch, item))
+                            rpc_fields=dict(zip(prefetch, item)),
                         )
                     )
                     yield items[-1]
