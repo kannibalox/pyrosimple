@@ -200,7 +200,7 @@ class RtorrentItem(engine.TorrentProxy):
         """Return known fields."""
         return self._fields.copy()
 
-    def rpc_call(self, method: str, args: Optional[List] = None, cache: bool = False):
+    def rpc_call(self, method: str, args: Optional[List] = None, cache: bool = True):
         """Directly call rpc for item-specific information"""
         cache_key = method
         if args:
@@ -892,7 +892,7 @@ class RtorrentEngine:
                             fields=zip(
                                 [self.RT2PYRO_MAPPING.get(i, i) for i in prefetch], item
                             ),
-                            rpc_fields=dict(zip(prefetch, item)),
+                            rpc_fields=dict(zip([f"d.{p}" for p in prefetch], item)),
                         )
                     )
                     yield items[-1]
