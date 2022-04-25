@@ -58,7 +58,12 @@ class RtorrentItem(engine.TorrentProxy):
         )  # Acts a cache for the item
         self._fields.update(dict(fields))
         self._rpc_cache = ExpiringCache(
-            static_keys={"d.name", "d.size_bytes", "d.size_chunks", "d.custom=memo_alias"}
+            static_keys={
+                "d.name",
+                "d.size_bytes",
+                "d.size_chunks",
+                "d.custom=memo_alias",
+            }
         )
         if rpc_fields is not None:
             self._rpc_cache.update(rpc_fields)
