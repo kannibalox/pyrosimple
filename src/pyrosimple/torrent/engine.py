@@ -346,7 +346,7 @@ def core_fields():
         "views this item is attached to",
         matcher=matching.TaggedAsFilter,
         formatter=_fmt_tags,
-        accessor=lambda o: o.rpc_call("views"),
+        accessor=lambda o: o.rpc_call("d.views"),
     )
     yield DynamicField(
         set,
@@ -493,7 +493,7 @@ def core_fields():
         "fno",
         "number of files in this item",
         matcher=matching.FloatFilter,
-        accessor=lambda o: o.rpc_call("size_files"),
+        accessor=lambda o: o.rpc_call("d.size_files"),
     )
 
     # Bandwidth & Data Transfer
@@ -502,22 +502,22 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
-        accessor=lambda o: float(o.rpc_call("completed_bytes"))
-        / o.rpc_call("size_bytes"),
+        accessor=lambda o: float(o.rpc_call("d.completed_bytes"))
+        / o.rpc_call("d.size_bytes"),
     )
     yield DynamicField(
         ratio_float,
         "ratio",
         "normalized ratio (1:1 = 1.0)",
         matcher=matching.FloatFilter,
-        accessor=lambda o: o.rpc_call("ratio"),
+        accessor=lambda o: o.rpc_call("d.ratio"),
     )
     yield DynamicField(
         int,
         "uploaded",
         "amount of uploaded data",
         matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.rpc_call("up.total"),
+        accessor=lambda o: o.rpc_call("d.up.total"),
     )
     yield DynamicField(
         int,
@@ -533,14 +533,14 @@ def core_fields():
         "down",
         "download rate",
         matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.rpc_call("down.rate"),
+        accessor=lambda o: o.rpc_call("d.down.rate"),
     )
     yield DynamicField(
         int,
         "up",
         "upload rate",
         matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.rpc_call("up.rate"),
+        accessor=lambda o: o.rpc_call("d.up.rate"),
     )
     yield DynamicField(
         str,
