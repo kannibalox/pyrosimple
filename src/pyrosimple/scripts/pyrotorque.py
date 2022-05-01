@@ -24,7 +24,6 @@ import signal
 import sys
 import time
 
-from collections import defaultdict
 from pathlib import Path
 from typing import Dict
 
@@ -34,9 +33,7 @@ from daemon.pidfile import TimeoutPIDLockFile
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.util import logutil, matching, pymagic
-from pyrosimple.util.parts import Bunch
-
+from pyrosimple.util import logutil, pymagic
 
 class RtorrentQueueManager(ScriptBaseWithConfig):
     ### Keep things wrapped to fit under this comment... ##############################
@@ -105,70 +102,26 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
     def _validate_config(self):
         """Handle and check configuration."""
-        groups = dict(
-            job=defaultdict(Bunch),
-            httpd=defaultdict(Bunch),
-        )
 
-        for key, val in config.torque.items():
-            # Auto-convert numbers and bools
-            if val.isdigit():
-                config.torque[key] = val = int(val)
-            elif val.lower() in (matching.TRUE | matching.FALSE):
-                val = matching.truth(str(val), key)
-
-            # Assemble grouped parameters
-            stem = key.split(".", 1)[0]
-            if key == "httpd.active":
-                groups[stem]["active"] = val
-            elif stem in groups:
-                try:
-                    stem, name, param = key.split(".", 2)
-                except (TypeError, ValueError):
-                    self.fatal(
-                        "Bad %s configuration key %r (expecting %s.NAME.PARAM)"
-                        % (stem, key, stem)
-                    )
-                else:
-                    groups[stem][name][param] = val
-
-        for key, val in groups.items():
-            setattr(self, key.replace("job", "jobs"), Bunch(val))
-
-        # Validate jobs
-        for name, params in self.jobs.items():
+        for name, params in config.settings.TORQUE.items():
             for key in ("handler", "schedule"):
                 if key not in params:
                     self.fatal(
-                        "Job '%s' is missing the required 'job.%s.%s' parameter"
-                        % (name, name, key)
+                        "Job '%s' is missing the required '%s' parameter"
+                        % (name, key)
                     )
-
-            bool_param = lambda name, k, default, p=params: matching.truth(
-                p.get(k, default), "job.%s.%s" % (name, k)
-            )
-
-            params.job_name = name
-            params.dry_run = bool_param(name, "dry_run", False) or self.options.dry_run
-            params.active = bool_param(name, "active", True)
-            params.schedule = self._parse_schedule(params.schedule)
-
-            if params.active:
-                try:
-                    params.handler = pymagic.import_name(params.handler)
-                except ImportError as exc:
-                    self.fatal(
-                        "Bad handler name '%s' for job '%s':\n    %s"
-                        % (params.handler, name, exc)
-                    )
+            self.jobs[name] = dict(params)
+            if params.get('active', False):
+                self.jobs[name]['handler'] = pymagic.import_name(params.handler)
+            self.jobs[name]['schedule'] = self._parse_schedule(params.get('schedule'))
 
     def _add_jobs(self):
         """Add configured jobs."""
         for name, params in self.jobs.items():
-            if params.active:
-                params.handler = params.handler(params)
+            if params['active']:
+                params['handler'] = params['handler'](params)
                 self.sched.add_job(
-                    params.handler.run, name=name, trigger="cron", **params.schedule
+                    params['handler'].run, name=name, trigger="cron", **params['schedule']
                 )
 
     def _run_forever(self):
@@ -197,7 +150,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
     def mainloop(self):
         """The main loop."""
         self._validate_config()
-        config.autoload_scgi_url()
 
         # Defaults for process control paths
         if not self.options.no_fork and not self.options.guard_file:
@@ -253,8 +205,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         # Check if we only need to run once
         if self.options.run_once:
             params = self.jobs[self.options.run_once]
-            params.handler2 = params.handler(params)
-            params.handler2.run()
+            params['handler_copy'] = params.get('handler')(params)
+            params['handler_copy'].run()
             sys.exit(0)
 
         dcontext = DaemonContext(
