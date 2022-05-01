@@ -24,7 +24,7 @@ import logging
 import urllib
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from dynaconf import Dynaconf, Validator
 
@@ -52,13 +52,14 @@ settings = Dynaconf(
     ],
 )
 
-def scgi_url_from_rtorrentrc(rcfile: str) -> Optional[str]:
+def scgi_url_from_rtorrentrc(rcfile: Union[str,Path]) -> Optional[str]:
     """Parse a rtorrent.rc file and """
     log = logging.getLogger(__name__)
     log.debug("Loading rtorrent config from '%s'", rcfile)
     scgi_local: str = ""
     scgi_port: str = ""
-    with open(rcfile, "r", encoding="utf-8") as handle:
+    rcfile = Path(rcfile)
+    with rcfile.open("r", encoding="utf-8") as handle:
         continued = False
         for line in handle.readlines():
             # Skip comments, continuations, and empty lines
