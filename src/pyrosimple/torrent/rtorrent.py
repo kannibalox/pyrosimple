@@ -648,7 +648,7 @@ class RtorrentEngine:
     # inverse mapping of rTorrent names to ours
     RT2PYRO_MAPPING = dict((v, k) for k, v in PYRO2RT_MAPPING.items())
 
-    def __init__(self, uri=None):
+    def __init__(self, uri=None, auto_open=False):
         """Initialize proxy."""
         self.LOG = pymagic.get_class_logger(self)
         self.engine_id = "N/A"  # ID of the instance we're connecting to
@@ -664,6 +664,8 @@ class RtorrentEngine:
             config.autoload_scgi_url()
         else:
             config.settings.SCGI_URL = uri
+        if auto_open:
+            self.open()
 
     def view(self, viewname="default", matcher=None):
         """Get list of download items."""
