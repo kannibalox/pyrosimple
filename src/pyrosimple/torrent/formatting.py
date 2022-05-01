@@ -157,7 +157,7 @@ def expand_template(template_path: str, namespace: Dict) -> str:
     """
     template = env.get_template(template_path)
     # Default templating namespace
-    #variables = dict(c=config.custom_template_helpers)
+    # variables = dict(c=config.custom_template_helpers)
     variables = {}
     # Provided namespace takes precedence
     variables.update(namespace)

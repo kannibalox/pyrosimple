@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 import time
 
-from pyrosimple import config as config_ini
 from pyrosimple import error
 from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
@@ -46,8 +45,8 @@ class QueueManager:
         self.config.startable = matching.ConditionParser(
             engine.FieldDefinition.lookup, "name"
         ).parse(
-            "[ %s ] [ %s ]"
-            % (config_ini.torque["queue_startable_base"], self.config.startable)
+            "[ %s ] [ is_open=no is_active=no is_complete=no ]"
+            % (self.config.startable)
         )
         self.LOG.info(
             "Startable matcher for '%s' is: [ %s ]",

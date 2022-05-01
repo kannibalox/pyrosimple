@@ -35,6 +35,7 @@ from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.util import logutil, pymagic
 
+
 class RtorrentQueueManager(ScriptBaseWithConfig):
     ### Keep things wrapped to fit under this comment... ##############################
     """
@@ -107,21 +108,23 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             for key in ("handler", "schedule"):
                 if key not in params:
                     self.fatal(
-                        "Job '%s' is missing the required '%s' parameter"
-                        % (name, key)
+                        "Job '%s' is missing the required '%s' parameter" % (name, key)
                     )
             self.jobs[name] = dict(params)
-            if params.get('active', False):
-                self.jobs[name]['handler'] = pymagic.import_name(params.handler)
-            self.jobs[name]['schedule'] = self._parse_schedule(params.get('schedule'))
+            if params.get("active", False):
+                self.jobs[name]["handler"] = pymagic.import_name(params.handler)
+            self.jobs[name]["schedule"] = self._parse_schedule(params.get("schedule"))
 
     def _add_jobs(self):
         """Add configured jobs."""
         for name, params in self.jobs.items():
-            if params['active']:
-                params['handler'] = params['handler'](params)
+            if params["active"]:
+                params["handler"] = params["handler"](params)
                 self.sched.add_job(
-                    params['handler'].run, name=name, trigger="cron", **params['schedule']
+                    params["handler"].run,
+                    name=name,
+                    trigger="cron",
+                    **params["schedule"]
                 )
 
     def _run_forever(self):
@@ -205,8 +208,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         # Check if we only need to run once
         if self.options.run_once:
             params = self.jobs[self.options.run_once]
-            params['handler_copy'] = params.get('handler')(params)
-            params['handler_copy'].run()
+            params["handler_copy"] = params.get("handler")(params)
+            params["handler_copy"].run()
             sys.exit(0)
 
         dcontext = DaemonContext(

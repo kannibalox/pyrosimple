@@ -30,7 +30,7 @@ from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import formatting
-from pyrosimple.util import logutil, matching, metafile, pymagic, rpc, traits
+from pyrosimple.util import logutil, metafile, pymagic, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
@@ -290,31 +290,30 @@ class TreeWatch:
         self.config = config or {}
         self.LOG = pymagic.get_class_logger(self)
         if "log_level" in self.config:
-            self.LOG.setLevel(config['log_level'])
+            self.LOG.setLevel(config["log_level"])
         self.LOG.debug("Tree watcher created with config %r", self.config)
 
         self.manager = None
         self.handler = None
         self.notifier = None
 
-        if 'path' not in self.config:
-            raise error.UserError(
-                "You need to set 'path' in the configuration!"
-            )
+        if "path" not in self.config:
+            raise error.UserError("You need to set 'path' in the configuration!")
 
-        #self.config.quiet = bool_param("quiet", False)
-        #self.config.queued = bool_param("queued", False)
-        #self.config.trace_inotify = bool_param("trace_inotify", False)
+        # self.config.quiet = bool_param("quiet", False)
+        # self.config.queued = bool_param("queued", False)
+        # self.config.trace_inotify = bool_param("trace_inotify", False)
 
-        self.config['path'] = {
-            Path(p).expanduser().absolute() for p in self.config['path'].split(os.pathsep)
+        self.config["path"] = {
+            Path(p).expanduser().absolute()
+            for p in self.config["path"].split(os.pathsep)
         }
-        for path in self.config['path']:
+        for path in self.config["path"]:
             if not path.is_dir():
                 raise error.UserError("Path '%s' is not a directory!" % path)
 
         # Assemble custom commands
-        self.custom_cmds = self.config['cmd']
+        self.custom_cmds = self.config["cmd"]
         self.LOG.debug("custom commands = %r", self.custom_cmds)
 
         # Get client proxy
@@ -345,7 +344,7 @@ class TreeWatch:
             )
 
         # Add all configured base dirs
-        for path in self.config['path']:
+        for path in self.config["path"]:
             self.manager.add_watch(path, mask, rec=True, auto_add=True)
 
     def run(self):
@@ -356,7 +355,7 @@ class TreeWatch:
         # XXX: Add a check that the notifier is working, by creating / deleting a file
         # XXX: Also check for unhandled files
         if self.config.get("check_unhandled", False):
-            for path in self.config['path']:
+            for path in self.config["path"]:
                 for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
                     if self.config.get("remove_unhandled", False) and filepath.exists():
@@ -412,7 +411,7 @@ class TreeWatchCommand(ScriptBaseWithConfig):
             config.update(
                 dict(
                     (key.split(".", 2)[-1], val)
-                    for key, val in configuration.torque.items()
+                    for key, val in configuration.settings.TORQUE.items()
                     if key.startswith("job.treewatch.")
                 )
             )

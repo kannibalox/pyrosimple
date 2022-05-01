@@ -52,8 +52,9 @@ settings = Dynaconf(
     ],
 )
 
-def scgi_url_from_rtorrentrc(rcfile: Union[str,Path]) -> Optional[str]:
-    """Parse a rtorrent.rc file and """
+
+def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
+    """Parse a rtorrent.rc file and"""
     log = logging.getLogger(__name__)
     log.debug("Loading rtorrent config from '%s'", rcfile)
     scgi_local: str = ""

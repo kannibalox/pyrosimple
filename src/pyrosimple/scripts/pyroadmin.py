@@ -22,6 +22,7 @@ from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 
 class AdminTool(ScriptBaseWithConfig):
     """Support for administrative tasks."""
+
     # TODO: config create, dump, set, get
     # TODO: backup session/config
 
@@ -30,6 +31,7 @@ class AdminTool(ScriptBaseWithConfig):
 
     def mainloop(self):
         pass
+
 
 def run():  # pragma: no cover
     """The entry point."""
