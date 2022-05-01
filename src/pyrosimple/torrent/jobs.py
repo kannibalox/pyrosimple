@@ -57,9 +57,9 @@ class EngineStats:
                 fmt.human_duration(
                     self.engine.rpc.system.time() - self.engine.startup, 0, 2, True
                 ).strip(),
-                proxy,
+                self.engine.rpc,
             )
-        except (error.LoggableError, rpc.ERRORS) as exc:
+        except (error.LoggableError, *rpc.ERRORS) as exc:
             self.LOG.warning(str(exc))
 
 
