@@ -28,7 +28,7 @@ from typing import Callable, Dict, Optional, Union
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-from pyrosimple import config, error
+from pyrosimple import error
 from pyrosimple.torrent import engine, rtorrent
 from pyrosimple.util import fmt, pymagic
 
@@ -157,7 +157,8 @@ def expand_template(template_path: str, namespace: Dict) -> str:
     """
     template = env.get_template(template_path)
     # Default templating namespace
-    variables = dict(c=config.custom_template_helpers)
+    #variables = dict(c=config.custom_template_helpers)
+    variables = {}
     # Provided namespace takes precedence
     variables.update(namespace)
     # Expand template
