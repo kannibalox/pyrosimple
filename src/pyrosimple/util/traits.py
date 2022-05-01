@@ -263,9 +263,8 @@ def detect_traits(name=None, alias=None, filetype=None):
         filetype = filetype.lstrip(".")
 
     # Check for "themed" trackers
-    theme = config.traits_by_alias.get(alias)
-    if alias and theme:
-        result = [theme, filetype or "other"]
+    if alias and alias in config.settings.ALIAS_TRAITS:
+        result = [config.settings.ALIAS_TRAITS[alias], filetype or "other"]
 
     # Guess from file extensionn and name
     elif filetype in KIND_AUDIO:
