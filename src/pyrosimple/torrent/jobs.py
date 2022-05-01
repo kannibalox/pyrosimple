@@ -50,7 +50,6 @@ class EngineStats:
         """Statistics logger job callback."""
         try:
             self.engine = rtorrent.RtorrentEngine()
-            proxy = engine.rpc
             self.LOG.info(
                 "Stats for %s - up %s, %s",
                 self.engine.engine_id,

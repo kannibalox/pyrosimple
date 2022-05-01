@@ -290,53 +290,37 @@ class TreeWatch:
         self.config = config or {}
         self.LOG = pymagic.get_class_logger(self)
         if "log_level" in self.config:
-            self.LOG.setLevel(config.log_level)
+            self.LOG.setLevel(config['log_level'])
         self.LOG.debug("Tree watcher created with config %r", self.config)
 
         self.manager = None
         self.handler = None
         self.notifier = None
 
-        bool_param = lambda key, default: matching.truth(
-            self.config.get(key, default), "job.%s.%s" % (self.config.job_name, key)
-        )
-
-        if not self.config.path:
+        if 'path' not in self.config:
             raise error.UserError(
-                "You need to set 'job.%s.path' in the configuration!"
-                % self.config.job_name
+                "You need to set 'path' in the configuration!"
             )
 
-        self.config.quiet = bool_param("quiet", False)
-        self.config.queued = bool_param("queued", False)
-        self.config.trace_inotify = bool_param("trace_inotify", False)
+        #self.config.quiet = bool_param("quiet", False)
+        #self.config.queued = bool_param("queued", False)
+        #self.config.trace_inotify = bool_param("trace_inotify", False)
 
-        self.config.path = {
-            Path(p).expanduser().absolute() for p in self.config.path.split(os.pathsep)
+        self.config['path'] = {
+            Path(p).expanduser().absolute() for p in self.config['path'].split(os.pathsep)
         }
-        for path in self.config.path:
+        for path in self.config['path']:
             if not path.is_dir():
                 raise error.UserError("Path '%s' is not a directory!" % path)
 
         # Assemble custom commands
-        self.custom_cmds = {}
-        for key, val in self.config.items():
-            if key.startswith("cmd."):
-                _, key = key.split(".", 1)
-                if key in self.custom_cmds:
-                    raise error.UserError(
-                        "Duplicate custom command definition '%s'"
-                        " (%r already registered, you also added %r)!"
-                        % (key, self.custom_cmds[key], val)
-                    )
-                self.custom_cmds[key] = val
+        self.custom_cmds = self.config['cmd']
         self.LOG.debug("custom commands = %r", self.custom_cmds)
 
         # Get client proxy
-        self.proxy = rpc.RTorrentProxy(config.settings.SCGI_URL)
+        self.proxy = rpc.RTorrentProxy(configuration.settings.SCGI_URL)
 
-        if self.config.active:
-            self.setup()
+        self.setup()
 
     def setup(self):
         """Set up inotify manager.
@@ -361,7 +345,7 @@ class TreeWatch:
             )
 
         # Add all configured base dirs
-        for path in self.config.path:
+        for path in self.config['path']:
             self.manager.add_watch(path, mask, rec=True, auto_add=True)
 
     def run(self):
@@ -372,7 +356,7 @@ class TreeWatch:
         # XXX: Add a check that the notifier is working, by creating / deleting a file
         # XXX: Also check for unhandled files
         if self.config.get("check_unhandled", False):
-            for path in self.config.path:
+            for path in self.config['path']:
                 for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
                     if self.config.get("remove_unhandled", False) and filepath.exists():
