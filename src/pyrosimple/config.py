@@ -53,18 +53,9 @@ settings = Dynaconf(
     ],
 )
 
-
-def autoload_scgi_url() -> str:
-    """Load and return SCGI URL, auto-resolving it if necessary"""
-    if settings.SCGI_URL:
-        return str(settings.SCGI_URL)
+def scgi_url_from_rtorrentrc(rcfile: str) -> Optional[str]:
+    """Parse a rtorrent.rc file and """
     log = logging.getLogger(__name__)
-    # Get and check config file name
-    rcfile = Path(settings.RTORRENT_RC).expanduser()
-    if not rcfile.exists():
-        raise error.UserError("Config file %r doesn't exist!" % (rcfile,))
-
-    # Parse the file
     log.debug("Loading rtorrent config from '%s'", rcfile)
     scgi_local: str = ""
     scgi_port: str = ""
@@ -99,8 +90,21 @@ def autoload_scgi_url() -> str:
     if scgi_port and not scgi_port.startswith("scgi://"):
         scgi_port = "scgi://" + scgi_port
 
-    # Prefer UNIX domain sockets over TCP socketsj
-    settings.set("SCGI_URL", scgi_local or scgi_port)
+    return scgi_local or scgi_port
+    # Prefer UNIX domain sockets over TCP sockets
+
+
+def autoload_scgi_url() -> str:
+    """Load and return SCGI URL, auto-resolving it if necessary"""
+    if settings.SCGI_URL:
+        return str(settings.SCGI_URL)
+    # Get and check config file name
+    rcfile = Path(settings.RTORRENT_RC).expanduser()
+    if not rcfile.exists():
+        raise error.UserError("Config file %r doesn't exist!" % (rcfile,))
+    scgi_url = scgi_url_from_rtorrentrc(rcfile)
+
+    settings.set("SCGI_URL", scgi_url)
 
     return str(settings.SCGI_URL)
 
