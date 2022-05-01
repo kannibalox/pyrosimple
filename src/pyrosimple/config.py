@@ -24,12 +24,11 @@ import logging
 import urllib
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Optional
 
 from dynaconf import Dynaconf, Validator
 
 from pyrosimple import error
-from pyrosimple.util.parts import Bunch
 
 
 settings = Dynaconf(
@@ -168,13 +167,3 @@ def load_custom_py():
             exec(handle.read())
     else:
         log.debug("Configuration file '%s' not found!", config_file)
-
-
-# Remember predefined names
-_PREDEFINED = tuple(_ for _ in globals() if not _.startswith("_"))
-
-# Set some defaults to shut up pydev / pylint;
-# these later get overwritten by loading the config
-custom_template_helpers = Bunch()
-traits_by_alias: Dict[Any, Any] = {}
-torque: Dict[Any, Any] = {}
