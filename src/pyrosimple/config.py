@@ -38,7 +38,7 @@ settings = Dynaconf(
     validators=[
         Validator("RTORRENT_RC", default="~/.rtorrent.rc"),
         Validator("CONFIG_PY", default="~/.config/pyrosimple/config.py"),
-        Validator("SORT_FIELDS", default="name,alias"),
+        Validator("SORT_FIELDS", default="name"),
         Validator(
             "CONFIG_VALIDATOR_CALLBACKS",
             default="pyrosimple.torrent.engine:TorrentProxy.add_custom_fields",
