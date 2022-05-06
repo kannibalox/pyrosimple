@@ -250,7 +250,8 @@ class FieldDefinition:
         self._matcher = matcher
         self.formatter = formatter
         if accessor is None:
-            self._accessor = lambda o: o.fetch(name)
+            self._accessor = lambda o: o.rpc_call("d." + name)
+            self.requires = ["d." + name]
 
         if name in FieldDefinition.FIELDS:
             raise RuntimeError("INTERNAL ERROR: Duplicate field definition")
@@ -337,8 +338,9 @@ def core_fields():
         "tagged",
         "has certain tags? (not related to the 'tagged' view)",
         matcher=matching.TaggedAsFilter,
-        accessor=lambda o: set(o.fetch("custom_tags").lower().split()),
+        accessor=lambda o: set(o.rpc_call("d.custom", ["tags"]).lower().split()),
         formatter=_fmt_tags,
+        requires=["d.custom=tags"]
     )
     yield DynamicField(
         set,
@@ -346,7 +348,6 @@ def core_fields():
         "views this item is attached to",
         matcher=matching.TaggedAsFilter,
         formatter=_fmt_tags,
-        accessor=lambda o: o.rpc_call("d.views"),
     )
     yield DynamicField(
         set,
@@ -383,6 +384,7 @@ def core_fields():
         "first in the list of announce URLs",
         matcher=matching.PatternFilter,
         accessor=lambda o: (o.announce_urls(default=[None]) or [None])[0],
+        requires=['t.multicall=,t.url=,t.is_enabled=']
     )
 
     def _alias_accessor(o):
@@ -394,6 +396,7 @@ def core_fields():
         "tracker alias or domain",
         matcher=matching.PatternFilter,
         accessor=lambda o: o.memoize("alias", _alias_accessor, o),
+        requires=["d.custom=memo_alias"]
     )
     yield DynamicField(
         str, "message", "current tracker message", matcher=matching.PatternFilter
@@ -420,6 +423,8 @@ def core_fields():
         "download complete?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "DONE" if val else "PART",
+        accessor=lambda o: o.rpc_call('d.complete'),
+        requires=["d.complete"]
     )
     yield ConstantField(
         bool,
@@ -434,6 +439,8 @@ def core_fields():
         "ignore commands?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "IGN!" if int(val) else "HEED",
+        accessor=lambda o: o.rpc_call('d.ignore_commands'),
+        requires=["d.ignore_commands"],
         setter=lambda o, val: o.ignore(int(val)),
     )
     yield DynamicField(
@@ -443,6 +450,7 @@ def core_fields():
         matcher=matching.BoolFilter,
         accessor=lambda o: not os.path.exists(o.datapath()) if o.datapath() else None,
         formatter=lambda val: "GHST" if val else "DATA",
+        requires=['d.directory', 'd.is_multi_file']
     )
 
     # Paths
@@ -458,6 +466,7 @@ def core_fields():
         "path to download data",
         matcher=matching.PatternFilter,
         accessor=lambda o: o.datapath(),
+        requires=['d.directory', 'd.is_multi_file']
     )
     yield DynamicField(
         str,
@@ -465,21 +474,24 @@ def core_fields():
         "real path to download data",
         matcher=matching.PatternFilter,
         accessor=lambda o: os.path.realpath(o.datapath()),
+        requires=['d.directory', 'd.is_multi_file']
     )
     yield ConstantField(
         str,
         "metafile",
         "path to torrent file",
         matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(str(o._fields["metafile"])),
+        accessor=lambda o: os.path.expanduser(str(o.rpc_call["metafile"])),
+        requires=['d.metafile']
     )
     yield ConstantField(
         str,
         "sessionfile",
         "path to session file",
         matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(str(o.fetch("session_file"))),
-    )
+        accessor=lambda o: os.path.expanduser(str(o.rpc_call("d.session_file"))),
+        requires=['d.session_file']
+     )
     yield ConstantField(
         list,
         "files",
@@ -494,6 +506,7 @@ def core_fields():
         "number of files in this item",
         matcher=matching.FloatFilter,
         accessor=lambda o: o.rpc_call("d.size_files"),
+        requires=['d.size_files']
     )
 
     # Bandwidth & Data Transfer
@@ -504,6 +517,7 @@ def core_fields():
         matcher=matching.FloatFilter,
         accessor=lambda o: float(o.rpc_call("d.completed_bytes"))
         / o.rpc_call("d.size_bytes"),
+        requires=['d.size_bytes', 'd.completed_bytes']
     )
     yield DynamicField(
         ratio_float,
@@ -511,6 +525,7 @@ def core_fields():
         "normalized ratio (1:1 = 1.0)",
         matcher=matching.FloatFilter,
         accessor=lambda o: o.rpc_call("d.ratio"),
+        requires=['d.ratio']
     )
     yield DynamicField(
         int,
@@ -518,6 +533,7 @@ def core_fields():
         "amount of uploaded data",
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.up.total"),
+        requires=['d.up.total']
     )
     yield DynamicField(
         int,
@@ -525,6 +541,7 @@ def core_fields():
         "transfer rate",
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.fetch("up") + o.fetch("down"),
+        requires = ['d.up.rate', 'd.down.rate']
     )
     # last_xfer = DynamicField(int, "last_xfer", "last time data was transferred", matcher=matching.TimeFilter,
     #     accessor=lambda o: int(o.fetch("timestamp.last_xfer") or 0), formatter=fmt.iso_datetime_optional)
@@ -534,6 +551,7 @@ def core_fields():
         "download rate",
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.down.rate"),
+        requires=['d.down.rate']
     )
     yield DynamicField(
         int,
@@ -541,6 +559,7 @@ def core_fields():
         "upload rate",
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.up.rate"),
+        requires=['d.up.rate']
     )
     yield DynamicField(
         str,
@@ -548,6 +567,7 @@ def core_fields():
         "throttle group name (NULL=unlimited, NONE=global)",
         matcher=matching.PatternFilter,
         accessor=lambda o: o._fields["throttle"] if "throttle" in o._fields else "NONE",
+        requires=['d.throttle']
     )
 
     # Lifecyle
@@ -556,16 +576,18 @@ def core_fields():
         "loaded",
         "time metafile was loaded",
         matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: int(o.fetch("custom_tm_loaded") or "0", 10),
+        accessor=lambda o: int(o.rpc_call("d.custom", ["tm_loaded"]) or "0", 10),
         formatter=fmt.iso_datetime_optional,
+        requires=["d.custom=tm_loaded"]
     )
     yield DynamicField(
         int,
         "started",
         "time download was FIRST started",
         matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: int(o.fetch("custom_tm_started") or "0", 10),
+        accessor=lambda o: int(o.rpc_call("d.custom",["tm_started"]) or "0", 10),
         formatter=fmt.iso_datetime_optional,
+        requires=["d.custom=tm_started"]
     )
     yield DynamicField(
         untyped,
@@ -575,14 +597,16 @@ def core_fields():
         accessor=lambda o: _interval_sum(o, end=o.completed)
         or _duration(o.started, o.completed),
         formatter=_fmt_duration,
+        requires=["d.custom=tm_completed", "d.custom=tm_started"]
     )
     yield DynamicField(
         int,
         "completed",
         "time download was finished",
         matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: int(o.fetch("custom_tm_completed") or "0", 10),
+        accessor=lambda o: int(o.rpc_call("d.custom", ["tm_completed"]) or "0", 10),
         formatter=fmt.iso_datetime_optional,
+        requires=["d.custom=tm_completed"]
     )
     yield DynamicField(
         untyped,
@@ -590,9 +614,10 @@ def core_fields():
         "total seeding time after completion",
         matcher=matching.DurationFilter,
         accessor=lambda o: _interval_sum(o, start=o.completed)
-        if o.is_complete
+        if o.rpc_call("d.complete")
         else None,
         formatter=_fmt_duration,
+        requires=["d.custom=tm_completed", "d.complete"]
     )
     # active = DynamicField(int, "active", "last time a peer was connected", matcher=matching.TimeFilter,
     #    accessor=lambda o: int(o.fetch("timestamp.last_active") or 0), formatter=fmt.iso_datetime_optional)

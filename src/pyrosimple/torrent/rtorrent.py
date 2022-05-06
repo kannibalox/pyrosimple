@@ -67,6 +67,8 @@ class RtorrentItem(engine.TorrentProxy):
         )
         if rpc_fields is not None:
             self._rpc_cache.update(rpc_fields)
+        if 'hash' not in fields:
+            self._fields['hash'] = rpc_fields['d.hash']
 
     def _make_it_so(
         self, command: str, calls: List[str], *args, observer: Optional[Callable] = None
@@ -151,7 +153,7 @@ class RtorrentItem(engine.TorrentProxy):
     def memoize(self, name: str, getter: Callable, *args, **kwargs):
         """Cache a stable expensive-to-get item value for later (optimized) retrieval."""
         field = "custom_memo_" + name
-        cached = self.fetch(field)
+        cached = self.rpc_call("d.custom", ["memo_" + name])
         if cached:
             value = cached
         else:
@@ -209,13 +211,13 @@ class RtorrentItem(engine.TorrentProxy):
         """Directly call rpc for item-specific information"""
         cache_key = method
         if args:
-            cache_key += "=" + ",".join(args)
+            cache_key += "=" + ",".join([str(a) for a in args])
         val = self._rpc_cache.get(cache_key, None)
         if cache and val is not None:
             return val
         if args is None:
             args = []
-        getter = getattr(self._engine.rpc, method)
+         getter = getattr(self._engine.rpc, method)
         val = getter(self._fields["hash"], *args)
         self._rpc_cache[cache_key] = val
         return val
@@ -248,15 +250,7 @@ class RtorrentItem(engine.TorrentProxy):
             except rpc.ERRORS as exc:
                 raise error.EngineError("While accessing field %r: %s" % (name, exc))
         else:
-            getter_name = RtorrentEngine.PYRO2RT_MAPPING.get(name, name)
-            if getter_name[0] == "=":
-                getter_name = getter_name[1:]
-            getter = getattr(self._engine.rpc.d, getter_name)
-
-            try:
-                val = getter(self._fields["hash"])
-            except rpc.ERRORS as exc:
-                raise error.EngineError("While accessing field %r: %s" % (name, exc))
+            val = getattr(self, name)
 
         # TODO: Currently, NOT caching makes no sense; in a demon, it does!
         # if isinstance(FieldDefinition.FIELDS.get(name), engine.ConstantField):
@@ -266,13 +260,11 @@ class RtorrentItem(engine.TorrentProxy):
 
     def datapath(self):
         """Get an item's data path."""
-        path = self._fields["path"]
-        if not path:  # stopped item with no base_dir?
-            path = self.fetch("directory")
-            if path and not self._fields["is_multi_file"]:
-                path = os.path.join(path, self._fields["name"])
+        path = self.rpc_call("d.directory")
+        if path and not self.rpc_call("d.is_multi_file"):
+            path = os.path.join(path, self.rpc_call("d.name"))
         path = os.path.expanduser(path)
-        if self._fields["is_multi_file"]:
+        if self.rpc_call("d.is_multi_file"):
             return path + "/"
         else:
             return path
@@ -282,9 +274,7 @@ class RtorrentItem(engine.TorrentProxy):
         Returns `default` if no trackers are found at all.
         """
         try:
-            response = self._engine.rpc.t.multicall(
-                self._fields["hash"], "", "t.url=", "t.is_enabled="
-            )
+            response = self.rpc_call("t.multicall", ["", "t.url=", "t.is_enabled="])
         except rpc.ERRORS as exc:
             raise error.EngineError(
                 "While getting announce URLs for #%s: %s" % (self._fields["hash"], exc)
@@ -591,62 +581,41 @@ class RtorrentEngine:
     # rTorrent names of fields that never change
     CONSTANT_FIELDS = set(
         (
-            "hash",
-            "name",
-            "is_private",
-            "is_multi_file",
-            "tracker_size",
-            "size_bytes",
+            "d.hash",
+            "d.name",
+            "d.is_private",
+            "d.is_multi_file",
+            "d.tracker_size",
+            "d.size_bytes",
         )
     )
 
     # rTorrent names of fields that need to be pre-fetched
     CORE_FIELDS = CONSTANT_FIELDS | set(
         (
-            "complete",
-            "tied_to_file",
+            "d.complete",
+            "d.tied_to_file",
         )
     )
 
     # rTorrent names of fields that get fetched in multi-call
     PREFETCH_FIELDS = CORE_FIELDS | set(
         (
-            "is_open",
-            "is_active",
-            "ratio",
-            "message",
-            "up.rate",
-            "up.total",
-            "down.rate",
-            "down.total",
-            "base_path",
-            "custom=memo_alias",
-            "custom=tm_completed",
-            "custom=tm_loaded",
-            "custom=tm_started",
+            "d.is_open",
+            "d.is_active",
+            "d.ratio",
+            "d.message",
+            "d.up.rate",
+            "d.up.total",
+            "d.down.rate",
+            "d.down.total",
+            "d.base_path",
+            "d.custom=memo_alias",
+            "d.custom=tm_completed",
+            "d.custom=tm_loaded",
+            "d.custom=tm_started",
         )
     )
-
-    # mapping of our names to rTorrent names (only those that differ)
-    PYRO2RT_MAPPING = dict(
-        is_complete="complete",
-        is_ignored="ignore_commands",
-        down="down.rate",
-        up="up.rate",
-        uploaded="up.total",
-        path="base_path",
-        metafile="tied_to_file",
-        size="size_bytes",
-        prio="priority",
-        throttle="throttle_name",
-        custom_memo_alias="custom=memo_alias",
-        custom_tm_completed="custom=tm_completed",
-        custom_tm_loaded="custom=tm_loaded",
-        custom_tm_started="custom=tm_started",
-    )
-
-    # inverse mapping of rTorrent names to ours
-    RT2PYRO_MAPPING = dict((v, k) for k, v in PYRO2RT_MAPPING.items())
 
     def __init__(self, uri=None, auto_open=False):
         """Initialize proxy."""
@@ -841,17 +810,16 @@ class RtorrentEngine:
         if not cache or view.viewname not in self._item_cache:
             # Map pyroscope names to rTorrent ones
             if prefetch:
-                prefetch = self.CORE_FIELDS | set(
-                    (self.PYRO2RT_MAPPING.get(i, i) for i in prefetch)
-                )
+                prefetch = self.CORE_FIELDS | set(prefetch)
             else:
                 prefetch = self.PREFETCH_FIELDS
+            prefetch = sorted(prefetch)
 
             # Fetch items
             items = []
             try:
                 # Prepare multi-call arguments
-                args = [f"d.{field}" for field in prefetch]
+                args = prefetch
 
                 infohash = view._check_hash_view()
                 if infohash:
@@ -893,16 +861,23 @@ class RtorrentEngine:
                 )
 
                 for item in raw_items:
-                    items.append(
-                        RtorrentItem(
-                            self,
-                            fields=zip(
-                                [self.RT2PYRO_MAPPING.get(i, i) for i in prefetch], item
-                            ),
-                            rpc_fields=dict(zip([f"d.{p}" for p in prefetch], item)),
-                        )
+                    ritem =                         RtorrentItem(
+                        self,
+                        fields={},
+                        rpc_fields=dict(zip(prefetch, item)),
                     )
-                    yield items[-1]
+
+                    if view.matcher:
+                        if view.matcher.match(ritem):
+                            items.append(
+                                ritem
+                            )
+                            yield items[-1]
+                    else:
+                        items.append(
+                            ritem
+                        )
+                        yield items[-1]
             except rpc.ERRORS as exc:
                 raise error.EngineError(
                     "While getting download items from %r: %s" % (self, exc)

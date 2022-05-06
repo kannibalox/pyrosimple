@@ -29,10 +29,9 @@ from typing import Callable, List, Optional, Union
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
-from pyrosimple.torrent import engine, formatting
+from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
 from pyrosimple.util.parts import Bunch, DefaultBunch
-
 
 def print_help_fields():
     """Print help about fields and field formatters."""
@@ -733,7 +732,12 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Find matching torrents
         view = self.engine.view(self.options.from_view, matcher)
-        matches = list(view.items())
+        if self.is_plain_output_format:
+            requires = [engine.FieldDefinition.FIELDS[f.split('.')[0]].requires for f in raw_output_format.split(',')]
+            prefetch = [item for sublist in requires for item in sublist]
+        else:
+            prefetch = None
+        matches = list(self.engine.items(view=view, prefetch=prefetch))
         matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
         if selection:
@@ -790,7 +794,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 len(matches),
                 view.size(),
             )
-            defaults = {"action": action.label}
+            defaults = {"action": action.label, "now": time.time}
             defaults.update(self.FORMATTER_DEFAULTS)
 
             if self.options.column_headers and matches:
@@ -806,7 +810,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     and not self.options.view_only
                     and str(self.options.output_format) != "-"
                 ):
-                    self.emit(item, defaults, to_log=True)
+                    self.emit(item, defaults)
 
                 args = tuple(
                     output_formatter(i, namespace=dict(item=item))
@@ -900,7 +904,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Show via template?
         elif self.options.output_template:
             output_template = self.options.output_template
-
             sys.stdout.write(output_formatter(output_template))
             sys.stdout.flush()
 
@@ -914,12 +917,12 @@ class RtorrentControl(ScriptBaseWithConfig):
             # Print summary?
             if matches and summary:
                 print(f"TOTALS:\t{len(matches)} out of {view.size()} torrents")
-                self.emit(summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip())
                 self.emit(summary.min, item_formatter=lambda i: "MIN:\t" + i.rstrip())
                 self.emit(
                     summary.average, item_formatter=lambda i: "AVG:\t" + i.rstrip()
                 )
                 self.emit(summary.max, item_formatter=lambda i: "MAX:\t" + i.rstrip())
+                self.emit(summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip())
 
             self.LOG.info(
                 "Dumped %d out of %d torrents.",
