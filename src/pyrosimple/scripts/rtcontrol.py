@@ -29,9 +29,10 @@ from typing import Callable, List, Optional, Union
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
-from pyrosimple.torrent import engine, formatting, rtorrent
+from pyrosimple.torrent import engine, formatting
 from pyrosimple.util import matching, pymagic, rpc
 from pyrosimple.util.parts import Bunch, DefaultBunch
+
 
 def print_help_fields():
     """Print help about fields and field formatters."""
@@ -733,7 +734,10 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Find matching torrents
         view = self.engine.view(self.options.from_view, matcher)
         if self.is_plain_output_format:
-            requires = [engine.FieldDefinition.FIELDS[f.split('.')[0]].requires for f in raw_output_format.split(',')]
+            requires = [
+                engine.FieldDefinition.FIELDS[f.split(".")[0]].requires
+                for f in raw_output_format.split(",")
+            ]
             prefetch = [item for sublist in requires for item in sublist]
         else:
             prefetch = None

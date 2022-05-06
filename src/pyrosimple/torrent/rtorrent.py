@@ -67,8 +67,8 @@ class RtorrentItem(engine.TorrentProxy):
         )
         if rpc_fields is not None:
             self._rpc_cache.update(rpc_fields)
-        if 'hash' not in fields:
-            self._fields['hash'] = rpc_fields['d.hash']
+        if "hash" not in fields:
+            self._fields["hash"] = self.rpc_call("d.hash")
 
     def _make_it_so(
         self, command: str, calls: List[str], *args, observer: Optional[Callable] = None
@@ -217,7 +217,7 @@ class RtorrentItem(engine.TorrentProxy):
             return val
         if args is None:
             args = []
-         getter = getattr(self._engine.rpc, method)
+        getter = getattr(self._engine.rpc, method)
         val = getter(self._fields["hash"], *args)
         self._rpc_cache[cache_key] = val
         return val
@@ -813,13 +813,12 @@ class RtorrentEngine:
                 prefetch = self.CORE_FIELDS | set(prefetch)
             else:
                 prefetch = self.PREFETCH_FIELDS
-            prefetch = sorted(prefetch)
 
             # Fetch items
             items = []
             try:
                 # Prepare multi-call arguments
-                args = prefetch
+                args = sorted(prefetch)
 
                 infohash = view._check_hash_view()
                 if infohash:
@@ -861,22 +860,18 @@ class RtorrentEngine:
                 )
 
                 for item in raw_items:
-                    ritem =                         RtorrentItem(
+                    ritem = RtorrentItem(
                         self,
                         fields={},
-                        rpc_fields=dict(zip(prefetch, item)),
+                        rpc_fields=dict(zip(args, item)),
                     )
 
                     if view.matcher:
                         if view.matcher.match(ritem):
-                            items.append(
-                                ritem
-                            )
+                            items.append(ritem)
                             yield items[-1]
                     else:
-                        items.append(
-                            ritem
-                        )
+                        items.append(ritem)
                         yield items[-1]
             except rpc.ERRORS as exc:
                 raise error.EngineError(
