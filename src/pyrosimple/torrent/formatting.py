@@ -133,7 +133,7 @@ def fmt_json(val):
 
 
 env = Environment(
-    loader=FileSystemLoader([Path("~/.pyroscope/templates").expanduser()]),
+    loader=FileSystemLoader([Path("~/.config/pyrosimple/templates/").expanduser()]),
 )
 env.filters.update(
     dict(
