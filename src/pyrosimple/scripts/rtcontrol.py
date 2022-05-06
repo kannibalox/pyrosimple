@@ -264,7 +264,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         super().__init__()
 
         self.prompt = PromptDecorator(self)
-        self.plain_output_format = False
+        self.is_plain_output_format = False
         self.original_output_format = None
 
     def add_options(self):
@@ -545,7 +545,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Expand plain field list to usable form
         # "name,size.sz" would become "{{d.name}}\t{{d.size|sz}}"
         if re.match(r"^[,._0-9a-zA-Z]+$", output_format):
-            self.plain_output_format = True
+            self.is_plain_output_format = True
             outputs = []
             for field in formatting.validate_field_list(
                 output_format, allow_fmt_specs=True
@@ -575,7 +575,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         """Get field names from output template."""
         # Re-engineer list from output format
         # XXX TODO: Would be better to use a FieldRecorder class to catch the full field names
-        if not self.plain_output_format:
+        if not self.is_plain_output_format:
             return []
         emit_fields: List[str] = [
             o.split(".")[0] for o in self.original_output_format.split(",")
@@ -745,7 +745,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Build header stencil
         stencil: Optional[str] = None
-        if self.options.column_headers and self.plain_output_format and matches:
+        if self.options.column_headers and self.is_plain_output_format and matches:
             stencil = formatting.format_item(
                 self.options.output_format_template, matches[0], self.FORMATTER_DEFAULTS
             ).split("\t")
