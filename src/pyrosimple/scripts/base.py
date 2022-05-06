@@ -240,8 +240,8 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         super().get_options()
         if self.options.url:
             url = self.options.url
-            if url.startswith("@"):
-                url = config.settings["CONNECTIONS"][url[1:]]
+            if url in config.settings["CONNECTIONS"]:
+                url = config.settings["CONNECTIONS"][url]
             config.settings["SCGI_URL"] = url
         config.load_custom_py()
         self.engine = rtorrent.RtorrentEngine()
