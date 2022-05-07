@@ -110,11 +110,26 @@ def autoload_scgi_url() -> str:
     return str(settings.SCGI_URL)
 
 
-def lookup_announce_alias(name):
+def lookup_announce_alias(name: str):
     """Get canonical alias name and announce URL list for the given alias."""
     for alias, urls in settings["ALIASES"].items():
         if alias.lower() == name.lower():
             return alias, urls
+
+    raise KeyError("Unknown alias %s" % (name,))
+
+
+def lookup_announce_url(name: str):
+    """Get canonical alias name and announce URL list for the given alias.
+
+    Unlike lookup_announce_alias, only valid URLs are returned"""
+    for alias, urls in settings["ALIASES"].items():
+        if alias.lower() == name.lower():
+            result = []
+            for url in urls:
+                if urllib.parse.urlparse(url).scheme:
+                    result.append(url)
+            return alias, result
 
     raise KeyError("Unknown alias %s" % (name,))
 

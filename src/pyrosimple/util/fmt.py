@@ -29,14 +29,14 @@ from typing import Optional
 log = logging.getLogger(__name__)
 
 
-def human_size(size: int) -> str:
+def human_size(size: float) -> str:
     """Return a human-readable representation of a byte size.
 
     @param size: Number of bytes as an integer or string.
     @return: String of length 10 with the formatted result.
     """
     if isinstance(size, str):
-        size = int(size, 10)
+        size = float(size, 10)
 
     if size < 0:
         return "-??? bytes"

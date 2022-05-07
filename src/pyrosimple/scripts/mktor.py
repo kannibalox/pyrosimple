@@ -20,7 +20,6 @@
 import hashlib
 import logging
 import os
-import random
 import re
 
 from urllib.parse import parse_qs
@@ -29,6 +28,7 @@ import bencode
 
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.util import metafile
+from pyrosimple import config
 
 
 class MetafileCreator(ScriptBaseWithConfig):
@@ -43,8 +43,6 @@ class MetafileCreator(ScriptBaseWithConfig):
 
     # argument description for the usage information
     ARGS_HELP = "<dir-or-file> <tracker-url-or-alias>... | <magnet-uri>"
-
-    ENTROPY_BITS = 512
 
     def add_options(self):
         """Add program options."""
@@ -88,17 +86,6 @@ class MetafileCreator(ScriptBaseWithConfig):
             action="append",
             default=[],
             help="set a specific key to the given value; omit the '=' to delete a key",
-        )
-        self.add_bool_option(
-            "--no-cross-seed",
-            help="do not automatically add a field to the info dict ensuring unique info hashes",
-        )
-        self.add_value_option(
-            "-X",
-            "--cross-seed",
-            "LABEL",
-            help="set additional explicit label for cross-seeding"
-            " (changes info hash, use '@entropy' to randomize it)",
         )
         self.add_bool_option(
             "-H",
@@ -175,16 +162,7 @@ class MetafileCreator(ScriptBaseWithConfig):
 
         def callback(meta):
             "Callback to set label and resume data."
-            if self.options.cross_seed:
-                if self.options.cross_seed == "@entropy":
-                    meta["info"]["entropy"] = format(
-                        random.getrandbits(self.ENTROPY_BITS), "x"
-                    ).zfill(self.ENTROPY_BITS // 4)
-                else:
-                    meta["info"]["x_cross_seed_label"] = self.options.cross_seed
-            if self.options.no_cross_seed:
-                del meta["info"]["x_cross_seed"]
-
+            meta['info']['source'] = config.map_announce2alias(meta['announce'] or meta['announce-list'][0])
             # Set specific keys?
             metafile.assign_fields(meta, self.options.set)
 
@@ -193,9 +171,9 @@ class MetafileCreator(ScriptBaseWithConfig):
         meta = torrent.create(
             datapath,
             self.args[1:],
-            progress=None
+            progress=metafile.console_progress()
             if logging.getLogger().isEnabledFor(logging.WARNING)
-            else metafile.console_progress(),
+            else None,
             root_name=self.options.root_name,
             private=self.options.private,
             no_date=self.options.no_date,

@@ -30,7 +30,7 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import Dict, Generator, List, Optional, Union
+from typing import Dict, Generator, List, Optional, Union, Callable
 
 import bencode  # typing: ignore
 
@@ -477,7 +477,7 @@ class Metafile:
         """Get total size of "self.datapath"."""
         return sum(os.path.getsize(filename) for filename in self.walk())
 
-    def _make_info(self, piece_size, progress, walker, piece_callback=None):
+    def _make_info(self, piece_size: int, progress, walker, piece_callback=None):
         """Create info dict."""
         # These collect the file descriptions and piece hashes
         file_list = []
@@ -496,15 +496,16 @@ class Metafile:
         # Hash all files
         for filename in walker:
             # Assemble file info
-            filesize = os.path.getsize(filename)
-            filepath = filename[len(self.datapath) :].lstrip(os.sep)
+            filepath = Path(filename)
+            filesize = filepath.stat().st_size
+            filepath = filepath.relative_to(self.datapath)
             file_list.append(
                 {
                     "length": filesize,
                     "path": PurePath(filepath).parts,
                 }
             )
-            self.LOG.debug("Hashing %r, size %d...", filename, filesize)
+            self.LOG.debug("Hashing '%s', size %d...", filename, filesize)
 
             # Open file and hash it
             fileoffset = 0
@@ -561,22 +562,20 @@ class Metafile:
         # Return validated info dict
         return check_info(metainfo), totalhashed
 
-    def _make_meta(self, tracker_url: str, root_name, private, progress):
+    def _make_meta(self, tracker_url: str, root_name: str , private: bool, progress: Optional[Callable] = None, piece_size: int = 0):
         """Create torrent dict."""
-        total_size = self._calc_size()
-        if total_size:
-            piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
-        else:
-            piece_size_exp = 0
+        if piece_size <= 0:
+            total_size = self._calc_size()
+            if total_size:
+                piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
+            else:
+                piece_size_exp = 0
 
-        piece_size_exp = min(max(15, piece_size_exp), 24)
-        piece_size = 2**piece_size_exp
+            piece_size_exp = min(max(15, piece_size_exp), 24)
+            piece_size = 2**piece_size_exp
 
         # Build info hash
         info, totalhashed = self._make_info(piece_size, progress, sorted(self.walk()))
-
-        # Enforce unique hash per tracker
-        info["x_cross_seed"] = hashlib.md5(tracker_url.encode("utf-8")).hexdigest()
 
         # Set private flag
         if private:
@@ -631,7 +630,7 @@ class Metafile:
                     )
                     tracker_alias = tracker_alias[-2 if len(tracker_alias) > 1 else 0]
                 else:
-                    tracker_alias, tracker_url = config.lookup_announce_alias(
+                    tracker_alias, tracker_url = config.lookup_announce_url(
                         tracker_url
                     )
                     tracker_url = tracker_url[0]
@@ -654,9 +653,8 @@ class Metafile:
 
             # Hash the data
             self.LOG.info(
-                "Creating %r for %s %r...",
+                "Creating %r from %r...",
                 output_name,
-                "filenames read from",
                 self.datapath,
             )
             meta, _ = self._make_meta(tracker_url, root_name, private, progress)
@@ -778,7 +776,7 @@ class Metafile:
             result.append(
                 "%-69s%9s"
                 % (
-                    info["name"].decode(),
+                    info["name"],
                     fmt.human_size(total_size),
                 )
             )
