@@ -119,7 +119,8 @@ def lookup_announce_alias(name):
     raise KeyError("Unknown alias %s" % (name,))
 
 
-@functools.cache
+# functools.cache would probably be slightly faster, but it was introduced in 3.9
+@functools.lru_cache
 def map_announce2alias(url: str) -> str:
     """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
     if url in settings["ALIASES"].items():
