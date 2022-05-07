@@ -23,9 +23,11 @@ import operator
 import os
 import re
 
-from pathlib import Path
-from typing import Callable, Dict, Optional, Union
 
+from pathlib import Path
+from typing import Callable, Dict, Optional, Union, Generator
+
+import jinja2
 from jinja2 import Environment, FileSystemLoader, Template
 
 from pyrosimple import error
@@ -267,3 +269,9 @@ def validate_sort_fields(sort_fields):
             return False
 
     return Key
+
+def get_fields_from_template(template: str, item_name: str = 'd') -> Generator[str, None, None]:
+    """Utility function to get field references from a template"""
+    for node in env.parse(template).find_all(jinja2.nodes.Getattr):
+        if isinstance(node.node, jinja2.nodes.Name) and node.node.name == item_name:
+            yield node.attr

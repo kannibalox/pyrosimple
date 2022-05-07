@@ -559,12 +559,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Replace some escape sequences
         output_format = (
-            output_format.replace(r"\\", "\\")
+            output_format
             .replace(r"\n", "\n")
             .replace(r"\t", "\t")
-            .replace(r"\$", "\0")  # the next 3 allow using $() instead of %()
-            .replace("$(", "%(")
-            .replace("\0", "$")
             .replace(r"\ ", " ")  # to prevent stripping in config file
         )
         self.options.output_format = output_format
@@ -573,17 +570,8 @@ class RtorrentControl(ScriptBaseWithConfig):
     # TODO: refactor to engine.FieldDefinition as a class method
     def get_output_fields(self) -> List[str]:
         """Get field names from output template."""
-        # Re-engineer list from output format
-        # XXX TODO: Would be better to use a FieldRecorder class to catch the full field names
-        if not self.is_plain_output_format:
-            return []
-        emit_fields: List[str] = [
-            o.split(".")[0] for o in self.original_output_format.split(",")
-        ]
-
-        # Validate result
         result = []
-        for name in emit_fields[:]:
+        for name in formatting.get_fields_from_template(self.options.output_format):
             if name not in engine.FieldDefinition.FIELDS:
                 self.LOG.warning(
                     "Omitted unknown name '%s' from statistics and output format sorting",
@@ -733,14 +721,8 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Find matching torrents
         view = self.engine.view(self.options.from_view, matcher)
-        if self.is_plain_output_format:
-            requires = [
-                engine.FieldDefinition.FIELDS[f.split(".")[0]].requires
-                for f in raw_output_format.split(",")
-            ]
-            prefetch = [item for sublist in requires for item in sublist]
-        else:
-            prefetch = None
+        prefetch = [engine.FieldDefinition.FIELDS[f].requires for f in self.get_output_fields()]
+        prefetch = [item for sublist in prefetch for item in sublist]
         matches = list(self.engine.items(view=view, prefetch=prefetch))
         matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
