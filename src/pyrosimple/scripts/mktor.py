@@ -26,9 +26,9 @@ from urllib.parse import parse_qs
 
 import bencode
 
+from pyrosimple import config
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.util import metafile
-from pyrosimple import config
 
 
 class MetafileCreator(ScriptBaseWithConfig):
@@ -71,10 +71,10 @@ class MetafileCreator(ScriptBaseWithConfig):
         self.add_value_option(
             "-x",
             "--exclude",
-            "PATTERN [-x ...]",
+            "PATTERN",
             action="append",
             default=[],
-            help="exclude files matching a glob pattern from hashing",
+            help="exclude files matching a glob pattern from hashing; can be specified multiple times",
         )
         self.add_value_option(
             "--comment", "TEXT", help="optional human-readable comment"
@@ -82,10 +82,10 @@ class MetafileCreator(ScriptBaseWithConfig):
         self.add_value_option(
             "-s",
             "--set",
-            "KEY=VAL [-s ...]",
+            "KEY=VAL",
             action="append",
             default=[],
-            help="set a specific key to the given value; omit the '=' to delete a key",
+            help="set a specific key to the given value; omit the '=' to delete a key; can be specified multiple times",
         )
         self.add_bool_option(
             "-H",
@@ -162,7 +162,9 @@ class MetafileCreator(ScriptBaseWithConfig):
 
         def callback(meta):
             "Callback to set label and resume data."
-            meta['info']['source'] = config.map_announce2alias(meta['announce'] or meta['announce-list'][0])
+            meta["info"]["source"] = config.map_announce2alias(
+                meta["announce"] or meta["announce-list"][0]
+            )
             # Set specific keys?
             metafile.assign_fields(meta, self.options.set)
 

@@ -370,9 +370,14 @@ def core_fields():
     yield ConstantField(
         str, "name", "name (file or root directory)", matcher=matching.PatternFilter
     )
-    yield ConstantField(int, "size", "data size", matcher=matching.ByteSizeFilter,
-                        accessor=lambda o: o.rpc_call("d.size_bytes"),
-                        requires=["d.size_bytes"])
+    yield ConstantField(
+        int,
+        "size",
+        "data size",
+        matcher=matching.ByteSizeFilter,
+        accessor=lambda o: o.rpc_call("d.size_bytes"),
+        requires=["d.size_bytes"],
+    )
     yield MutableField(
         int,
         "prio",

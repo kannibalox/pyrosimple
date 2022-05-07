@@ -30,7 +30,7 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import Dict, Generator, List, Optional, Union, Callable
+from typing import Callable, Dict, Generator, List, Optional, Union
 
 import bencode  # typing: ignore
 
@@ -562,7 +562,14 @@ class Metafile:
         # Return validated info dict
         return check_info(metainfo), totalhashed
 
-    def _make_meta(self, tracker_url: str, root_name: str , private: bool, progress: Optional[Callable] = None, piece_size: int = 0):
+    def _make_meta(
+        self,
+        tracker_url: str,
+        root_name: str,
+        private: bool,
+        progress: Optional[Callable] = None,
+        piece_size: int = 0,
+    ):
         """Create torrent dict."""
         if piece_size <= 0:
             total_size = self._calc_size()
@@ -630,9 +637,7 @@ class Metafile:
                     )
                     tracker_alias = tracker_alias[-2 if len(tracker_alias) > 1 else 0]
                 else:
-                    tracker_alias, tracker_url = config.lookup_announce_url(
-                        tracker_url
-                    )
+                    tracker_alias, tracker_url = config.lookup_announce_url(tracker_url)
                     tracker_url = tracker_url[0]
             except (KeyError, IndexError) as exc:
                 raise error.UserError(
