@@ -192,7 +192,7 @@ class ScriptBase:
                 # Template method with the tool's main loop
                 self.mainloop()
             except error.LoggableError as exc:
-                traceback.print_exception(exc)
+                print(traceback.format_exc())
                 sys.exit(error.EX_SOFTWARE)
             except KeyboardInterrupt:
                 print()
