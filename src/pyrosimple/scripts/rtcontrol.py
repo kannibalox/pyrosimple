@@ -799,7 +799,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     self.emit(item, defaults)
 
                 args = tuple(
-                    output_formatter(i, namespace=dict(item=item))
+                    formatting.format_item(formatting.env.from_string(i), item, defaults=dict(item=item))
                     for i in template_args
                 )
 
