@@ -240,29 +240,64 @@ class FieldFilter(Filter):  # pylint: disable=abstract-method
     # views                 views this item is attached to
     # xfer                  transfer rate
 
-    def __init__(self, name: str, value: str):
+    def __init__(self, name: str, op: str, value: str):
         """Store field name and filter value for later evaluations."""
         self._name = name
         self._condition = self._value = value
+        self._op = op
+
         self.validate()
 
     def __str__(self) -> str:
-        return "%s=%s" % (self._name, self._condition)
+        conditions = {
+            operator.eq: "==",
+            operator.ne: "!=",
+            operator.ge: ">=",
+            operator.le: "<=",
+            operator.gt: ">",
+            operator.lt: "<",
+        }
+        return str(self._name) + conditions[self._op] + str(self._condition)
 
     def validate(self):
         """Validate filter condition (template method)."""
 
-
-class EqualsFilter(FieldFilter):
-    """Filter fields equal to the given value."""
+    def pre_filter(self) -> str:
+        """Return a condition for use in d.multicall.filtered (template method)."""
+        return ""
 
     def match(self, item):
-        """Return True if filter matches item."""
-        result = self._value == getattr(item, self._name)
-        # log.debug("%r for %r = %r, name %r, item %r" % (
-        #    result, getattr(item, self._name), self._value, self._name, item))
-        return result
+        conditions = {
+            operator.eq: self.eq,
+            operator.ne: self.ne,
+            operator.ge: self.ge,
+            operator.le: self.le,
+            operator.gt: self.gt,
+            operator.lt: self.lt,
+        }
+        return conditions[self._op](item)
 
+    def eq(self, item) -> bool:
+        """Test equality against item"""
+        raise NotImplementedError()
+
+    def gt(self, item) -> bool:
+        """Test if item is greater than value"""
+        raise NotImplementedError()
+
+    # Theoretically all other logic can be derived from the previous two definitions
+    # Practically, we'll probably want to override some of these
+    def ne(self, item) -> bool:
+        return not self.eq(item)
+
+    def ge(self, item) -> bool:
+        return self.eq(item) or self.gt(item)
+
+    def lt(self, item) -> bool:
+        return not self.eq(item) and not self.gt(item)
+
+    def le(self, item) -> bool:
+        return self.eq(item) or not self.gt(item)
 
 class PatternFilter(FieldFilter):
     """Case-insensitive pattern filter, either a glob or a /regex/ pattern."""
@@ -323,7 +358,7 @@ class PatternFilter(FieldFilter):
 
         return ""
 
-    def match(self, item):
+    def eq(self, item):
         """Return True if filter matches item."""
         val = (getattr(item, self._name) or "").lower()
         result = self._matcher(val) if self._is_regex else self._matcher(val, item)
@@ -409,7 +444,7 @@ class BoolFilter(FieldFilter):
         self._value = truth(str(self._value), self._condition)
         self._condition = "yes" if self._value else "no"
 
-    def match(self, item):
+    def eq(self, item):
         """Return True if filter matches item."""
         val = getattr(item, self._name) or False
         return bool(val) is self._value
