@@ -849,7 +849,7 @@ class ConditionParser:
         return NegateFilter(root) if negate else root
 
 
-grammar = Grammar(
+QueryGrammar = Grammar(
     r"""
     query = (group / stmt)+
     group = (not ws)? lpar ws stmt ws rpar
