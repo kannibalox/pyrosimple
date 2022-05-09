@@ -954,13 +954,15 @@ class AndNode(MatcherNode):
                     return "and={%s}" % ",".join(result)
         return ""
 
-    
+
 class OrNode(MatcherNode):
     def match(self, item):
         return any(c.match(item) for c in self.children)
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
+        if int(config.settings.get("FAST_QUERY")) == 1:
+            return ""
         if len(self.children) == 1:
             return self.children[0].pre_filter()
         else:
@@ -969,11 +971,8 @@ class OrNode(MatcherNode):
             ]
             result = [x for x in result if x]
             if result:
-                if int(config.settings.get("FAST_QUERY")) == 1:
-                    return result[0]  # using just one simple expression is safer
-                else:
-                    # TODO: make this purely value-based (is.nz=…)
-                    return "or={%s}" % ",".join(result)
+                # TODO: make this purely value-based (is.nz=…)
+                return "or={%s}" % ",".join(result)
         return ""
 
 class ConditionNode(MatcherNode):
