@@ -631,36 +631,6 @@ class ByteSizeFilter(NumericFilterBase):
         self._value = self._value * scale
 
 
-class MagicFilter(FieldFilter):
-    """Filter that looks at the comparison value and automatically decides
-    what type of filter to use.
-    """
-
-    def validate(self):
-        """Validate filter condition (template method)."""
-        val = self._condition.lower()
-        if val and val[0] in "+-":
-            val = val[1:]
-
-        matcher = PatternFilter
-        if not val or val.startswith("/") and val.endswith("/"):
-            pass
-        elif val.replace(".", "0").isdigit():
-            matcher = FloatFilter
-        elif self._condition in (TRUE | FALSE):
-            matcher = BoolFilter
-        elif any(val.endswith(i) for i in ByteSizeFilter.UNITS) and val[:-1].isdigit():
-            matcher = ByteSizeFilter
-        elif TimeFilter.TIMEDELTA_RE.match(val):
-            matcher = TimeFilter
-
-        self._inner = matcher(self._name, self._condition)
-
-    def match(self, item):
-        """Return True if filter matches item."""
-        return self._inner.match(item)
-
-
 class ConditionParser:
     """Filter condition parser."""
 
@@ -673,11 +643,6 @@ class ConditionParser:
         "!=": "!%s",
         "~": "/%s/",
     }
-
-    @classmethod
-    def AMENABLE(cls, _):
-        """Prefined lookup mode for typeless access to any field name."""
-        return {"matcher": MagicFilter}
 
     def __init__(self, lookup, default_field=None, ident_re=r"[_A-Za-z][_A-Za-z0-9]*"):
         """Initialize parser.
