@@ -23,7 +23,8 @@ import operator
 import re
 import time
 
-from typing import List, Callable, Any
+from dataclasses import dataclass
+from typing import Any, Callable, List
 
 from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
@@ -47,6 +48,22 @@ FALSE = {
     "n",
     "0",
     "-",
+}
+
+
+@dataclass
+class FilterOperator:
+    name: str
+    query_repr: str
+
+
+Operators = {
+    "eq": FilterOperator("eq", "="),
+    "ne": FilterOperator("ne", "!="),
+    "gt": FilterOperator("gt", ">"),
+    "lt": FilterOperator("lt", "<"),
+    "ge": FilterOperator("ge", ">="),
+    "le": FilterOperator("le", "<="),
 }
 
 
@@ -89,8 +106,99 @@ class FilterError(error.UserError):
     """(Syntax) error in filter."""
 
 
-class FieldFilter:  # pylint: disable=abstract-method
-    """Base class for all field filters."""
+class MatcherNode:
+    """Base class for the tree structure."""
+
+    def __init__(self, children: List):
+        self.children = list(children)
+
+    def match(self, item) -> bool:
+        """Check if the item matches. All logic is deferred to subclasses."""
+        raise NotImplementedError()
+
+    def __repr__(self):
+        return f"{type(self).__name__}{[str(c) for c in self.children]}"
+
+
+class GroupNode(MatcherNode):
+    """This simply groups another node, and optionally inverts it (a logical NOT)"""
+
+    def __init__(self, children: List, invert: bool):
+        super().__init__(children)
+        self.invert = invert
+
+    def match(self, item):
+        assert len(self.children) == 1
+        result = self.children[0].match(item)
+        if self.invert:
+            return not result
+        return result
+
+    def pre_filter(self):
+        assert len(self.children) == 1
+        if self.invert:
+            inner = self.children[0].pre_filter()
+            if inner.startswith('"not=$') and inner.endswith('"') and "\\" not in inner:
+                return inner[6:-1]  # double negation, return inner command
+            elif inner.startswith('"'):
+                inner = '"$' + inner[1:]
+            else:
+                inner = "$" + inner
+            return "not=" + inner
+        return self.children[0].pre_filter()
+
+    def __repr__(self):
+        return f"{self.invert}{type(self).__name__}[{[str(c) for c in self.children]}]"
+
+
+class AndNode(MatcherNode):
+    """This node performs a logical AND for all of it's children."""
+
+    def match(self, item):
+        return all(c.match(item) for c in self.children)
+
+    def pre_filter(self):
+        """Return rTorrent condition to speed up data transfer."""
+        if len(self.children) == 1:
+            return self.children[0].pre_filter()
+        else:
+            result = [x.pre_filter() for x in self.children]
+            result = [x for x in result if x]
+            if result:
+                if int(config.settings.get("FAST_QUERY")) == 1:
+                    return result[0]  # using just one simple expression is safer
+                else:
+                    # TODO: make this purely value-based (is.nz=…)
+                    return "and={%s}" % ",".join(result)
+        return ""
+
+
+class OrNode(MatcherNode):
+    """This node performs a logical OR for all of it's children."""
+
+    def match(self, item):
+        return any(c.match(item) for c in self.children)
+
+    def pre_filter(self):
+        """Return rTorrent condition to speed up data transfer."""
+        if int(config.settings.get("FAST_QUERY")) == 1:
+            return ""
+        if len(self.children) == 1:
+            return self.children[0].pre_filter()
+        else:
+            result = [x.pre_filter() for x in self.children]
+            result = [x for x in result if x]
+            if result:
+                # TODO: make this purely value-based (is.nz=…)
+                return "or={%s}" % ",".join(result)
+        return ""
+
+
+class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
+    """Base class for all field filters.
+
+    Subclasses of FieldFilter act as the leaves of the tree, providing
+    matching and pre-filtering functionality."""
 
     PRE_FILTER_FIELDS = dict(
         # alias="",
@@ -140,22 +248,15 @@ class FieldFilter:  # pylint: disable=abstract-method
 
     def __init__(self, name: str, op: str, value: str):
         """Store field name and filter value for later evaluations."""
+        super().__init__([])  # Filters are the leaves of the tree and have no children
         self._name = name
         self._condition = self._value = value
-        self._op = op
+        self._op: FilterOperator = op
 
         self.validate()
 
     def __str__(self) -> str:
-        conditions = {
-            operator.eq: "==",
-            operator.ne: "!=",
-            operator.ge: ">=",
-            operator.le: "<=",
-            operator.gt: ">",
-            operator.lt: "<",
-        }
-        return str(self._name) + conditions[self._op] + str(self._condition)
+        return str(self._name) + self._op.query_repr + str(self._condition)
 
     def __call__(self, item):
         return self.match(item)
@@ -163,42 +264,64 @@ class FieldFilter:  # pylint: disable=abstract-method
     def validate(self) -> bool:
         """Validate filter condition (template method)."""
 
-    def pre_filter(self) -> str:
-        """Return a condition for use in d.multicall.filtered."""
-        return ""
+    # def pre_filter(self) -> str: # pylint: disable=no-self-use
+    #     """Return a condition for use in d.multicall.filtered."""
+    #     return ""
 
     def match(self, item) -> bool:
-        conditions = {
-            operator.eq: self.eq,
-            operator.ne: self.ne,
-            operator.ge: self.ge,
-            operator.le: self.le,
-            operator.gt: self.gt,
-            operator.lt: self.lt,
+        """Test if item matches filter.
+
+        By default this will defer to the operator functions in subclasses,
+        but that behaivor can be overridden."""
+        if hasattr(self, self._op.name):
+            return getattr(self, self._op.name)(item)
+        # If the subclasses didn't define a specific way to deal with it,
+        # derived the logic from eq and gt
+        derived = {
+            "ne": lambda i: not self.eq(i),
+            "ge": lambda i: self.eq(i) or self.gt(i),
+            "le": lambda i: self.eq(i) or not self.gt(i),
+            "lt": lambda i: not self.eq(i) and not self.gt(i),
         }
-        return conditions[self._op](item)
+        return derived[self._op.name](item)
 
     def eq(self, item) -> bool:
         """Test equality against item"""
-        raise NotImplementedError()
+        raise FilterError(
+            f"Filter '{type(self).__name__}' for field '{self._name}' does not support comparison '{self._op}'"
+        )
 
     def gt(self, item) -> bool:
         """Test if item is greater than value"""
-        raise NotImplementedError()
+        raise FilterError(
+            f"Filter '{type(self).__name__}' for field '{self._name}' does not support comparison '{self._op}'"
+        )
 
-    # Theoretically all other logic can be derived from the previous two definitions
-    # Practically, we'll probably want to override some of these
-    def ne(self, item) -> bool:
-        return not self.eq(item)
+    def pre_filter(self) -> str:
+        """Create a prefilter condition (if possible).
 
-    def ge(self, item) -> bool:
-        return self.eq(item) or self.gt(item)
+        By default this will defer to the operator functions in subclasses,
+        but that behaivor can be overridden."""
+        method_name = f"pre_filter_{self._op.name}"
+        if hasattr(self, method_name):
+            return getattr(self, method_name)()
+        # If the subclasses didn't define a specific way to deal with it,
+        # derived the logic from eq and gt
+        derived = {
+            "ne": lambda s: GroupNode(
+                [type(self)(s._name, Operators["eq"], s._value)], True
+            ),
+            "ge": lambda i: self.eq(i) or self.gt(i),
+            "le": lambda i: self.eq(i) or not self.gt(i),
+            "lt": lambda i: not self.eq(i) and not self.gt(i),
+        }
+        return derived[self._op.name](self).pre_filter()
 
-    def lt(self, item) -> bool:
-        return not self.eq(item) and not self.gt(item)
+    def pre_filter_eq(self) -> str:
+        return ""
 
-    def le(self, item) -> bool:
-        return self.eq(item) or not self.gt(item)
+    def pre_filter_gt(self) -> str:
+        return ""
 
 
 class PatternFilter(FieldFilter):
@@ -216,8 +339,11 @@ class PatternFilter(FieldFilter):
         self._template = None
         self._matcher: Callable[Any, Any]
         if self._value.startswith("/") and self._value.endswith("/"):
-            regex = re.compile(self._value[1:-1])
-            self._matcher = lambda val, _: regex.search(val)
+            if self._value in ["//", "/.*/"]:
+                self._matcher = lambda _, __: True
+            else:
+                regex = re.compile(self._value[1:-1])
+                self._matcher = lambda val, _: regex.search(val)
         elif self._value.startswith("{{") or self._value.endswith("}}"):
 
             def _template_globber(val, item):
@@ -232,7 +358,7 @@ class PatternFilter(FieldFilter):
         else:
             self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)
 
-    def pre_filter(self):
+    def pre_filter_eq(self):
         """Return rTorrent condition to speed up data transfer."""
         if self._name not in self.PRE_FILTER_FIELDS or self._template:
             return ""
@@ -253,10 +379,9 @@ class PatternFilter(FieldFilter):
                 needle.encode("ascii")
             except UnicodeEncodeError:
                 return ""
-            else:
-                return r'"string.contains_i=${},\"{}\""'.format(
-                    self.PRE_FILTER_FIELDS[self._name], needle.replace('"', r"\\\"")
-                )
+            return r'"string.contains_i=${},\"{}\""'.format(
+                self.PRE_FILTER_FIELDS[self._name], needle.replace('"', r"\\\"")
+            )
 
         return ""
 
@@ -331,7 +456,7 @@ class TaggedAsFilter(FieldFilter):
 class BoolFilter(FieldFilter):
     """Filter boolean values."""
 
-    def pre_filter(self):
+    def pre_filter_eq(self):
         """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             return '"equal={},value={}"'.format(
@@ -361,25 +486,15 @@ class NumericFilterBase(FieldFilter):
 
         self.not_null = False
 
-        if self._value.startswith("+"):
-            self._cmp = operator.gt
-            self._rt_cmp = "greater"
-            self._value = self._value[1:]
-        elif self._value.startswith("-"):
-            self._cmp = operator.lt
-            self._rt_cmp = "less"
-            self._value = self._value[1:]
-        else:
-            self._cmp = operator.eq
-            self._rt_cmp = "equal"
-
     def match(self, item):
         """Return True if filter matches item."""
         val = getattr(item, self._name) or 0
         if self.not_null and self._value and not val:
             return False
         else:
-            return self._cmp(float(val), self._value)
+            # Grab the function from the native operator module
+            op = getattr(operator, self._op.name)
+            return op(float(val), self._value)
 
 
 class FloatFilter(NumericFilterBase):
@@ -389,12 +504,21 @@ class FloatFilter(NumericFilterBase):
         ratio=1000,
     )
 
-    def pre_filter(self):
-        """Return rTorrent condition to speed up data transfer."""
+    def pre_filter_eq(self):
         if self._name in self.PRE_FILTER_FIELDS:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
+            return '"equal=value=${},value={}"'.format(
+                self.PRE_FILTER_FIELDS[self._name], val
+            )
+        return ""
+
+    def pre_filter_old(self):
+        """Return rTorrent condition to speed up data transfer."""
+        conditions = {"gt": "greater", "lt": "less", "eq": "equal"}
+        if self._name in self.PRE_FILTER_FIELDS and self._op.name in conditions:
+            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return '"{}=value=${},value={}"'.format(
-                self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], val
+                conditions[self._op.name], self.PRE_FILTER_FIELDS[self._name], val
             )
         return ""
 
@@ -543,9 +667,16 @@ class ByteSizeFilter(NumericFilterBase):
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
-        if self._name in self.PRE_FILTER_FIELDS:
+        comparers = {
+            operator.gt: "greater",
+            operator.lt: "less",
+            operator.eq: "equal",
+        }
+        if self._name in self.PRE_FILTER_FIELDS and self._op in comparers:
             return '"{}={},value={}"'.format(
-                self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], int(self._value)
+                comparers[self._op],
+                self.PRE_FILTER_FIELDS[self._name],
+                int(self._value),
             )
         return ""
 
@@ -606,8 +737,11 @@ QueryGrammar = Grammar(
 
 
 class KeyNameVisitor(NodeVisitor):
+    """Walk through a query tree and returns an array of key names.
+    Implicit key names are not included."""
+
+    # pylint: disable=no-self-use,unused-argument,missing-function-docstring
     def visit_expr(self, node, visited_children):
-        """Returns the overall output."""
         output = ""
         for child in visited_children:
             output += str(child)
@@ -620,83 +754,14 @@ class KeyNameVisitor(NodeVisitor):
         return [node.text]
 
     def generic_visit(self, node, visited_children):
-        """The generic visit method."""
         if visited_children:
             return [item for sublist in visited_children for item in sublist]
         else:
             return []
 
 
-class MatcherNode:
-    """Base class for the tree structure."""
-
-    def __init__(self, children: List):
-        self.children = list(children)
-
-    def match(self, item) -> bool:
-        """Check if the item matches. All logic is deferred to subclasses."""
-        raise NotImplementedError()
-
-    def __repr__(self):
-        return f"{type(self).__name__}{[str(c) for c in self.children]}"
-
-
-class GroupNode(MatcherNode):
-    def __init__(self, children: List, invert: bool):
-        super().__init__(children)
-        self.invert = invert
-
-    def match(self, item):
-        assert len(self.children) == 1
-        result = self.children[0].match(item)
-        if self.invert:
-            return not result
-        return result
-
-    def __repr__(self):
-        return f"{self.invert}{type(self).__name__}[{[str(c) for c in self.children]}]"
-
-
-class AndNode(MatcherNode):
-    def match(self, item):
-        return all(c.match(item) for c in self.children)
-
-    def pre_filter(self):
-        """Return rTorrent condition to speed up data transfer."""
-        if len(self.children) == 1:
-            return self.children[0].pre_filter()
-        else:
-            result = [x.pre_filter() for x in self.children]
-            result = [x for x in result if x]
-            if result:
-                if int(config.settings.get("FAST_QUERY")) == 1:
-                    return result[0]  # using just one simple expression is safer
-                else:
-                    # TODO: make this purely value-based (is.nz=…)
-                    return "and={%s}" % ",".join(result)
-        return ""
-
-
-class OrNode(MatcherNode):
-    def match(self, item):
-        return any(c.match(item) for c in self.children)
-
-    def pre_filter(self):
-        """Return rTorrent condition to speed up data transfer."""
-        if int(config.settings.get("FAST_QUERY")) == 1:
-            return ""
-        if len(self.children) == 1:
-            return self.children[0].pre_filter()
-        else:
-            result = [x.pre_filter() for x in self.children]
-            result = [x for x in result if x]
-            if result:
-                # TODO: make this purely value-based (is.nz=…)
-                return "or={%s}" % ",".join(result)
-        return ""
-
-
 def create_filter(name: str, op: str, value: str) -> FieldFilter:
+    """Generates a filter class with the given name, operation and value"""
     filt = torrent.engine.FieldDefinition.lookup(name)._matcher
     return filt(name, op, value)
 
@@ -704,63 +769,79 @@ def create_filter(name: str, op: str, value: str) -> FieldFilter:
 class MatcherBuilder(NodeVisitor):
     """Build a simplified tree of MatcherNodes to match an item against."""
 
-    # pylint: disable=no-self-use,missing-function-docstring
-    def visit_named_cond(self, _node, visited_children):
+    # pylint: disable=no-self-use,unused-argument,missing-function-docstring
+    def visit_named_cond(self, node, visited_children):
         key, cond, needle = visited_children
         return create_filter(key, cond, needle)
 
-    def visit_group(self, _node, visited_children):
+    def visit_group(self, node, visited_children):
         return GroupNode(
             [c for c in visited_children[1:] if c is not None], visited_children[0]
         )
 
-    def visit_not(self, node, _visited_children):
+    def visit_not(self, node, visited_children):
         if node.text == "NOT":
             return True
         return False
 
     def __pare_children(self, children, class_):
+        """Get all non-None children, and if there's only one child left,
+        return the child instead of wrapping it in the parent class.
+
+        We should hopefully never have to deal with all None children,
+        due to the grammar combined with the generic_visit method.
+        """
         real_children = [c for c in children if c is not None]
         if len(real_children) == 1:
             return real_children[0]
         return class_(real_children)
 
-    def visit_or_stmt(self, _node, visited_children):
+    def visit_or_stmt(self, node, visited_children):
         return self.__pare_children(visited_children, OrNode)
 
-    def visit_conds(self, _node, visited_children):
+    def visit_conds(self, node, visited_children):
         return self.__pare_children(visited_children, AndNode)
 
     def visit_cond(self, node, visited_children):
         if len(visited_children) == 1 and isinstance(
             visited_children[0], (str, re.Pattern)
         ):
-            return create_filter("name", "=", visited_children[0])
+            return create_filter("name", Operators["eq"], visited_children[0])
         return self.generic_visit(node, visited_children)
 
-    def visit_word(self, node, _):
+    # Unfortunate but necessary boilerplate methods
+
+    def visit_word(self, node, visited_children):
         return node.text
 
-    def visit_quoted(self, node, _):
+    def visit_quoted(self, node, visited_children):
         return node.text[1:-1]
 
-    def visit_glob(self, node, _):
+    def visit_glob(self, node, visited_children):
         return node.text
 
-    def visit_regex(self, node, _):
-        return node.text  # re.compile(node.text[1:-1])
+    def visit_regex(self, node, visited_children):
+        return node.text
 
-    def visit_eq(self, node, _):
-        return operator.eq
+    def visit_eq(self, node, visited_children):
+        return Operators["eq"]
 
-    def visit_ne(self, node, _):
-        return operator.ne
+    def visit_ne(self, node, visited_children):
+        return Operators["ne"]
 
-    def visit_gt(self, node, _):
-        return operator.gt
+    def visit_gt(self, node, visited_children):
+        return Operators["gt"]
+
+    def visit_ge(self, node, visited_children):
+        return Operators["ge"]
+
+    def visit_lt(self, node, visited_children):
+        return Operators["lt"]
+
+    def visit_le(self, node, visited_children):
+        return Operators["le"]
 
     def generic_visit(self, node, visited_children):
-        """The generic visit method."""
         real_children = [c for c in visited_children if c is not None]
         if real_children:
             if isinstance(real_children, list) and len(real_children) == 1:
