@@ -113,9 +113,7 @@ class PathMover:
         try:
             self.engine = rtorrent.RtorrentEngine()
             self.proxy = self.engine.rpc
-            matcher = matching.ConditionParser(
-                engine.FieldDefinition.lookup, "name"
-            ).parse(self.config.matcher)
+            matcher = matching.QueryGrammar.parse(self.config.matcher)
             view = engine.TorrentView(self.engine, "default")
             view.matcher = matcher
             futures = []
@@ -241,9 +239,7 @@ class Mover:
         try:
             self.engine = rtorrent.RtorrentEngine()
             self.proxy = self.engine.open()
-            matcher = matching.ConditionParser(
-                engine.FieldDefinition.lookup, "name"
-            ).parse(f"{self.config.matcher}")
+            matcher = matching.QueryGrammar.parse(f"{self.config.matcher}")
             view = engine.TorrentView(self.engine, "default")
             view.matcher = matcher
             hosts = self.config.hosts.split(",")

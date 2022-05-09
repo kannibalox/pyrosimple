@@ -90,108 +90,7 @@ class FilterError(error.UserError):
     """(Syntax) error in filter."""
 
 
-class Filter:
-    """Base class for all filters."""
-
-    def pre_filter(self) -> str:  # pylint: disable=no-self-use
-        """Return rTorrent condition to speed up data transfer."""
-        return ""
-
-    def match(self, item) -> bool:
-        """Return True if filter matches item."""
-        raise NotImplementedError()
-
-    def __call__(self, item):
-        return self.match(item)
-
-
-class CompoundFilterBase(Filter, list):  # pylint: disable=abstract-method
-    """List of filters."""
-
-
-class CompoundFilterAll(CompoundFilterBase):
-    """List of filters that must all match (AND)."""
-
-    def __str__(self):
-        return " ".join(str(i) for i in self)
-
-    def pre_filter(self):
-        """Return rTorrent condition to speed up data transfer."""
-        if len(self) == 1:
-            return self[0].pre_filter()
-        else:
-            result = [
-                x.pre_filter() for x in self if not isinstance(x, CompoundFilterBase)
-            ]
-            result = [x for x in result if x]
-            if result:
-                if int(config.settings.get("FAST_QUERY")) == 1:
-                    return result[0]  # using just one simple expression is safer
-                else:
-                    # TODO: make this purely value-based (is.nz=…)
-                    return "and={%s}" % ",".join(result)
-        return ""
-
-    def match(self, item):
-        """Return True if filter matches item."""
-        return all(i.match(item) for i in self)
-
-
-class CompoundFilterAny(CompoundFilterBase):
-    """List of filters where at least one must match (OR)."""
-
-    def __str__(self):
-        if (
-            all(isinstance(i, FieldFilter) for i in self)
-            and len(set(i._name for i in self)) == 1
-        ):
-            return "%s,%s" % (str(self[0]), ",".join(i._condition for i in self[1:]))
-        return "[ %s ]" % " OR ".join(str(i) for i in self)
-
-    def pre_filter(self):
-        """Return rTorrent condition to speed up data transfer."""
-        if len(self) == 1:
-            return self[0].pre_filter()
-        # TODO: Find a safe way to do 'or' expressions
-        return ""
-
-    def match(self, item):
-        """Return True if filter matches item."""
-        return any(i.match(item) for i in self)
-
-
-class NegateFilter(Filter):
-    """Negate result of another filter (NOT)."""
-
-    def __init__(self, inner):
-        self._inner = inner
-
-    def __str__(self):
-        if isinstance(self._inner, FieldFilter):
-            return str("%s=!%s" % tuple(str(self._inner).split("=", 1)))
-        elif isinstance(self._inner, CompoundFilterBase):
-            return "[ NOT [ %s ] ]" % str(self._inner)
-        return "[ NOT %s ]" % str(self._inner)
-
-    def pre_filter(self):
-        """Return rTorrent condition to speed up data transfer."""
-        inner = self._inner.pre_filter()
-        if inner:
-            if inner.startswith('"not=$') and inner.endswith('"') and "\\" not in inner:
-                return inner[6:-1]  # double negation, return inner command
-            elif inner.startswith('"'):
-                inner = '"$' + inner[1:]
-            else:
-                inner = "$" + inner
-            return "not=" + inner
-        return ""
-
-    def match(self, item):
-        """Return True if filter matches item."""
-        return not self._inner.match(item)
-
-
-class FieldFilter(Filter):  # pylint: disable=abstract-method
+class FieldFilter:  # pylint: disable=abstract-method
     """Base class for all field filters."""
 
     PRE_FILTER_FIELDS = dict(
@@ -259,14 +158,17 @@ class FieldFilter(Filter):  # pylint: disable=abstract-method
         }
         return str(self._name) + conditions[self._op] + str(self._condition)
 
-    def validate(self):
+    def __call__(self, item):
+        return self.match(item)
+
+    def validate(self) -> bool:
         """Validate filter condition (template method)."""
 
     def pre_filter(self) -> str:
-        """Return a condition for use in d.multicall.filtered (template method)."""
+        """Return a condition for use in d.multicall.filtered."""
         return ""
 
-    def match(self, item):
+    def match(self, item) -> bool:
         conditions = {
             operator.eq: self.eq,
             operator.ne: self.ne,
@@ -669,184 +571,6 @@ class ByteSizeFilter(NumericFilterBase):
 
         # Scale to bytes
         self._value = self._value * scale
-
-
-class ConditionParser:
-    """Filter condition parser."""
-
-    COMPARISON_OPS = {
-        "<": "-%s",
-        "<=": "!+%s",
-        ">": "+%s",
-        ">=": "!-%s",
-        "<>": "!%s",
-        "!=": "!%s",
-        "~": "/%s/",
-    }
-
-    def __init__(self, lookup, default_field=None, ident_re=r"[_A-Za-z][_A-Za-z0-9]*"):
-        """Initialize parser.
-
-        The C{lookup} callback takes a C{name} argument and returns a dict describing
-        that field, or None for an unknown field. If a dict is returned, the "matcher"
-        key is supposed to be a C{Filter} instance; if it's None or missing, the field
-        is not comparable.
-
-        @param lookup: Field definition lookup callable.
-        @param default_field: Optional default field name for conditions without an operator.
-        @param ident_re: Regex describing valid field names.
-        """
-        self.lookup = lookup
-        self.default_field = default_field
-        self.ident_re = ident_re
-
-    def _create_filter(self, condition):
-        """Create a filter object from a textual condition."""
-        # "Normal" comparison operators?
-        comparison = re.match(r"^(%s)(<[>=]?|>=?|!=|~)(.*)$" % self.ident_re, condition)
-        if comparison:
-            name, comparison, values = comparison.groups()
-            if values and values[0] in "+-":
-                raise FilterError(
-                    "Comparison operator cannot be followed by '%s' in '%s'"
-                    % (values[0], condition)
-                )
-            values = self.COMPARISON_OPS[comparison] % values
-        else:
-            # Split name from value(s)
-            try:
-                name, values = condition.split("=", 1)
-            except ValueError:
-                #  pylint: disable=raise-missing-from
-                if self.default_field:
-                    name, values = self.default_field, condition
-                else:
-                    raise FilterError(
-                        "Field name missing in '%s' (expected '=')" % condition
-                    )
-
-        # Try to find field definition
-        field = self.lookup(name)
-        if not field:
-            raise FilterError("Unknown field %r in %r" % (name, condition))
-        if field.get("matcher") is None:
-            raise FilterError("Field %r cannot be used as a filter" % (name,))
-
-        # Make filters from values (split on commas outside of /…/)
-        filters = []
-        split_values = (
-            re.findall(r"(!?/[^/]*/|[^,]+)(?:,|$)", values) if values else [""]
-        )
-        if not split_values:
-            raise FilterError(
-                "Internal Error: Cannot split %r into match values" % (values,)
-            )
-
-        for value in split_values:
-            wrapper = None
-            if value.startswith("!"):
-                wrapper = NegateFilter
-                value = value[1:]
-            field_matcher = field["matcher"](name, value)
-            filters.append(wrapper(field_matcher) if wrapper else field_matcher)
-
-        # Return filters
-        return CompoundFilterAny(filters) if len(filters) > 1 else filters[0]
-
-    def _tree2str(self, tree, root=True):
-        """Convert parsed condition tree back to a (printable) string."""
-        try:
-            # Keep strings as they are
-            return "" + tree
-        except (TypeError, ValueError):
-            flat = " ".join(self._tree2str(i, root=False) for i in tree)
-            return flat if root else "[ %s ]" % flat
-
-    def parse(self, conditions):
-        """Parse filter conditions.
-
-        @param conditions: multiple conditions.
-        @type conditions: list or str
-        """
-        conditions_text = conditions
-        if isinstance(conditions, bytes):
-            conditions = shlex.split(conditions.decode("utf-8"))
-        elif isinstance(conditions, str):
-            conditions = shlex.split(conditions)
-        else:
-            # Not a string, assume parsed tree
-            conditions_text = self._tree2str(conditions)
-
-        # Empty list?
-        if not conditions:
-            raise FilterError("No conditions given at all!")
-
-        # NOT *must* appear at the start of a group
-        negate = conditions[:1] == ["NOT"]
-        if negate:
-            conditions = conditions[1:]
-            if not conditions:
-                raise FilterError("NOT must be followed by some conditions!")
-
-        # Handle grouping
-        if "[" in conditions:
-            tree = [[]]
-            for term in conditions:
-                if term == "[":
-                    tree.append([])  # new grouping
-                elif term == "]":
-                    subtree = tree.pop()
-                    if not tree:
-                        raise FilterError(
-                            "Unbalanced brackets, too many closing ']' in condition %r"
-                            % (conditions_text,)
-                        )
-                    tree[-1].append(
-                        subtree
-                    )  # append finished group to containing level
-                else:
-                    tree[-1].append(term)  # append to current level
-
-            if len(tree) > 1:
-                raise FilterError(
-                    "Unbalanced brackets, too many open '[' in condition %r"
-                    % (conditions_text,)
-                )
-            conditions = tree[0]
-
-        # Prepare root matcher
-        conditions = list(conditions)
-        matcher = CompoundFilterAll()
-        if "OR" in conditions:
-            root = CompoundFilterAny()
-            root.append(matcher)
-        else:
-            root = matcher
-
-        # Go through conditions and parse them
-        for condition in conditions:
-            if condition == "OR":
-                # Leading OR, or OR OR in sequence?
-                if not matcher:
-                    raise FilterError(
-                        "Left-hand side of OR missing in %r!" % (conditions_text,)
-                    )
-
-                # Start next run of AND conditions
-                matcher = CompoundFilterAll()
-                root.append(matcher)
-            elif isinstance(condition, list):
-                matcher.append(self.parse(condition))
-            else:
-                matcher.append(self._create_filter(condition))
-
-        # Trailing OR?
-        if not matcher:
-            raise FilterError(
-                "Right-hand side of OR missing in %r!" % (conditions_text,)
-            )
-
-        return NegateFilter(root) if negate else root
 
 
 QueryGrammar = Grammar(

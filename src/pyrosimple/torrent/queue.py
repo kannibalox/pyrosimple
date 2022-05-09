@@ -19,7 +19,7 @@
 import time
 
 from pyrosimple import error
-from pyrosimple.torrent import engine, formatting, rtorrent
+from pyrosimple.torrent import formatting, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
 
 
@@ -42,9 +42,7 @@ class QueueManager:
         )
         self.config.viewname = self.config.get("viewname", "pyrotorque")
         self.config.quiet = bool_param("quiet", False)
-        self.config.startable = matching.ConditionParser(
-            engine.FieldDefinition.lookup, "name"
-        ).parse(
+        self.config.startable = matching.QueryGrammar.parse(
             "[ %s ] [ is_open=no is_active=no is_complete=no ]"
             % (self.config.startable)
         )
@@ -53,9 +51,7 @@ class QueueManager:
             self.config.job_name,
             self.config.startable,
         )
-        self.config.downloading = matching.ConditionParser(
-            engine.FieldDefinition.lookup, "name"
-        ).parse(
+        self.config.downloading = matching.QueryGrammar.parse(
             "is_active=1 is_complete=0"
             + (
                 " [ %s ]" % self.config.downloading
