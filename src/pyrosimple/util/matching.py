@@ -827,7 +827,7 @@ grammar = Grammar(
     filter      = (regex / glob / quoted / word)
     glob = ~r"[*\.\/\-?!\w]+"
     regex = ~"/[^/]*/"
-    quoted      = ~'"[^\"]+"'
+    quoted      = ~'"[^\"]*"'
     word        = ~r"[\w]+"
     conditional = (ne / ge / le / lt / gt / eq)
     ne          = ("!=" / "<>")
