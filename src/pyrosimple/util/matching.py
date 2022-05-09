@@ -4,8 +4,6 @@
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
-import fnmatch
-import operator
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +18,18 @@ import operator
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+import fnmatch
+import operator
 import re
 import shlex
 import time
 
-from pyrosimple import config, error, torrent
+from typing import List
+
+from parsimonious.grammar import Grammar
+from parsimonious.nodes import NodeVisitor
+
+from pyrosimple import config, error, torrent, util
 
 
 TRUE = {
@@ -890,15 +895,51 @@ class GroupNode(MatcherNode):
         return result
 
     def __repr__(self):
-        return(f"{self.invert}{type(self).__name__}[{[c for c in self.children]}]")
+        return f"{self.invert}{type(self).__name__}[{[str(c) for c in self.children]}]"
+
 
 class AndNode(MatcherNode):
     def match(self, item):
         return all(c.match(item) for c in self.children)
 
+    def pre_filter(self):
+        """Return rTorrent condition to speed up data transfer."""
+        if len(self.children) == 1:
+            return self.children[0].pre_filter()
+        else:
+            result = [
+                x.pre_filter() for x in self.children
+            ]
+            result = [x for x in result if x]
+            if result:
+                if int(config.settings.get("FAST_QUERY")) == 1:
+                    return result[0]  # using just one simple expression is safer
+                else:
+                    # TODO: make this purely value-based (is.nz=…)
+                    return "and={%s}" % ",".join(result)
+        return ""
+
+    
 class OrNode(MatcherNode):
     def match(self, item):
         return any(c.match(item) for c in self.children)
+
+    def pre_filter(self):
+        """Return rTorrent condition to speed up data transfer."""
+        if len(self.children) == 1:
+            return self.children[0].pre_filter()
+        else:
+            result = [
+                x.pre_filter() for x in self.children
+            ]
+            result = [x for x in result if x]
+            if result:
+                if int(config.settings.get("FAST_QUERY")) == 1:
+                    return result[0]  # using just one simple expression is safer
+                else:
+                    # TODO: make this purely value-based (is.nz=…)
+                    return "or={%s}" % ",".join(result)
+        return ""
 
 class ConditionNode(MatcherNode):
     def match(self, item):
@@ -906,30 +947,47 @@ class ConditionNode(MatcherNode):
         print(getattr(item, self.children[0]), self.children[1], self.children[2])
         return True
 
+
+def create_filter(name: str, op: str, value: str) -> FieldFilter:
+    filt = torrent.engine.FieldDefinition.lookup(name)._matcher
+    return filt(name, op, value)
+
+
 class MatcherBuilder(NodeVisitor):
     """Build a simplified tree of MatcherNodes to match an item against."""
+
     # pylint: disable=no-self-use,missing-function-docstring
     def visit_named_cond(self, _node, visited_children):
         key, cond, needle = visited_children
-        return ConditionNode([key, cond, needle])
+        return create_filter(key, cond, needle)
 
     def visit_group(self, _node, visited_children):
-        return GroupNode([c for c in visited_children[1:] if c is not None], visited_children[0])
+        return GroupNode(
+            [c for c in visited_children[1:] if c is not None], visited_children[0]
+        )
 
     def visit_not(self, node, _visited_children):
         if node.text == "NOT":
             return True
         return False
-    
+
+    def __pare_children(self, children, class_):
+        real_children = [c for c in children if c is not None]
+        if len(real_children) == 1:
+            return real_children[0]
+        return class_(real_children)
+
     def visit_or_stmt(self, _node, visited_children):
-        return OrNode(c for c in visited_children if c is not None)
+        return self.__pare_children(visited_children, OrNode)
 
     def visit_conds(self, _node, visited_children):
-        return AndNode(c for c in visited_children if c is not None)
+        return self.__pare_children(visited_children, AndNode)
 
     def visit_cond(self, node, visited_children):
-        if len(visited_children) == 1 and isinstance(visited_children[0], (str, re.Pattern)):
-            return ConditionNode(["name", "=", visited_children[0]])
+        if len(visited_children) == 1 and isinstance(
+            visited_children[0], (str, re.Pattern)
+        ):
+            return create_filter("name", "=", visited_children[0])
         return self.generic_visit(node, visited_children)
 
     def visit_word(self, node, _):
@@ -939,13 +997,13 @@ class MatcherBuilder(NodeVisitor):
         return node.text
 
     def visit_regex(self, node, _):
-        return re.compile(node.text[1:-1])
+        return node.text  # re.compile(node.text[1:-1])
 
     def visit_conditional(self, node, _):
         return node.text
 
     def generic_visit(self, node, visited_children):
-        """ The generic visit method. """
+        """The generic visit method."""
         real_children = [c for c in visited_children if c is not None]
         if real_children:
             if isinstance(real_children, list) and len(real_children) == 1:

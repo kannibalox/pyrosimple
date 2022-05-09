@@ -559,8 +559,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Replace some escape sequences
         output_format = (
-            output_format
-            .replace(r"\n", "\n")
+            output_format.replace(r"\n", "\n")
             .replace(r"\t", "\t")
             .replace(r"\ ", " ")  # to prevent stripping in config file
         )
@@ -721,7 +720,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Find matching torrents
         view = self.engine.view(self.options.from_view, matcher)
-        prefetch = [engine.FieldDefinition.FIELDS[f].requires for f in self.get_output_fields()]
+        prefetch = [
+            engine.FieldDefinition.FIELDS[f].requires for f in self.get_output_fields()
+        ]
         prefetch = [item for sublist in prefetch for item in sublist]
         matches = list(self.engine.items(view=view, prefetch=prefetch))
         matches.sort(key=sort_key, reverse=self.options.reverse_sort)
@@ -799,7 +800,9 @@ class RtorrentControl(ScriptBaseWithConfig):
                     self.emit(item, defaults)
 
                 args = tuple(
-                    formatting.format_item(formatting.env.from_string(i), item, defaults=dict(item=item))
+                    formatting.format_item(
+                        formatting.env.from_string(i), item, defaults=dict(item=item)
+                    )
                     for i in template_args
                 )
 
