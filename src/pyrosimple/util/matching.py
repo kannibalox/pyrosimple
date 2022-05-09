@@ -127,17 +127,17 @@ class GroupNode(MatcherNode):
         super().__init__(children)
         self.invert = invert
 
-    def match(self, item):
+    def match(self, item) -> bool:
         assert len(self.children) == 1
-        result = self.children[0].match(item)
+        result = bool(self.children[0].match(item))
         if self.invert:
             return not result
         return result
 
-    def pre_filter(self):
+    def pre_filter(self) -> str:
         assert len(self.children) == 1
+        inner = str(self.children[0].pre_filter())
         if self.invert:
-            inner = self.children[0].pre_filter()
             if inner.startswith('"not=$') and inner.endswith('"') and "\\" not in inner:
                 return inner[6:-1]  # double negation, return inner command
             elif inner.startswith('"'):
@@ -145,7 +145,7 @@ class GroupNode(MatcherNode):
             else:
                 inner = "$" + inner
             return "not=" + inner
-        return self.children[0].pre_filter()
+        return inner
 
     def __repr__(self):
         return f"{self.invert}{type(self).__name__}[{[str(c) for c in self.children]}]"
@@ -154,37 +154,34 @@ class GroupNode(MatcherNode):
 class AndNode(MatcherNode):
     """This node performs a logical AND for all of it's children."""
 
-    def match(self, item):
+    def match(self, item) -> bool:
         return all(c.match(item) for c in self.children)
 
     def pre_filter(self):
         """Return rTorrent condition to speed up data transfer."""
-        if len(self.children) == 1:
-            return self.children[0].pre_filter()
-        else:
-            result = [x.pre_filter() for x in self.children]
-            result = [x for x in result if x]
-            if result:
-                if int(config.settings.get("FAST_QUERY")) == 1:
-                    return result[0]  # using just one simple expression is safer
-                else:
-                    # TODO: make this purely value-based (is.nz=…)
-                    return "and={%s}" % ",".join(result)
+        result = [x.pre_filter() for x in self.children]
+        result = [x for x in result if x]
+        if result:
+            if int(config.settings.get("FAST_QUERY")) == 1 or len(result) == 1:
+                return result[0]  # using just one simple expression is safer
+            else:
+                # TODO: make this purely value-based (is.nz=…)
+                return "and={%s}" % ",".join(result)
         return ""
 
 
 class OrNode(MatcherNode):
     """This node performs a logical OR for all of it's children."""
 
-    def match(self, item):
+    def match(self, item) -> bool:
         return any(c.match(item) for c in self.children)
 
-    def pre_filter(self):
+    def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         if int(config.settings.get("FAST_QUERY")) == 1:
             return ""
         if len(self.children) == 1:
-            return self.children[0].pre_filter()
+            return str(self.children[0].pre_filter())
         else:
             result = [x.pre_filter() for x in self.children]
             result = [x for x in result if x]
@@ -246,7 +243,7 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
     # views                 views this item is attached to
     # xfer                  transfer rate
 
-    def __init__(self, name: str, op: str, value: str):
+    def __init__(self, name: str, op: FilterOperator, value: str):
         """Store field name and filter value for later evaluations."""
         super().__init__([])  # Filters are the leaves of the tree and have no children
         self._name = name
@@ -261,7 +258,7 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
     def __call__(self, item):
         return self.match(item)
 
-    def validate(self) -> bool:
+    def validate(self):
         """Validate filter condition (template method)."""
 
     # def pre_filter(self) -> str: # pylint: disable=no-self-use
@@ -273,17 +270,7 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
 
         By default this will defer to the operator functions in subclasses,
         but that behaivor can be overridden."""
-        if hasattr(self, self._op.name):
-            return getattr(self, self._op.name)(item)
-        # If the subclasses didn't define a specific way to deal with it,
-        # derived the logic from eq and gt
-        derived = {
-            "ne": lambda i: not self.eq(i),
-            "ge": lambda i: self.eq(i) or self.gt(i),
-            "le": lambda i: self.eq(i) or not self.gt(i),
-            "lt": lambda i: not self.eq(i) and not self.gt(i),
-        }
-        return derived[self._op.name](item)
+        return bool(getattr(self, self._op.name)(item))
 
     def eq(self, item) -> bool:
         """Test equality against item"""
@@ -297,25 +284,26 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
             f"Filter '{type(self).__name__}' for field '{self._name}' does not support comparison '{self._op}'"
         )
 
+    def ge(self, item) -> bool:
+        return self.eq(item) or self.gt(item)
+
+    def ne(self, item) -> bool:
+        return not self.eq(item)
+
+    def le(self, item) -> bool:
+        return self.eq(item) or not self.gt(item)
+
+    def lt(self, item) -> bool:
+        return not self.eq(item) and not self.gt(item)
+
+
     def pre_filter(self) -> str:
         """Create a prefilter condition (if possible).
 
         By default this will defer to the operator functions in subclasses,
         but that behaivor can be overridden."""
         method_name = f"pre_filter_{self._op.name}"
-        if hasattr(self, method_name):
-            return getattr(self, method_name)()
-        # If the subclasses didn't define a specific way to deal with it,
-        # derived the logic from eq and gt
-        derived = {
-            "ne": lambda s: GroupNode(
-                [type(self)(s._name, Operators["eq"], s._value)], True
-            ),
-            "ge": lambda i: self.eq(i) or self.gt(i),
-            "le": lambda i: self.eq(i) or not self.gt(i),
-            "lt": lambda i: not self.eq(i) and not self.gt(i),
-        }
-        return derived[self._op.name](self).pre_filter()
+        return str(getattr(self, method_name)())
 
     def pre_filter_eq(self) -> str:
         return ""
@@ -323,6 +311,13 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
     def pre_filter_gt(self) -> str:
         return ""
 
+    def pre_filter_ne(self) -> str:
+        """Create a prefilter by creating a NOT[name=filter] object and rendering it."""
+        if self.pre_filter_eq():
+            return GroupNode(
+	        [type(self)(self._name, Operators["eq"], self._value)], True
+	    ).pre_filter()
+        return ""
 
 class PatternFilter(FieldFilter):
     """Case-insensitive pattern filter, either a glob or a /regex/ pattern."""
@@ -358,7 +353,7 @@ class PatternFilter(FieldFilter):
         else:
             self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)
 
-    def pre_filter_eq(self):
+    def pre_filter_eq(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         if self._name not in self.PRE_FILTER_FIELDS or self._template:
             return ""
@@ -395,7 +390,7 @@ class PatternFilter(FieldFilter):
 class FilesFilter(PatternFilter):
     """Case-insensitive pattern filter on filenames in a torrent."""
 
-    def match(self, item):
+    def match(self, item) -> bool:
         """Return True if filter matches item."""
         val = getattr(item, self._name)
         if val is not None:
@@ -411,7 +406,7 @@ class TaggedAsFilter(FieldFilter):
     of tags.
     """
 
-    def pre_filter(self):
+    def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             if not self._value:
@@ -442,7 +437,7 @@ class TaggedAsFilter(FieldFilter):
             # Empty tag means empty set, not set of one empty string
             self._value = set((self._value,)) if self._value else set()
 
-    def match(self, item):
+    def match(self, item) -> bool:
         """Return True if filter matches item."""
         tags = getattr(item, self._name) or []
         if self._exact:
@@ -486,7 +481,7 @@ class NumericFilterBase(FieldFilter):
 
         self.not_null = False
 
-    def match(self, item):
+    def match(self, item) -> bool:
         """Return True if filter matches item."""
         val = getattr(item, self._name) or 0
         if self.not_null and self._value and not val:
@@ -494,7 +489,7 @@ class NumericFilterBase(FieldFilter):
         else:
             # Grab the function from the native operator module
             op = getattr(operator, self._op.name)
-            return op(float(val), self._value)
+            return bool(op(float(val), self._value))
 
 
 class FloatFilter(NumericFilterBase):
@@ -552,11 +547,11 @@ class TimeFilter(NumericFilterBase):
         % "".join(r"(?:(?P<%s>\d+)[%s%s])?" % (i, i, i.upper()) for i in "ymwdhis")
     )
 
-    def pre_filter(self):
+    def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             # Adding a day of fuzz to avoid any possible timezone problems
-            timestamp = self._value + (
+            timestamp = float(self._value) + (
                 -86400
                 if self._rt_cmp == "greater"
                 else 86400
@@ -651,11 +646,11 @@ class DurationFilter(TimeFilter):
         """Validate filter condition (template method)."""
         super().validate_time(duration=True)
 
-    def match(self, item):
+    def match(self, item) -> bool:
         """Return True if filter matches item."""
         if getattr(item, self._name) is None:
             # Never match "N/A" items, except when "-0" was specified
-            return False if self._value else self._cmp(-1, 0)
+            return False if self._value else bool(self._cmp(-1, 0))
         else:
             return super().match(item)
 
@@ -665,16 +660,16 @@ class ByteSizeFilter(NumericFilterBase):
 
     UNITS = dict(b=1, k=1024, m=1024**2, g=1024**3)
 
-    def pre_filter(self):
+    def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         comparers = {
-            operator.gt: "greater",
-            operator.lt: "less",
-            operator.eq: "equal",
+            "gt": "greater",
+            "lt": "less",
+            "eq": "equal",
         }
-        if self._name in self.PRE_FILTER_FIELDS and self._op in comparers:
+        if self._name in self.PRE_FILTER_FIELDS and self._op.name in comparers:
             return '"{}={},value={}"'.format(
-                comparers[self._op],
+                comparers[self._op.name],
                 self.PRE_FILTER_FIELDS[self._name],
                 int(self._value),
             )
@@ -780,7 +775,7 @@ class MatcherBuilder(NodeVisitor):
         )
 
     def visit_not(self, node, visited_children):
-        if node.text == "NOT":
+        if node.text:
             return True
         return False
 
