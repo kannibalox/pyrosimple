@@ -837,11 +837,13 @@ grammar = Grammar(
     rpar = "]"
     or = "OR"
     not = ( "NOT" / "!" )
-    """)
+    """
+)
+
 
 class KeyNameVisitor(NodeVisitor):
     def visit_expr(self, node, visited_children):
-        """ Returns the overall output. """
+        """Returns the overall output."""
         output = ""
         for child in visited_children:
             output += str(child)
@@ -852,16 +854,18 @@ class KeyNameVisitor(NodeVisitor):
 
     def visit_word(self, node, visited_children):
         return [node.text]
-    
+
     def generic_visit(self, node, visited_children):
-        """ The generic visit method. """
+        """The generic visit method."""
         if visited_children:
             return [item for sublist in visited_children for item in sublist]
         else:
             return []
 
+
 class MatcherNode:
     """Base class for the tree structure."""
+
     def __init__(self, children: List):
         self.children = list(children)
 
@@ -870,13 +874,14 @@ class MatcherNode:
         raise NotImplementedError()
 
     def __repr__(self):
-        return(f"{type(self).__name__}{[c for c in self.children]}")
+        return f"{type(self).__name__}{[str(c) for c in self.children]}"
+
 
 class GroupNode(MatcherNode):
     def __init__(self, children: List, invert: bool):
         super().__init__(children)
         self.invert = invert
-        
+
     def match(self, item):
         assert len(self.children) == 1
         result = self.children[0].match(item)
