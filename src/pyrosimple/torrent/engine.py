@@ -251,7 +251,8 @@ class FieldDefinition:
         self.formatter = formatter
         if accessor is None:
             self._accessor = lambda o: o.rpc_call("d." + name)
-            self.requires = ["d." + name]
+            if requires is None:
+                self.requires = ["d." + name]
 
         if name in FieldDefinition.FIELDS:
             raise RuntimeError("INTERNAL ERROR: Duplicate field definition")
