@@ -68,13 +68,13 @@ def truth(val, context) -> bool:
 
 
 def unquote_pre_filter(
-    pre_filter: str, _regex: re.Pattern = re.compile(r"[\\]+")
+    pre_filter: str, regex_: re.Pattern = re.compile(r"[\\]+")
 ) -> str:
     """Unquote a pre-filter condition."""
     if pre_filter.startswith('"') and pre_filter.endswith('"'):
         # Unquote outer level
         pre_filter = pre_filter[1:-1]
-        pre_filter = _regex.sub(
+        pre_filter = regex_.sub(
             lambda x: x.group(0)[: len(x.group(0)) // 2], pre_filter
         )
 
