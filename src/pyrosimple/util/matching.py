@@ -51,6 +51,7 @@ FALSE = {
 }
 
 
+
 def truth(val, context) -> bool:
     """Convert truth value in "val" to a boolean."""
     # Try coercing it to an int then a bool
@@ -322,7 +323,6 @@ class PatternFilter(FieldFilter):
                 pattern = torrent.formatting.format_item(self._template, item).replace(
                     "[", "[[]"
                 )
-                ##print('!!!', val, '~~~', pattern, '???')
                 return fnmatch.fnmatchcase(val, pattern.lower())
 
             self._template = self._value
@@ -1027,14 +1027,23 @@ class MatcherBuilder(NodeVisitor):
     def visit_word(self, node, _):
         return node.text
 
+    def visit_quoted(self, node, _):
+        return node.text[1:-1]
+
     def visit_glob(self, node, _):
         return node.text
 
     def visit_regex(self, node, _):
         return node.text  # re.compile(node.text[1:-1])
 
-    def visit_conditional(self, node, _):
-        return node.text
+    def visit_eq(self, node, _):
+        return operator.eq
+
+    def visit_ne(self, node, _):
+        return operator.ne
+
+    def visit_gt(self, node, _):
+        return operator.gt
 
     def generic_visit(self, node, visited_children):
         """The generic visit method."""
@@ -1045,3 +1054,12 @@ class MatcherBuilder(NodeVisitor):
             return real_children
         else:
             return None
+
+
+if __name__ == "__main__":
+    tree = QueryGrammar.parse("name=/asdfsd/ OR /.*/ tagged=test2")
+    print(tree)
+    match_tree = MatcherBuilder().visit(tree)
+    print(match_tree)
+    match_result = match_tree.match(util.parts.Bunch(tagged="test", name="The Thing"))
+    print(match_result)

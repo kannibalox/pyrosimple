@@ -230,7 +230,7 @@ class FieldDefinition:
             # Is it a custom attribute?
             field = TorrentProxy.add_manifold_attribute(name)
 
-        return {"matcher": field._matcher} if field else None
+        return field if field else None
 
     def __init__(
         self,
