@@ -51,7 +51,6 @@ FALSE = {
 }
 
 
-
 def truth(val, context) -> bool:
     """Convert truth value in "val" to a boolean."""
     # Try coercing it to an int then a bool
@@ -299,6 +298,7 @@ class FieldFilter(Filter):  # pylint: disable=abstract-method
 
     def le(self, item) -> bool:
         return self.eq(item) or not self.gt(item)
+
 
 class PatternFilter(FieldFilter):
     """Case-insensitive pattern filter, either a glob or a /regex/ pattern."""
@@ -942,9 +942,7 @@ class AndNode(MatcherNode):
         if len(self.children) == 1:
             return self.children[0].pre_filter()
         else:
-            result = [
-                x.pre_filter() for x in self.children
-            ]
+            result = [x.pre_filter() for x in self.children]
             result = [x for x in result if x]
             if result:
                 if int(config.settings.get("FAST_QUERY")) == 1:
@@ -966,14 +964,13 @@ class OrNode(MatcherNode):
         if len(self.children) == 1:
             return self.children[0].pre_filter()
         else:
-            result = [
-                x.pre_filter() for x in self.children
-            ]
+            result = [x.pre_filter() for x in self.children]
             result = [x for x in result if x]
             if result:
                 # TODO: make this purely value-based (is.nz=…)
                 return "or={%s}" % ",".join(result)
         return ""
+
 
 class ConditionNode(MatcherNode):
     def match(self, item):
