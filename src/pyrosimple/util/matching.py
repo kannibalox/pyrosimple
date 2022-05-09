@@ -842,3 +842,144 @@ class ConditionParser:
             )
 
         return NegateFilter(root) if negate else root
+
+
+grammar = Grammar(
+    r"""
+    query = (group / stmt)+
+    group = (not ws)? lpar ws stmt ws rpar
+    stmt = (or_stmt / conds)
+    or_stmt = conds ws or ws conds
+    conds = cond (ws cond)*
+    cond = (&or / &lpar / &rpar / &not / named_cond / unnamed_cond)
+    named_cond = word conditional filter
+    unnamed_cond = filter
+    filter      = (regex / glob / quoted / word)
+    glob = ~r"[*\.\/\-?!\w]+"
+    regex = ~"/[^/]*/"
+    quoted      = ~'"[^\"]+"'
+    word        = ~r"[\w]+"
+    conditional = (ne / ge / le / lt / gt / eq)
+    ne          = ("!=" / "<>")
+    eq          = ("==" / "=")
+    gt          = ">"
+    lt          = "<"
+    ge          = (">=" / "=+")
+    le          = ("<=" / "=-")
+    fws         = ~r"\s+"
+    ws          = ~r"\s*"
+    lpar = "["
+    rpar = "]"
+    or = "OR"
+    not = ( "NOT" / "!" )
+    """)
+
+class KeyNameVisitor(NodeVisitor):
+    def visit_expr(self, node, visited_children):
+        """ Returns the overall output. """
+        output = ""
+        for child in visited_children:
+            output += str(child)
+        return output
+
+    def visit_named_cond(self, node, visited_children):
+        return visited_children[0]
+
+    def visit_word(self, node, visited_children):
+        return [node.text]
+    
+    def generic_visit(self, node, visited_children):
+        """ The generic visit method. """
+        if visited_children:
+            return [item for sublist in visited_children for item in sublist]
+        else:
+            return []
+
+class MatcherNode:
+    """Base class for the tree structure."""
+    def __init__(self, children: List):
+        self.children = list(children)
+
+    def match(self, item) -> bool:
+        """Check if the item matches. All logic is deferred to subclasses."""
+        raise NotImplementedError()
+
+    def __repr__(self):
+        return(f"{type(self).__name__}{[c for c in self.children]}")
+
+class GroupNode(MatcherNode):
+    def __init__(self, children: List, invert: bool):
+        super().__init__(children)
+        self.invert = invert
+        
+    def match(self, item):
+        assert len(self.children) == 1
+        result = self.children[0].match(item)
+        if self.invert:
+            return not result
+        return result
+
+    def __repr__(self):
+        return(f"{self.invert}{type(self).__name__}[{[c for c in self.children]}]")
+
+class AndNode(MatcherNode):
+    def match(self, item):
+        return all(c.match(item) for c in self.children)
+
+class OrNode(MatcherNode):
+    def match(self, item):
+        return any(c.match(item) for c in self.children)
+
+class ConditionNode(MatcherNode):
+    def match(self, item):
+        assert len(self.children) == 3
+        print(getattr(item, self.children[0]), self.children[1], self.children[2])
+        return True
+
+class MatcherBuilder(NodeVisitor):
+    """Build a simplified tree of MatcherNodes to match an item against."""
+    # pylint: disable=no-self-use,missing-function-docstring
+    def visit_named_cond(self, _node, visited_children):
+        key, cond, needle = visited_children
+        return ConditionNode([key, cond, needle])
+
+    def visit_group(self, _node, visited_children):
+        return GroupNode([c for c in visited_children[1:] if c is not None], visited_children[0])
+
+    def visit_not(self, node, _visited_children):
+        if node.text == "NOT":
+            return True
+        return False
+    
+    def visit_or_stmt(self, _node, visited_children):
+        return OrNode(c for c in visited_children if c is not None)
+
+    def visit_conds(self, _node, visited_children):
+        return AndNode(c for c in visited_children if c is not None)
+
+    def visit_cond(self, node, visited_children):
+        if len(visited_children) == 1 and isinstance(visited_children[0], (str, re.Pattern)):
+            return ConditionNode(["name", "=", visited_children[0]])
+        return self.generic_visit(node, visited_children)
+
+    def visit_word(self, node, _):
+        return node.text
+
+    def visit_glob(self, node, _):
+        return node.text
+
+    def visit_regex(self, node, _):
+        return re.compile(node.text[1:-1])
+
+    def visit_conditional(self, node, _):
+        return node.text
+
+    def generic_visit(self, node, visited_children):
+        """ The generic visit method. """
+        real_children = [c for c in visited_children if c is not None]
+        if real_children:
+            if isinstance(real_children, list) and len(real_children) == 1:
+                return real_children[0]
+            return real_children
+        else:
+            return None
