@@ -21,10 +21,9 @@
 import fnmatch
 import operator
 import re
-import shlex
 import time
 
-from typing import List
+from typing import List, Callable, Any
 
 from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
@@ -213,11 +212,12 @@ class PatternFilter(FieldFilter):
         """Validate filter condition (template method)."""
 
         super().validate()
-        self._value = self._value.lower()
+        self._value: str = self._value.lower()
         self._template = None
-        self._is_regex = self._value.startswith("/") and self._value.endswith("/")
-        if self._is_regex:
-            self._matcher = re.compile(self._value[1:-1]).search
+        self._matcher: Callable[Any, Any]
+        if self._value.startswith("/") and self._value.endswith("/"):
+            regex = re.compile(self._value[1:-1])
+            self._matcher = lambda val, _: regex.search(val)
         elif self._value.startswith("{{") or self._value.endswith("}}"):
 
             def _template_globber(val, item):
@@ -239,7 +239,7 @@ class PatternFilter(FieldFilter):
         if not self._value:
             return '"equal={},cat="'.format(self.PRE_FILTER_FIELDS[self._name])
 
-        if self._is_regex:
+        if self._value.startswith("/") and self._value.endswith("/"):
             needle = self._value[1:-1]
             needle = self.CLEAN_PRE_VAL_RE.sub(" ", needle)
             needle = self.SPLIT_PRE_VAL_RE.split(needle)
@@ -263,7 +263,7 @@ class PatternFilter(FieldFilter):
     def eq(self, item):
         """Return True if filter matches item."""
         val = (getattr(item, self._name) or "").lower()
-        result = self._matcher(val) if self._is_regex else self._matcher(val, item)
+        result = self._matcher(val, item)
         return result
 
 
@@ -694,13 +694,6 @@ class OrNode(MatcherNode):
                 # TODO: make this purely value-based (is.nz=…)
                 return "or={%s}" % ",".join(result)
         return ""
-
-
-class ConditionNode(MatcherNode):
-    def match(self, item):
-        assert len(self.children) == 3
-        print(getattr(item, self.children[0]), self.children[1], self.children[2])
-        return True
 
 
 def create_filter(name: str, op: str, value: str) -> FieldFilter:
