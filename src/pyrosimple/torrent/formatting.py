@@ -185,7 +185,6 @@ def format_item(
 def validate_field_list(
     fields: str,
     allow_fmt_specs=False,
-    name_filter: Optional[Callable[[str], str]] = None,
 ):
     """Make sure the fields in the given list exist.
 
@@ -197,13 +196,10 @@ def validate_field_list(
     formats = [i[4:] for i in globals() if i.startswith("fmt_")]
 
     try:
-        split_fields = [i.strip() for i in fields.replace(",", " ").split()]
+        split_fields = [i.strip() for i in fields.split(",")]
     except AttributeError:
         # Not a string, expecting an iterable
         pass
-
-    if name_filter:
-        split_fields = [name_filter(name) for name in split_fields]
 
     for name in split_fields:
         if allow_fmt_specs and "." in name:
@@ -239,19 +235,25 @@ def validate_sort_fields(sort_fields):
             descending.add(name)
         return name
 
-    # Split and validate field list
-    sort_fields = validate_field_list(sort_fields, name_filter=sort_order_filter)
+    # Create sort specification
+    sort_spec = tuple()
+    for name in sort_fields.split(","):
+        descending = False
+        if name.startswith("-"):
+            name = name[1:]
+            descending = True
+        sort_spec += ((name, descending),)
+
+    # Validate field list
+    validate_field_list(",".join([name for name, _ in sort_spec]))
     log = logging.getLogger(__name__)
     log.debug(
         "Sorting order is: %s",
-        ", ".join([("-" if i in descending else "") + i for i in sort_fields]),
+        ", ".join([("-" if descending else "") + i for i, descending in sort_spec]),
     )
 
-    # No descending fields?
-    if not descending:
-        return operator.attrgetter(*tuple(sort_fields))
-
-    # Need to provide complex key
+    # Need to provide complex key in order to allow for the minimum amount of attribute fetches,
+    # since they could mean a potentially expensive RPC call.
     class Key:
         "Complex sort order key"
 
@@ -261,11 +263,11 @@ def validate_sort_fields(sort_fields):
 
         def __lt__(self, other):
             "Compare to other key"
-            for field in sort_fields:
+            for field, descending in sort_spec:
                 lhs, rhs = getattr(self.obj, field), getattr(other.obj, field)
                 if lhs == rhs:
                     continue
-                return rhs < lhs if field in descending else lhs < rhs
+                return rhs < lhs if descending else lhs < rhs
             return False
 
     return Key
@@ -274,7 +276,9 @@ def validate_sort_fields(sort_fields):
 def get_fields_from_template(
     template: str, item_name: str = "d"
 ) -> Generator[str, None, None]:
-    """Utility function to get field references from a template"""
+    """Utility function to get field references from a template
+
+    E.g: 'Name: {{d.size}}' -> ['size']"""
     for node in env.parse(template).find_all(jinja2.nodes.Getattr):
         if isinstance(node.node, jinja2.nodes.Name) and node.node.name == item_name:
             yield node.attr
