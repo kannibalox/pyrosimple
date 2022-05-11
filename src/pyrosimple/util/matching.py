@@ -53,6 +53,8 @@ FALSE = {
 
 @dataclass
 class FilterOperator:
+    """Small class to hold operator information"""
+
     name: str
     query_repr: str
 
@@ -135,6 +137,7 @@ class GroupNode(MatcherNode):
         return result
 
     def pre_filter(self) -> str:
+        """Return rTorrent condition to speed up data transfer."""
         assert len(self.children) == 1
         inner = str(self.children[0].pre_filter())
         if self.invert:
@@ -284,6 +287,8 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
             f"Filter '{type(self).__name__}' for field '{self._name}' does not support comparison '{self._op}'"
         )
 
+    # Unfortunate but necessary boilerplate functions
+    # pylint: disable=missing-function-docstring
     def ge(self, item) -> bool:
         return self.eq(item) or self.gt(item)
 
@@ -296,6 +301,8 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
     def lt(self, item) -> bool:
         return not self.eq(item) and not self.gt(item)
 
+    # pylint: enable=missing-function-docstring
+
     def pre_filter(self) -> str:
         """Create a prefilter condition (if possible).
 
@@ -305,9 +312,11 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
         return str(getattr(self, method_name)())
 
     def pre_filter_eq(self) -> str:
+        """Returns empty if not defined in subclass."""
         return ""
 
     def pre_filter_gt(self) -> str:
+        """Returns empty if not defined."""
         return ""
 
     def pre_filter_ne(self) -> str:
@@ -414,7 +423,7 @@ class TaggedAsFilter(FieldFilter):
             else:
                 val = self._value
                 if self._exact:
-                    val = val.copy().pop()
+                    val = val.split().pop()
                 return r'"string.contains_i=${},\"{}\""'.format(
                     self.PRE_FILTER_FIELDS[self._name], val.replace('"', r"\\\"")
                 )
@@ -551,15 +560,27 @@ class TimeFilter(NumericFilterBase):
         """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             # Adding a day of fuzz to avoid any possible timezone problems
+            if self._op.name == "gt":
+                timestamp = float(self._value) + 86400
+                cmp_ = "greater"
+            elif self._op.name == "lt":
+                timestamp = float(self._value) - 86400
+                cmp_ = "less"
+            elif self._op.name == "eq":
+                timestamp = 0
+                cmp_ = "equal"
+            else:
+                return ""
             timestamp = float(self._value) + (
                 -86400
-                if self._rt_cmp == "greater"
+                if self._op.name == "gt"
                 else 86400
-                if self._rt_cmp == "less"
+                if self._op.name == "lt"
                 else 0
             )
+
             return '"{}=value=${},value={}"'.format(
-                self._rt_cmp, self.PRE_FILTER_FIELDS[self._name], int(timestamp)
+                cmp_, self.PRE_FILTER_FIELDS[self._name], int(timestamp)
             )
         return ""
 
@@ -587,14 +608,6 @@ class TimeFilter(NumericFilterBase):
 
                 if duration:
                     timestamp = now - timestamp
-                else:
-                    # Invert logic for time deltas (+ = older; - = within the delta range)
-                    if self._cmp == operator.lt:
-                        self._cmp = operator.gt
-                        self._rt_cmp = "greater"
-                    elif self._cmp == operator.gt:
-                        self._cmp = operator.lt
-                        self._rt_cmp = "less"
             else:
                 # Assume it's an absolute date
                 if "/" in self._value:
@@ -650,7 +663,7 @@ class DurationFilter(TimeFilter):
         """Return True if filter matches item."""
         if getattr(item, self._name) is None:
             # Never match "N/A" items, except when "-0" was specified
-            return False if self._value else bool(self._cmp(-1, 0))
+            return bool(self._value)
         else:
             return super().match(item)
 
@@ -755,7 +768,7 @@ class KeyNameVisitor(NodeVisitor):
             return []
 
 
-def create_filter(name: str, op: str, value: str) -> FieldFilter:
+def create_filter(name: str, op: str, value: str):
     """Generates a filter class with the given name, operation and value"""
     filt = torrent.engine.FieldDefinition.lookup(name)._matcher
     return filt(name, op, value)

@@ -19,12 +19,11 @@
 
 import json
 import logging
-import operator
 import os
 import re
 
 from pathlib import Path
-from typing import Callable, Dict, Generator, Optional, Union
+from typing import Dict, Generator, Union
 
 import jinja2
 
@@ -225,16 +224,6 @@ def validate_sort_fields(sort_fields):
 
     If field names are prefixed with '-', sort order is reversed for that field (descending).
     """
-    # Allow descending order per field by prefixing with '-'
-    descending = set()
-
-    def sort_order_filter(name: str) -> str:
-        "Helper to remove flag and memoize sort order"
-        if name.startswith("-"):
-            name = name[1:]
-            descending.add(name)
-        return name
-
     # Create sort specification
     sort_spec = tuple()
     for name in sort_fields.split(","):
