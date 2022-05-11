@@ -581,13 +581,12 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def validate_sort_fields(self):
         """Take care of sorting."""
-        sort_fields = self.options.sort_fields
-        if sort_fields == "*":
-            sort_fields = self.get_output_fields()
+        if self.options.sort_fields is None:
+            self.options.sort_fields = config.settings.SORT_FIELDS
+        if self.options.sort_fields == "*":
+            self.options.sort_fields = self.get_output_fields()
 
-        return formatting.validate_sort_fields(
-            sort_fields or config.settings.SORT_FIELDS
-        )
+        return formatting.validate_sort_fields(self.options.sort_fields)
 
     def show_in_view(self, sourceview, matches, targetname=None):
         """Show search result in ncurses view."""
