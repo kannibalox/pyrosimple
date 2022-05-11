@@ -578,44 +578,42 @@ class RtorrentItem(engine.TorrentProxy):
 class RtorrentEngine:
     """The rTorrent backend proxy."""
 
+    # Bare minimum fields to prefetch
+    BASE_FIELDS = {
+        "d.hash",
+    }
+
     # rTorrent names of fields that never change
-    CONSTANT_FIELDS = set(
-        (
-            "d.hash",
-            "d.name",
-            "d.is_private",
-            "d.is_multi_file",
-            "d.tracker_size",
-            "d.size_bytes",
-        )
-    )
+    CONSTANT_FIELDS = BASE_FIELDS | {
+        "d.name",
+        "d.is_private",
+        "d.is_multi_file",
+        "d.tracker_size",
+        "d.size_bytes",
+    }
 
     # rTorrent names of fields that need to be pre-fetched
-    CORE_FIELDS = CONSTANT_FIELDS | set(
-        (
-            "d.complete",
-            "d.tied_to_file",
-        )
-    )
+    CORE_FIELDS = CONSTANT_FIELDS | {
+        "d.complete",
+        "d.tied_to_file",
+    }
 
     # rTorrent names of fields that get fetched in multi-call
-    PREFETCH_FIELDS = CORE_FIELDS | set(
-        (
-            "d.is_open",
-            "d.is_active",
-            "d.ratio",
-            "d.message",
-            "d.up.rate",
-            "d.up.total",
-            "d.down.rate",
-            "d.down.total",
-            "d.base_path",
-            "d.custom=memo_alias",
-            "d.custom=tm_completed",
-            "d.custom=tm_loaded",
-            "d.custom=tm_started",
-        )
-    )
+    PREFETCH_FIELDS = CORE_FIELDS | {
+        "d.base_path",
+        "d.custom=memo_alias",
+        "d.custom=tm_completed",
+        "d.custom=tm_loaded",
+        "d.custom=tm_started",
+        "d.down.rate",
+        "d.down.total",
+        "d.is_active",
+        "d.is_open",
+        "d.message",
+        "d.ratio",
+        "d.up.rate",
+        "d.up.total",
+    }
 
     def __init__(self, uri=None, auto_open=False):
         """Initialize proxy."""
@@ -810,7 +808,7 @@ class RtorrentEngine:
         if not cache or view.viewname not in self._item_cache:
             # Map pyroscope names to rTorrent ones
             if prefetch:
-                prefetch = self.CORE_FIELDS | set(prefetch)
+                prefetch = self.BASE_FIELDS | set(prefetch)
             else:
                 prefetch = self.PREFETCH_FIELDS
 
