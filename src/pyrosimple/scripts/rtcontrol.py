@@ -704,9 +704,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.validate_output_format(default_output_format)
         sort_key = self.validate_sort_fields()
         query_tree = matching.QueryGrammar.parse(" ".join(self.args))
-        matcher = matching.MatcherBuilder().visit(
-            query_tree
-        )
+        matcher = matching.MatcherBuilder().visit(query_tree)
         self.LOG.debug("Matcher is: %s", matcher)
 
         # View handling
@@ -720,7 +718,13 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Find matching torrents
         view = self.engine.view(self.options.from_view, matcher)
         prefetch = [
-            engine.FieldDefinition.FIELDS[f].requires for f in self.get_output_fields() + matching.KeyNameVisitor().visit(query_tree) + [s[1:] if s.startswith("-") else s for s in self.options.sort_fields.split(",")]
+            engine.FieldDefinition.FIELDS[f].requires
+            for f in self.get_output_fields()
+            + matching.KeyNameVisitor().visit(query_tree)
+            + [
+                s[1:] if s.startswith("-") else s
+                for s in self.options.sort_fields.split(",")
+            ]
         ]
         prefetch = [item for sublist in prefetch for item in sublist]
         matches = list(self.engine.items(view=view, prefetch=prefetch))

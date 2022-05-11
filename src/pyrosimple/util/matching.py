@@ -296,7 +296,6 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
     def lt(self, item) -> bool:
         return not self.eq(item) and not self.gt(item)
 
-
     def pre_filter(self) -> str:
         """Create a prefilter condition (if possible).
 
@@ -315,9 +314,10 @@ class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
         """Create a prefilter by creating a NOT[name=filter] object and rendering it."""
         if self.pre_filter_eq():
             return GroupNode(
-	        [type(self)(self._name, Operators["eq"], self._value)], True
-	    ).pre_filter()
+                [type(self)(self._name, Operators["eq"], self._value)], True
+            ).pre_filter()
         return ""
+
 
 class PatternFilter(FieldFilter):
     """Case-insensitive pattern filter, either a glob or a /regex/ pattern."""
@@ -363,11 +363,11 @@ class PatternFilter(FieldFilter):
         if self._value.startswith("/") and self._value.endswith("/"):
             needle = self._value[1:-1]
             needle = self.CLEAN_PRE_VAL_RE.sub(" ", needle)
-            needle = self.SPLIT_PRE_VAL_RE.split(needle)
+            split_needle = self.SPLIT_PRE_VAL_RE.split(needle)
         else:
             needle = self.CLEAN_PRE_VAL_RE.sub(" ", self._value)
-            needle = self.SPLIT_PRE_GLOB_RE.split(needle)
-        needle = list(sorted(needle, key=len))[-1]
+            split_needle = self.SPLIT_PRE_GLOB_RE.split(needle)
+        needle = list(sorted(split_needle, key=len))[-1]
 
         if needle:
             try:
