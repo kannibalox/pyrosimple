@@ -330,8 +330,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             "-s",
             "--sort-fields",
             metavar="FIELD",
-            action="append",
-            default=[],
             help="fields used for sorting, descending if prefixed with a '-'; '-s*' uses output field list",
         )
         output_group.add_argument(
@@ -583,7 +581,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def validate_sort_fields(self):
         """Take care of sorting."""
-        sort_fields = ",".join(self.options.sort_fields)
+        sort_fields = self.options.sort_fields
         if sort_fields == "*":
             sort_fields = self.get_output_fields()
 
@@ -722,7 +720,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Find matching torrents
         view = self.engine.view(self.options.from_view, matcher)
         prefetch = [
-            engine.FieldDefinition.FIELDS[f].requires for f in self.get_output_fields() + matching.KeyNameVisitor().visit(query_tree)
+            engine.FieldDefinition.FIELDS[f].requires for f in self.get_output_fields() + matching.KeyNameVisitor().visit(query_tree) + [s[1:] if s.startswith("-") else s for s in self.options.sort_fields.split(",")]
         ]
         prefetch = [item for sublist in prefetch for item in sublist]
         matches = list(self.engine.items(view=view, prefetch=prefetch))
