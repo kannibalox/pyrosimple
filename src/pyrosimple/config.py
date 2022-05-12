@@ -96,7 +96,7 @@ def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
 
 
 def autoload_scgi_url() -> str:
-    """Load and return SCGI URL, auto-resolving it if necessary"""
+    """Load and return the SCGI URL, auto-resolving it if necessary."""
     if settings.SCGI_URL:
         return str(settings.SCGI_URL)
     # Get and check config file name

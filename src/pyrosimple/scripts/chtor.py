@@ -371,7 +371,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                                 )
                                 del metainfo["libtorrent_resume"]
                                 self.LOG.info("Writing %r...", filename)
-                                bencode.bwrite(filename, metainfo)
+                                bencode.bwrite(metainfo, filename)
                     else:
                         self.LOG.info("Changing %r...", filename)
 
@@ -382,7 +382,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                                 "." + os.path.basename(filename),
                             )
                             self.LOG.debug("Writing %r...", tempname)
-                            bencode.bwrite(tempname, metainfo)
+                            bencode.bwrite(metainfo, tempname)
 
                             # Replace existing file
                             if os.name != "posix":
