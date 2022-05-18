@@ -811,7 +811,10 @@ class MatcherBuilder(NodeVisitor):
         return self.__pare_children(visited_children, OrNode)
 
     def visit_conds(self, node, visited_children):
-        children = [visited_children[0]] + [c for c in visited_children[1]]
+        if len(visited_children) == 2 and isinstance(visited_children[1], list):
+            children = [visited_children[0]] + visited_children[1]
+        else:
+            children = visited_children
         return self.__pare_children(children, AndNode)
 
     def visit_cond(self, node, visited_children):
