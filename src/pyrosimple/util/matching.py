@@ -355,7 +355,7 @@ class PatternFilter(FieldFilter):
 
             def _template_globber(val, item):
                 """Helper."""
-                pattern = torrent.formatting.format_item(self._template, item).replace(
+                pattern = torrent.formatting.format_item(torrent.formatting.env.from_string(self._template), item).replace(
                     "[", "[[]"
                 )
                 return fnmatch.fnmatchcase(val, pattern.lower())

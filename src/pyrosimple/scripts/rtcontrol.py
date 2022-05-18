@@ -161,7 +161,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     # additional values for output formatting
     FORMATTER_DEFAULTS = dict(
-        now=time.time(),
+        now=time.time,
     )
 
     # choices for --ignore
@@ -809,8 +809,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
 
                 if self.options.dry_run:
-                    if self.options.debug:
-                        self.LOG.debug("Would call action %s(*%r)", action.method, args)
+                    self.LOG.debug("Would call action %s%r", action.method, args)
                 else:
                     getattr(item, action.method)(*args)
                     if self.options.flush:
