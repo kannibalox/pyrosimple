@@ -726,7 +726,7 @@ QueryGrammar = Grammar(
     named_cond = word conditional filter
     unnamed_cond = filter
     filter      = (regex / glob / quoted / word)
-    glob = ~r"[*\.\/\-?!\w]+"
+    glob = ~r"[*\.\/{}|\-?!\w]+"
     regex = ~"/[^/]*/"
     quoted      = ~'"[^\"]*"'
     word        = ~r"[\w]+"
@@ -811,7 +811,8 @@ class MatcherBuilder(NodeVisitor):
         return self.__pare_children(visited_children, OrNode)
 
     def visit_conds(self, node, visited_children):
-        return self.__pare_children(visited_children, AndNode)
+        children = [visited_children[0]] + [c for c in visited_children[1]]
+        return self.__pare_children(children, AndNode)
 
     def visit_cond(self, node, visited_children):
         if len(visited_children) == 1 and isinstance(
