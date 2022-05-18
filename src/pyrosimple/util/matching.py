@@ -119,7 +119,10 @@ class MatcherNode:
         raise NotImplementedError()
 
     def __repr__(self):
-        return f"{type(self).__name__}{[str(c) for c in self.children]}"
+        result = type(self).__name__
+        if self.children:
+            result = str([str(c) for c in self.children])
+        return result
 
 
 class GroupNode(MatcherNode):
