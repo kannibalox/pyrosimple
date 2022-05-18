@@ -79,8 +79,9 @@ def fmt_strip(val: str) -> str:
     return str(val).strip()
 
 
-def fmt_subst(regex, subst):
+def fmt_subst(val, regex, subst):
     """Replace regex with string."""
+    return re.sub(regex, subst, val)
     return lambda text: re.sub(regex, subst, text) if text else text
 
 
