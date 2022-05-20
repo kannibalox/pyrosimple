@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Python Torrent Tools Core Package.
 
     Copyright (c) 2010 The PyroScope Project <pyroscope.project@gmail.com>

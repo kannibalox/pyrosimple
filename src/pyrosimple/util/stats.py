@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Statistics data.
 
     Copyright (c) 2014 The PyroScope Project <pyroscope.project@gmail.com>

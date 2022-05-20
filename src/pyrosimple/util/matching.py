@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=attribute-defined-outside-init
 """ Torrent Item Filters.
 
@@ -355,9 +354,9 @@ class PatternFilter(FieldFilter):
 
             def _template_globber(val, item):
                 """Helper."""
-                pattern = torrent.formatting.format_item(torrent.formatting.env.from_string(self._template), item).replace(
-                    "[", "[[]"
-                )
+                pattern = torrent.formatting.format_item(
+                    torrent.formatting.env.from_string(self._template), item
+                ).replace("[", "[[]")
                 return fnmatch.fnmatchcase(val, pattern.lower())
 
             self._template = self._value
@@ -370,7 +369,7 @@ class PatternFilter(FieldFilter):
         if self._name not in self.PRE_FILTER_FIELDS or self._template:
             return ""
         if not self._value:
-            return '"equal={},cat="'.format(self.PRE_FILTER_FIELDS[self._name])
+            return f'"equal={self.PRE_FILTER_FIELDS[self._name]},cat="'
 
         if self._value.startswith("/") and self._value.endswith("/"):
             needle = self._value[1:-1]
@@ -422,7 +421,7 @@ class TaggedAsFilter(FieldFilter):
         """Return rTorrent condition to speed up data transfer."""
         if self._name in self.PRE_FILTER_FIELDS:
             if not self._value:
-                return '"not=${}"'.format(self.PRE_FILTER_FIELDS[self._name])
+                return f'"not=${self.PRE_FILTER_FIELDS[self._name]}"'
             else:
                 val = self._value
                 if self._exact:
@@ -447,7 +446,7 @@ class TaggedAsFilter(FieldFilter):
         # For exact matches, value is the set to compare to
         if self._exact:
             # Empty tag means empty set, not set of one empty string
-            self._value = set((self._value,)) if self._value else set()
+            self._value = {self._value} if self._value else set()
 
     def match(self, item) -> bool:
         """Return True if filter matches item."""
@@ -514,9 +513,7 @@ class FloatFilter(NumericFilterBase):
     def pre_filter_eq(self):
         if self._name in self.PRE_FILTER_FIELDS:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return '"equal=value=${},value={}"'.format(
-                self.PRE_FILTER_FIELDS[self._name], val
-            )
+            return f'"equal=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
         return ""
 
     def pre_filter_old(self):
@@ -537,8 +534,7 @@ class FloatFilter(NumericFilterBase):
             self._value = float(self._value)
         except (ValueError, TypeError) as exc:
             raise FilterError(
-                "Bad numerical value %r in %r (%s)"
-                % (self._value, self._condition, exc)
+                f"Bad numerical value {self._value!r} in {self._condition!r} ({exc})"
             ) from exc
 
 
@@ -556,7 +552,7 @@ class TimeFilter(NumericFilterBase):
     )
     TIMEDELTA_RE = re.compile(
         "^%s$"
-        % "".join(r"(?:(?P<%s>\d+)[%s%s])?" % (i, i, i.upper()) for i in "ymwdhis")
+        % "".join(r"(?:(?P<{}>\d+)[{}{}])?".format(i, i, i.upper()) for i in "ymwdhis")
     )
 
     def pre_filter(self) -> str:
@@ -598,7 +594,7 @@ class TimeFilter(NumericFilterBase):
                 timestamp = float(self._value)
             except (ValueError, TypeError) as exc:
                 raise FilterError(
-                    "Bad timestamp value %r in %r" % (self._value, self._condition)
+                    f"Bad timestamp value {self._value!r} in {self._condition!r}"
                 ) from exc
         else:
             # Something human readable
@@ -708,7 +704,7 @@ class ByteSizeFilter(NumericFilterBase):
             self._value = float(self._value)
         except (ValueError, TypeError) as exc:
             raise FilterError(
-                "Bad numerical value %r in %r" % (self._value, self._condition)
+                f"Bad numerical value {self._value!r} in {self._condition!r}"
             ) from exc
 
         # Scale to bytes

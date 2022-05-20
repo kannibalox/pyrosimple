@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Configuration.
 
     For details, see https://pyrosimple.readthedocs.io/en/latest/setup.html
@@ -102,7 +101,7 @@ def autoload_scgi_url() -> str:
     # Get and check config file name
     rcfile = Path(settings.RTORRENT_RC).expanduser()
     if not rcfile.exists():
-        raise error.UserError("Config file %r doesn't exist!" % (rcfile,))
+        raise error.UserError(f"Config file {rcfile!r} doesn't exist!")
     scgi_url = scgi_url_from_rtorrentrc(rcfile)
 
     settings.set("SCGI_URL", scgi_url)
@@ -116,7 +115,7 @@ def lookup_announce_alias(name: str):
         if alias.lower() == name.lower():
             return alias, urls
 
-    raise KeyError("Unknown alias %s" % (name,))
+    raise KeyError(f"Unknown alias {name}")
 
 
 def lookup_announce_url(name: str):
@@ -131,7 +130,7 @@ def lookup_announce_url(name: str):
                     result.append(url)
             return alias, result
 
-    raise KeyError("Unknown alias %s" % (name,))
+    raise KeyError(f"Unknown alias {name}")
 
 
 # functools.cache would probably be slightly faster, but it was introduced in 3.9

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ rTorrent Daemon Jobs.
 
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>
@@ -149,7 +148,7 @@ def get_custom_fields(infohash, proxy):
         for key in proxy.d.custom.keys(infohash):
             custom_fields[key] = proxy.d.custom(infohash, key)
     else:
-        info_file = Path(proxy.session.path(), "{}.torrent.rtorrent".format(infohash))
+        info_file = Path(proxy.session.path(), f"{infohash}.torrent.rtorrent")
         proxy.d.save_full_session(infohash)
         with open(info_file, "rb") as fh:
             custom_fields = bencode.bread(fh)["custom"]
@@ -185,12 +184,12 @@ class Mover:
             return False
 
         torrent = bencode.bread(
-            os.path.join(self.proxy.session.path(), "{}.torrent".format(infohash))
+            os.path.join(self.proxy.session.path(), f"{infohash}.torrent")
         )
 
         if keep_basedir:
             esc_basedir = self.proxy.d.directory_base(infohash).replace('"', '"')
-            extra_cmds.insert(0, 'd.directory_base.set="{}"'.format(esc_basedir))
+            extra_cmds.insert(0, f'd.directory_base.set="{esc_basedir}"')
 
         if self.proxy.d.complete(infohash) == 1 and fast_resume:
             self.LOG.debug(
@@ -203,7 +202,7 @@ class Mover:
 
         if not copy:
             self.proxy.d.stop(infohash)
-        self.LOG.debug("Running extra commands on load: {}".format(extra_cmds))
+        self.LOG.debug(f"Running extra commands on load: {extra_cmds}")
         remote_proxy.load.raw("", xml_metafile, *extra_cmds)
         for _ in range(0, 5):
             try:
@@ -217,8 +216,8 @@ class Mover:
         for k, v in get_custom_fields(infohash, self.proxy).items():
             remote_proxy.d.custom.set(infohash, k, v)
         for key in range(1, 5):
-            value = getattr(self.proxy.d, "custom{}".format(key))(infohash)
-            getattr(remote_proxy.d, "custom{}.set".format(key))(infohash, value)
+            value = getattr(self.proxy.d, f"custom{key}")(infohash)
+            getattr(remote_proxy.d, f"custom{key}.set")(infohash, value)
 
         if fast_resume:
             remote_proxy.d.start(infohash)
@@ -249,9 +248,7 @@ class Mover:
                     metahash = i.hash
                     if self.move(metahash, rproxy):
                         self.LOG.info(
-                            "Archived {} to {}".format(
-                                metahash, rproxy.system.hostname()
-                            )
+                            f"Archived {metahash} to {rproxy.system.hostname()}"
                         )
                         break
         except (error.LoggableError, *rpc.ERRORS) as exc:

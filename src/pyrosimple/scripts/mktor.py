@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Metafile Creator.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -112,7 +111,7 @@ class MetafileCreator(ScriptBaseWithConfig):
 
         meta_name = magnet_params.get("xt", [hashlib.sha1(magnet_uri).hexdigest()])[0]
         if "dn" in magnet_params:
-            meta_name = "%s-%s" % (magnet_params["dn"][0], meta_name)
+            meta_name = f"{magnet_params['dn'][0]}-{meta_name}"
         meta_name = (
             re.sub(r"[^-_,a-zA-Z0-9]+", ".", meta_name)
             .strip(".")
@@ -122,13 +121,13 @@ class MetafileCreator(ScriptBaseWithConfig):
         if not self.options.magnet_watch:
             self.fatal("You MUST set the '--magnet-watch' config option!")
         meta_path = os.path.join(
-            self.options.magnet_watch, "magnet-%s.torrent" % meta_name
+            self.options.magnet_watch, f"magnet-{meta_name}.torrent"
         )
         self.LOG.debug("Writing magnet-uri metafile %r...", meta_path)
 
         try:
             bencode.bwrite(meta_path, meta)
-        except EnvironmentError as exc:
+        except OSError as exc:
             self.fatal("Error writing magnet-uri metafile %r (%s)", (meta_path, exc))
             raise
 
@@ -188,21 +187,17 @@ class MetafileCreator(ScriptBaseWithConfig):
         if self.options.hashed:
             try:
                 metafile.add_fast_resume(meta, datapath)
-            except EnvironmentError as exc:
-                self.fatal("Error making fast-resume data (%s)" % (exc,))
+            except OSError as exc:
+                self.fatal(f"Error making fast-resume data ({exc})")
                 raise
 
             hashed_path = re.sub(r"\.torrent$", "", metapath) + "-resume.torrent"
             self.LOG.info("Writing fast-resume metafile %r...", hashed_path)
             try:
                 bencode.bwrite(hashed_path, meta)
-            except EnvironmentError as exc:
+            except OSError as exc:
                 self.fatal(
-                    "Error writing fast-resume metafile %r (%s)"
-                    % (
-                        hashed_path,
-                        exc,
-                    )
+                    f"Error writing fast-resume metafile {hashed_path!r} ({exc})"
                 )
                 raise
 

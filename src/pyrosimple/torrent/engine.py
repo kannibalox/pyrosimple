@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Torrent Engine Interface.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -167,12 +166,12 @@ def _fmt_files(filelist):
             )
             while indent > common:
                 indent -= 1
-                result.append("%s%s/" % (base_indent, " " * indent))
+                result.append(f"{base_indent}{' ' * indent}/")
 
             for dirname in path[common:]:
                 if dirname == "\uFFFE":
                     break
-                result.append("%s%s\\ %s" % (base_indent, " " * indent, dirname))
+                result.append(f"{base_indent}{' ' * indent}\\ {dirname}")
                 indent += 1
 
         result.append(
@@ -190,8 +189,8 @@ def _fmt_files(filelist):
 
     while indent > 0:
         indent -= 1
-        result.append("%s%s/" % (base_indent, " " * indent))
-    result.append("%s= %d file(s)" % (base_indent, len(filelist)))
+        result.append(f"{base_indent}{' ' * indent}/")
+    result.append(f"{base_indent}= {len(filelist)} file(s)")
 
     return "\n".join(result)
 
@@ -216,7 +215,7 @@ class FieldDefinition:
     """Download item field."""
 
     FIELDS: Dict[str, Any] = {}
-    CONSTANT_FIELDS = set(["hash"])
+    CONSTANT_FIELDS = {"hash"}
 
     @classmethod
     def lookup(cls, name):
@@ -260,7 +259,7 @@ class FieldDefinition:
 
     def __repr__(self):
         """Return a representation of internal state."""
-        return "<%s(%r, %r, %r)>" % (
+        return "<{}({!r}, {!r}, {!r})>".format(
             self.__class__.__name__,
             self.valtype,
             self.name,
@@ -275,14 +274,14 @@ class FieldDefinition:
         )
 
     def __delete__(self, obj):
-        raise RuntimeError("Can't delete field %r" % (self.name,))
+        raise RuntimeError(f"Can't delete field {self.name!r}")
 
 
 class ImmutableField(FieldDefinition):
     """Read-only download item field."""
 
     def __set__(self, obj, val):
-        raise RuntimeError("Immutable field %r" % (self.name,))
+        raise RuntimeError(f"Immutable field {self.name!r}")
 
 
 class ConstantField(ImmutableField):
@@ -658,7 +657,7 @@ class TorrentProxy:
                 field = DynamicField(
                     str,
                     name,
-                    "custom attribute %r" % name.split("_", 1)[1],
+                    f"custom attribute {name.split('_', 1)[1]!r}",
                     matcher=matching.PatternFilter,
                 )
                 setattr(cls, name, field)  # add field to all proxy objects
@@ -671,7 +670,7 @@ class TorrentProxy:
                 # pylint: disable=raise-missing-from
                 limit = int(name[5:].lstrip("0") or "0", 10)
                 if limit > 100:
-                    raise error.UserError("kind_N: N > 100 in %r" % name)
+                    raise error.UserError(f"kind_N: N > 100 in {name!r}")
                 field = DynamicField(
                     set,
                     name,
@@ -728,9 +727,9 @@ class TorrentProxy:
             else:
                 return key, val
 
-        return "<%s(%s)>" % (
+        return "<{}({})>".format(
             self.__class__.__name__,
-            ", ".join(sorted(["%s=%r" % mask(k, v) for k, v in self._fields.items()])),
+            ", ".join(sorted("%s=%r" % mask(k, v) for k, v in self._fields.items())),
         )
 
     # TODO: metafile data cache (sqlite, shelve or maybe .ini)

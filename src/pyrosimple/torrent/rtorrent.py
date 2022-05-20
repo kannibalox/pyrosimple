@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ rTorrent Proxy.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -93,7 +92,7 @@ class RtorrentItem(engine.TorrentProxy):
                     observer(result)
         except rpc.ERRORS as exc:
             raise error.EngineError(
-                "While %s torrent #%s: %s" % (command, self._fields["hash"], exc)
+                f"While {command} torrent #{self._fields['hash']}: {exc}"
             )
 
     def _get_files(self, attrs: Optional[List[str]] = None):
@@ -120,12 +119,11 @@ class RtorrentItem(engine.TorrentProxy):
                 "f.is_open=",
             ]
             for attr in attrs or []:
-                f_params.append("f.%s=" % attr)
+                f_params.append(f"f.{attr}=")
             rpc_result = f_multicall(*tuple(f_params))
         except rpc.ERRORS as exc:
             raise error.EngineError(
-                "While %s torrent #%s: %s"
-                % ("getting files for", self._fields["hash"], exc)
+                f"While getting files for torrent #{self._fields['hash']}: {exc}"
             )
         else:
             # self._engine.LOG.debug("files result: %r" % rpc_result)
@@ -159,11 +157,7 @@ class RtorrentItem(engine.TorrentProxy):
         else:
             value = getter(*args, **kwargs)
             self._make_it_so(
-                "caching %s=%r for"
-                % (
-                    name,
-                    value,
-                ),
+                f"caching {name}={value!r} for",
                 ["custom.set"],
                 field[7:],
                 value,
@@ -193,7 +187,7 @@ class RtorrentItem(engine.TorrentProxy):
             # Set custom cache field with value formatted like "80%_flac 20%_jpg" (sorted by percentage)
             histo_str = " ".join(("%d%%_%s" % i).replace(" ", "_") for i in histo)
             self._make_it_so(
-                "setting kind cache %r on" % (histo_str,),
+                f"setting kind cache {histo_str!r} on",
                 ["custom.set"],
                 "kind",
                 histo_str,
@@ -201,7 +195,7 @@ class RtorrentItem(engine.TorrentProxy):
             self._fields["custom_kind"] = histo_str
 
         # Return all non-empty extensions that make up at least <limit>% of total size
-        return set(ext for val, ext in histo if ext and val >= limit)
+        return {ext for val, ext in histo if ext and val >= limit}
 
     def as_dict(self):
         """Return known fields."""
@@ -248,7 +242,7 @@ class RtorrentItem(engine.TorrentProxy):
                 else:
                     val = self._engine.rpc.d.custom(self._fields["hash"], key)
             except rpc.ERRORS as exc:
-                raise error.EngineError("While accessing field %r: %s" % (name, exc))
+                raise error.EngineError(f"While accessing field {name!r}: {exc}")
         else:
             val = getattr(self, name)
 
@@ -277,7 +271,7 @@ class RtorrentItem(engine.TorrentProxy):
             response = self.rpc_call("t.multicall", ["", "t.url=", "t.is_enabled="])
         except rpc.ERRORS as exc:
             raise error.EngineError(
-                "While getting announce URLs for #%s: %s" % (self._fields["hash"], exc)
+                f"While getting announce URLs for #{self._fields['hash']}: {exc}"
             )
 
         if response:
@@ -323,7 +317,7 @@ class RtorrentItem(engine.TorrentProxy):
         if tagset != previous:
             tagset = " ".join(sorted(tagset))
             self._make_it_so(
-                "setting tags %r on" % (tagset,), ["custom.set"], "tags", tagset
+                f"setting tags {tagset!r} on", ["custom.set"], "tags", tagset
             )
             self._fields["custom_tags"] = tagset
 
@@ -337,7 +331,7 @@ class RtorrentItem(engine.TorrentProxy):
         if name not in self._engine.known_throttle_names:
             if self._engine.rpc.throttle.up.max(rpc.NOHASH, name) == -1:
                 if self._engine.rpc.throttle.down.max(rpc.NOHASH, name) == -1:
-                    raise error.UserError("Unknown throttle name '{}'".format(name))
+                    raise error.UserError(f"Unknown throttle name '{name}'")
             self._engine.known_throttle_names.add(name)
 
         if (name or "NONE") == self.fetch("throttle"):
@@ -354,9 +348,7 @@ class RtorrentItem(engine.TorrentProxy):
                 "Torrent #%s stopped for throttling", self._fields["hash"]
             )
             self.stop()
-        self._make_it_so(
-            "setting throttle %r on" % (name,), ["throttle_name.set"], name
-        )
+        self._make_it_so(f"setting throttle {name!r} on", ["throttle_name.set"], name)
         if active:
             self._engine.LOG.debug(
                 "Torrent #%s restarted after throttling",
@@ -384,14 +376,13 @@ class RtorrentItem(engine.TorrentProxy):
             method, args = "custom" + key + ".set", [value]
         elif not (key[0].isalpha() and key.replace("_", "").isalnum()):
             raise error.UserError(
-                "Bad custom field name %r (must only contain a-z, A-Z, 0-9 and _)"
-                % (key,)
+                f"Bad custom field name {key!r} (must only contain a-z, A-Z, 0-9 and _)"
             )
         else:
             method, args = "custom.set", [key, value]
 
         # Make the assignment
-        self._make_it_so("setting custom_%s = %r on" % (key, value), [method], *args)
+        self._make_it_so(f"setting custom_{key} = {value!r} on", [method], *args)
         self._fields["custom_" + key] = value
 
     def hash_check(self):
@@ -403,10 +394,7 @@ class RtorrentItem(engine.TorrentProxy):
         args_list = ""
         if args:
             args_list = '"' + '","'.join(args) + '"'
-        print(
-            "%s\t%s\t%s=%s"
-            % (self._fields["hash"], data, method.lstrip(":"), args_list)
-        )
+        print(f"{self._fields['hash']}\t{data}\t{method.lstrip(':')}={args_list}")
 
     def execute(self, commands):
         """Execute RPC command(s)."""
@@ -421,7 +409,7 @@ class RtorrentItem(engine.TorrentProxy):
                 args = tuple(CommaLexer(args))
             except (ValueError, TypeError) as exc:
                 raise error.UserError(
-                    "Bad command %r, probably missing a '=' (%s)" % (command, exc)
+                    f"Bad command {command!r}, probably missing a '=' ({exc})"
                 )
 
             observer = None
@@ -550,18 +538,18 @@ class RtorrentItem(engine.TorrentProxy):
                     path,
                     len(residue),
                     "entry" if len(residue) == 1 else "entries",
-                    (" (%d ignorable)" % len(ignorable)) if ignorable else "",
+                    f" ({len(ignorable)} ignorable)" if ignorable else "",
                 )
             else:
                 for waif in ignorable:  # - doomed:
                     waif = os.path.join(path, waif)
-                    self._engine.LOG.debug("Deleting waif '%s'" % (waif,))
+                    self._engine.LOG.debug(f"Deleting waif '{waif}'")
                     if not dry_run:
                         try:
                             os.remove(waif)
-                        except EnvironmentError as exc:
+                        except OSError as exc:
                             self._engine.LOG.warning(
-                                "Problem deleting waif '%s' (%s)" % (waif, exc)
+                                f"Problem deleting waif '{waif}' ({exc})"
                             )
 
                 doomed.update(remove_with_links(path))
@@ -664,7 +652,7 @@ class RtorrentEngine:
         """Return a representation of internal state."""
         if self.rpc:
             # Connected state
-            return "%s connected to %s [%s, up %s] via %r" % (
+            return "{} connected to {} [{}, up {}] via {!r}".format(
                 self.__class__.__name__,
                 self.engine_id,
                 self.engine_software,
@@ -673,7 +661,7 @@ class RtorrentEngine:
             )
         else:
             # Unconnected state
-            return "%s connectable via %r" % (
+            return "{} connectable via {!r}".format(
                 self.__class__.__name__,
                 config.settings.SCGI_URL,
             )
@@ -690,7 +678,7 @@ class RtorrentEngine:
                 # Only works with rTorrent-PS at this time!
                 viewname = self.open().ui.current_view()
             except rpc.ERRORS as exc:
-                raise error.EngineError("Can't get name of current view: %s" % (exc))
+                raise error.EngineError(f"Can't get name of current view: {exc}")
 
         return viewname
 
@@ -766,7 +754,7 @@ class RtorrentEngine:
         The result list contains named tuples,
         so you can access the fields directly by their name.
         """
-        commands = tuple("d.{}=".format(x) for x in fields)
+        commands = tuple(f"d.{x}=" for x in fields)
         items = self.open().d.multicall2("", viewname, *commands)
         return Bunch(dict(zip([x.replace(".", "_") for x in fields], items)))
 
@@ -843,7 +831,7 @@ class RtorrentEngine:
                         pre_filter = matching.unquote_pre_filter(
                             view.matcher.pre_filter()
                         )
-                        self.LOG.info("!!! pre-filter: {}".format(pre_filter or "N/A"))
+                        self.LOG.info(f"!!! pre-filter: {pre_filter or 'N/A'}")
                         if pre_filter:
                             multi_call = self.open().d.multicall.filtered
                             multi_args.insert(2, pre_filter)
@@ -873,7 +861,7 @@ class RtorrentEngine:
                         yield items[-1]
             except rpc.ERRORS as exc:
                 raise error.EngineError(
-                    "While getting download items from %r: %s" % (self, exc)
+                    f"While getting download items from {self!r}: {exc}"
                 )
 
             # Everything yielded, store for next iteration
@@ -897,7 +885,7 @@ class RtorrentEngine:
 
         if append and disjoin:
             raise error.EngineError(
-                "Cannot BOTH append to / disjoin from view '{}'".format(view_name)
+                f"Cannot BOTH append to / disjoin from view '{view_name}'"
             )
 
         # Add view if needed

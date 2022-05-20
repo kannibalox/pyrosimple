@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ rTorrent Watch Jobs.
 
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>
@@ -61,11 +60,11 @@ class MetafileHandler:
                 self.job.LOG.warning("Ignoring 0-byte metafile '%s'", self.ns.pathname)
                 return False
             self.metadata = metafile.checked_open(self.ns.pathname)
-        except EnvironmentError as exc:
+        except OSError as exc:
             self.job.LOG.error(
                 "Can't read metafile '%s' (%s)",
                 self.ns.pathname,
-                str(exc).replace(": '%s'" % self.ns.pathname, ""),
+                str(exc).replace(f": '{self.ns.pathname}'", ""),
             )
             return False
         except ValueError as exc:
@@ -113,7 +112,7 @@ class MetafileHandler:
         # Build indicator flags for target state from filename
         flags = self.ns.pathname.split(os.sep)
         flags.extend(flags[-1].split("."))
-        self.ns.flags = set(i for i in flags if i)
+        self.ns.flags = {i for i in flags if i}
 
         # Metafile stuff
         announce = self.metadata.get("announce", None)
@@ -147,9 +146,7 @@ class MetafileHandler:
             try:
                 self.ns.commands.append(formatting.format_item(cmd, self.ns))
             except error.LoggableError as exc:
-                self.job.LOG.error(
-                    "While expanding '%s' custom command: %s" % (key, exc)
-                )
+                self.job.LOG.error(f"While expanding '{key}' custom command: {exc}")
 
     def load(self):
         """Load metafile into client."""
@@ -185,7 +182,8 @@ class MetafileHandler:
             self.job.LOG.debug(
                 "Templating values are:\n    %s"
                 % "\n    ".join(
-                    "%s=%s" % (key, repr(val)) for key, val in sorted(self.ns.items())
+                    "{}={}".format(key, repr(val))
+                    for key, val in sorted(self.ns.items())
                 )
             )
 
@@ -198,7 +196,7 @@ class MetafileHandler:
                     name = self.job.proxy.d.name(self.ns.info_hash)
                 except rpc.HashNotFound:
                     name = "NOHASH"
-                msg = "%s: Loaded '%s' from '%s/'%s%s" % (
+                msg = "{}: Loaded '{}' from '{}/'{}{}".format(
                     self.job.__class__.__name__,
                     name,
                     os.path.dirname(self.ns.pathname).rstrip(os.sep),
@@ -253,14 +251,14 @@ class TreeWatchHandler(pyinotify.ProcessEvent):
 
     def handle_path(self, event):
         """Handle a path-related event."""
-        self.job.LOG.debug("Notification %r" % event)
+        self.job.LOG.debug(f"Notification {event!r}")
         if event.dir:
             return
 
         if any(event.pathname.endswith(i) for i in self.METAFILE_EXT):
             MetafileHandler(self.job, event.pathname).handle()
         elif os.path.basename(event.pathname) == "watch.ini":
-            self.job.LOG.info("NOT YET Reloading watch config for '%s'" % event.path)
+            self.job.LOG.info(f"NOT YET Reloading watch config for '{event.path}'")
             # TODO: Load new metadata
 
     def process_IN_CLOSE_WRITE(self, event):
@@ -278,9 +276,9 @@ class TreeWatchHandler(pyinotify.ProcessEvent):
         if self.job.LOG.isEnabledFor(logging.DEBUG):
             # On debug level, we subscribe to ALL events, so they're expected in that case ;)
             if self.job.config.trace_inotify:
-                self.job.LOG.debug("Ignored inotify event:\n    %r" % event)
+                self.job.LOG.debug(f"Ignored inotify event:\n    {event!r}")
         else:
-            self.job.LOG.warning("Unexpected inotify event %r" % event)
+            self.job.LOG.warning(f"Unexpected inotify event {event!r}")
 
 
 class TreeWatch:
@@ -310,7 +308,7 @@ class TreeWatch:
         }
         for path in self.config["path"]:
             if not path.is_dir():
-                raise error.UserError("Path '%s' is not a directory!" % path)
+                raise error.UserError(f"Path '{path}' is not a directory!")
 
         # Assemble custom commands
         self.custom_cmds = self.config["cmd"]
@@ -328,7 +326,7 @@ class TreeWatch:
         """
         if not pyinotify.WatchManager:
             raise error.UserError(
-                "You need to install 'pyinotify' to use %s!" % (self.__class__.__name__)
+                f"You need to install 'pyinotify' to use {self.__class__.__name__}!"
             )
 
         self.manager = pyinotify.WatchManager()
@@ -409,11 +407,11 @@ class TreeWatchCommand(ScriptBaseWithConfig):
         else:
             config = Bunch()
             config.update(
-                dict(
-                    (key.split(".", 2)[-1], val)
+                {
+                    key.split(".", 2)[-1]: val
                     for key, val in configuration.settings.TORQUE.items()
                     if key.startswith("job.treewatch.")
-                )
+                }
             )
             config.update(
                 dict(
@@ -437,7 +435,7 @@ class TreeWatchCommand(ScriptBaseWithConfig):
                 self.LOG.info(
                     "Templating values are:\n    %s",
                     "\n    ".join(
-                        "%s=%s" % (key, post_process(repr(val)))
+                        f"{key}={post_process(repr(val))}"
                         for key, val in sorted(handler.ns.items())
                     ),
                 )

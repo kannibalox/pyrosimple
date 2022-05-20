@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Perform raw XMLRPC calls.
 
     Copyright (c) 2010 The PyroScope Project <pyroscope.project@gmail.com>
@@ -52,9 +51,7 @@ def read_blob(arg):
     result = None
     if arg == "@-":
         result = sys.stdin.read()
-    elif any(
-        arg.startswith("@{}://".format(x)) for x in ["http", "https", "ftp", "file"]
-    ):
+    elif any(arg.startswith(f"@{x}://") for x in ["http", "https", "ftp", "file"]):
         if not requests_found:
             raise error.UserError(
                 "You must 'pip install requests' to support @URL arguments."
@@ -262,7 +259,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 args = self.cooked(raw_args)
                 self.execute(proxy, method, args)
             except EOFError:
-                print("Bye from {!r}".format(proxy))
+                print(f"Bye from {proxy!r}")
                 break
 
     def do_import(self):
@@ -272,9 +269,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             if self.args[0].startswith("@") and self.args[0] != "@-":
                 import_file = os.path.expanduser(self.args[0][1:])
                 if not os.path.isfile(import_file):
-                    self.parser.error(
-                        "File not found (or not a file): {}".format(import_file)
-                    )
+                    self.parser.error(f"File not found (or not a file): {import_file}")
                 args = (rpc.NOHASH, os.path.abspath(import_file))
             else:
                 script_text = "\n".join(self.args + [""])
@@ -315,18 +310,15 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             "Helper"
             for arg in self.args:
                 if os.path.isdir(arg):
-                    for name in glob.glob(os.path.join(arg, "*.torrent.rtorrent")):
-                        yield name
+                    yield from glob.glob(os.path.join(arg, "*.torrent.rtorrent"))
                 elif arg == "@-":
                     for line in sys.stdin.read().splitlines():
                         if line.strip():
                             yield line.strip()
                 elif arg.startswith("@"):
                     if not os.path.isfile(arg[1:]):
-                        self.parser.error(
-                            "File not found (or not a file): {}".format(arg[1:])
-                        )
-                    with io.open(arg[1:], encoding="utf-8") as handle:
+                        self.parser.error(f"File not found (or not a file): {arg[1:]}")
+                    with open(arg[1:], encoding="utf-8") as handle:
                         for line in handle:
                             if line.strip():
                                 yield line.strip()
@@ -351,11 +343,11 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 with open(filename, "rb") as handle:
                     raw_data = handle.read()
                 data = bencode.bdecode(raw_data)
-            except EnvironmentError as exc:
+            except OSError as exc:
                 self.LOG.warning(
                     "Can't read '%s' (%s)",
                     filename,
-                    str(exc).replace(": '%s'" % filename, ""),
+                    str(exc).replace(f": '{filename}'", ""),
                 )
                 continue
 

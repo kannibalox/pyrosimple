@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Color theme support.
 
     Copyright (c) 2017 The PyroScope Project <pyroscope.project@gmail.com>
@@ -57,12 +56,12 @@ class ThemeSwitcher(ScriptBaseWithConfig):
         # Read persisted state
         selected_themes = []
         if os.path.exists(selected_file):
-            with open(selected_file, "rt", encoding="ascii") as handle:
+            with open(selected_file, encoding="ascii") as handle:
                 selected_themes = [x.strip() for x in handle]
 
         current_theme = None
         if os.path.exists(current_file):
-            with open(current_file, "rt", encoding="ascii") as handle:
+            with open(current_file, encoding="ascii") as handle:
                 current_theme = handle.readline().strip()
 
         # Scan config for available themes
@@ -90,7 +89,7 @@ class ThemeSwitcher(ScriptBaseWithConfig):
             for name in (self.options.toggle or "").replace(",", " ").split():
                 if name not in themes:
                     self.parser.error(
-                        "Unknown theme {0!r}, use '--list' to show them".format(name)
+                        f"Unknown theme {name!r}, use '--list' to show them"
                     )
                 elif name in selected_themes:
                     selected_themes = [x for x in selected_themes if x != name]
@@ -105,7 +104,7 @@ class ThemeSwitcher(ScriptBaseWithConfig):
                     print(
                         "{} {} {}".format(
                             "*" if name == current_theme else " ",
-                            "{:2d}".format(selected_themes.index(name) + 1)
+                            f"{selected_themes.index(name) + 1:2d}"
                             if name in selected_themes
                             else "  ",
                             name,

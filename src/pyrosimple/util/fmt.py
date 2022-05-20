@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=invalid-name,no-else-return
 """ Data Formatting.
 
@@ -48,9 +47,9 @@ def human_size(size: float) -> str:
     for unit in ("KiB", "MiB", "GiB", "TiB"):
         rem /= 1024.0
         if rem < 1024:
-            return "%6.1f %s" % (rem, unit)
+            return f"{rem:6.1f} {unit}"
 
-    return "%6.1f TiB" % rem
+    return f"{rem:6.1f} TiB"
 
 
 def iso_datetime(timestamp: Optional[float] = None) -> str:

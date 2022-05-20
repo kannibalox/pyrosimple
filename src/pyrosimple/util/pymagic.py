@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Python Utility Functions.
 
     Copyright (c) 2009, 2010 The PyroScope Project <pyroscope.project@gmail.com>
@@ -50,7 +49,7 @@ def import_name(module_spec, name=None):
     try:
         module = __import__(module_name, globals(), {}, [name])
     except ImportError as exc:
-        raise ImportError("Bad module name in %r (%s)" % (module_spec, exc)) from exc
+        raise ImportError(f"Bad module name in {module_spec!r} ({exc})") from exc
 
     # Resolve the requested name
     result = module

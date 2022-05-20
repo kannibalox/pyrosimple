@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=attribute-defined-outside-init
 """ rTorrent queue manager & daemon.
 
@@ -95,7 +94,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 if key == "jitter":
                     val = int(val)
             except (TypeError, ValueError):
-                self.fatal("Bad param '%s' in job schedule '%s'" % (param, schedule))
+                self.fatal(f"Bad param '{param}' in job schedule '{schedule}'")
             else:
                 result[key] = val
 
@@ -108,7 +107,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             for key in ("handler", "schedule"):
                 if key not in params:
                     self.fatal(
-                        "Job '%s' is missing the required '%s' parameter" % (name, key)
+                        f"Job '{name}' is missing the required '{key}' parameter"
                     )
             self.jobs[name] = dict(params)
             if params.get("active", False):
@@ -124,7 +123,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     params["handler"].run,
                     name=name,
                     trigger="cron",
-                    **params["schedule"]
+                    **params["schedule"],
                 )
 
     def _run_forever(self):
@@ -201,8 +200,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         # Check for guard file and running daemon, abort if not OK
         if self.options.guard_file and not os.path.exists(self.options.guard_file):
-            raise EnvironmentError(
-                "Guard file '%s' not found, won't start!" % self.options.guard_file
+            raise OSError(
+                f"Guard file '{self.options.guard_file}' not found, won't start!"
             )
 
         # Check if we only need to run once

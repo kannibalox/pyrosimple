@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Metafile Lister.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -77,7 +76,7 @@ class MetafileLister(ScriptBase):
                         filename,
                         log=self.LOG if self.options.skip_validation else None,
                     )
-                except EnvironmentError as exc:
+                except OSError as exc:
                     self.fatal(
                         "Can't read '%s' (%s)"
                         % (

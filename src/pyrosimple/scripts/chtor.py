@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Metafile Editor.
 
     Copyright (c) 2010 The PyroScope Project <pyroscope.project@gmail.com>
@@ -47,7 +46,7 @@ def replace_fields(meta, patterns):
 
             namespace[keypath[-1]] = re.sub(regex, subst, namespace[keypath[-1]])
         except (KeyError, IndexError, TypeError, ValueError) as exc:
-            raise error.UserError("Bad substitution '%s' (%s)!" % (pattern, exc))
+            raise error.UserError(f"Bad substitution '{pattern}' ({exc})!")
 
     return meta
 
@@ -225,7 +224,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                 # Read and remember current content
                 metainfo = bencode.bread(filename)
                 old_metainfo = bencode.bencode(metainfo)
-            except (EnvironmentError, KeyError, bencode.BencodeDecodeError) as exc:
+            except (OSError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.LOG.warning(
                     "Skipping bad metafile %r (%s: %s)",
                     filename,
@@ -344,7 +343,7 @@ class MetafileChanger(ScriptBaseWithConfig):
                         datadir = datadir.replace("{}", metainfo["info"]["name"])
                     try:
                         metafile.add_fast_resume(metainfo, datadir)
-                    except EnvironmentError as exc:
+                    except OSError as exc:
                         self.fatal("Error making fast-resume data (%s)", exc)
                         raise
 
@@ -391,7 +390,7 @@ class MetafileChanger(ScriptBaseWithConfig):
 
                             try:
                                 os.rename(tempname, filename)
-                            except EnvironmentError as exc:
+                            except OSError as exc:
                                 # TODO: Try to write directly, keeping a backup!
                                 raise error.LoggableError(
                                     "Can't rename tempfile %r to %r (%s)"

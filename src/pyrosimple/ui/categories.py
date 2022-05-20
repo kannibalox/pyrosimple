@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Category management.
 
     Copyright (c) 2017 The PyroScope Project <pyroscope.project@gmail.com>
@@ -55,7 +54,7 @@ class CategoryManager(ScriptBaseWithConfig):
                 current_view = views[0]
             else:
                 raise error.UserError(
-                    "There are no '{}*' views defined at all!".format(self.PREFIX)
+                    f"There are no '{self.PREFIX}*' views defined at all!"
                 )
 
         # Check options
@@ -90,7 +89,7 @@ class CategoryManager(ScriptBaseWithConfig):
 
         else:
             self.LOG.info(
-                "Current category view is '{}'.".format(current_view[self.PREFIX_LEN :])
+                f"Current category view is '{current_view[self.PREFIX_LEN :]}'."
             )
             self.LOG.info("Use '--help' to get usage information.")
 

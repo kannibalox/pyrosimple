@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Torrent Item Formatting and Filter Rule Parsing.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -137,11 +136,7 @@ env = Environment(
     loader=FileSystemLoader([Path("~/.config/pyrosimple/templates/").expanduser()]),
 )
 env.filters.update(
-    dict(
-        (name[4:], method)
-        for name, method in globals().items()
-        if name.startswith("fmt_")
-    )
+    {name[4:]: method for name, method in globals().items() if name.startswith("fmt_")}
 )
 
 # TODO: All constant stuff should be calculated once, make this a class or something
@@ -207,14 +202,14 @@ def validate_field_list(
             for fmtspec in fmtspecs.split("."):
                 if fmtspec not in formats and fmtspec != "raw":
                     raise error.UserError(
-                        "Unknown format specification %r in %r" % (fmtspec, fullname)
+                        f"Unknown format specification {fmtspec!r} in {fullname!r}"
                     )
 
         if (
             name not in engine.FieldDefinition.FIELDS
             and not engine.TorrentProxy.add_manifold_attribute(name)
         ):
-            raise error.UserError("Unknown field name %r" % (name,))
+            raise error.UserError(f"Unknown field name {name!r}")
 
     return split_fields
 

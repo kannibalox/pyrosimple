@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ rTorrent Queue Manager.
 
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>
@@ -38,13 +37,12 @@ class QueueManager:
         self.LOG.debug("Queue manager created with config %r", self.config)
 
         bool_param = lambda key, default: matching.truth(
-            self.config.get(key, default), "job.%s.%s" % (self.config.job_name, key)
+            self.config.get(key, default), f"job.{self.config.job_name}.{key}"
         )
         self.config.viewname = self.config.get("viewname", "pyrotorque")
         self.config.quiet = bool_param("quiet", False)
         self.config.startable = matching.QueryGrammar.parse(
-            "[ %s ] [ is_open=no is_active=no is_complete=no ]"
-            % (self.config.startable)
+            f"[ {self.config.startable} ] [ is_open=no is_active=no is_complete=no ]"
         )
         self.LOG.info(
             "Startable matcher for '%s' is: [ %s ]",
@@ -54,7 +52,7 @@ class QueueManager:
         self.config.downloading = matching.QueryGrammar.parse(
             "is_active=1 is_complete=0"
             + (
-                " [ %s ]" % self.config.downloading
+                f" [ {self.config.downloading} ]"
                 if "downloading" in self.config
                 else ""
             )

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Metafile Support.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -87,7 +86,7 @@ def console_progress():
         "Helper"
         msg = " " * 30
         if totalhashed < totalsize:
-            msg = "%5.1f%% complete" % (totalhashed * 100.0 / totalsize)
+            msg = f"{totalhashed * 100.0 / totalsize:5.1f}% complete"
         sys.stdout.write(msg + " \r")
         sys.stdout.flush()
 
@@ -135,9 +134,9 @@ def check_info(info):
 
     name = info.get("name")
     if not isinstance(name, str):
-        raise ValueError("bad metainfo - bad name (type is %r)" % type(name).__name__)
+        raise ValueError(f"bad metainfo - bad name (type is {type(name).__name__!r})")
     if not ALLOWED_ROOT_NAME.match(name):
-        raise ValueError("name %s disallowed for security reasons" % name)
+        raise ValueError(f"name {name} disallowed for security reasons")
 
     if ("files" in info) == ("length" in info):
         raise ValueError("single/multiple file mix")
@@ -172,7 +171,7 @@ def check_info(info):
                         % "/".join(path)
                     )
                 if part and not ALLOWED_PATH_NAME.match(part):
-                    raise ValueError("path %s disallowed for security reasons" % part)
+                    raise ValueError(f"path {part} disallowed for security reasons")
 
         file_paths = [os.sep.join(item["path"]) for item in files]
         if len(set(file_paths)) != len(file_paths):
@@ -206,7 +205,7 @@ def clean_meta(meta: Dict, including_info: bool = False, logger=None):
     for key in list(meta.keys()):
         if [key] not in METAFILE_STD_KEYS:
             if logger:
-                logger("Removing key %r..." % (key,))
+                logger(f"Removing key {key!r}...")
             del meta[key]
             modified.add(key)
 
@@ -214,7 +213,7 @@ def clean_meta(meta: Dict, including_info: bool = False, logger=None):
         for key in list(meta["info"].keys()):
             if ["info", key] not in METAFILE_STD_KEYS:
                 if logger:
-                    logger("Removing key %r..." % ("info." + key,))
+                    logger(f"Removing key {'info.' + key!r}...")
                 del meta["info"][key]
                 modified.add("info." + key)
 
@@ -298,9 +297,7 @@ def assign_fields(meta, assignments: List[str]):
                 # Create missing dicts as we go...
                 namespace = namespace.setdefault(key, {})
         except (KeyError, IndexError, TypeError, ValueError) as exc:
-            raise error.UserError(
-                "Bad assignment %r (%s)!" % (assignment, exc)
-            ) from exc
+            raise error.UserError(f"Bad assignment {assignment!r} ({exc})!") from exc
         else:
             if val is None:
                 del namespace[keypath[-1]]
@@ -378,7 +375,7 @@ def data_size(metadata) -> int:
         # Single file
         return int(info["length"])
     # Directory structure
-    return sum([f["length"] for f in info["files"]])
+    return sum(f["length"] for f in info["files"])
 
 
 def checked_open(filename: str, log: logging.Logger = None):
@@ -397,7 +394,7 @@ def checked_open(filename: str, log: logging.Logger = None):
             raise ValueError("Bad bencoded data - dict keys out of order?")
     except ValueError as exc:
         if log:
-            log.warning("%s: %s" % (filename, exc))
+            log.warning(f"{filename}: {exc}")
         else:
             raise
 
@@ -434,7 +431,7 @@ class Metafile:
         """Get a valid datapath, else raise an exception."""
         if self._datapath is None:
             raise OSError(
-                errno.ENOENT, "You didn't provide any datapath for %r" % self.filename
+                errno.ENOENT, f"You didn't provide any datapath for {self.filename!r}"
             )
 
         return self._datapath
@@ -641,7 +638,7 @@ class Metafile:
                     tracker_url = tracker_url[0]
             except (KeyError, IndexError) as exc:
                 raise error.UserError(
-                    "Bad tracker URL %r, or unknown alias!" % (tracker_url,)
+                    f"Bad tracker URL {tracker_url!r}, or unknown alias!"
                 ) from exc
 
             # Determine metafile name
@@ -733,7 +730,7 @@ class Metafile:
 
         # Build result
         result: List[str] = [
-            "NAME %s" % (Path(self.filename).name),
+            f"NAME {Path(self.filename).name}",
             "SIZE %s (%i * %s + %s)"
             % (
                 fmt.human_size(total_size).strip(),
@@ -747,8 +744,8 @@ class Metafile:
                 fmt.human_size(len(info["pieces"])).strip(),
                 100.0 * len(info["pieces"]) / os.path.getsize(self.filename),
             ),
-            "HASH %s" % (infohash.hexdigest().upper()),
-            "URL  %s" % (mask_keys if masked else str)(announce),
+            f"HASH {infohash.hexdigest().upper()}",
+            f"URL  {(mask_keys if masked else str)(announce)}",
             "PRV  %s"
             % (
                 "YES (DHT/PEX disabled)"
@@ -767,7 +764,7 @@ class Metafile:
 
         for label, key in (("BY  ", "created by"), ("REM ", "comment")):
             if key in metainfo:
-                result.append("%s %s" % (label, metainfo.get(key, "N/A")))
+                result.append(f"{label} {metainfo.get(key, 'N/A')}")
 
         result.extend(
             [
@@ -787,7 +784,7 @@ class Metafile:
             )
         else:
             # Directory structure
-            result.append("%s/" % info["name"])
+            result.append(f"{info['name']}/")
             oldpaths = [None] * 99
             for entry in info["files"]:
                 # Remove crap that certain PHP software puts in paths
@@ -795,7 +792,7 @@ class Metafile:
 
                 for idx, item in enumerate(entry_path[:-1]):
                     if item != oldpaths[idx]:
-                        result.append("%s%s/" % (" " * (4 * (idx + 1)), item))
+                        result.append(f"{' ' * (4 * (idx + 1))}{item}/")
                         oldpaths[idx] = item
                 result.append(
                     "%-69s%9s"

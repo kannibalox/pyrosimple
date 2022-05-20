@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ RTorrent client proxy.
 
     Copyright (c) 2011 The PyroScope Project <pyroscope.project@gmail.com>

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Command Line Script Support.
 
     Copyright (c) 2009, 2010 The PyroScope Project <pyroscope.project@gmail.com>
@@ -73,9 +72,7 @@ class ScriptBase:
             self.__version__ = importlib.metadata.version("pyrosimple")
         except ImportError:
             self.__version__ = "unknown"
-        self.version_info = "{} on Python {}".format(
-            self.__version__, sys.version.split()[0]
-        )
+        self.version_info = f"{self.__version__} on Python {sys.version.split()[0]}"
 
         self.parser = ArgumentParser(
             usage="%(prog)s [options] " + self.ARGS_HELP + "\n\n"
@@ -124,7 +121,7 @@ class ScriptBase:
                 .replace("-", "_")
             )
         if "default" in kwargs and kwargs["default"]:
-            kwargs["help"] += " [%s]" % kwargs["default"]
+            kwargs["help"] += f" [{kwargs['default']}]"
         if "choices" in kwargs:
             del kwargs["type"]
         self.parser.add_argument(*args[:-1], **kwargs)
@@ -198,10 +195,10 @@ class ScriptBase:
                 print()
                 self.LOG.critical("Aborted by CTRL-C!\n")
                 sys.exit(error.EX_TEMPFAIL)
-            except IOError as exc:
+            except OSError as exc:
                 # [Errno 32] Broken pipe?
                 if exc.errno == errno.EPIPE:
-                    print("\n%s, exiting!\n" % exc, file=sys.stderr)
+                    print(f"\n{exc}, exiting!\n", file=sys.stderr)
                     sys.exit(error.EX_IOERR)
                 else:
                     raise

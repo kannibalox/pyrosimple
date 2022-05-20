@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=no-self-use,too-many-lines,too-many-nested-blocks
 """ rTorrent Control.
 
@@ -48,19 +47,17 @@ def print_help_fields():
     print("")
     print("Fields are:")
     print(
-        (
-            "\n".join(
-                [
-                    "  %-21s %s" % (name, field.__doc__)
-                    for name, field in sorted(
-                        list(engine.FieldDefinition.FIELDS.items())
-                        + [
-                            custom_manifold(),
-                            kind_manifold(),
-                        ]
-                    )
-                ]
-            )
+        "\n".join(
+            [
+                "  %-21s %s" % (name, field.__doc__)
+                for name, field in sorted(
+                    list(engine.FieldDefinition.FIELDS.items())
+                    + [
+                        custom_manifold(),
+                        kind_manifold(),
+                    ]
+                )
+            ]
         )
     )
 
@@ -451,23 +448,23 @@ class RtorrentControl(ScriptBaseWithConfig):
         """Return valid field names."""
         for name, field in sorted(engine.FieldDefinition.FIELDS.items()):
             if issubclass(field._matcher, matching.BoolFilter):
-                yield "%s=no" % (name,)
-                yield "%s=yes" % (name,)
+                yield f"{name}=no"
+                yield f"{name}=yes"
                 continue
             if issubclass(field._matcher, matching.PatternFilter):
-                yield "%s=" % (name,)
-                yield "%s=/" % (name,)
-                yield "%s=?" % (name,)
-                yield "%s=\"'*'\"" % (name,)
+                yield f"{name}="
+                yield f"{name}=/"
+                yield f"{name}=?"
+                yield f"{name}=\"'*'\""
                 continue
             if issubclass(field._matcher, matching.NumericFilterBase):
                 for i in range(10):
                     yield "%s=%d" % (name, i)
             else:
-                yield "%s=" % (name,)
+                yield f"{name}="
 
-            yield r"%s=+" % (name,)
-            yield r"%s=-" % (name,)
+            yield r"{}=+".format(name)
+            yield r"{}=-".format(name)
 
         yield "custom_"
         yield "kind_"
@@ -550,7 +547,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             ):
                 field = field.replace(".", "|")
                 if len(field.split("|")) == 1:
-                    outputs += ["{{d.%s|fmt('%s')}}" % (field, field)]
+                    outputs += [f"{{{{d.{field}|fmt('{field}')}}}}"]
                 else:
                     outputs += ["{{d.%s}}" % field]
             output_format = "\t".join(outputs)
@@ -691,7 +688,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 else:
                     selection = 1, int(self.options.select, 10)
             except (ValueError, TypeError) as exc:
-                self.fatal("Bad selection '%s' (%s)" % (self.options.select, exc))
+                self.fatal(f"Bad selection '{self.options.select}' ({exc})")
 
         # Preparation steps
         if self.options.fast_query != "=":
@@ -792,7 +789,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             # Perform chosen action on matches
             template_args = [("{##}" + i if "{{" in i else i) for i in action.args]
             for item in matches:
-                if not self.prompt.ask_bool("%s item %s" % (action.label, item.name)):
+                if not self.prompt.ask_bool(f"{action.label} item {item.name}"):
                     continue
                 if (
                     self.options.output_format
@@ -854,7 +851,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         if self.options.call:
                             logged_cmd = cmd[0]
                         else:
-                            logged_cmd = '"%s"' % ('" "'.join(cmd),)
+                            logged_cmd = '"{}"'.format('" "'.join(cmd))
                         self.LOG.info("Calling: %s", logged_cmd)
                         try:
                             if self.options.call:
@@ -862,14 +859,10 @@ class RtorrentControl(ScriptBaseWithConfig):
                             else:
                                 subprocess.check_call(cmd)
                         except subprocess.CalledProcessError as exc:
-                            raise error.UserError("Command failed: %s" % (exc,))
+                            raise error.UserError(f"Command failed: {exc}")
                         except OSError as exc:
                             raise error.UserError(
-                                "Command failed (%s): %s"
-                                % (
-                                    logged_cmd,
-                                    exc,
-                                )
+                                f"Command failed ({logged_cmd}): {exc}"
                             )
 
         # Dump as JSON array?

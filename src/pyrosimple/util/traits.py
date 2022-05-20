@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=too-many-nested-blocks
 """ Classification.
 
@@ -30,29 +29,37 @@ from pyrosimple import config
 log = logging.getLogger(__name__)
 
 # Sets of of extensions / kinds
-KIND_AUDIO = set(("flac", "mp3", "ogg", "wav", "dts", "ac3", "alac", "wma"))
-KIND_VIDEO = set(
-    ("avi", "mkv", "m4v", "vob", "mp4", "mpg", "mpeg", "m2ts", "ts", "ogv", "wmv")
-)
-KIND_IMAGE = set(("jpg", "png", "gif", "tif", "bmp", "svg"))
-KIND_DOCS = set(
-    (
-        "chm",
-        "pdf",
-        "cbr",
-        "cbz",
-        "odt",
-        "ods",
-        "doc",
-        "xls",
-        "ppt",
-        "epub",
-        "mobi",
-        "azw3",
-        "djvu",
-    )
-)
-KIND_ARCHIVE = set(("rar", "zip", "tgz", "bz2", "iso", "bin"))
+KIND_AUDIO = {"flac", "mp3", "ogg", "wav", "dts", "ac3", "alac", "wma"}
+KIND_VIDEO = {
+    "avi",
+    "mkv",
+    "m4v",
+    "vob",
+    "mp4",
+    "mpg",
+    "mpeg",
+    "m2ts",
+    "ts",
+    "ogv",
+    "wmv",
+}
+KIND_IMAGE = {"jpg", "png", "gif", "tif", "bmp", "svg"}
+KIND_DOCS = {
+    "chm",
+    "pdf",
+    "cbr",
+    "cbz",
+    "odt",
+    "ods",
+    "doc",
+    "xls",
+    "ppt",
+    "epub",
+    "mobi",
+    "azw3",
+    "djvu",
+}
+KIND_ARCHIVE = {"rar", "zip", "tgz", "bz2", "iso", "bin"}
 
 # Regex matchers for names
 _i = _k = None
@@ -69,7 +76,7 @@ _TV_TRAIL = (
     r"(?:[._ ](?P<codec2>[XH]\.?264|XviD|VTS|ISO|NTSC|PAL))?"
     r"(?:[-. ](?P<group>.+?))?(?P<extension>" + _VIDEO_EXT + ")?$"
 )
-_DEFINITELY_TV = [".%s." % _i.lower() for _i in ("HDTV", "PDTV", "DSR")]
+_DEFINITELY_TV = ["hdtv", "pdtv", "dsr"]
 
 TV_PATTERNS = [
     (_k, re.compile(_i, re.I))
@@ -137,33 +144,31 @@ MOVIE_PATTERNS = [
     )
 ]
 
-BAD_TITLE_WORDS = set(
-    (
-        "bdrip",
-        "brrip",
-        "hdrip",
-        "dvdrip",
-        "ntsc",
-        "hdtv",
-        "dvd-r",
-        "dvdr",
-        "dvd5",
-        "dvd9",
-        "web-dl",
-        "blu-ray",
-        "bluray",
-        "bd25",
-        "bd50",
-        "480p",
-        "576p",
-        "720p",
-        "1080p",
-        "2160p",
-        "mp3",
-        "ac3",
-        "dts",
-    )
-)
+BAD_TITLE_WORDS = {
+    "bdrip",
+    "brrip",
+    "hdrip",
+    "dvdrip",
+    "ntsc",
+    "hdtv",
+    "dvd-r",
+    "dvdr",
+    "dvd5",
+    "dvd9",
+    "web-dl",
+    "blu-ray",
+    "bluray",
+    "bd25",
+    "bd50",
+    "480p",
+    "576p",
+    "720p",
+    "1080p",
+    "2160p",
+    "mp3",
+    "ac3",
+    "dts",
+}
 
 del _k, _i
 
@@ -239,7 +244,7 @@ def name_trait(name, add_info=False):
                         del info[key]
                         if val:
                             key = re.sub("[0-9]+$", "", key)
-                            info[key] = ("%s %s" % (info.get(key) or "", val)).strip()
+                            info[key] = f"{info.get(key) or ''} {val}".strip()
                 break
 
         # TODO: Split by "dvdrip", year, etc. to get to the title and then
