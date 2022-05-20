@@ -220,9 +220,6 @@ class RtorrentItem(engine.TorrentProxy):
         """Get a field on demand. By 'on demand', this means that the field may possibly be created
         if it does not already exists (e.g. custom fields). It also allows directly controlling if the _fields cache
         should be used"""
-        # TODO: Get each on-demand field in a multicall for all other items, since
-        # we likely need it anyway; another (more easy) way would be to pre-fetch dynamically
-        # with the list of fields from filters and output formats
         if cache:
             try:
                 return self._fields[name]
@@ -246,8 +243,6 @@ class RtorrentItem(engine.TorrentProxy):
         else:
             val = getattr(self, name)
 
-        # TODO: Currently, NOT caching makes no sense; in a demon, it does!
-        # if isinstance(FieldDefinition.FIELDS.get(name), engine.ConstantField):
         self._fields[name] = val
 
         return val
@@ -260,8 +255,7 @@ class RtorrentItem(engine.TorrentProxy):
         path = os.path.expanduser(path)
         if self.rpc_call("d.is_multi_file"):
             return path + "/"
-        else:
-            return path
+        return path
 
     def announce_urls(self, default=[]):  # pylint: disable=dangerous-default-value
         """Get a list of all announce URLs.
@@ -831,7 +825,7 @@ class RtorrentEngine:
                         pre_filter = matching.unquote_pre_filter(
                             view.matcher.pre_filter()
                         )
-                        self.LOG.info(f"!!! pre-filter: {pre_filter or 'N/A'}")
+                        self.LOG.info("!!! pre-filter: %s", pre_filter or 'N/A')
                         if pre_filter:
                             multi_call = self.open().d.multicall.filtered
                             multi_args.insert(2, pre_filter)

@@ -42,9 +42,8 @@ class ExpiringCache(abc.MutableMapping):
                     return item, expires_at - time.time()
                 else:
                     return item
-            else:
-                del self[key]
-                raise KeyError(key)
+            del self[key]
+            raise KeyError(key)
 
     def __contains__(self, key):
         """Return True if the dict has a key, else return False."""
@@ -53,8 +52,7 @@ class ExpiringCache(abc.MutableMapping):
                 expires_at, _ = self.data.get(key)
                 if expires_at == 0 or expires_at < time.time():
                     return True
-                else:
-                    del self[key]
+                del self[key]
         except KeyError:
             pass
         return False

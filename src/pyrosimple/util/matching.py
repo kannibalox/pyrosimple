@@ -80,7 +80,7 @@ def truth(val, context) -> bool:
 
     if lower_val in TRUE:
         return True
-    elif lower_val in FALSE:
+    if lower_val in FALSE:
         return False
 
     raise FilterError(
@@ -170,7 +170,6 @@ class AndNode(MatcherNode):
             if int(config.settings.get("FAST_QUERY")) == 1 or len(result) == 1:
                 return result[0]  # using just one simple expression is safer
             else:
-                # TODO: make this purely value-based (is.nz=…)
                 return "and={%s}" % ",".join(result)
         return ""
 
@@ -191,7 +190,6 @@ class OrNode(MatcherNode):
             result = [x.pre_filter() for x in self.children]
             result = [x for x in result if x]
             if result:
-                # TODO: make this purely value-based (is.nz=…)
                 return "or={%s}" % ",".join(result)
         return ""
 
@@ -422,13 +420,12 @@ class TaggedAsFilter(FieldFilter):
         if self._name in self.PRE_FILTER_FIELDS:
             if not self._value:
                 return f'"not=${self.PRE_FILTER_FIELDS[self._name]}"'
-            else:
-                val = self._value
-                if self._exact:
-                    val = val.split().pop()
-                return r'"string.contains_i=${},\"{}\""'.format(
-                    self.PRE_FILTER_FIELDS[self._name], val.replace('"', r"\\\"")
-                )
+            val = self._value
+            if self._exact:
+                val = val.split().pop()
+            return r'"string.contains_i=${},\"{}\""'.format(
+                self.PRE_FILTER_FIELDS[self._name], val.replace('"', r"\\\"")
+            )
         return ""
 
     def validate(self):
@@ -552,7 +549,7 @@ class TimeFilter(NumericFilterBase):
     )
     TIMEDELTA_RE = re.compile(
         "^%s$"
-        % "".join(r"(?:(?P<{}>\d+)[{}{}])?".format(i, i, i.upper()) for i in "ymwdhis")
+        % "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms")
     )
 
     def pre_filter(self) -> str:
@@ -763,8 +760,7 @@ class KeyNameVisitor(NodeVisitor):
     def generic_visit(self, node, visited_children):
         if visited_children:
             return [item for sublist in visited_children for item in sublist]
-        else:
-            return []
+        return []
 
 
 def create_filter(name: str, op: str, value: str):
@@ -858,14 +854,4 @@ class MatcherBuilder(NodeVisitor):
             if isinstance(real_children, list) and len(real_children) == 1:
                 return real_children[0]
             return real_children
-        else:
-            return None
-
-
-if __name__ == "__main__":
-    tree = QueryGrammar.parse("name=/asdfsd/ OR /.*/ tagged=test2")
-    print(tree)
-    match_tree = MatcherBuilder().visit(tree)
-    print(match_tree)
-    match_result = match_tree.match(util.parts.Bunch(tagged="test", name="The Thing"))
-    print(match_result)
+        return None
