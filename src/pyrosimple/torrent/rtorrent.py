@@ -270,8 +270,7 @@ class RtorrentItem(engine.TorrentProxy):
 
         if response:
             return [i[0] for i in response if i[1]]
-        else:
-            return default
+        return default
 
     def start(self):
         """(Re-)start downloading or seeding."""

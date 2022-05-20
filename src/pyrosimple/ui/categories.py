@@ -89,7 +89,7 @@ class CategoryManager(ScriptBaseWithConfig):
 
         else:
             self.LOG.info(
-                f"Current category view is '{current_view[self.PREFIX_LEN :]}'."
+                "Current category view is '%s'.", current_view[self.PREFIX_LEN :]
             )
             self.LOG.info("Use '--help' to get usage information.")
 

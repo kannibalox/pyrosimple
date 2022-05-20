@@ -120,7 +120,7 @@ class PathMover:
                 max_workers=self.config.max_workers
             ) as executor:
                 # Submit tasks
-                for i in self.engine.items(view, cache=False):
+                for i in self.engine.items(view):
                     if matcher(i):
                         futures.append(executor.submit(self.check_and_move, i))
                 # Wait and check for exceptions
@@ -202,7 +202,7 @@ class Mover:
 
         if not copy:
             self.proxy.d.stop(infohash)
-        self.LOG.debug(f"Running extra commands on load: {extra_cmds}")
+        self.LOG.debug("Running extra commands on load: %s", extra_cmds)
         remote_proxy.load.raw("", xml_metafile, *extra_cmds)
         for _ in range(0, 5):
             try:
@@ -242,13 +242,13 @@ class Mover:
             view = engine.TorrentView(self.engine, "default")
             view.matcher = matcher
             hosts = self.config.hosts.split(",")
-            for i in self.engine.items(view, cache=False):
+            for i in self.engine.items(view):
                 for host in nodes_by_hash_weight(i.hash + i.alias, hosts):
                     rproxy = rpc.RTorrentProxy(host)
                     metahash = i.hash
                     if self.move(metahash, rproxy):
                         self.LOG.info(
-                            f"Archived {metahash} to {rproxy.system.hostname()}"
+                            "Archived %s to %s", metahash, rproxy.system.hostname()
                         )
                         break
         except (error.LoggableError, *rpc.ERRORS) as exc:

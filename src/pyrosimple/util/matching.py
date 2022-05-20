@@ -28,7 +28,7 @@ from typing import Any, Callable, List
 from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
 
-from pyrosimple import config, error, torrent, util
+from pyrosimple import config, error, torrent
 
 
 TRUE = {

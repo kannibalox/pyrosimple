@@ -165,12 +165,7 @@ class QueueManager:
                 if not self.config.quiet:
                     self.proxy.log(
                         rpc.NOHASH,
-                        "%s: Started '%s' {%s}"
-                        % (
-                            self.__class__.__name__,
-                            item.name,
-                            item.alias,
-                        ),
+                        "{self.__class__.__name__}: Started '{item.name}' {item.alias}",
                     )
 
     def run(self):
@@ -180,11 +175,10 @@ class QueueManager:
             self.proxy = self.engine.open()
 
             # Get items from 'pyrotorque' view
-            items = list(self.engine.items(self.config.viewname, cache=False))
+            items = list(self.engine.items(self.config.viewname))
 
             if self.sort_key:
                 items.sort(key=self.sort_key)
-                # self.LOG.debug("Sorted: %r" % [i.name for i in items])
 
             # Handle found items
             self._start(items)

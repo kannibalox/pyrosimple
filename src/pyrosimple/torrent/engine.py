@@ -57,8 +57,7 @@ def _duration(start: Optional[float], end: Optional[float]) -> Optional[float]:
             return end - start
     elif start:
         return time.time() - start
-    else:
-        return None
+    return None
 
 
 def _interval_split(interval, only=None, event_re=re.compile("[A-Z][0-9]+")):
@@ -674,11 +673,10 @@ class TorrentProxy:
                 field = DynamicField(
                     set,
                     name,
-                    "kinds of files that make up more than %d%% of this item's size"
-                    % limit,
+                    f"kinds of files that make up more than {limit}% of this item's size",
                     matcher=matching.TaggedAsFilter,
                     formatter=_fmt_tags,
-                    requires=["kind_%d" % limit],
+                    requires=[f"kind_{limit}"],
                 )
                 setattr(cls, name, field)
 
