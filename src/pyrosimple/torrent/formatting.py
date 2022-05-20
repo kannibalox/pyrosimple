@@ -82,7 +82,6 @@ def fmt_strip(val: str) -> str:
 def fmt_subst(val, regex, subst):
     """Replace regex with string."""
     return re.sub(regex, subst, val)
-    return lambda text: re.sub(regex, subst, text) if text else text
 
 
 def fmt_mtime(val: str) -> float:
