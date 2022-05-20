@@ -756,28 +756,20 @@ class RtorrentEngine:
         """Log a message in the torrent client."""
         self.open().log(rpc.NOHASH, msg)
 
-    def item(self, infohash: str, prefetch=None, cache=False):
+    def item(self, infohash: str, prefetch=None):
         """Fetch a single item by its info hash."""
-        return next(self.items(infohash, prefetch, cache))
+        return next(self.items(infohash, prefetch))
 
     def items(
         self,
         view: Optional[Union[engine.TorrentView, str]] = None,
         prefetch: Optional[Set[str]] = None,
-        cache: bool = True,
     ):
         """Get list of download items.
 
         @param view: Name of the view.
         @param prefetch: Optional list of field names to fetch initially.
-        @param cache: Cache items for the given view?
         """
-        # TODO: Cache should be by hash.
-        # Then get the initial data when cache is empty,
-        # else get a list of hashes from the view, make a diff
-        # to what's in the cache, fetch the rest. Getting the
-        # fields for one hash might be done by a special view
-        # (filter: $d.hash == hashvalue)
 
         multi_args: List
         if view is None:
@@ -787,84 +779,75 @@ class RtorrentEngine:
         else:
             view.viewname = self._resolve_viewname(view.viewname)
 
-        if not cache or view.viewname not in self._item_cache:
-            # Map pyroscope names to rTorrent ones
-            if prefetch:
-                prefetch = self.BASE_FIELDS | set(prefetch)
+        # Map pyroscope names to rTorrent ones
+        if prefetch:
+            prefetch = self.BASE_FIELDS | set(prefetch)
+        else:
+            prefetch = self.PREFETCH_FIELDS
+
+        # Fetch items
+        items = []
+        try:
+            # Prepare multi-call arguments
+            args = sorted(prefetch)
+
+            infohash = view._check_hash_view()
+            if infohash:
+                multi_call = self.open().system.multicall
+                multi_args = [
+                    dict(
+                        methodName=field.rsplit("=", 1)[0],
+                        params=[infohash]
+                        + (
+                            field.rsplit("=", 1)[1].split(",")
+                            if "=" in field
+                            else []
+                        ),
+                    )
+                    for field in args
+                ]
+                raw_items = [[i[0] for i in multi_call(args)]]
             else:
-                prefetch = self.PREFETCH_FIELDS
+                multi_call = self.open().d.multicall2
+                multi_args = ["", view.viewname] + [
+                    field if "=" in field else field + "=" for field in args
+                ]
+                if view.matcher and config.settings.get("FAST_QUERY"):
+                    pre_filter = matching.unquote_pre_filter(
+                        view.matcher.pre_filter()
+                    )
+                    self.LOG.info("!!! pre-filter: %s", pre_filter or 'N/A')
+                    if pre_filter:
+                        multi_call = self.open().d.multicall.filtered
+                        multi_args.insert(2, pre_filter)
+                raw_items = multi_call(*tuple(multi_args))
 
-            # Fetch items
-            items = []
-            try:
-                # Prepare multi-call arguments
-                args = sorted(prefetch)
+            self.LOG.debug(
+                "Got %d items with %d attributes from %r [%s]",
+                len(raw_items),
+                len(prefetch),
+                self.engine_id,
+                multi_call,
+            )
 
-                infohash = view._check_hash_view()
-                if infohash:
-                    multi_call = self.open().system.multicall
-                    multi_args = [
-                        dict(
-                            methodName=field.rsplit("=", 1)[0],
-                            params=[infohash]
-                            + (
-                                field.rsplit("=", 1)[1].split(",")
-                                if "=" in field
-                                else []
-                            ),
-                        )
-                        for field in args
-                    ]
-                    raw_items = [[i[0] for i in multi_call(args)]]
-                else:
-                    multi_call = self.open().d.multicall2
-                    multi_args = ["", view.viewname] + [
-                        field if "=" in field else field + "=" for field in args
-                    ]
-                    if view.matcher and config.settings.get("FAST_QUERY"):
-                        pre_filter = matching.unquote_pre_filter(
-                            view.matcher.pre_filter()
-                        )
-                        self.LOG.info("!!! pre-filter: %s", pre_filter or 'N/A')
-                        if pre_filter:
-                            multi_call = self.open().d.multicall.filtered
-                            multi_args.insert(2, pre_filter)
-                    raw_items = multi_call(*tuple(multi_args))
-
-                self.LOG.debug(
-                    "Got %d items with %d attributes from %r [%s]",
-                    len(raw_items),
-                    len(prefetch),
-                    self.engine_id,
-                    multi_call,
+            for item in raw_items:
+                ritem = RtorrentItem(
+                    self,
+                    fields={},
+                    rpc_fields=dict(zip(args, item)),
                 )
 
-                for item in raw_items:
-                    ritem = RtorrentItem(
-                        self,
-                        fields={},
-                        rpc_fields=dict(zip(args, item)),
-                    )
-
-                    if view.matcher:
-                        if view.matcher.match(ritem):
-                            items.append(ritem)
-                            yield items[-1]
-                    else:
+                if view.matcher:
+                    if view.matcher.match(ritem):
                         items.append(ritem)
                         yield items[-1]
-            except rpc.ERRORS as exc:
-                raise error.EngineError(
-                    f"While getting download items from {self!r}: {exc}"
-                )
-
-            # Everything yielded, store for next iteration
-            if cache:
-                self._item_cache[view.viewname] = items
-        else:
-            # Yield prefetched results
-            for item in self._item_cache[view.viewname]:
-                yield item
+                else:
+                    items.append(ritem)
+                    yield items[-1]
+        except rpc.ERRORS as exc:
+            raise error.EngineError(
+                f"While getting download items from {self!r}: {exc}"
+            )
 
     def show(
         self,
