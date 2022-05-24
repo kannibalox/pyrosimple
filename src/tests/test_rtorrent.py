@@ -28,10 +28,8 @@ log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
-class RTorrentTest(unittest.TestCase):
-    def test_rtorrent(self):
-        pass
 
 
+    
 if __name__ == "__main__":
     unittest.main()

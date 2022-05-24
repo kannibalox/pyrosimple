@@ -18,20 +18,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
-import logging
-import unittest
+import pytest
 
 from pyrosimple.torrent import formatting
+from pyrosimple.util import fmt
 
+@pytest.mark.parametrize(
+    ("size", "expected"),
+    [(5*1024, "5.0 KiB"), (0, "0 bytes"),
+     (7*1024*1024*1024, "7.0 GiB")]
+)
+def test_fmt_human_size(size, expected):
+    assert fmt.human_size(size) == expected
 
-log = logging.getLogger(__name__)
-log.debug("module loaded")
-
-
-class FormattingTest(unittest.TestCase):
-    def test_formatting(self):
-        pass
-
-
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize(
+    ("size", "expected"),
+    [(5*1024, "5.0 KiB".rjust(10)), (0, "0 bytes".rjust(10)),
+     ("invalid", "N/A".rjust(10))]
+)
+def test_fmt_size(size, expected):
+    assert formatting.fmt_sz(size) == expected

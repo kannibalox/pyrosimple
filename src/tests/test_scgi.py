@@ -57,6 +57,7 @@ def test_local_transports(url, transport):
     [
         (b"", b"0:,"),
         (b"a", b"1:a,"),
+        (b"aaaa", b"4:aaaa,"),
         # (b"\x20\xac", b"3:\xe2\x82\xac,"),
     ],
 )
@@ -69,6 +70,7 @@ def test_encode_netstring(data, expected):
     [
         ((), b""),
         ((("a", "b"),), b"a\0b\0"),
+        ((("a: 1", "b: 2"),), b"a: 1\0b: 2\0"),
     ],
 )
 def test_encode_headers(data, expected):
