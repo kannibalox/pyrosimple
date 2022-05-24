@@ -45,7 +45,6 @@ log.debug("module loaded")
         "name!=//",
         "name=/test/",
         "name=/.*/",
-        "name=/.+/",
         "Roger.Rabbit?",
         "name=Roger.Rabbit?",
         "Bang!Bang!Bang!",
@@ -91,8 +90,9 @@ def test_parsim_good_conditions(cond):
         "",
         "NOT",
         "NOT OR",
-        "[ name!=",
-        "name== ]"
+        "name=name=name",
+        "name!="
+        "name=="
     ],
 )
 def test_parsim_error_conditions(cond):

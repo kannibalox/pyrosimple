@@ -548,7 +548,8 @@ class TimeFilter(NumericFilterBase):
         s=lambda t, d: t - d,
     )
     TIMEDELTA_RE = re.compile(
-        "^%s$" % "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms")
+        "^%s$"
+        % "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms")
     )
 
     def pre_filter(self) -> str:
@@ -717,9 +718,11 @@ QueryGrammar = Grammar(
     cond = (&or / &lpar / &rpar / &not / named_cond / unnamed_cond)
     named_cond = word conditional filter
     unnamed_cond = filter
-    filter      = (dquoted / word)
-    dquoted      = ~'"[^\"]*"'
-    word        = ~r"[\S]+"
+    filter      = (glob / regex / quoted / word)
+    glob = ~r"[*\.\/{}|\-?!\w]+"
+    regex = ~"/[^/]*/"
+    quoted      = ~'"[^\"]*"'
+    word        = ~r"[\w]+"
     conditional = (ne / ge / le / lt / gt / eq)
     ne          = ("!=" / "<>")
     eq          = ("==" / "=")
@@ -818,8 +821,14 @@ class MatcherBuilder(NodeVisitor):
     def visit_word(self, node, visited_children):
         return node.text
 
-    def visit_dquoted(self, node, visited_children):
+    def visit_quoted(self, node, visited_children):
         return node.text[1:-1]
+
+    def visit_glob(self, node, visited_children):
+        return node.text
+
+    def visit_regex(self, node, visited_children):
+        return node.text
 
     def visit_eq(self, node, visited_children):
         return Operators["eq"]
