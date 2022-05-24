@@ -39,9 +39,9 @@ from pyrosimple.util import fmt, pymagic
 def fmt_sz(intval: int) -> str:
     """Format a byte sized value."""
     try:
-        return fmt.human_size(intval)
+        return fmt.human_size(intval).rjust(10)
     except (ValueError, TypeError):
-        return "N/A".rjust(len(fmt.human_size(0)))
+        return "N/A".rjust(10)
 
 
 def fmt_iso(timestamp: float) -> str:

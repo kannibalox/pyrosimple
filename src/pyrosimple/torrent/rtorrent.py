@@ -797,11 +797,7 @@ class RtorrentEngine:
                     dict(
                         methodName=field.rsplit("=", 1)[0],
                         params=[infohash]
-                        + (
-                            field.rsplit("=", 1)[1].split(",")
-                            if "=" in field
-                            else []
-                        ),
+                        + (field.rsplit("=", 1)[1].split(",") if "=" in field else []),
                     )
                     for field in args
                 ]
@@ -812,10 +808,8 @@ class RtorrentEngine:
                     field if "=" in field else field + "=" for field in args
                 ]
                 if view.matcher and config.settings.get("FAST_QUERY"):
-                    pre_filter = matching.unquote_pre_filter(
-                        view.matcher.pre_filter()
-                    )
-                    self.LOG.info("!!! pre-filter: %s", pre_filter or 'N/A')
+                    pre_filter = matching.unquote_pre_filter(view.matcher.pre_filter())
+                    self.LOG.info("!!! pre-filter: %s", pre_filter or "N/A")
                     if pre_filter:
                         multi_call = self.open().d.multicall.filtered
                         multi_args.insert(2, pre_filter)

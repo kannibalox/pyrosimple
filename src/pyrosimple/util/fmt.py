@@ -39,15 +39,15 @@ def human_size(size: float) -> str:
         return "-??? bytes"
 
     if size < 1024:
-        return "%4d bytes" % size
+        return f"{size:4d} bytes".lstrip()
 
     rem = float(size)
     for unit in ("KiB", "MiB", "GiB", "TiB"):
         rem /= 1024.0
         if rem < 1024:
-            return f"{rem:6.1f} {unit}"
+            return f"{rem:6.1f} {unit}".lstrip()
 
-    return f"{rem:6.1f} TiB"
+    return f"{rem:6.1f} TiB".lstrip()
 
 
 def iso_datetime(timestamp: Optional[float] = None) -> str:

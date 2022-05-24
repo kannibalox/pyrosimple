@@ -163,9 +163,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if methodname == "system.multicall":
             results = []
             for i in params[0]:
-                m = i["methodName"]
-                p = i["params"]
-                results.append([self.__request_json(m, p)])
+                results.append([self.__request_json(i["methodName"], i["params"])])
             return results
 
         # This random ID feels silly but there's not much need for anything better at the moment.

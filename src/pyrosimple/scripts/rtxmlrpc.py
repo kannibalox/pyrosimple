@@ -139,7 +139,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         """Return interpreted / typed list of args."""
         args = []
         for arg in raw_args:
-            # TODO: use the xmlrpc-c type indicators instead / additionally
             if arg and arg[0] in "+-":
                 try:
                     arg = int(arg, 10)

@@ -347,23 +347,12 @@ class TreeWatch:
 
     def run(self):
         """Regular maintenance and fallback task."""
-        # TODO: Maybe do some stats logging here, once per hour or so
-        # TODO: We can handle files that were not valid bencode here, from a Queue! And watch.ini reloading.
-
-        # XXX: Add a check that the notifier is working, by creating / deleting a file
-        # XXX: Also check for unhandled files
         if self.config.get("check_unhandled", False):
             for path in self.config["path"]:
                 for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
                     if self.config.get("remove_unhandled", False) and filepath.exists():
                         filepath.unlink()
-
-        # TODO: XXX: Especially on startup, we need to walk the directory tree
-        #    and check for files not loaded (by checking hashes)!
-        #    Or maybe rename them during loading?! Makes detection easy.
-
-        # TODO: Move untied *.torrent.loaded in the tree to *.torrent.dead
 
 
 class TreeWatchCommand(ScriptBaseWithConfig):
