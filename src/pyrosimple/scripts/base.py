@@ -66,8 +66,9 @@ class ScriptBase:
         self.return_code = 0
         self.engine = None
 
+        # For python 3.7 compatibility
         try:
-            import importlib.metadata  # pylint: disable=import-outside-toplevel
+            import importlib.metadata  # pylint: disable=import-outside-toplevel,no-member
 
             self.__version__ = importlib.metadata.version("pyrosimple")
         except ImportError:

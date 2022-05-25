@@ -11,7 +11,9 @@ class ExpiringCache(abc.MutableMapping):
 
     def __init__(self, items: Optional[Dict] = None, expires=5, static_keys=None):
         self.expires = expires
-        self.data: Dict[str, tuple[float, Any]] = {}
+        # When 3.7 support is dropped, the type can be made more specific:
+        # Dict[str, tuple[float, Any]]
+        self.data: Dict[str, tuple] = {}
         self.lock = RLock()
         self.static_keys = static_keys or set()
         if items:

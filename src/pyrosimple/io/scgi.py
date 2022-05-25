@@ -38,8 +38,11 @@ class RTorrentTransport(xmlrpclib.Transport):
     def __init__(self, *args, codec=xmlrpclib, headers=(), **kwargs):
         self.codec = codec
         self.verbose = False
+        # We need to handle the headers differently based on the RPC protocols
         self._headers = list(headers)
-        super().__init__(*args, headers=self._headers, **kwargs)
+        # Pass them to the transport as well though
+        kwargs['headers'] = self._headers
+        super().__init__(*args, **kwargs)
 
     def parse_response(self, response):
         if self.codec == xmlrpclib:
