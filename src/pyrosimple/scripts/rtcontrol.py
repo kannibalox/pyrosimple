@@ -700,6 +700,9 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.validate_output_format(default_output_format)
         sort_key = self.validate_sort_fields()
         query_tree = matching.QueryGrammar.parse(" ".join(self.args))
+        # Use validate_sort_fields to pre-validate key name
+        key_names = matching.KeyNameVisitor().visit(query_tree)
+        formatting.validate_sort_fields(",".join(key_names))
         matcher = matching.MatcherBuilder().visit(query_tree)
         self.LOG.debug("Matcher is: %s", matcher)
 
@@ -716,7 +719,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         prefetch = [
             engine.FieldDefinition.FIELDS[f].requires
             for f in self.get_output_fields()
-            + matching.KeyNameVisitor().visit(query_tree)
+            + key_names
             + [
                 s[1:] if s.startswith("-") else s
                 for s in self.options.sort_fields.split(",")

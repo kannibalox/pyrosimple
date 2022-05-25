@@ -765,7 +765,10 @@ class KeyNameVisitor(NodeVisitor):
 
 def create_filter(name: str, op: str, value: str):
     """Generates a filter class with the given name, operation and value"""
-    filt = torrent.engine.FieldDefinition.lookup(name)._matcher
+    field = torrent.engine.FieldDefinition.lookup(name)
+    if field is None:
+        raise SyntaxError(f"No such field '{name}'")
+    filt = field._matcher
     return filt(name, op, value)
 
 
