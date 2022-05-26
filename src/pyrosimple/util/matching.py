@@ -548,8 +548,7 @@ class TimeFilter(NumericFilterBase):
         s=lambda t, d: t - d,
     )
     TIMEDELTA_RE = re.compile(
-        "^%s$"
-        % "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms")
+        "^%s$" % "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms")
     )
 
     def pre_filter(self) -> str:

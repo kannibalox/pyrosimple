@@ -22,9 +22,8 @@ import logging
 import time
 import unittest
 
-import pytest
-
 import parsimonious
+import pytest
 
 from pyrosimple.util import matching
 from pyrosimple.util.parts import Bunch

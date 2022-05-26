@@ -41,7 +41,7 @@ class RTorrentTransport(xmlrpclib.Transport):
         # We need to handle the headers differently based on the RPC protocols
         self._headers = list(headers)
         # Pass them to the transport as well though
-        kwargs['headers'] = self._headers
+        kwargs["headers"] = self._headers
         super().__init__(*args, **kwargs)
 
     def parse_response(self, response):
