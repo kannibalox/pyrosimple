@@ -3,7 +3,7 @@ import time
 
 from collections import abc
 from threading import RLock
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 
 class ExpiringCache(abc.MutableMapping):
