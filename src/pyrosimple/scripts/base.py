@@ -68,9 +68,9 @@ class ScriptBase:
 
         # For python 3.7 compatibility
         try:
-            import importlib.metadata  # pylint: disable=import-outside-toplevel,no-member
+            import importlib.metadata  # pylint: disable=import-outside-toplevel
 
-            self.__version__ = importlib.metadata.version("pyrosimple")
+            self.__version__ = importlib.metadata.version("pyrosimple") # pylint: disable=no-member
         except ImportError:
             self.__version__ = "unknown"
         self.version_info = f"{self.__version__} on Python {sys.version.split()[0]}"
