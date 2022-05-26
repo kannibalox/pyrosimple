@@ -54,7 +54,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         """Add program options."""
         super().add_options()
         self.jobs: Dict = {}
-        self.httpd = None
 
         # basic options
         self.add_bool_option(
@@ -79,9 +78,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "--pid-file",
             "PATH",
             help="file holding the process ID of the daemon, when running in background",
-        )
-        self.add_value_option(
-            "--guard-file", "PATH", help="guard file for the process watchdog"
         )
 
     def _parse_schedule(self, schedule):
@@ -138,26 +134,12 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.return_code = exc.code or 0
                 self.LOG.info("System exit (RC=%r)", self.return_code)
                 break
-            else:
-                # Idle work
-                # self.LOG.warning("IDLE %s %r" % (self.options.guard_file, os.path.exists(self.options.guard_file)))
-                if self.options.guard_file and not os.path.exists(
-                    self.options.guard_file
-                ):
-                    self.LOG.warning(
-                        "Guard file '%s' disappeared, exiting!", self.options.guard_file
-                    )
-                    break
 
     def mainloop(self):
         """The main loop."""
         self._validate_config()
 
         # Defaults for process control paths
-        if not self.options.no_fork and not self.options.guard_file:
-            self.options.guard_file = Path(
-                self.RUNTIME_DIR, "pyrotorque.guard"
-            ).expanduser()
         if not self.options.pid_file:
             self.options.pid_file = TimeoutPIDLockFile(
                 Path(self.RUNTIME_DIR, "pyrotorque.pid").expanduser()
@@ -197,12 +179,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             if self.options.stop:
                 self.return_code = error.EX_OK if running else error.EX_UNAVAILABLE
                 return
-
-        # Check for guard file and running daemon, abort if not OK
-        if self.options.guard_file and not os.path.exists(self.options.guard_file):
-            raise OSError(
-                f"Guard file '{self.options.guard_file}' not found, won't start!"
-            )
 
         # Check if we only need to run once
         if self.options.run_once:
