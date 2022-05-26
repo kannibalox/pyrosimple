@@ -29,7 +29,7 @@ from typing import Dict, List
 
 import bencode
 
-from pyrosimple import error
+from pyrosimple import error, connect
 from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import fmt, matching, metafile, pymagic, rpc
 from pyrosimple.util.parts import Bunch
@@ -43,12 +43,12 @@ class EngineStats:
         self.config = config or Bunch()
         self.LOG = pymagic.get_class_logger(self)
         self.LOG.debug("Statistics logger created with config %r", self.config)
-        self.engine = None
+        self.engine = connect()
+        self.engine.open()
 
     def run(self):
         """Statistics logger job callback."""
         try:
-            self.engine = rtorrent.RtorrentEngine()
             self.LOG.info(
                 "Stats for %s - up %s, %s",
                 self.engine.engine_id,
