@@ -311,8 +311,10 @@ class TreeWatch:
                 raise error.UserError(f"Path '{path}' is not a directory!")
 
         # Assemble custom commands
-        self.custom_cmds = self.config["cmd"]
-        self.LOG.debug("custom commands = %r", self.custom_cmds)
+        self.custom_cmds = {}
+        for key, val in self.config.items():
+            if key.startswith('cmd.'):
+                self.custom_cmds[key] = val
 
         # Get client proxy
         self.proxy = rpc.RTorrentProxy(configuration.settings.SCGI_URL)
@@ -420,11 +422,10 @@ class TreeWatchCommand(ScriptBaseWithConfig):
 
             if ok:
                 handler.addinfo()
-                post_process = str if self.options.verbose else logutil.shorten
                 self.LOG.info(
                     "Templating values are:\n    %s",
                     "\n    ".join(
-                        f"{key}={post_process(repr(val))}"
+                        f"{key}={repr(val)}"
                         for key, val in sorted(handler.ns.items())
                     ),
                 )
