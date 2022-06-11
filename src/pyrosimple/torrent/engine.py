@@ -382,6 +382,8 @@ def core_fields():
         "prio",
         "priority (0=off, 1=low, 2=normal, 3=high)",
         matcher=matching.FloatFilter,
+        accessor=lambda o: o.rpc_call("d.priority"),
+        requires=["d.priority"],
         formatter=lambda val: "X- +"[val],
     )
     yield ConstantField(
@@ -521,8 +523,8 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
-        accessor=lambda o: float(o.rpc_call("d.completed_bytes"))
-        / o.rpc_call("d.size_bytes"),
+        accessor=lambda o: round(float(o.rpc_call("d.completed_bytes"))
+                                 / o.rpc_call("d.size_bytes"), 1),
         requires=["d.size_bytes", "d.completed_bytes"],
     )
     yield DynamicField(
@@ -572,8 +574,9 @@ def core_fields():
         "throttle",
         "throttle group name (NULL=unlimited, NONE=global)",
         matcher=matching.PatternFilter,
-        accessor=lambda o: o._fields["throttle"] if "throttle" in o._fields else "NONE",
-        requires=["d.throttle"],
+        accessor=lambda o: o.rpc_call("d.throttle_name"),
+        formatter= lambda v: v if v else "NONE",
+        requires=["d.throttle_name"],
     )
 
     # Lifecyle

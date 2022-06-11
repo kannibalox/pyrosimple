@@ -101,7 +101,7 @@ def autoload_scgi_url() -> str:
     # Get and check config file name
     rcfile = Path(settings.RTORRENT_RC).expanduser()
     if not rcfile.exists():
-        raise error.UserError(f"Config file {rcfile!r} doesn't exist!")
+        raise error.UserError(f"Config file '{rcfile}' doesn't exist!")
     scgi_url = scgi_url_from_rtorrentrc(rcfile)
 
     settings.set("SCGI_URL", scgi_url)
