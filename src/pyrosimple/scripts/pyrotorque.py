@@ -69,9 +69,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         self.add_value_option(
             "--run-once", "JOB", help="run the specified job once in the foreground"
         )
-        self.add_bool_option("--stop", help="Stop running daemon")
+        self.add_bool_option("--stop", help="stop running daemon")
         self.add_bool_option(
-            "--restart", help="Stop running daemon, then fork into background"
+            "--restart", help="stop any existing daemon, then start the process in the backgrounds"
         )
         self.add_bool_option("-?", "--status", help="Check daemon status")
         self.add_value_option(
@@ -152,6 +152,14 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             else:
                 running, pid = False, 0
 
+            if self.options.status:
+                if running:
+                    print(f"Pyrotorque is running (PID {pid}).")
+                    sys.exit(0)
+                else:
+                    print("No pyrotorque process found.")
+                    sys.exit(1)
+
             if self.options.stop or self.options.restart:
                 if running:
                     os.kill(pid, signal.SIGTERM)
@@ -202,10 +210,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             dcontext.stderr = logutil.get_logfile()
             dcontext.stdout = logutil.get_logfile()
             dcontext.pidfile = self.options.pid_file
+            self.LOG.info("Writing pid to %s and detaching process...", self.options.pid_file)
+            self.LOG.info("Logging stderr/stdout to %s", logutil.get_logfile())
+            
 
         with dcontext:
-            if dcontext.pidfile:
-                print(dcontext.pidfile)
             # Set up services
             self.sched = BackgroundScheduler()
 
