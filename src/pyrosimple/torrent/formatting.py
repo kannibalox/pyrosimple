@@ -16,18 +16,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time
 import datetime
 import json
 import logging
 import os
 import re
+import time
 
 from pathlib import Path
 from typing import Dict, Generator, Union
 
-import jinja2
 import humanize
+import jinja2
 
 from jinja2 import Environment, FileSystemLoader, Template
 
@@ -40,6 +40,7 @@ from pyrosimple.util import fmt, pymagic
 # Format specifiers
 #
 def fmt_natdate(val: int) -> str:
+    """Use humanize to format dates"""
     text = str(humanize.naturaldate(datetime.datetime.fromtimestamp(val)))
     if text == "a moment":
         text = "never"

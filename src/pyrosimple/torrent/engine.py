@@ -16,17 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import datetime
 import os
 import re
 import time
 
 from typing import Any, Callable, Dict, Optional, Set
 
+import humanize
+
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
-
-import humanize
-import datetime
 
 
 #
@@ -38,14 +38,17 @@ def untyped(val):
 
 
 def natsizerate(val):
+    """Formate an int to a data rate"""
     return natsize(val) + "/s"
 
 
 def natsize(val):
+    """Format an int to a human-readable string"""
     return humanize.naturalsize(val, binary=True).rjust(10)
 
 
 def natdate(val):
+    """Convert epoch seconds to human-readable date"""
     text = humanize.naturaldate(datetime.datetime.fromtimestamp(val))
     if text == "a moment":
         text = "never"
