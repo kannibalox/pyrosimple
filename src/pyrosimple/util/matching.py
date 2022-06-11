@@ -129,7 +129,7 @@ class GroupNode(MatcherNode):
 
     def __init__(self, children: List, invert: bool):
         super().__init__(children)
-        self.invert = invert
+        self.invert = bool(invert)
 
     def match(self, item) -> bool:
         assert len(self.children) == 1
@@ -153,7 +153,8 @@ class GroupNode(MatcherNode):
         return inner
 
     def __repr__(self):
-        return f"{self.invert}{type(self).__name__}[{[str(c) for c in self.children]}]"
+        prefix = "Not" if self.invert else ""
+        return f"{prefix}{type(self).__name__}{[repr(c) for c in self.children]}"
 
 
 class AndNode(MatcherNode):
@@ -173,6 +174,8 @@ class AndNode(MatcherNode):
                 return "and={%s}" % ",".join(result)
         return ""
 
+    def __repr__(self):
+        return f"{type(self).__name__}{[repr(c) for c in self.children]}"
 
 class OrNode(MatcherNode):
     """This node performs a logical OR for all of it's children."""
@@ -193,6 +196,8 @@ class OrNode(MatcherNode):
                 return "or={%s}" % ",".join(result)
         return ""
 
+    def __repr__(self):
+        return f"{type(self).__name__}{[repr(c) for c in self.children]}"
 
 class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
     """Base class for all field filters.
@@ -710,9 +715,9 @@ class ByteSizeFilter(NumericFilterBase):
 QueryGrammar = Grammar(
     r"""
     query = (group / stmt)+
-    group = (not ws)? lpar ws stmt ws rpar
     stmt = (or_stmt / conds)
-    or_stmt = conds ws or ws conds
+    or_stmt = (group / conds) ws or ws (group / conds)
+    group = (not ws)? lpar ws stmt ws rpar
     conds = cond (ws cond)*
     cond = (&or / &lpar / &rpar / &not / named_cond / unnamed_cond)
     named_cond = word conditional filter
@@ -792,24 +797,24 @@ class MatcherBuilder(NodeVisitor):
     def __pare_children(self, children, class_):
         """Get all non-None children, and if there's only one child left,
         return the child instead of wrapping it in the parent class.
-
-        We should hopefully never have to deal with all None children,
-        due to the grammar combined with the generic_visit method.
         """
         real_children = [c for c in children if c is not None]
+        if len(real_children) == 0:
+            return None
         if len(real_children) == 1:
             return real_children[0]
         return class_(real_children)
 
     def visit_or_stmt(self, node, visited_children):
-        return self.__pare_children(visited_children, OrNode)
+        return OrNode([c for c in visited_children if c is not None])
 
     def visit_conds(self, node, visited_children):
         if len(visited_children) == 2 and isinstance(visited_children[1], list):
             children = [visited_children[0]] + visited_children[1]
         else:
             children = visited_children
-        return self.__pare_children(children, AndNode)
+        pared = self.__pare_children(children, AndNode)
+        return pared
 
     def visit_cond(self, node, visited_children):
         if len(visited_children) == 1 and isinstance(

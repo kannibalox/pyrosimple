@@ -78,6 +78,7 @@ log.debug("module loaded")
         "test=five NOT [ name=test OR name=test2 ]",
         "test=five OR NOT [ name=test name=test2 ]",
         "test=five OR NOT [ name=test OR name=test2 ]",
+        "name=arch-* OR [ alias=Ubuntu loaded>1w ]",
     ],
 )
 def test_parsim_good_conditions(cond):
@@ -97,6 +98,18 @@ def test_parsim_good_conditions(cond):
 def test_parsim_error_conditions(cond):
     with pytest.raises(parsimonious.exceptions.ParseError):
         matching.QueryGrammar.parse(cond)
+
+@pytest.mark.parametrize(
+    ("cond", "expected"),
+    [
+        ("name=arch", '"string.contains_i=$d.name=,\\"arch\\""'),
+        ("name=arch-* OR [ alias=Ubuntu loaded>1w ]", "")
+    ],
+)
+def test_conditions_prefilter(cond, expected):
+    filt = matching.MatcherBuilder().visit(
+        matching.QueryGrammar.parse(cond)).pre_filter()
+    assert str(filt) == expected
 
 if __name__ == "__main__":
     unittest.main()
