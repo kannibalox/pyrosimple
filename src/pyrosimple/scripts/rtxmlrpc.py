@@ -93,7 +93,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
     def __init__(self):
         super().__init__()
-        self.proxy = None
+        self.proxies = []
 
     def add_options(self):
         """Add program options."""
@@ -124,7 +124,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
     def open(self):
         """Open connection and return proxy."""
-        if not self.proxy:
+        if not self.proxies:
             if not config.settings["SCGI_URL"]:
                 config.autoload_scgi_url()
             if not config.settings["SCGI_URL"]:
@@ -132,8 +132,9 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     "You need to configure a RPC connection, read"
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
-            self.proxy = rpc.RTorrentProxy(config.settings["SCGI_URL"])
-        return self.proxy
+            for uri in self.split_scgi_url(config.settings["SCGI_URL"]):
+                self.proxies.append(rpc.RTorrentProxy(uri))
+        return self.proxies
 
     def cooked(self, raw_args):
         """Return interpreted / typed list of args."""
@@ -216,7 +217,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             self.LOG.critical("prompt_toolkit must be installed to use the REPL!")
             raise
 
-        proxy = self.open()
+        proxies: List = self.open()
         ps1 = proxy.session.name() + "> "
         words = ["help", "stats", "exit"]
         words += [x + "=" for x in proxy.system.listMethods()]
@@ -281,7 +282,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     tmp_import = handle.name
                 args = (rpc.NOHASH, tmp_import)
 
-            self.execute(self.open(), "import", args)
+            for proxy in self.open():
+                self.execute(proxy, "import", args)
         finally:
             if tmp_import and os.path.exists(tmp_import):
                 os.remove(tmp_import)
@@ -299,7 +301,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             method, raw_args = method.split("=", 1)
             raw_args = raw_args.split(",")
 
-        self.execute(self.open(), method, self.cooked(raw_args))
+        for proxy in self.open():
+            self.execute(proxy, method, self.cooked(raw_args))
 
     def do_session(self):
         """Restore state from session files."""

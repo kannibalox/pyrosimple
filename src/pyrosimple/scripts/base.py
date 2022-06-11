@@ -25,7 +25,7 @@ import time
 import traceback
 
 from argparse import ArgumentParser
-from typing import List
+from typing import List, Iterator
 
 from pyrosimple import config, error
 from pyrosimple.torrent import rtorrent
@@ -239,12 +239,25 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         """Get program options."""
         super().get_options()
         if self.options.url:
-            url = self.options.url
-            if url in config.settings["CONNECTIONS"]:
-                url = config.settings["CONNECTIONS"][url]
-            config.settings["SCGI_URL"] = url
+            config.settings["SCGI_URL"] = self.lookup_connection_alias(self.options.url)
         config.load_custom_py()
         self.engine = rtorrent.RtorrentEngine()
+
+    def lookup_connection_alias(self, uri: str) -> str:
+        if uri in config.settings["CONNECTIONS"]:
+            return str(config.settings["CONNECTIONS"][uri])
+        return uri
+
+    def split_scgi_url(self, uri: str) -> Iterator[str]:
+        """Split a URL into multiple components.
+
+        This is separate from the normal get_options due to
+        scripts needing to be designed differently for multi-client
+        support."""
+        for u in uri.split('+'):
+            yield self.lookup_connection_alias(u)
+
+
 
 
 class PromptDecorator:
