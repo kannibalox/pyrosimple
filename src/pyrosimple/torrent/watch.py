@@ -29,7 +29,7 @@ from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import formatting
-from pyrosimple.util import logutil, metafile, pymagic, rpc, traits
+from pyrosimple.util import metafile, pymagic, rpc, traits
 from pyrosimple.util.parts import Bunch
 
 
