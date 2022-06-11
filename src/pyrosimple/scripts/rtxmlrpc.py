@@ -16,16 +16,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import glob
 import json
 import logging
 import os
-import re
 import sys
 import tempfile
-import textwrap
 
-from pathlib import Path
 from pprint import pformat
 
 
@@ -37,8 +33,6 @@ except ImportError:
     requests_found = False
 
 from xmlrpc import client as xmlrpc_client
-
-import bencode  # type: ignore
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
@@ -187,80 +181,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     result = fmt.rpc_result_to_string(result)
                 print(result)
 
-    def repl_usage(self):  # pylint: disable=no-self-use
-        """Print a short REPL usage summary."""
-        print(
-            textwrap.dedent(
-                """
-            rTorrent RPC REPL Help Summary
-            =================================
-
-            ? / help            Show this help text.
-            Ctrl-D              Exit the REPL and show call stats.
-            stats               Show current call stats.
-            cmd=arg1,arg2,..    Call a RPC command.
-        """.strip(
-                    "\n"
-                )
-            )
-        )
-
-    def do_repl(self):
-        """REPL for rTorrent RPC commands."""
-        # pylint: disable=import-outside-toplevel
-        try:
-            from prompt_toolkit import prompt
-            from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-            from prompt_toolkit.completion import WordCompleter
-            from prompt_toolkit.history import FileHistory
-        except ImportError:
-            self.LOG.critical("prompt_toolkit must be installed to use the REPL!")
-            raise
-
-        proxies: List = self.open()
-        ps1 = proxy.session.name() + "> "
-        words = ["help", "stats", "exit"]
-        words += [x + "=" for x in proxy.system.listMethods()]
-        history_file = Path("~/.rtxmlrpc_history").expanduser()
-
-        while True:
-            try:
-                try:
-                    cmd = prompt(
-                        ps1,
-                        completer=WordCompleter(words),
-                        auto_suggest=AutoSuggestFromHistory(),
-                        history=FileHistory(history_file),
-                    )
-                except KeyboardInterrupt:
-                    cmd = ""
-                if not cmd:
-                    print(
-                        "Enter '?' or 'help' for usage information, 'Ctrl-D' to exit."
-                    )
-
-                if cmd in {"?", "help"}:
-                    self.repl_usage()
-                    continue
-                if cmd in {"", "stats"}:
-                    print(repr(proxy).split(None, 1)[1])
-                    continue
-                if cmd in {"exit"}:
-                    raise EOFError()
-
-                try:
-                    method, raw_args = cmd.split("=", 1)
-                except ValueError:
-                    print("ERROR: '=' not found")
-                    continue
-
-                raw_args = raw_args.split(",")
-                args = self.cooked(raw_args)
-                self.execute(proxy, method, args)
-            except EOFError:
-                print(f"Bye from {proxy!r}")
-                break
-
     def do_import(self):
         """Handle import files or streams passed with '-i'."""
         tmp_import = None
@@ -304,113 +224,11 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         for proxy in self.open():
             self.execute(proxy, method, self.cooked(raw_args))
 
-    def do_session(self):
-        """Restore state from session files."""
-
-        def filenames():
-            "Helper"
-            for arg in self.args:
-                if os.path.isdir(arg):
-                    yield from glob.glob(os.path.join(arg, "*.torrent.rtorrent"))
-                elif arg == "@-":
-                    for line in sys.stdin.read().splitlines():
-                        if line.strip():
-                            yield line.strip()
-                elif arg.startswith("@"):
-                    if not os.path.isfile(arg[1:]):
-                        self.parser.error(f"File not found (or not a file): {arg[1:]}")
-                    with open(arg[1:], encoding="utf-8") as handle:
-                        for line in handle:
-                            if line.strip():
-                                yield line.strip()
-                else:
-                    yield arg
-
-        proxy = self.open()
-        for filename in filenames():
-            # Check filename and extract infohash
-            self.LOG.debug("Reading '%s'...", filename)
-            match = re.match(
-                r"(?:.+?[-._])?([a-fA-F0-9]{40})(?:[-._].+?)?\.torrent\.rtorrent",
-                os.path.basename(filename),
-            )
-            if not match:
-                self.LOG.warning("Skipping badly named session file '%s'...", filename)
-                continue
-            infohash = match.group(1)
-
-            # Read bencoded data
-            try:
-                with open(filename, "rb") as handle:
-                    raw_data = handle.read()
-                data = bencode.bdecode(raw_data)
-            except OSError as exc:
-                self.LOG.warning(
-                    "Can't read '%s' (%s)",
-                    filename,
-                    str(exc).replace(f": '{filename}'", ""),
-                )
-                continue
-
-            ##print(infohash, '=', repr(data))
-            if "state_changed" not in data:
-                self.LOG.warning("Skipping invalid session file '%s'...", filename)
-                continue
-
-            # Restore metadata
-            was_active = proxy.d.is_active(infohash)
-            proxy.d.ignore_commands.set(infohash, data["ignore_commands"])
-            proxy.d.priority.set(infohash, data["priority"])
-
-            if proxy.d.throttle_name(infohash) != data["throttle_name"]:
-                proxy.d.pause(infohash)
-                proxy.d.throttle_name.set(infohash, data["throttle_name"])
-
-            if proxy.d.directory(infohash) != data["directory"]:
-                proxy.d.stop(infohash)
-                proxy.d.directory_base.set(infohash, data["directory"])
-
-            for i in range(5):
-                key = "custom%d" % (i + 1)
-                getattr(proxy.d, key).set(infohash, data[key])
-
-            for key, val in data["custom"].items():
-                proxy.d.custom.set(infohash, key, val)
-
-            for name in data["views"]:
-                try:
-                    proxy.view.set_visible(infohash, name)
-                except xmlrpc_client.Fault as exc:
-                    if "Could not find view" not in str(exc):
-                        raise
-
-            if was_active and not proxy.d.is_active(infohash):
-                (proxy.d.resume if proxy.d.is_open(infohash) else proxy.d.start)(
-                    infohash
-                )
-            proxy.d.save_full_session(infohash)
-
-            # TODO:
-            #  NO public "set" command! 'timestamp.finished': 1503012786,
-            #  NO public "set" command! 'timestamp.started': 1503012784,
-            #  NO public "set" command! 'total_uploaded': 0,
-
     def mainloop(self):
         """The main loop."""
-        # Enter REPL if no args
-        if len(self.args) < 1:
-            self.do_repl()
-            return
-
-        # Check for bad options
-        if sum([self.options.as_import, self.options.session]) > 1:
-            self.parser.error("You cannot combine -i and --session!")
-
         # Dispatch to handlers
         if self.options.as_import:
             self.do_import()
-        elif self.options.session:
-            self.do_session()
         else:
             self.do_command()
 
