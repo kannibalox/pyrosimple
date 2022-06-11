@@ -179,7 +179,7 @@ class MetafileCreator(ScriptBaseWithConfig):
             private=self.options.private,
             no_date=self.options.no_date,
             comment=self.options.comment,
-            created_by="PyroScope",
+            created_by="PyroSimple",
             callback=callback,
         )
 
