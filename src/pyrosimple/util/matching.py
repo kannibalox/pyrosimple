@@ -68,7 +68,7 @@ Operators = {
 }
 
 
-def truth(val, context) -> bool:
+def truth(val, context=None) -> bool:
     """Convert truth value in "val" to a boolean."""
     # Try coercing it to an int then a bool
     try:

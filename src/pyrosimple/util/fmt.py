@@ -39,7 +39,7 @@ def human_size(size: float) -> str:
         return "-??? bytes"
 
     if size < 1024:
-        return f"{size:4d} bytes".lstrip()
+        return f"{int(size):4d} bytes".lstrip()
 
     rem = float(size)
     for unit in ("KiB", "MiB", "GiB", "TiB"):
