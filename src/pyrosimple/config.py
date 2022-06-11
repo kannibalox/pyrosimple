@@ -35,28 +35,21 @@ settings = Dynaconf(
     envvar="PYRO_CONF",
     envvar_prefix="PYRO",
     validators=[
+        # Top-level settings
         Validator("RTORRENT_RC", default="~/.rtorrent.rc"),
         Validator("CONFIG_PY", default="~/.config/pyrosimple/config.py"),
         Validator("SORT_FIELDS", default="name,hash"),
-        Validator(
-            "CONFIG_VALIDATOR_CALLBACKS",
-            default="pyrosimple.torrent.engine:TorrentProxy.add_custom_fields",
-        ),
-        Validator("ENGINE", default="pyrocore.torrent.rtorrent:RtorrentEngine"),
         Validator("FAST_QUERY", gte=0, lte=2, default=0),
         Validator("SCGI_URL", default=""),
-        Validator(
-            "FORMATS",
-            default={
-                "default": '{{d.name}} \t[{{d.alias}}]\n  {{d.is_private|fmt("is_private")}} {{d.is_open|fmt("is_open")}} {{d.is_active|fmt("is_active")}} P{{d.prio}} {%if d.is_complete %}     done{%else%}{{"%8.1f"|format(d.done)}}%{%endif%}\t{{d.size|sz}} U:{{d.up|sz}}/s  D:{{d.down|sz}}/s T:{{d.throttle|fmt("throttle")}}',
-                "short": '{%set ESC = "\x1B" %}{%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{%if d.is_open%}O{%else%} {%endif%}{%if  d.is_active%}A{%else%} {%endif%}{%if not d.is_complete%}{{ESC+"[36m"}}{{ "{:>3}".format(d.done | round | int) }}{{ESC+"[0m"}}{%else%}  D{%endif%} {{"{:>10}".format(d.size | filesizeformat(True))}} {%if d.message%}{{ESC+"[31m"}}{%endif%} {{d.alias.rjust(3)}}{{ESC+"[0m"}} {%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{{d.name}}{{ESC+"[0m"}}',
-                "action": "{{now()|iso}} {{action}}\t {{d.name}} {{d.alias}}",
-                "filelist": "{% for f in d.files %}{{d.realpath}}{% if d.is_multi_file %}/{{f.path}}{% endif %}{% if loop.index != loop.length %}\n{% endif %}{% endfor %}",
-            },
-        ),
+
         # TOML sections
         Validator("ALIASES", default={}),
         Validator("CONNECTIONS", default={}),
+        # Allow individual overrides in FORMATS section
+        Validator("FORMATS__default", default='{{d.name}} \t[{{d.alias}}]\n  {{d.is_private|fmt("is_private")}} {{d.is_open|fmt("is_open")}} {{d.is_active|fmt("is_active")}} P{{d.prio}} {%if d.is_complete %}     done{%else%}{{"%8.1f"|format(d.done)}}%{%endif%}\t{{d.size|sz}} U:{{d.up|sz}}/s  D:{{d.down|sz}}/s T:{{d.throttle|fmt("throttle")}}'),
+        Validator("FORMATS__short", default='{%set ESC = "\x1B" %}{%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{%if d.is_open%}O{%else%} {%endif%}{%if  d.is_active%}A{%else%} {%endif%}{%if not d.is_complete%}{{ESC+"[36m"}}{{ "{:>3}".format(d.done | round | int) }}{{ESC+"[0m"}}{%else%}  D{%endif%} {{"{:>10}".format(d.size | filesizeformat(True))}} {%if d.message%}{{ESC+"[31m"}}{%endif%} {{d.alias.rjust(3)}}{{ESC+"[0m"}} {%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{{d.name}}{{ESC+"[0m"}}'),
+        Validator("FORMATS__filesize", default="{% for f in d.files %}{{d.realpath}}{% if d.is_multi_file %}/{{f.path}}{% endif %}{% if loop.index != loop.length %}\n{% endif %}{% endfor %}"),
+        Validator("FORMATS__action", default="{{now()|iso}} {{action}}\t {{d.name}} {{d.alias}}"),
     ],
 )
 

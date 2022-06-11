@@ -523,8 +523,9 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
-        accessor=lambda o: round(float(o.rpc_call("d.completed_bytes"))
-                                 / o.rpc_call("d.size_bytes"), 1),
+        accessor=lambda o: round(
+            float(o.rpc_call("d.completed_bytes")) / o.rpc_call("d.size_bytes"), 1
+        ),
         requires=["d.size_bytes", "d.completed_bytes"],
     )
     yield DynamicField(
@@ -575,7 +576,7 @@ def core_fields():
         "throttle group name (NULL=unlimited, NONE=global)",
         matcher=matching.PatternFilter,
         accessor=lambda o: o.rpc_call("d.throttle_name"),
-        formatter= lambda v: v if v else "NONE",
+        formatter=lambda v: v if v else "NONE",
         requires=["d.throttle_name"],
     )
 
