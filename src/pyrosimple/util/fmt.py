@@ -69,7 +69,8 @@ def iso_datetime_optional(timestamp) -> str:
     """
     if timestamp:
         return iso_datetime(timestamp)
-    return "never"
+    # Justified to match length of iso_datetime
+    return "never              "
 
 
 def human_duration(

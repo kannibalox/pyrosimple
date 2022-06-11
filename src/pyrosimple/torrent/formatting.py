@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import time
+import datetime
 import json
 import logging
 import os
@@ -25,6 +27,7 @@ from pathlib import Path
 from typing import Dict, Generator, Union
 
 import jinja2
+import humanize
 
 from jinja2 import Environment, FileSystemLoader, Template
 
@@ -36,10 +39,17 @@ from pyrosimple.util import fmt, pymagic
 #
 # Format specifiers
 #
+def fmt_natdate(val: int) -> str:
+    text = str(humanize.naturaldate(datetime.datetime.fromtimestamp(val)))
+    if text == "a moment":
+        text = "never"
+    return text.ljust(11)
+
+
 def fmt_sz(intval: int) -> str:
     """Format a byte sized value."""
     try:
-        return fmt.human_size(intval).rjust(10)
+        return str(humanize.naturalsize(intval, binary=True).rjust(10))
     except (ValueError, TypeError):
         return "N/A".rjust(10)
 
@@ -55,17 +65,19 @@ def fmt_iso(timestamp: float) -> str:
 def fmt_duration(duration: int) -> str:
     """Format a duration value in seconds to a readable form."""
     try:
-        return fmt.human_duration(float(duration), 0, 2, True)
+        delta = datetime.timedelta(seconds=duration)
+        return str(humanize.naturaldelta(delta))
     except (ValueError, TypeError):
-        return "N/A".rjust(len(fmt.human_duration(0, 0, 2, True)))
+        return "N/A"
 
 
 def fmt_delta(timestamp) -> str:
     """Format a UNIX timestamp to a delta (relative to now)."""
     try:
-        return fmt.human_duration(float(timestamp), precision=2, short=True)
+        delta = datetime.timedelta(seconds=(time.time() - timestamp))
+        return str(humanize.naturaltime(delta))
     except (ValueError, TypeError):
-        return "N/A".rjust(len(fmt.human_duration(0, precision=2, short=True)))
+        return "N/A"
 
 
 def fmt_pc(floatval: float):

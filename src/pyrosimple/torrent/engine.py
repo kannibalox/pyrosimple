@@ -25,6 +25,9 @@ from typing import Any, Callable, Dict, Optional, Set
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
 
+import humanize
+import datetime
+
 
 #
 # Conversion Helpers
@@ -32,6 +35,21 @@ from pyrosimple.util import fmt, matching, metafile, rpc, traits
 def untyped(val):
     """A type specifier for fields that does nothing."""
     return val
+
+
+def natsizerate(val):
+    return natsize(val) + "/s"
+
+
+def natsize(val):
+    return humanize.naturalsize(val, binary=True).rjust(10)
+
+
+def natdate(val):
+    text = humanize.naturaldate(datetime.datetime.fromtimestamp(val))
+    if text == "a moment":
+        text = "never"
+    return text.ljust(11)
 
 
 def ratio_float(intval: float) -> float:
@@ -375,6 +393,7 @@ def core_fields():
         "data size",
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.size_bytes"),
+        formatter=natsize,
         requires=["d.size_bytes"],
     )
     yield MutableField(
@@ -523,8 +542,8 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
-        accessor=lambda o: round(
-            float(o.rpc_call("d.completed_bytes")) / o.rpc_call("d.size_bytes"), 1
+        accessor=lambda o: (
+            float(o.rpc_call("d.completed_bytes")) / o.rpc_call("d.size_bytes")
         ),
         requires=["d.size_bytes", "d.completed_bytes"],
     )
@@ -541,6 +560,7 @@ def core_fields():
         "uploaded",
         "amount of uploaded data",
         matcher=matching.ByteSizeFilter,
+        formatter=natsize,
         accessor=lambda o: o.rpc_call("d.up.total"),
         requires=["d.up.total"],
     )
@@ -549,6 +569,7 @@ def core_fields():
         "xfer",
         "transfer rate",
         matcher=matching.ByteSizeFilter,
+        formatter=natsizerate,
         accessor=lambda o: o.fetch("up") + o.fetch("down"),
         requires=["d.up.rate", "d.down.rate"],
     )
@@ -587,7 +608,7 @@ def core_fields():
         "time metafile was loaded",
         matcher=matching.TimeFilterNotNull,
         accessor=lambda o: int(o.rpc_call("d.custom", ["tm_loaded"]) or "0", 10),
-        formatter=fmt.iso_datetime_optional,
+        formatter=natdate,
         requires=["d.custom=tm_loaded"],
     )
     yield DynamicField(
