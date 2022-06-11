@@ -702,6 +702,9 @@ class RtorrentControl(ScriptBaseWithConfig):
         query_tree = matching.QueryGrammar.parse(" ".join(self.args))
         # Use validate_sort_fields to pre-validate key name
         key_names = matching.KeyNameVisitor().visit(query_tree)
+        # Handles the empty regex query "//"
+        if not key_names:
+            key_names = ["name"]
         formatting.validate_sort_fields(",".join(key_names))
         matcher = matching.MatcherBuilder().visit(query_tree)
         self.LOG.debug("Matcher is: %s", matcher)
