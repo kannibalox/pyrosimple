@@ -29,7 +29,7 @@ from typing import Dict, List
 
 import bencode
 
-from pyrosimple import error, connect
+from pyrosimple import connect, error
 from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import fmt, matching, metafile, pymagic, rpc
 from pyrosimple.util.parts import Bunch

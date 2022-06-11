@@ -25,7 +25,7 @@ import time
 import traceback
 
 from argparse import ArgumentParser
-from typing import List, Iterator
+from typing import Iterator, List
 
 from pyrosimple import config, error
 from pyrosimple.torrent import rtorrent
@@ -254,10 +254,8 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         This is separate from the normal get_options due to
         scripts needing to be designed differently for multi-client
         support."""
-        for u in uri.split('+'):
+        for u in uri.split("+"):
             yield self.lookup_connection_alias(u)
-
-
 
 
 class PromptDecorator:
