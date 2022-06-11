@@ -33,38 +33,44 @@ class QueueManager:
         self.engine = None
         self.LOG = pymagic.get_class_logger(self)
         if "log_level" in self.config:
-            self.LOG.setLevel(config.log_level)
+            self.LOG.setLevel(config['log_level'])
         self.LOG.debug("Queue manager created with config %r", self.config)
 
         bool_param = lambda key, default: matching.truth(
-            self.config.get(key, default), f"job.{self.config.job_name}.{key}"
+            self.config.get(key, default)
         )
-        self.config.viewname = self.config.get("viewname", "pyrotorque")
-        self.config.quiet = bool_param("quiet", False)
-        self.config.startable = matching.QueryGrammar.parse(
-            f"[ {self.config.startable} ] [ is_open=no is_active=no is_complete=no ]"
+        self.config.setdefault("viewname", "main")
+        self.config.setdefault("downloading_min", 0)
+        self.config.setdefault("downloading_max", 20)
+        self.config.setdefault("max_downloading_traffic", 0)
+        self.config['quiet'] = bool_param("quiet", False)
+        self.config['startable'] = matching.MatcherBuilder().visit(
+            matching.QueryGrammar.parse(
+                self.config.get("startable", "[ is_open=no is_active=no is_complete=no ]")
+            )
         )
         self.LOG.info(
-            "Startable matcher for '%s' is: [ %s ]",
-            self.config.job_name,
-            self.config.startable,
+            "Startable matcher is: %s",
+            self.config['startable'],
         )
-        self.config.downloading = matching.QueryGrammar.parse(
+        self.config['downloading'] = matching.MatcherBuilder().visit(
+        matching.QueryGrammar.parse(
             "is_active=1 is_complete=0"
             + (
-                f" [ {self.config.downloading} ]"
+                f" [ {self.config['downloading']} ]"
                 if "downloading" in self.config
                 else ""
             )
         )
-        self.LOG.info(
-            "Downloading matcher for '%s' is: [ %s ]",
-            self.config.job_name,
-            self.config.downloading,
         )
+        self.LOG.info(
+            "Downloading matcher is: [ %s ]",
+            self.config['downloading'],
+        )
+        sort_fields = self.config.get('sort_fields', 'prio-,loaded,name').strip()
         self.sort_key = (
-            formatting.validate_sort_fields(self.config.sort_fields)
-            if self.config.sort_fields.strip()
+            formatting.validate_sort_fields(sort_fields)
+            if sort_fields
             else None
         )
 
@@ -76,45 +82,43 @@ class QueueManager:
         # TODO: Don't start anything more if download BW is used >= config threshold in %
 
         # Check if anything more is ready to start downloading
-        startable = [i for i in items if self.config.startable.match(i)]
+        startable = [i for i in items if self.config['startable'].match(i)]
         if not startable:
             self.LOG.debug(
-                "Checked %d item(s), none startable according to [ %s ]",
+                "Checked %d item(s), none startable according to %s",
                 len(items),
-                self.config.startable,
+                self.config['startable'],
             )
             return
 
         # Check intermission delay
+        intermission = self.config.get('intermission', 120)
         now = time.time()
         if now < self.last_start:
             # compensate for summer time and other oddities
             self.last_start = now
-        delayed = int(self.last_start + self.config.intermission - now)
+        delayed = int(self.last_start + intermission - now)
         if delayed > 0:
             self.LOG.debug(
                 "Delaying start of %d item(s),"
                 " due to %ds intermission with %ds left",
                 len(startable),
-                self.config.intermission,
+                intermission,
                 delayed,
             )
             return
 
         # Stick to "start_at_once" parameter, unless "downloading_min" is violated
-        downloading = [i for i in items if self.config.downloading.match(i)]
+        downloading = [i for i in items if self.config['downloading'].match(i)]
         start_now = max(
-            self.config.start_at_once, self.config.downloading_min - len(downloading)
+            self.config.get('start_at_once', 1), self.config['downloading_min'] - len(downloading)
         )
         start_now = min(start_now, len(startable))
 
-        if (
-            "max_downloading_traffic" in self.config
-            and self.config.max_downloading_traffic
-        ):
+        if (self.config['max_downloading_traffic'] > 0):
             down_traffic = sum(i.down for i in downloading)
             self.LOG.debug("%d downloading, down %d", len(downloading), down_traffic)
-            if down_traffic > int(self.config.max_downloading_traffic):
+            if down_traffic > int(self.config['max_downloading_traffic']):
                 self.LOG.debug("Max download traffic reaching, skipping start")
                 return
 
@@ -133,19 +137,19 @@ class QueueManager:
             # (restarts items that were stopped due to the "low_diskspace" schedule, and also avoids triggering it at all)
 
             # Only check the other conditions when we have `downloading_min` covered
-            if len(downloading) < self.config.downloading_min:
+            if len(downloading) < self.config['downloading_min']:
                 self.LOG.debug(
                     "Catching up from %d to a minimum of %d downloading item(s)",
                     len(downloading),
-                    self.config.downloading_min,
+                    self.config['downloading_min'],
                 )
             else:
                 # Limit to the given maximum of downloading items
-                if len(downloading) >= self.config.downloading_max:
+                if len(downloading) >= self.config['downloading_max']:
                     self.LOG.debug(
                         "Already downloading %d item(s) out of %d max, %d more could be downloading",
                         len(downloading),
-                        self.config.downloading_max,
+                        self.config['downloading_max'],
                         len(startable) - idx,
                     )
                     break
@@ -154,15 +158,15 @@ class QueueManager:
             self.last_start = now
             downloading.append(item)
             self.LOG.info(
-                "%s '%s' [%s, #%s]",
-                "WOULD start" if self.config.dry_run else "Starting",
+                "%s '%s' [%s, %s]",
+                "WOULD start" if self.config['dry_run'] else "Starting",
                 item.name,
                 item.alias,
                 item.hash,
             )
-            if not self.config.dry_run:
+            if not self.config['dry_run']:
                 item.start()
-                if not self.config.quiet:
+                if not self.config['quiet']:
                     self.proxy.log(
                         rpc.NOHASH,
                         "{self.__class__.__name__}: Started '{item.name}' {item.alias}",
@@ -175,7 +179,7 @@ class QueueManager:
             self.proxy = self.engine.open()
 
             # Get items from 'pyrotorque' view
-            items = list(self.engine.items(self.config.viewname))
+            items = list(self.engine.items(self.config['viewname']))
 
             if self.sort_key:
                 items.sort(key=self.sort_key)
