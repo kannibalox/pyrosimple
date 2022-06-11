@@ -39,12 +39,12 @@ from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.util import fmt, rpc
 
 
-def read_blob(arg):
+def read_blob(arg: str) -> bytes:
     """Read a BLOB from given ``@arg``."""
-    result = None
     if arg == "@-":
-        result = sys.stdin.read()
-    elif any(arg.startswith(f"@{x}://") for x in ["http", "https", "ftp", "file"]):
+        return sys.stdin.buffer.read()
+
+    if any(arg.startswith(f"@{x}://") for x in ["http", "https", "ftp", "file"]):
         if not requests_found:
             raise error.UserError(
                 "You must 'pip install requests' to support @URL arguments."
@@ -52,14 +52,12 @@ def read_blob(arg):
         try:
             response = requests.get(arg[1:])
             response.raise_for_status()
-            result = response.content
+            return response.content
         except requests.RequestException as exc:
             raise error.UserError(str(exc))
-    else:
-        with open(os.path.expanduser(arg[1:]), "rb") as handle:
-            result = handle.read()
 
-    return result
+    with open(os.path.expanduser(arg[1:]), "rb") as handle:
+        return handle.read()
 
 
 class RtorrentXmlRpc(ScriptBaseWithConfig):
