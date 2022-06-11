@@ -71,7 +71,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         )
         self.add_bool_option("--stop", help="stop running daemon")
         self.add_bool_option(
-            "--restart", help="stop any existing daemon, then start the process in the backgrounds"
+            "--restart",
+            help="stop any existing daemon, then start the process in the backgrounds",
         )
         self.add_bool_option("-?", "--status", help="Check daemon status")
         self.add_value_option(
@@ -210,9 +211,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             dcontext.stderr = logutil.get_logfile()
             dcontext.stdout = logutil.get_logfile()
             dcontext.pidfile = self.options.pid_file
-            self.LOG.info("Writing pid to %s and detaching process...", self.options.pid_file)
+            self.LOG.info(
+                "Writing pid to %s and detaching process...", self.options.pid_file
+            )
             self.LOG.info("Logging stderr/stdout to %s", logutil.get_logfile())
-            
 
         with dcontext:
             # Set up services

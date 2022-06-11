@@ -313,7 +313,7 @@ class TreeWatch:
         # Assemble custom commands
         self.custom_cmds = {}
         for key, val in self.config.items():
-            if key.startswith('cmd.'):
+            if key.startswith("cmd."):
                 self.custom_cmds[key] = val
 
         # Get client proxy
@@ -425,8 +425,7 @@ class TreeWatchCommand(ScriptBaseWithConfig):
                 self.LOG.info(
                     "Templating values are:\n    %s",
                     "\n    ".join(
-                        f"{key}={repr(val)}"
-                        for key, val in sorted(handler.ns.items())
+                        f"{key}={repr(val)}" for key, val in sorted(handler.ns.items())
                     ),
                 )
 
