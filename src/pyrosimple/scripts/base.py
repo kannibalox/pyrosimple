@@ -243,7 +243,8 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         config.load_custom_py()
         self.engine = rtorrent.RtorrentEngine()
 
-    def lookup_connection_alias(self, uri: str) -> str:
+    def lookup_connection_alias(self, uri: str) -> str:  # pylint: disable=no-self-use
+        """Convert a connection alias to the actual URI (if set in the config"""
         if uri in config.settings["CONNECTIONS"]:
             return str(config.settings["CONNECTIONS"][uri])
         return uri
