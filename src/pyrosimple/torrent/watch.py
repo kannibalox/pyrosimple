@@ -29,7 +29,7 @@ from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import formatting
-from pyrosimple.util import metafile, pymagic, rpc, traits
+from pyrosimple.util import metafile, pymagic, rpc
 from pyrosimple.util.parts import Bunch
 
 
@@ -90,7 +90,7 @@ class MetafileHandler:
             self.job.LOG.warn(
                 "Item #%s '%s' already added to client", self.ns.info_hash, name
             )
-            if self.job.config.get('remove_already_added', False):
+            if self.job.config.get("remove_already_added", False):
                 Path(self.ns.pathname).unlink()
             return False
 
@@ -99,9 +99,9 @@ class MetafileHandler:
     def addinfo(self):
         """Add known facts to templating namespace."""
         # Basic values
-        self.ns.watch_path = self.job.config['path']
+        self.ns.watch_path = self.job.config["path"]
         self.ns.relpath = None
-        for watch in self.job.config['path']:
+        for watch in self.job.config["path"]:
             path = Path(self.ns.pathname)
             try:
                 self.ns.relpath = path.relative_to(watch)
@@ -133,7 +133,9 @@ class MetafileHandler:
         for key, cmd in sorted(self.job.custom_cmds.items()):
             try:
                 template = formatting.env.from_string(cmd)
-                for split_cmd in formatting.format_item(template, {}, defaults=self.ns).split():
+                for split_cmd in formatting.format_item(
+                    template, {}, defaults=self.ns
+                ).split():
                     self.ns.commands.append(split_cmd.strip())
             except error.LoggableError as exc:
                 self.job.LOG.error(f"While expanding '{key}' custom command: {exc}")
@@ -150,7 +152,10 @@ class MetafileHandler:
             # TODO: Scrub metafile if requested
 
             # Determine target state
-            start_it = self.job.config.get("load_mode", "").lower() in ("start", "started")
+            start_it = self.job.config.get("load_mode", "").lower() in (
+                "start",
+                "started",
+            )
 
             if "start" in self.ns.flags:
                 start_it = True
@@ -170,27 +175,26 @@ class MetafileHandler:
                 )
             )
 
-            if self.job.config['dry_run']:
-                self.job.LOG.info(f"Would load: {self.ns.pathname} with commands {self.ns.commands}")
+            if self.job.config["dry_run"]:
+                self.job.LOG.info(
+                    f"Would load: {self.ns.pathname} with commands {self.ns.commands}"
+                )
                 return
-             
+
             load_cmd(rpc.NOHASH, self.ns.pathname, *tuple(self.ns.commands))
             time.sleep(0.05)  # let things settle
 
             # Announce new item
-            if not self.job.config['quiet']:
+            if not self.job.config["quiet"]:
                 try:
                     name = self.job.proxy.d.name(self.ns.info_hash)
                 except rpc.HashNotFound:
                     name = "NOHASH"
-                msg = "{}: Loaded '{}' from '{}/'{}{}".format(
+                msg = "{}: Loaded '{}' from '{}/' {}".format(
                     self.job.__class__.__name__,
                     name,
                     os.path.dirname(self.ns.pathname).rstrip(os.sep),
-                    " [queued]" if queue_it else "",
-                    (" [startable]" if queue_it else " [started]")
-                    if start_it
-                    else " [normal]",
+                    "[started]" if start_it else "[normal]",
                 )
                 self.job.proxy.log(rpc.NOHASH, msg)
 
@@ -262,7 +266,7 @@ class TreeWatchHandler(pyinotify.ProcessEvent):
         """Fallback."""
         if self.job.LOG.isEnabledFor(logging.DEBUG):
             # On debug level, we subscribe to ALL events, so they're expected in that case ;)
-            if self.job.config['trace_inotify']:
+            if self.job.config["trace_inotify"]:
                 self.job.LOG.debug(f"Ignored inotify event:\n    {event!r}")
         else:
             self.job.LOG.warning(f"Unexpected inotify event {event!r}")
@@ -277,12 +281,12 @@ class TreeWatch:
         if "log_level" in self.config:
             self.LOG.setLevel(config["log_level"])
         self.LOG.debug("Tree watcher created with config %r", self.config)
-        self.config.setdefault('dry_run', False)
-        self.config.setdefault('started', False)
-        self.config.setdefault('trace_inotify', False)
-        self.config.setdefault('check_unhandled', False)
-        self.config.setdefault('remove_unhandled', False)
-        self.config.setdefault('remove_already_added', False)
+        self.config.setdefault("dry_run", False)
+        self.config.setdefault("started", False)
+        self.config.setdefault("trace_inotify", False)
+        self.config.setdefault("check_unhandled", False)
+        self.config.setdefault("remove_unhandled", False)
+        self.config.setdefault("remove_already_added", False)
 
         self.manager = None
         self.handler = None
@@ -346,7 +350,11 @@ class TreeWatch:
             for path in self.config["path"]:
                 for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
-                    if self.config.get("remove_unhandled", False) and filepath.exists() and not self.config["dry_run"]:
+                    if (
+                        self.config.get("remove_unhandled", False)
+                        and filepath.exists()
+                        and not self.config["dry_run"]
+                    ):
                         filepath.unlink()
 
 
