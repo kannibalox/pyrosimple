@@ -25,6 +25,7 @@ import sys
 import time
 
 from typing import Callable, List, Optional, Union
+from multiprocessing.pool import ThreadPool
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
@@ -726,21 +727,31 @@ class RtorrentControl(ScriptBaseWithConfig):
         engines = {}
         for uri in self.split_scgi_url(config.settings["SCGI_URL"]):
             engines[uri] = rtorrent.RtorrentEngine(uri, auto_open=True)
+        # Kick off the result fetcher in a thread pool
+        pool = ThreadPool(processes=len(engines))
+        futures = {}
         for uri, r_engine in engines.items():
-            r_engine = rtorrent.RtorrentEngine(uri, auto_open=True)
-            view = r_engine.view(self.options.from_view, matcher)
-            prefetch = [
-                engine.FieldDefinition.FIELDS[f].requires
-                for f in self.get_output_fields()
-                + key_names
-                + [
-                    s[1:] if s.startswith("-") else s
-                    for s in self.options.sort_fields.split(",")
+            def fetch(e):
+                view = e.view(self.options.from_view, matcher)
+                prefetch = [
+                    engine.FieldDefinition.FIELDS[f].requires
+                    for f in self.get_output_fields()
+                    + key_names
+                    + [
+                        s[1:] if s.startswith("-") else s
+                        for s in self.options.sort_fields.split(",")
+                    ]
                 ]
-            ]
-            prefetch = [item for sublist in prefetch for item in sublist]
-            matches = list(r_engine.items(view=view, prefetch=prefetch))
-            matches.sort(key=sort_key, reverse=self.options.reverse_sort)
+                prefetch = [item for sublist in prefetch for item in sublist]
+                matches = list(e.items(view=view, prefetch=prefetch))
+                matches.sort(key=sort_key, reverse=self.options.reverse_sort)
+                return matches
+            futures[uri] = pool.apply_async(fetch, (r_engine,))
+
+        # The rest of the process should still be done in sequence
+        for uri, r_engine in engines.items():
+            view = r_engine.view(self.options.from_view, matcher)
+            matches = futures[uri].get()
 
             if selection:
                 matches = matches[selection[0] - 1 : selection[1]]
