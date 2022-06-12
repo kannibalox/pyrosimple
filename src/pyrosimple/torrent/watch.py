@@ -90,7 +90,7 @@ class MetafileHandler:
             self.job.LOG.warn(
                 "Item #%s '%s' already added to client", self.ns.info_hash, name
             )
-            if self.job.config.remove_already_added:
+            if self.job.config.get('remove_already_added', False):
                 Path(self.ns.pathname).unlink()
             return False
 
@@ -99,9 +99,9 @@ class MetafileHandler:
     def addinfo(self):
         """Add known facts to templating namespace."""
         # Basic values
-        self.ns.watch_path = self.job.config.path
+        self.ns.watch_path = self.job.config['path']
         self.ns.relpath = None
-        for watch in self.job.config.path:
+        for watch in self.job.config['path']:
             path = Path(self.ns.pathname)
             try:
                 self.ns.relpath = path.relative_to(watch)
@@ -160,23 +160,16 @@ class MetafileHandler:
             # TODO: Scrub metafile if requested
 
             # Determine target state
-            start_it = self.job.config.load_mode.lower() in ("start", "started")
-            queue_it = self.job.config.queued
+            start_it = self.job.config.get("load_mode", "").lower() in ("start", "started")
 
             if "start" in self.ns.flags:
                 start_it = True
             elif "load" in self.ns.flags:
                 start_it = False
 
-            if "queue" in self.ns.flags:
-                queue_it = True
-
             # Load metafile into client
             load_cmd = self.job.proxy.load.verbose
-            if queue_it:
-                if not start_it:
-                    self.ns.commands.append("d.priority.set=0")
-            elif start_it:
+            if start_it:
                 load_cmd = self.job.proxy.load.start_verbose
 
             self.job.LOG.debug(
@@ -187,7 +180,7 @@ class MetafileHandler:
                 )
             )
 
-            if self.job.config.dry_run:
+            if self.job.config['dry_run']:
                 self.LOG.info(f"Would load: {self.ns.pathname} with commands {self.ns.commands}")
                 return
              
@@ -195,7 +188,7 @@ class MetafileHandler:
             time.sleep(0.05)  # let things settle
 
             # Announce new item
-            if not self.job.config.quiet:
+            if not self.job.config['quiet']:
                 try:
                     name = self.job.proxy.d.name(self.ns.info_hash)
                 except rpc.HashNotFound:
@@ -279,7 +272,7 @@ class TreeWatchHandler(pyinotify.ProcessEvent):
         """Fallback."""
         if self.job.LOG.isEnabledFor(logging.DEBUG):
             # On debug level, we subscribe to ALL events, so they're expected in that case ;)
-            if self.job.config.trace_inotify:
+            if self.job.config['trace_inotify']:
                 self.job.LOG.debug(f"Ignored inotify event:\n    {event!r}")
         else:
             self.job.LOG.warning(f"Unexpected inotify event {event!r}")
@@ -294,6 +287,12 @@ class TreeWatch:
         if "log_level" in self.config:
             self.LOG.setLevel(config["log_level"])
         self.LOG.debug("Tree watcher created with config %r", self.config)
+        self.config.setdefault('dry_run', False)
+        self.config.setdefault('started', False)
+        self.config.setdefault('trace_inotify', False)
+        self.config.setdefault('check_unhandled', False)
+        self.config.setdefault('remove_unhandled', False)
+        self.config.setdefault('remove_already_added', False)
 
         self.manager = None
         self.handler = None
