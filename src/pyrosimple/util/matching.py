@@ -349,7 +349,9 @@ class PatternFilter(FieldFilter):
         self._value: str = self._value.lower()
         self._template = None
         self._matcher: Callable[Any, Any]
-        if self._value.startswith("/") and self._value.endswith("/"):
+        if self._value == '""':
+            self._matcher = lambda val, _: val == ""
+        elif self._value.startswith("/") and self._value.endswith("/"):
             if self._value in ["//", "/.*/"]:
                 self._matcher = lambda _, __: True
             else:
@@ -373,7 +375,7 @@ class PatternFilter(FieldFilter):
         """Return rTorrent condition to speed up data transfer."""
         if self._name not in self.PRE_FILTER_FIELDS or self._template:
             return ""
-        if not self._value:
+        if not self._value or self._value == '""':
             return f'"equal={self.PRE_FILTER_FIELDS[self._name]},cat="'
 
         if self._value.startswith("/") and self._value.endswith("/"):
