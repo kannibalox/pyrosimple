@@ -187,6 +187,10 @@ class MetafileHandler:
                 )
             )
 
+            if self.job.config.dry_run:
+                self.LOG.info(f"Would load: {self.ns.pathname} with commands {self.ns.commands}")
+                return
+             
             load_cmd(rpc.NOHASH, self.ns.pathname, *tuple(self.ns.commands))
             time.sleep(0.05)  # let things settle
 
