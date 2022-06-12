@@ -185,7 +185,7 @@ class MetafileHandler:
             time.sleep(0.05)  # let things settle
 
             # Announce new item
-            if not self.job.config["quiet"]:
+            if self.job.config["print_to_client"]:
                 try:
                     name = self.job.proxy.d.name(self.ns.info_hash)
                 except rpc.HashNotFound:
@@ -281,6 +281,7 @@ class TreeWatch:
         if "log_level" in self.config:
             self.LOG.setLevel(config["log_level"])
         self.LOG.debug("Tree watcher created with config %r", self.config)
+        self.config.setdefault("print_to_client", True)
         self.config.setdefault("dry_run", False)
         self.config.setdefault("started", False)
         self.config.setdefault("trace_inotify", False)
@@ -294,10 +295,6 @@ class TreeWatch:
 
         if "path" not in self.config:
             raise error.UserError("You need to set 'path' in the configuration!")
-
-        # self.config.quiet = bool_param("quiet", False)
-        # self.config.queued = bool_param("queued", False)
-        # self.config.trace_inotify = bool_param("trace_inotify", False)
 
         self.config["path"] = {
             Path(p).expanduser().absolute()
