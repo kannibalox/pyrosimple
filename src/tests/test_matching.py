@@ -103,7 +103,6 @@ def test_parsim_error_conditions(cond):
     ("cond", "expected"),
     [
         ("name=arch", '"string.contains_i=$d.name=,\\"arch\\""'),
-        ("name=arch-* OR [ alias=Ubuntu loaded>1w ]", "")
     ],
 )
 def test_conditions_prefilter(cond, expected):
