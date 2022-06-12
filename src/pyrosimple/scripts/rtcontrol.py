@@ -28,7 +28,7 @@ from typing import Callable, List, Optional, Union
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
-from pyrosimple.torrent import engine, formatting
+from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
 from pyrosimple.util.parts import Bunch, DefaultBunch
 
@@ -65,9 +65,9 @@ def print_help_fields():
 class FieldStatistics:
     """Collect statistical values for the fields of a search result."""
 
-    def __init__(self, size):
+    def __init__(self):
         "Initialize accumulator"
-        self.size = size
+        self.size = 0
         self.errors = DefaultBunch(int)
         self.total = DefaultBunch(int)
         self.min = DefaultBunch(int)
@@ -90,6 +90,7 @@ class FieldStatistics:
             self.total[field] += val
             self.min[field] = min(self.min[field], val) if field in self.min else val
             self.max[field] = max(self.max[field], val)
+            self.size += 1
         except (ValueError, TypeError):
             self.errors[field] += 1
 
@@ -717,215 +718,215 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
             self.options.from_view = self.options.to_view = self.options.modify_view
 
+        # Holds summary information, will be populated later
+        summary = FieldStatistics()
+
+
         # Find matching torrents
-        view = self.engine.view(self.options.from_view, matcher)
-        prefetch = [
-            engine.FieldDefinition.FIELDS[f].requires
-            for f in self.get_output_fields()
-            + key_names
-            + [
-                s[1:] if s.startswith("-") else s
-                for s in self.options.sort_fields.split(",")
+        engines = {}
+        for uri in self.split_scgi_url(config.settings["SCGI_URL"]):
+            engines[uri] = rtorrent.RtorrentEngine(uri, auto_open=True)
+        for uri, r_engine in engines.items():
+            r_engine = rtorrent.RtorrentEngine(uri, auto_open=True)
+            view = r_engine.view(self.options.from_view, matcher)
+            prefetch = [
+                engine.FieldDefinition.FIELDS[f].requires
+                for f in self.get_output_fields()
+                + key_names
+                + [
+                    s[1:] if s.startswith("-") else s
+                    for s in self.options.sort_fields.split(",")
+                ]
             ]
-        ]
-        prefetch = [item for sublist in prefetch for item in sublist]
-        matches = list(self.engine.items(view=view, prefetch=prefetch))
-        matches.sort(key=sort_key, reverse=self.options.reverse_sort)
+            prefetch = [item for sublist in prefetch for item in sublist]
+            matches = list(r_engine.items(view=view, prefetch=prefetch))
+            matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
-        if selection:
-            matches = matches[selection[0] - 1 : selection[1]]
+            if selection:
+                matches = matches[selection[0] - 1 : selection[1]]
 
-        if not matches:
-            # Think "404 NOT FOUND", but then exit codes should be < 256
-            self.return_code = 44
+            if not matches:
+                # Think "404 NOT FOUND", but then exit codes should be < 256
+                self.return_code = 44
 
-        # Build header stencil
-        stencil: Optional[str] = None
-        if self.options.column_headers and self.is_plain_output_format and matches:
-            stencil = formatting.format_item(
-                self.options.output_format_template, matches[0], self.FORMATTER_DEFAULTS
-            ).split("\t")
-            self.emit(item=None, stencil=stencil)
+            # Tee to ncurses view, if requested
+            if self.options.tee_view and (self.options.to_view or self.options.view_only):
+                self.show_in_view(view, matches)
 
-        # Tee to ncurses view, if requested
-        if self.options.tee_view and (self.options.to_view or self.options.view_only):
-            self.show_in_view(view, matches)
+            # Generate summary?
+            if self.options.stats or self.options.summary:
+                for field in self.get_output_fields():
+                    try:
+                        0 + getattr(matches[0], field)
+                    except (TypeError, ValueError, IndexError):
+                        summary.total[field] = ""
+                    else:
+                        for item in matches:
+                            summary.add(field, getattr(item, field))
 
-        # Generate summary?
-        summary = FieldStatistics(len(matches))
-        if self.options.stats or self.options.summary:
-            for field in self.get_output_fields():
-                try:
-                    0 + getattr(matches[0], field)
-                except (TypeError, ValueError, IndexError):
-                    summary.total[field] = ""
-                else:
-                    for item in matches:
-                        summary.add(field, getattr(item, field))
-
-        def output_formatter(templ, namespace=None):
-            "Output formatting helper"
-            full_ns = dict(
-                version=None,
-                proxy=self.engine.open(),
-                view=view,
-                query=matcher,
-                matches=matches,
-                summary=summary,
-            )
-            full_ns.update(namespace or {})
-            return formatting.expand_template(templ, full_ns)
-
-        # Execute action?
-        if actions:
-            action = actions[0]  # TODO: loop over it
-            self.LOG.info(
-                "%s %s %d out of %d torrents.",
-                "Would" if self.options.dry_run else "About to",
-                action.label,
-                len(matches),
-                view.size(),
-            )
-            defaults = {"action": action.label, "now": time.time}
-            defaults.update(self.FORMATTER_DEFAULTS)
-
-            if self.options.column_headers and matches:
-                self.emit(None, stencil=stencil)
-
-            # Perform chosen action on matches
-            template_args = [("{##}" + i if "{{" in i else i) for i in action.args]
-            for item in matches:
-                if not self.prompt.ask_bool(f"{action.label} item {item.name}"):
-                    continue
-                if (
-                    self.options.output_format
-                    and not self.options.view_only
-                    and str(self.options.output_format) != "-"
-                ):
-                    self.emit(item, defaults)
-
-                args = tuple(
-                    formatting.format_item(
-                        formatting.env.from_string(i), item, defaults=dict(item=item)
-                    )
-                    for i in template_args
+            def output_formatter(templ, namespace=None):
+                "Output formatting helper"
+                full_ns = dict(
+                    version=None,
+                    proxy=r_engine.open(),
+                    view=view,
+                    query=matcher,
+                    matches=matches,
+                    summary=summary,
                 )
+                full_ns.update(namespace or {})
+                return formatting.expand_template(templ, full_ns)
 
-                if self.options.dry_run:
-                    self.LOG.debug("Would call action %s%r", action.method, args)
-                else:
-                    getattr(item, action.method)(*args)
-                    if self.options.flush:
-                        item.flush()
-                    if self.options.view_only:
-                        show_in_client = lambda x: self.engine.open().log(rpc.NOHASH, x)
-                        self.emit(item, defaults, to_log=show_in_client)
+            # Execute action?
+            if actions:
+                action = actions[0]  # TODO: loop over it
+                self.LOG.info(
+                    "%s %s %d out of %d torrents.",
+                    "Would" if self.options.dry_run else "About to",
+                    action.label,
+                    len(matches),
+                    view.size(),
+                )
+                defaults = {"action": action.label, "now": time.time}
+                defaults.update(self.FORMATTER_DEFAULTS)
 
-        # Show in ncurses UI?
-        elif not self.options.tee_view and (
-            self.options.to_view or self.options.view_only
-        ):
-            self.show_in_view(view, matches)
+                if self.options.column_headers and matches:
+                    self.emit(None, stencil=stencil)
 
-        # Execute OS commands?
-        elif self.options.call or self.options.spawn:
-            if self.options.call and self.options.spawn:
-                self.fatal("You cannot mix --call and --spawn")
-
-            template_cmds = []
-            if self.options.call:
-                for cmd in self.options.call:
-                    template_cmds.append(["{##}" + cmd])
-            else:
-                for cmd in self.options.spawn:
-                    template_cmds.append(
-                        [
-                            ("{##}" + i if "{{" in i else i)
-                            for i in shlex.split(str(cmd))
-                        ]
-                    )
-
-            for item in matches:
-                cmds: List[str] = [
-                    [formatting.format_item(i, item) for i in k] for k in template_cmds
-                ]
-
-                if self.options.dry_run:
-                    self.LOG.info("Would call command(s) %r", cmds)
-                else:
-                    for cmd in cmds:
-                        if self.options.call:
-                            logged_cmd = cmd[0]
-                        else:
-                            logged_cmd = '"{}"'.format('" "'.join(cmd))
-                        self.LOG.info("Calling: %s", logged_cmd)
-                        try:
-                            if self.options.call:
-                                subprocess.check_call(cmd[0], shell=True)
-                            else:
-                                subprocess.check_call(cmd)
-                        except subprocess.CalledProcessError as exc:
-                            raise error.UserError(f"Command failed: {exc}")
-                        except OSError as exc:
-                            raise error.UserError(
-                                f"Command failed ({logged_cmd}): {exc}"
-                            )
-
-        # Dump as JSON array?
-        elif self.options.json:
-            json_data = matches
-            if raw_output_format:
-                json_fields = raw_output_format.split(",")
-                json_data = [
-                    {name: getattr(i, name) for name in json_fields} for i in matches
-                ]
-            json.dump(
-                json_data,
-                sys.stdout,
-                indent=2,
-                separators=(",", ": "),
-                sort_keys=True,
-                cls=pymagic.JSONEncoder,
-            )
-            sys.stdout.write("\n")
-            sys.stdout.flush()
-
-        # Show via template?
-        elif self.options.output_template:
-            output_template = self.options.output_template
-            sys.stdout.write(output_formatter(output_template))
-            sys.stdout.flush()
-
-        # Show on console?
-        elif self.options.output_format and str(self.options.output_format) != "-":
-            if not self.options.summary:
+                # Perform chosen action on matches
+                template_args = [("{##}" + i if "{{" in i else i) for i in action.args]
                 for item in matches:
-                    # Print matching item
-                    self.emit(item, self.FORMATTER_DEFAULTS)
+                    if not self.prompt.ask_bool(f"{action.label} item {item.name}"):
+                        continue
+                    if (
+                        self.options.output_format
+                        and not self.options.view_only
+                        and str(self.options.output_format) != "-"
+                    ):
+                        self.emit(item, defaults)
 
-            # Print summary?
-            if matches and summary:
-                print(f"TOTALS:\t{len(matches)} out of {view.size()} torrents")
-                self.emit(summary.min, item_formatter=lambda i: "MIN:\t" + i.rstrip())
-                self.emit(
-                    summary.average, item_formatter=lambda i: "AVG:\t" + i.rstrip()
+                    args = tuple(
+                        formatting.format_item(
+                            formatting.env.from_string(i), item, defaults=dict(item=item)
+                        )
+                        for i in template_args
+                    )
+
+                    if self.options.dry_run:
+                        self.LOG.debug("Would call action %s%r", action.method, args)
+                    else:
+                        getattr(item, action.method)(*args)
+                        if self.options.flush:
+                            item.flush()
+                        if self.options.view_only:
+                            show_in_client = lambda x: r_engine.open().log(rpc.NOHASH, x)
+                            self.emit(item, defaults, to_log=show_in_client)
+
+            # Show in ncurses UI?
+            elif not self.options.tee_view and (
+                self.options.to_view or self.options.view_only
+            ):
+                self.show_in_view(view, matches)
+
+            # Execute OS commands?
+            elif self.options.call or self.options.spawn:
+                if self.options.call and self.options.spawn:
+                    self.fatal("You cannot mix --call and --spawn")
+
+                template_cmds = []
+                if self.options.call:
+                    for cmd in self.options.call:
+                        template_cmds.append(["{##}" + cmd])
+                else:
+                    for cmd in self.options.spawn:
+                        template_cmds.append(
+                            [
+                                ("{##}" + i if "{{" in i else i)
+                                for i in shlex.split(str(cmd))
+                            ]
+                        )
+
+                for item in matches:
+                    cmds: List[str] = [
+                        [formatting.format_item(i, item) for i in k] for k in template_cmds
+                    ]
+
+                    if self.options.dry_run:
+                        self.LOG.info("Would call command(s) %r", cmds)
+                    else:
+                        for cmd in cmds:
+                            if self.options.call:
+                                logged_cmd = cmd[0]
+                            else:
+                                logged_cmd = '"{}"'.format('" "'.join(cmd))
+                            self.LOG.info("Calling: %s", logged_cmd)
+                            try:
+                                if self.options.call:
+                                    subprocess.check_call(cmd[0], shell=True)
+                                else:
+                                    subprocess.check_call(cmd)
+                            except subprocess.CalledProcessError as exc:
+                                raise error.UserError(f"Command failed: {exc}")
+                            except OSError as exc:
+                                raise error.UserError(
+                                    f"Command failed ({logged_cmd}): {exc}"
+                                )
+
+            # Dump as JSON array?
+            elif self.options.json:
+                json_data = matches
+                if raw_output_format:
+                    json_fields = raw_output_format.split(",")
+                    json_data = [
+                        {name: getattr(i, name) for name in json_fields} for i in matches
+                    ]
+                json.dump(
+                    json_data,
+                    sys.stdout,
+                    indent=2,
+                    separators=(",", ": "),
+                    sort_keys=True,
+                    cls=pymagic.JSONEncoder,
                 )
-                self.emit(summary.max, item_formatter=lambda i: "MAX:\t" + i.rstrip())
-                self.emit(summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip())
+                sys.stdout.write("\n")
+                sys.stdout.flush()
 
-            self.LOG.info(
-                "Dumped %d out of %d torrents.",
-                len(matches),
-                view.size(),
-            )
-        else:
-            self.LOG.info(
-                "Filtered %d out of %d torrents.",
-                len(matches),
-                view.size(),
-            )
+            # Show via template?
+            elif self.options.output_template:
+                output_template = self.options.output_template
+                sys.stdout.write(output_formatter(output_template))
+                sys.stdout.flush()
 
-        self.LOG.debug("RPC stats: %s", self.engine.rpc)
+            # Show on console?
+            elif self.options.output_format and str(self.options.output_format) != "-":
+                if not self.options.summary:
+                    for item in matches:
+                        # Print matching item
+                        self.emit(item, self.FORMATTER_DEFAULTS)
+
+                # Print summary?
+                if matches and summary:
+                    print(f"TOTALS:\t{len(matches)} out of {view.size()} torrents")
+                    self.emit(summary.min, item_formatter=lambda i: "MIN:\t" + i.rstrip())
+                    self.emit(
+                        summary.average, item_formatter=lambda i: "AVG:\t" + i.rstrip()
+                    )
+                    self.emit(summary.max, item_formatter=lambda i: "MAX:\t" + i.rstrip())
+                    self.emit(summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip())
+
+                self.LOG.info(
+                    "Dumped %d out of %d torrents.",
+                    len(matches),
+                    view.size(),
+                )
+            else:
+                self.LOG.info(
+                    "Filtered %d out of %d torrents.",
+                    len(matches),
+                    view.size(),
+                )
+
+            self.LOG.debug("RPC stats: %s", r_engine.rpc)
 
 
 def run():  # pragma: no cover
