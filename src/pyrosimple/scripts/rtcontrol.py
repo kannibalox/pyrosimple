@@ -22,9 +22,10 @@ import re
 import shlex
 import subprocess
 import sys
+import functools
 import time
 
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Union
 from multiprocessing.pool import ThreadPool
 
 from pyrosimple import config, error
@@ -293,9 +294,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             "--print0",
             action="store_true",
             help="use a NUL character instead of a linebreak after items",
-        )
-        output_group.add_argument(
-            "-c", "--column-headers", help="print column headers", action="store_true"
         )
         output_group.add_argument(
             "-+",
@@ -775,19 +773,6 @@ class RtorrentControl(ScriptBaseWithConfig):
                         for item in matches:
                             summary.add(field, getattr(item, field))
 
-            def output_formatter(templ, namespace=None):
-                "Output formatting helper"
-                full_ns = dict(
-                    version=None,
-                    proxy=r_engine.open(),
-                    view=view,
-                    query=matcher,
-                    matches=matches,
-                    summary=summary,
-                )
-                full_ns.update(namespace or {})
-                return formatting.expand_template(templ, full_ns)
-
             # Execute action?
             if actions:
                 action = actions[0]  # TODO: loop over it
@@ -800,9 +785,6 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
                 defaults = {"action": action.label, "now": time.time}
                 defaults.update(self.FORMATTER_DEFAULTS)
-
-                if self.options.column_headers and matches:
-                    self.emit(None, stencil=stencil)
 
                 # Perform chosen action on matches
                 template_args = [("{##}" + i if "{{" in i else i) for i in action.args]
@@ -830,7 +812,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         if self.options.flush:
                             item.flush()
                         if self.options.view_only:
-                            show_in_client = lambda x: r_engine.open().log(rpc.NOHASH, x)
+                            show_in_client = functools.partial(lambda x, e: e.open().log(rpc.NOHASH, x), e=r_engine)
                             self.emit(item, defaults, to_log=show_in_client)
 
             # Show in ncurses UI?
@@ -904,8 +886,17 @@ class RtorrentControl(ScriptBaseWithConfig):
 
             # Show via template?
             elif self.options.output_template:
+                full_ns = dict(
+                    version=None,
+                    proxy=r_engine.open(),
+                    view=view,
+                    query=matcher,
+                    matches=matches,
+                    summary=summary,
+                )
+
                 output_template = self.options.output_template
-                sys.stdout.write(output_formatter(output_template))
+                sys.stdout.write(formatting.expand_template(output_template, full_ns))
                 sys.stdout.flush()
 
             # Show on console?
