@@ -163,7 +163,7 @@ class QueueManager:
                 if not self.config["quiet"]:
                     self.proxy.log(
                         rpc.NOHASH,
-                        "{self.__class__.__name__}: Started '{item.name}' {item.alias}",
+                        f"{self.__class__.__name__}: Started '{item.name}' {item.alias}",
                     )
 
     def run(self):
