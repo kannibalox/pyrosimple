@@ -128,23 +128,13 @@ class MetafileHandler:
             )[-1][1]
         self.ns.filetype = os.path.splitext(main_file)[1]
 
-        # Add name traits
-        kind, info = traits.name_trait(self.ns.info_name, add_info=True)
-        self.ns.traits = Bunch(info)
-        self.ns.traits.kind = kind
-        self.ns.label = "/".join(
-            traits.detect_traits(
-                name=self.ns.info_name,
-                alias=self.ns.tracker_alias,
-                filetype=self.ns.filetype,
-            )
-        ).strip("/")
-
         # Finally, expand commands from templates
         self.ns.commands = []
         for key, cmd in sorted(self.job.custom_cmds.items()):
             try:
-                self.ns.commands.append(formatting.format_item(cmd, self.ns))
+                template = formatting.env.from_string(cmd)
+                for split_cmd in formatting.format_item(template, {}, defaults=self.ns).split():
+                    self.ns.commands.append(split_cmd.strip())
             except error.LoggableError as exc:
                 self.job.LOG.error(f"While expanding '{key}' custom command: {exc}")
 
@@ -181,7 +171,7 @@ class MetafileHandler:
             )
 
             if self.job.config['dry_run']:
-                self.LOG.info(f"Would load: {self.ns.pathname} with commands {self.ns.commands}")
+                self.job.LOG.info(f"Would load: {self.ns.pathname} with commands {self.ns.commands}")
                 return
              
             load_cmd(rpc.NOHASH, self.ns.pathname, *tuple(self.ns.commands))
@@ -316,7 +306,7 @@ class TreeWatch:
         # Assemble custom commands
         self.custom_cmds = {}
         for key, val in self.config.items():
-            if key.startswith("cmd."):
+            if key.startswith("cmd_"):
                 self.custom_cmds[key] = val
 
         # Get client proxy
@@ -356,7 +346,7 @@ class TreeWatch:
             for path in self.config["path"]:
                 for filepath in Path(path).rglob("**/*.torrent"):
                     MetafileHandler(self, filepath).handle()
-                    if self.config.get("remove_unhandled", False) and filepath.exists():
+                    if self.config.get("remove_unhandled", False) and filepath.exists() and not self.config["dry_run"]:
                         filepath.unlink()
 
 
