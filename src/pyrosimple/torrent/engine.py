@@ -658,11 +658,14 @@ class TorrentProxy:
             try:
                 return FieldDefinition.FIELDS[name]
             except KeyError:
+                custom_name = name.split('_', 1)[1]
                 field = DynamicField(
                     str,
                     name,
-                    f"custom attribute {name.split('_', 1)[1]!r}",
+                    f"custom attribute {custom_name}",
                     matcher=matching.PatternFilter,
+                    accessor=lambda o: o.rpc_call("d.custom", [custom_name]),
+                    requires=[f"d.custom={custom_name}"],
                 )
                 setattr(cls, name, field)  # add field to all proxy objects
 
