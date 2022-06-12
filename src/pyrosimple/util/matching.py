@@ -177,6 +177,7 @@ class AndNode(MatcherNode):
     def __repr__(self):
         return f"{type(self).__name__}{[repr(c) for c in self.children]}"
 
+
 class OrNode(MatcherNode):
     """This node performs a logical OR for all of it's children."""
 
@@ -198,6 +199,7 @@ class OrNode(MatcherNode):
 
     def __repr__(self):
         return f"{type(self).__name__}{[repr(c) for c in self.children]}"
+
 
 class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
     """Base class for all field filters.

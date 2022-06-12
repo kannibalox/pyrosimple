@@ -23,8 +23,6 @@ import time
 
 from typing import Any, Callable, Dict, Optional, Set
 
-import humanize
-
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
 
