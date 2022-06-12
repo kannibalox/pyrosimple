@@ -37,24 +37,6 @@ def untyped(val):
     return val
 
 
-def natsizerate(val):
-    """Formate an int to a data rate"""
-    return natsize(val) + "/s"
-
-
-def natsize(val):
-    """Format an int to a human-readable string"""
-    return humanize.naturalsize(val, binary=True).rjust(10)
-
-
-def natdate(val):
-    """Convert epoch seconds to human-readable date"""
-    text = humanize.naturaldate(datetime.datetime.fromtimestamp(val))
-    if text == "a moment":
-        text = "never"
-    return text.ljust(11)
-
-
 def ratio_float(intval: float) -> float:
     """Convert scaled integer ratio to a normalized float."""
     return intval / 1000.0
@@ -396,7 +378,6 @@ def core_fields():
         "data size",
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.size_bytes"),
-        formatter=natsize,
         requires=["d.size_bytes"],
     )
     yield MutableField(
@@ -545,8 +526,8 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
-        accessor=lambda o: (
-            float(o.rpc_call("d.completed_bytes")) / o.rpc_call("d.size_bytes")
+        accessor=lambda o: round(
+            float(o.rpc_call("d.completed_bytes")) / o.rpc_call("d.size_bytes"), 1
         ),
         requires=["d.size_bytes", "d.completed_bytes"],
     )
@@ -563,7 +544,6 @@ def core_fields():
         "uploaded",
         "amount of uploaded data",
         matcher=matching.ByteSizeFilter,
-        formatter=natsize,
         accessor=lambda o: o.rpc_call("d.up.total"),
         requires=["d.up.total"],
     )
@@ -572,7 +552,6 @@ def core_fields():
         "xfer",
         "transfer rate",
         matcher=matching.ByteSizeFilter,
-        formatter=natsizerate,
         accessor=lambda o: o.fetch("up") + o.fetch("down"),
         requires=["d.up.rate", "d.down.rate"],
     )
@@ -611,7 +590,7 @@ def core_fields():
         "time metafile was loaded",
         matcher=matching.TimeFilterNotNull,
         accessor=lambda o: int(o.rpc_call("d.custom", ["tm_loaded"]) or "0", 10),
-        formatter=natdate,
+        formatter=fmt.iso_datetime_optional,
         requires=["d.custom=tm_loaded"],
     )
     yield DynamicField(
