@@ -36,7 +36,7 @@ def test_fmt_human_size(size, expected):
     ("size", "expected"),
     [
         (5 * 1024, "5.0 KiB".rjust(10)),
-        (0, "0 Bytes".rjust(10)),
+        (0, "0 bytes".rjust(10)),
         ("invalid", "N/A".rjust(10)),
     ],
 )
