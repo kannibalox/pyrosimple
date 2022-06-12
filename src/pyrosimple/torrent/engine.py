@@ -657,7 +657,7 @@ class TorrentProxy:
             try:
                 return FieldDefinition.FIELDS[name]
             except KeyError:
-                custom_name = name.split('_', 1)[1]
+                custom_name = name.split("_", 1)[1]
                 field = DynamicField(
                     str,
                     name,

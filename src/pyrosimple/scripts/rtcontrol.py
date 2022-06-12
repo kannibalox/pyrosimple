@@ -720,7 +720,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Holds summary information, will be populated later
         summary = FieldStatistics()
 
-
         # Find matching torrents
         engines = {}
         for uri in self.split_scgi_url(config.settings["SCGI_URL"]):
@@ -729,6 +728,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         pool = ThreadPool(processes=len(engines))
         futures = {}
         for uri, r_engine in engines.items():
+
             def fetch(e):
                 view = e.view(self.options.from_view, matcher)
                 prefetch = [
@@ -744,6 +744,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 matches = list(e.items(view=view, prefetch=prefetch))
                 matches.sort(key=sort_key, reverse=self.options.reverse_sort)
                 return matches
+
             futures[uri] = pool.apply_async(fetch, (r_engine,))
 
         # The rest of the process should still be done in sequence
@@ -759,7 +760,9 @@ class RtorrentControl(ScriptBaseWithConfig):
                 self.return_code = 44
 
             # Tee to ncurses view, if requested
-            if self.options.tee_view and (self.options.to_view or self.options.view_only):
+            if self.options.tee_view and (
+                self.options.to_view or self.options.view_only
+            ):
                 self.show_in_view(view, matches)
 
             # Generate summary?
@@ -800,7 +803,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
                     args = tuple(
                         formatting.format_item(
-                            formatting.env.from_string(i), item, defaults=dict(item=item)
+                            formatting.env.from_string(i),
+                            item,
+                            defaults=dict(item=item),
                         )
                         for i in template_args
                     )
@@ -812,7 +817,9 @@ class RtorrentControl(ScriptBaseWithConfig):
                         if self.options.flush:
                             item.flush()
                         if self.options.view_only:
-                            show_in_client = functools.partial(lambda x, e: e.open().log(rpc.NOHASH, x), e=r_engine)
+                            show_in_client = functools.partial(
+                                lambda x, e: e.open().log(rpc.NOHASH, x), e=r_engine
+                            )
                             self.emit(item, defaults, to_log=show_in_client)
 
             # Show in ncurses UI?
@@ -841,7 +848,8 @@ class RtorrentControl(ScriptBaseWithConfig):
 
                 for item in matches:
                     cmds: List[str] = [
-                        [formatting.format_item(i, item) for i in k] for k in template_cmds
+                        [formatting.format_item(i, item) for i in k]
+                        for k in template_cmds
                     ]
 
                     if self.options.dry_run:
@@ -871,7 +879,8 @@ class RtorrentControl(ScriptBaseWithConfig):
                 if raw_output_format:
                     json_fields = raw_output_format.split(",")
                     json_data = [
-                        {name: getattr(i, name) for name in json_fields} for i in matches
+                        {name: getattr(i, name) for name in json_fields}
+                        for i in matches
                     ]
                 json.dump(
                     json_data,
@@ -909,12 +918,18 @@ class RtorrentControl(ScriptBaseWithConfig):
                 # Print summary?
                 if matches and summary:
                     print(f"TOTALS:\t{len(matches)} out of {view.size()} torrents")
-                    self.emit(summary.min, item_formatter=lambda i: "MIN:\t" + i.rstrip())
+                    self.emit(
+                        summary.min, item_formatter=lambda i: "MIN:\t" + i.rstrip()
+                    )
                     self.emit(
                         summary.average, item_formatter=lambda i: "AVG:\t" + i.rstrip()
                     )
-                    self.emit(summary.max, item_formatter=lambda i: "MAX:\t" + i.rstrip())
-                    self.emit(summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip())
+                    self.emit(
+                        summary.max, item_formatter=lambda i: "MAX:\t" + i.rstrip()
+                    )
+                    self.emit(
+                        summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip()
+                    )
 
                 self.LOG.info(
                     "Dumped %d out of %d torrents.",

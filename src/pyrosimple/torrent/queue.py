@@ -55,7 +55,7 @@ class QueueManager:
         )
         self.config["downloading"] = matching.MatcherBuilder().visit(
             matching.QueryGrammar.parse(
-                self.config.get('downloading', 'is_active=1 is_complete=0')
+                self.config.get("downloading", "is_active=1 is_complete=0")
             )
         )
         self.LOG.info(
