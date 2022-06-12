@@ -55,16 +55,11 @@ class QueueManager:
         )
         self.config["downloading"] = matching.MatcherBuilder().visit(
             matching.QueryGrammar.parse(
-                "is_active=1 is_complete=0"
-                + (
-                    f" [ {self.config['downloading']} ]"
-                    if "downloading" in self.config
-                    else ""
-                )
+                self.config.get('downloading', 'is_active=1 is_complete=0')
             )
         )
         self.LOG.info(
-            "Downloading matcher is: [ %s ]",
+            "Downloading matcher is: %s",
             self.config["downloading"],
         )
         sort_fields = self.config.get("sort_fields", "prio-,loaded,name").strip()
