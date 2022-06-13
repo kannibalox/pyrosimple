@@ -16,6 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import difflib
 import json
 import logging
 import os
@@ -162,6 +163,16 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 ", ".join(repr(i) for i in args),
                 exc,
             )
+            if f"Method '{method}' not defined" in str(exc):
+                cmds = difflib.get_close_matches(method, proxy.system.listMethods())
+                if cmds:
+                    print("The most similar methods are:")
+                    for w in cmds:
+                        print("-", w)
+                else:
+                    print(
+                        "No similar methods found, try `rtxmlrpc system.listMethods` to see a full list of available methods."
+                    )
             self.return_code = (
                 error.EX_NOINPUT
                 if "not find" in getattr(exc, "faultString", "")
