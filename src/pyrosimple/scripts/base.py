@@ -254,7 +254,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
 
         This is separate from lookup_connection_alias due to scripts needing to be written specifically
         to handle this"""
-        val = config.settings["CONNECTIONS"][uri]
+        val = config.settings["CONNECTIONS"].get(uri, [uri])
         if isinstance(val, list):
             for v in val:
                 yield self.lookup_connection_alias(v)
