@@ -108,6 +108,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                         f"Job '{name}' is missing the required '{key}' parameter"
                     )
             self.jobs[name] = dict(params)
+            if self.options().dry_run:
+                self.jobs[name]["dry_run"] = True
             if params.get("active", False):
                 self.jobs[name]["handler"] = pymagic.import_name(params.handler)
             self.jobs[name]["schedule"] = self.parse_schedule(params.get("schedule"))
@@ -193,6 +195,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         # Check if we only need to run once
         if self.options.run_once:
             params = self.jobs[self.options.run_once]
+            if self.options.dry_run:
+                params["dry_run"] = True
             params["handler_copy"] = params.get("handler")(params)
             params["handler_copy"].run()
             sys.exit(0)
