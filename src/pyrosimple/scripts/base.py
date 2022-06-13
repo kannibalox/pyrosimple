@@ -239,7 +239,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         """Get program options."""
         super().get_options()
         if self.options.url:
-            config.settings["SCGI_URL"] = self.lookup_connection_alias(self.options.url)
+            config.settings["SCGI_URL"] = self.options.url
         config.load_custom_py()
         self.engine = rtorrent.RtorrentEngine()
 
@@ -249,14 +249,17 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
             return str(config.settings["CONNECTIONS"][uri])
         return uri
 
-    def split_scgi_url(self, uri: str) -> Iterator[str]:
-        """Split a URL into multiple components.
+    def multi_connection_lookup(self, uri: str) -> Iterator[str]:
+        """Return a list of uris.
 
-        This is separate from the normal get_options due to
-        scripts needing to be designed differently for multi-client
-        support."""
-        for u in uri.split("+"):
-            yield self.lookup_connection_alias(u)
+        This is separate from lookup_connection_alias due to scripts needing to be written specifically
+        to handle this"""
+        val = config.settings["CONNECTIONS"][uri]
+        if isinstance(val, list):
+            for v in val:
+                yield self.lookup_connection_alias(v)
+        else:
+            yield self.lookup_connection_alias(val)
 
 
 class PromptDecorator:
