@@ -867,8 +867,7 @@ class MatcherBuilder(NodeVisitor):
             return real_children
         return None
 
+
 def create_matcher(query: str):
     """Utility function to build a matcher from a query string."""
-    return MatcherBuilder().visit(
-        QueryGrammar.parse(query)
-    )
+    return MatcherBuilder().visit(QueryGrammar.parse(query))

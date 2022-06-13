@@ -17,16 +17,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import functools
 import json
 import re
 import shlex
 import subprocess
 import sys
-import functools
 import time
 
-from typing import Callable, List, Union
 from multiprocessing.pool import ThreadPool
+from typing import Callable, List, Union
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
