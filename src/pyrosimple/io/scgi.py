@@ -3,6 +3,7 @@ import io
 import logging
 import socket
 import subprocess
+import urllib.request
 
 from typing import Dict, List, Tuple, Type
 from urllib import parse as urlparse
@@ -72,6 +73,19 @@ class SSHTransport(RTorrentTransport):
         return self.parse_response(io.BytesIO(_parse_response(resp.stdout)[0]))
 
 
+class HTTPTransport(RTorrentTransport):
+    """Transport via HTTP(s) call."""
+
+    def request(self, host, handler, request_body, verbose=False):
+        self.verbose = verbose
+        req = urllib.request.Request(self.uri)
+        for key, val in self._headers:
+            req.add_header(key, val)
+        req.data = request_body
+        with urllib.request.urlopen(req) as resp:
+            return self.parse_response(resp)
+
+
 class TCPTransport(RTorrentTransport):
     """Transport via TCP socket."""
 
@@ -103,6 +117,8 @@ class UnixTransport(RTorrentTransport):
 
 TRANSPORTS = {
     "scgi": TCPTransport,
+    "http": HTTPTransport,
+    "https": HTTPTransport,
     "scgi+unix": UnixTransport,
     "scgi+ssh": SSHTransport,
 }
