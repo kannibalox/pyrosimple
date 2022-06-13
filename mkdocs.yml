@@ -1,0 +1,47 @@
+---
+site_name: pyrosimple
+site_url: https://example.com/
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - User Guide:
+      - rtxmlrpc: usage-rtxmlrpc.md
+      - rtcontrol: usage-rtcontrol.md
+      - pyrotorque: usage-pyrotorque.md
+      - "mktor/lstor/chtor": usage-tor.md
+  - Reference:
+      - Configuration: configuration.md
+      - Torque Jobs: pyrotorque-jobs.md
+  - Advanced:
+      - Experimental Features: experimental.md
+      - Tips & Tricks: tips.md
+theme:
+  name: material
+  palette:
+
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+plugins:
+  - search
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
