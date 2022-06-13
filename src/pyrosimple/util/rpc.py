@@ -124,6 +124,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 codec = xmlrpclib
             handler = scgi.transport_from_url(uri)
             transport = handler(
+                uri=uri,
                 use_datetime=use_datetime,
                 use_builtin_types=use_builtin_types,
                 codec=codec,

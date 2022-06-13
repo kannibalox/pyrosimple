@@ -2,6 +2,7 @@
 import io
 import logging
 import socket
+import subprocess
 
 from typing import Dict, List, Tuple, Type
 from urllib import parse as urlparse
@@ -32,10 +33,11 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 
 
 class RTorrentTransport(xmlrpclib.Transport):
-    """Base class for handle transports. Primaarily exists to allow
+    """Base class for handle transports. Primarily exists to allow
     using the same transport with a different underlying RPC mechanism"""
 
-    def __init__(self, *args, codec=xmlrpclib, headers=(), **kwargs):
+    def __init__(self, *args, uri, codec=xmlrpclib, headers=(), **kwargs):
+        self.uri = uri
         self.codec = codec
         self.verbose = False
         # We need to handle the headers differently based on the RPC protocols
@@ -48,6 +50,26 @@ class RTorrentTransport(xmlrpclib.Transport):
         if self.codec == xmlrpclib:
             return super().parse_response(response)
         return self.codec.loads(response.read())
+
+
+class SSHTransport(RTorrentTransport):
+    """Transport via SSH conneection."""
+
+    def request(self, host, handler, request_body, verbose=False):
+        self.verbose = verbose
+        target = urlparse.urlparse(self.uri).path
+        cmd = ["ssh", host, "socat", "STDIO", target[1:]]
+        resp = subprocess.run(
+            cmd,
+            input=_encode_payload(request_body, self._headers),
+            capture_output=True,
+            check=False,
+        )
+        if resp.returncode > 0:
+            print("SSH command returned non-zero exit code")
+            print("stderr:", resp.stderr)
+            print("stdout:", resp.stdout)
+        return self.parse_response(io.BytesIO(_parse_response(resp.stdout)[0]))
 
 
 class TCPTransport(RTorrentTransport):
@@ -77,10 +99,6 @@ class UnixTransport(RTorrentTransport):
                 return self.parse_response(
                     io.BytesIO(_parse_response(handle.read())[0])
                 )
-
-
-class SSHTransport(RTorrentTransport):
-    """Stub for removed SSH support"""
 
 
 TRANSPORTS = {
