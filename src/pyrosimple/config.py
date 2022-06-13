@@ -47,7 +47,7 @@ settings = Dynaconf(
         # Allow individual overrides in FORMATS section
         Validator(
             "FORMATS__default",
-            default='{{d.name}} \t[{{d.alias}}]\n  {{d.is_private|fmt("is_private")}} {{d.is_open|fmt("is_open")}} {{d.is_active|fmt("is_active")}} P{{d.prio}} {%if d.is_complete %}     done{%else%}{{"%8.1f"|format(d.done)}}%{%endif%}\t{{d.size|sz}} U:{{d.up|sz}}/s  D:{{d.down|sz}}/s T:{{d.throttle|fmt("throttle")}}',
+            default='{{d.name}} \t[{{d.alias}}]\n  {{d.is_private|fmt("is_private")}} {{d.is_open|fmt("is_open")}} {{d.is_active|fmt("is_active")}} P{{d.prio}} {%if d.is_complete %}     done{%else%}{{"%8.2f"|format(d.done)}}%{%endif%}\t{{d.size|sz}} U:{{d.up|sz}}/s  D:{{d.down|sz}}/s T:{{d.throttle|fmt("throttle")}}',
         ),
         Validator(
             "FORMATS__short",
@@ -59,7 +59,7 @@ settings = Dynaconf(
         ),
         Validator(
             "FORMATS__action",
-            default="{{now()|iso}} {{action}}\t {{d.name}} {{d.alias}}",
+            default="{{now()|iso}} {{action}}\t {{d.name}} [{{d.alias}}]",
         ),
     ],
 )
