@@ -489,8 +489,8 @@ def core_fields():
         "metafile",
         "path to torrent file",
         matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(str(o.rpc_call["metafile"])),
-        requires=["d.metafile"],
+        accessor=lambda o: os.path.expanduser(str(o.rpc_call("d.session_file"))),
+        requires=["d.session_file"],
     )
     yield ConstantField(
         str,
