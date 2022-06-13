@@ -81,11 +81,12 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             help="file holding the process ID of the daemon, when running in background",
         )
 
-    def _parse_schedule(self, schedule):
+    def parse_schedule(self, schedule):
         """Parse a job schedule."""
         result = {}
 
-        for param in shlex.split(str(schedule)):  # do not feed unicode to shlex
+        for param in schedule.split():
+            param = param.strip()
             try:
                 key, val = param.split("=", 1)
                 if key == "jitter":
@@ -97,7 +98,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         return result
 
-    def _validate_config(self):
+    def validate_config(self):
         """Handle and check configuration."""
 
         for name, params in config.settings.TORQUE.items():
@@ -109,9 +110,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.jobs[name] = dict(params)
             if params.get("active", False):
                 self.jobs[name]["handler"] = pymagic.import_name(params.handler)
-            self.jobs[name]["schedule"] = self._parse_schedule(params.get("schedule"))
+            self.jobs[name]["schedule"] = self.parse_schedule(params.get("schedule"))
 
-    def _add_jobs(self):
+    def add_jobs(self):
         """Add configured jobs."""
         for name, params in self.jobs.items():
             if params["active"]:
@@ -123,7 +124,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     **params["schedule"],
                 )
 
-    def _run_forever(self):
+    def run_forever(self):
         """Run configured jobs until termination request."""
         while True:
             try:
@@ -138,7 +139,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
     def mainloop(self):
         """The main loop."""
-        self._validate_config()
+        self.validate_config()
 
         # Defaults for process control paths
         if not self.options.pid_file:
@@ -223,9 +224,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             # Run services
             self.sched.start()
             try:
-                self._add_jobs()
+                self.add_jobs()
                 # TODO: daemonize here, or before the scheduler starts?
-                self._run_forever()
+                self.run_forever()
             finally:
                 self.sched.shutdown()
 
