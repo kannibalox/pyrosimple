@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tempita package &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/js/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing Guidelines" href="../contributing.html" />
+    <link rel="prev" title="pyrosimple.util package" href="pyrosimple.util.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pyrosimple
+            <img src="../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migrating.html">Migrating from pyrocore</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#packages-modules">Packages &amp; Modules</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#tempita-templating-api">Tempita Templating API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tempita package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tempita.compat3">tempita.compat3 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tempita">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">API Documentation</a> &raquo;</li>
+      <li>tempita package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/apidoc/tempita.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tempita-package">
+<h1>tempita package<a class="headerlink" href="#tempita-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-tempita.compat3">
+<span id="tempita-compat3-module"></span><h2>tempita.compat3 module<a class="headerlink" href="#module-tempita.compat3" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tempita.compat3.b">
+<span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita/compat3.html#b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.compat3.b" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tempita.compat3.bytes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable_of_ints</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#tempita.compat3.bytes" title="tempita.compat3.bytes"><span class="pre">bytes</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#tempita.compat3.bytes" title="tempita.compat3.bytes"><span class="pre">bytes</span></a></span></span></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_or_buffer</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">immutable</span> <span class="pre">copy</span> <span class="pre">of</span> <span class="pre">bytes_or_buffer</span></span></span></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span> <span class="pre">object</span> <span class="pre">of</span> <span class="pre">size</span> <span class="pre">given</span> <span class="pre">by</span> <span class="pre">the</span> <span class="pre">parameter</span> <span class="pre">initialized</span> <span class="pre">with</span> <span class="pre">null</span> <span class="pre">bytes</span></span></span></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">bytes</span></span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">empty</span> <span class="pre">bytes</span> <span class="pre">object</span></span></span></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="simple">
+<dt>Construct an immutable array of bytes from:</dt><dd><ul class="simple">
+<li><p>an iterable yielding integers in range(256)</p></li>
+<li><p>a text string encoded using the specified encoding</p></li>
+<li><p>any object implementing the buffer API.</p></li>
+<li><p>an integer</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.capitalize">
+<span class="sig-name descname"><span class="pre">capitalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">copy</span> <span class="pre">of</span> <span class="pre">B</span></span></span><a class="headerlink" href="#tempita.compat3.bytes.capitalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of B with only its first character capitalized (ASCII)
+and the rest lower-cased.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.center">
+<span class="sig-name descname"><span class="pre">center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a centered string of length width.</p>
+<p>Padding is done using the specified fill character.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.count">
+<span class="sig-name descname"><span class="pre">count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of non-overlapping occurrences of subsection sub in
+bytes B[start:end].  Optional arguments start and end are interpreted
+as in slice notation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode the bytes using the codec registered for encoding.</p>
+<dl class="simple">
+<dt>encoding</dt><dd><p>The encoding with which to decode the bytes.</p>
+</dd>
+<dt>errors</dt><dd><p>The error handling scheme to use for the handling of decoding errors.
+The default is ‘strict’ meaning that decoding errors raise a
+UnicodeDecodeError. Other possible values are ‘ignore’ and ‘replace’
+as well as any other name registered with codecs.register_error that
+can handle UnicodeDecodeErrors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.endswith">
+<span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.endswith" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if B ends with the specified suffix, False otherwise.
+With optional start, test B beginning at that position.
+With optional end, stop comparing B at that position.
+suffix can also be a tuple of bytes to try.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.expandtabs">
+<span class="sig-name descname"><span class="pre">expandtabs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tabsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.expandtabs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy where all tab characters are expanded using spaces.</p>
+<p>If tabsize is not given, a tab size of 8 characters is assumed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the lowest index in B where subsection sub is found,
+such that sub is contained within B[start,end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Return -1 on failure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.fromhex">
+<span class="sig-name descname"><span class="pre">fromhex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.fromhex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a bytes object from a string of hexadecimal numbers.</p>
+<p>Spaces between two numbers are accepted.
+Example: bytes.fromhex(‘B9 01EF’) -&gt; b’\xb9\x01\xef’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.hex">
+<span class="sig-name descname"><span class="pre">hex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.hex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a string of hexadecimal numbers from a bytes object.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>sep</dt><dd><p>An optional single character or byte to separate hex bytes.</p>
+</dd>
+<dt>bytes_per_sep</dt><dd><p>How many bytes between separators.  Positive values count from the
+right, negative values count from the left.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Example:
+&gt;&gt;&gt; value = b’xb9x01xef’
+&gt;&gt;&gt; value.hex()
+‘b901ef’
+&gt;&gt;&gt; value.hex(‘:’)
+‘b9:01:ef’
+&gt;&gt;&gt; value.hex(‘:’, 2)
+‘b9:01ef’
+&gt;&gt;&gt; value.hex(‘:’, -2)
+‘b901:ef’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the lowest index in B where subsection sub is found,
+such that sub is contained within B[start,end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Raises ValueError when the subsection is not found.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.isalnum">
+<span class="sig-name descname"><span class="pre">isalnum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.isalnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all characters in B are alphanumeric
+and there is at least one character in B, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.isalpha">
+<span class="sig-name descname"><span class="pre">isalpha</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.isalpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all characters in B are alphabetic
+and there is at least one character in B, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.isascii">
+<span class="sig-name descname"><span class="pre">isascii</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.isascii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if B is empty or all characters in B are ASCII,
+False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.isdigit">
+<span class="sig-name descname"><span class="pre">isdigit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.isdigit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all characters in B are digits
+and there is at least one character in B, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.islower">
+<span class="sig-name descname"><span class="pre">islower</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.islower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all cased characters in B are lowercase and there is
+at least one cased character in B, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.isspace">
+<span class="sig-name descname"><span class="pre">isspace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.isspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all characters in B are whitespace
+and there is at least one character in B, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.istitle">
+<span class="sig-name descname"><span class="pre">istitle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.istitle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if B is a titlecased string and there is at least one
+character in B, i.e. uppercase characters may only follow uncased
+characters and lowercase characters only cased ones. Return False
+otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.isupper">
+<span class="sig-name descname"><span class="pre">isupper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.isupper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all cased characters in B are uppercase and there is
+at least one cased character in B, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable_of_bytes</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenate any number of bytes objects.</p>
+<p>The bytes whose method is called is inserted in between each pair.</p>
+<p>The result is returned as a new bytes object.</p>
+<p>Example: b’.’.join([b’ab’, b’pq’, b’rs’]) -&gt; b’ab.pq.rs’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.ljust">
+<span class="sig-name descname"><span class="pre">ljust</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.ljust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a left-justified string of length width.</p>
+<p>Padding is done using the specified fill character.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.lower">
+<span class="sig-name descname"><span class="pre">lower</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">copy</span> <span class="pre">of</span> <span class="pre">B</span></span></span><a class="headerlink" href="#tempita.compat3.bytes.lower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of B with all ASCII characters converted to lowercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.lstrip">
+<span class="sig-name descname"><span class="pre">lstrip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.lstrip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strip leading bytes contained in the argument.</p>
+<p>If the argument is omitted or None, strip leading  ASCII whitespace.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.maketrans">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maketrans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.maketrans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a translation table useable for the bytes or bytearray translate method.</p>
+<p>The returned table will be one where each byte in frm is mapped to the byte at
+the same position in to.</p>
+<p>The bytes objects frm and to must be of the same length.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.partition">
+<span class="sig-name descname"><span class="pre">partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partition the bytes into three parts using the given separator.</p>
+<p>This will search for the separator sep in the bytes. If the separator is found,
+returns a 3-tuple containing the part before the separator, the separator
+itself, and the part after it.</p>
+<p>If the separator is not found, returns a 3-tuple containing the original bytes
+object and two empty bytes objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.removeprefix">
+<span class="sig-name descname"><span class="pre">removeprefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.removeprefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a bytes object with the given prefix string removed if present.</p>
+<p>If the bytes starts with the prefix string, return bytes[len(prefix):].
+Otherwise, return a copy of the original bytes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.removesuffix">
+<span class="sig-name descname"><span class="pre">removesuffix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.removesuffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a bytes object with the given suffix string removed if present.</p>
+<p>If the bytes ends with the suffix string and that suffix is not empty,
+return bytes[:-len(prefix)].  Otherwise, return a copy of the original
+bytes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy with all occurrences of substring old replaced by new.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>count</dt><dd><p>Maximum number of occurrences to replace.
+-1 (the default value) means replace all occurrences.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>If the optional argument count is given, only the first count occurrences are
+replaced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.rfind">
+<span class="sig-name descname"><span class="pre">rfind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.rfind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the highest index in B where subsection sub is found,
+such that sub is contained within B[start,end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Return -1 on failure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.rindex">
+<span class="sig-name descname"><span class="pre">rindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><span class="pre">int</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.rindex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the highest index in B where subsection sub is found,
+such that sub is contained within B[start,end].  Optional
+arguments start and end are interpreted as in slice notation.</p>
+<p>Raise ValueError when the subsection is not found.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.rjust">
+<span class="sig-name descname"><span class="pre">rjust</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillchar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.rjust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a right-justified string of length width.</p>
+<p>Padding is done using the specified fill character.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.rpartition">
+<span class="sig-name descname"><span class="pre">rpartition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.rpartition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partition the bytes into three parts using the given separator.</p>
+<p>This will search for the separator sep in the bytes, starting at the end. If
+the separator is found, returns a 3-tuple containing the part before the
+separator, the separator itself, and the part after it.</p>
+<p>If the separator is not found, returns a 3-tuple containing two empty bytes
+objects and the original bytes object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.rsplit">
+<span class="sig-name descname"><span class="pre">rsplit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsplit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.rsplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the sections in the bytes, using sep as the delimiter.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>sep</dt><dd><p>The delimiter according which to split the bytes.
+None (the default value) means split on ASCII whitespace characters
+(space, tab, return, newline, formfeed, vertical tab).</p>
+</dd>
+<dt>maxsplit</dt><dd><p>Maximum number of splits to do.
+-1 (the default value) means no limit.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Splitting is done starting at the end of the bytes and working to the front.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.rstrip">
+<span class="sig-name descname"><span class="pre">rstrip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.rstrip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strip trailing bytes contained in the argument.</p>
+<p>If the argument is omitted or None, strip trailing ASCII whitespace.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsplit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the sections in the bytes, using sep as the delimiter.</p>
+<dl class="simple">
+<dt>sep</dt><dd><p>The delimiter according which to split the bytes.
+None (the default value) means split on ASCII whitespace characters
+(space, tab, return, newline, formfeed, vertical tab).</p>
+</dd>
+<dt>maxsplit</dt><dd><p>Maximum number of splits to do.
+-1 (the default value) means no limit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.splitlines">
+<span class="sig-name descname"><span class="pre">splitlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keepends</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.splitlines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the lines in the bytes, breaking at line boundaries.</p>
+<p>Line breaks are not included in the resulting list unless keepends is given and
+true.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.startswith">
+<span class="sig-name descname"><span class="pre">startswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#tempita.compat3.bytes.startswith" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if B starts with the specified prefix, False otherwise.
+With optional start, test B beginning at that position.
+With optional end, stop comparing B at that position.
+prefix can also be a tuple of bytes to try.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.strip">
+<span class="sig-name descname"><span class="pre">strip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.strip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strip leading and trailing bytes contained in the argument.</p>
+<p>If the argument is omitted or None, strip leading and trailing ASCII whitespace.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.swapcase">
+<span class="sig-name descname"><span class="pre">swapcase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">copy</span> <span class="pre">of</span> <span class="pre">B</span></span></span><a class="headerlink" href="#tempita.compat3.bytes.swapcase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of B with uppercase ASCII characters converted
+to lowercase ASCII and vice versa.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.title">
+<span class="sig-name descname"><span class="pre">title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">copy</span> <span class="pre">of</span> <span class="pre">B</span></span></span><a class="headerlink" href="#tempita.compat3.bytes.title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a titlecased version of B, i.e. ASCII words start with uppercase
+characters, all remaining cased characters have lowercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.translate">
+<span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy with each character mapped by the given translation table.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>table</dt><dd><p>Translation table, which must be a bytes object of length 256.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>All characters occurring in the optional argument delete are removed.
+The remaining characters are mapped through the given translation table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.upper">
+<span class="sig-name descname"><span class="pre">upper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">copy</span> <span class="pre">of</span> <span class="pre">B</span></span></span><a class="headerlink" href="#tempita.compat3.bytes.upper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of B with all ASCII characters converted to uppercase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.compat3.bytes.zfill">
+<span class="sig-name descname"><span class="pre">zfill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.bytes.zfill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pad a numeric string with zeros on the left, to fill a field of the given width.</p>
+<p>The original string is never truncated.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tempita.compat3.is_unicode">
+<span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">is_unicode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita/compat3.html#is_unicode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.compat3.is_unicode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tempita.compat3.next">
+<span class="sig-prename descclassname"><span class="pre">tempita.compat3.</span></span><span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterator</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#tempita.compat3.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next item from the iterator. If default is given and the iterator
+is exhausted, it is returned instead of raising StopIteration.</p>
+</dd></dl>
+
+</section>
+<section id="module-tempita">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tempita" title="Permalink to this headline">¶</a></h2>
+<p>A small templating language</p>
+<p>This implements a small templating language.  This language implements
+if/elif/else, for/continue/break, expressions, and blocks of Python
+code.  The syntax is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="nb">any</span> <span class="n">expression</span> <span class="p">(</span><span class="n">function</span> <span class="n">calls</span> <span class="n">etc</span><span class="p">)}}</span>
+<span class="p">{{</span><span class="nb">any</span> <span class="n">expression</span> <span class="o">|</span> <span class="nb">filter</span><span class="p">}}</span>
+<span class="p">{{</span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">y</span><span class="p">}}</span><span class="o">...</span><span class="p">{{</span><span class="n">endfor</span><span class="p">}}</span>
+<span class="p">{{</span><span class="k">if</span> <span class="n">x</span><span class="p">}}</span><span class="n">x</span><span class="p">{{</span><span class="k">elif</span> <span class="n">y</span><span class="p">}}</span><span class="n">y</span><span class="p">{{</span><span class="k">else</span><span class="p">}}</span><span class="n">z</span><span class="p">{{</span><span class="n">endif</span><span class="p">}}</span>
+<span class="p">{{</span><span class="n">py</span><span class="p">:</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">}}</span>
+<span class="p">{{</span><span class="n">py</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;baz&#39;</span>
+<span class="p">}}</span>
+<span class="p">{{</span><span class="n">default</span> <span class="n">var</span> <span class="o">=</span> <span class="n">default_value</span><span class="p">}}</span>
+<span class="p">{{</span><span class="c1"># comment}}</span>
+</pre></div>
+</div>
+<p>You use this with the <code class="docutils literal notranslate"><span class="pre">Template</span></code> class or the <code class="docutils literal notranslate"><span class="pre">sub</span></code> shortcut.
+The <code class="docutils literal notranslate"><span class="pre">Template</span></code> class takes the template string and the name of
+the template (for errors) and a default namespace.  Then (like
+<code class="docutils literal notranslate"><span class="pre">string.Template</span></code>) you can call the <code class="docutils literal notranslate"><span class="pre">tmpl.substitute(**kw)</span></code>
+method to make a substitution (or <code class="docutils literal notranslate"><span class="pre">tmpl.substitute(a_dict)</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">sub(content,</span> <span class="pre">**kw)</span></code> substitutes the template immediately.  You
+can use <code class="docutils literal notranslate"><span class="pre">__name='tmpl.html'</span></code> to set the name of the template.</p>
+<p>If there are syntax errors <code class="docutils literal notranslate"><span class="pre">TemplateError</span></code> will be raised.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tempita.HTMLTemplate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.</span></span><span class="sig-name descname"><span class="pre">HTMLTemplate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacklevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_inherit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#HTMLTemplate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.HTMLTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tempita.Template" title="tempita.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">tempita.Template</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tempita.HTMLTemplate.default_namespace">
+<span class="sig-name descname"><span class="pre">default_namespace</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'attr':</span> <span class="pre">&lt;function</span> <span class="pre">attr&gt;,</span> <span class="pre">'end_braces':</span> <span class="pre">'}}',</span> <span class="pre">'html':</span> <span class="pre">&lt;class</span> <span class="pre">'tempita.html'&gt;,</span> <span class="pre">'html_quote':</span> <span class="pre">&lt;function</span> <span class="pre">html_quote&gt;,</span> <span class="pre">'looper':</span> <span class="pre">&lt;class</span> <span class="pre">'tempita._looper.looper'&gt;,</span> <span class="pre">'start_braces':</span> <span class="pre">'{{',</span> <span class="pre">'url':</span> <span class="pre">&lt;function</span> <span class="pre">url&gt;}</span></em><a class="headerlink" href="#tempita.HTMLTemplate.default_namespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tempita.Template">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.</span></span><span class="sig-name descname"><span class="pre">Template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacklevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_inherit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#Template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.Template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tempita.Template.default_encoding">
+<span class="sig-name descname"><span class="pre">default_encoding</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'utf8'</span></em><a class="headerlink" href="#tempita.Template.default_encoding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tempita.Template.default_inherit">
+<span class="sig-name descname"><span class="pre">default_inherit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#tempita.Template.default_inherit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tempita.Template.default_namespace">
+<span class="sig-name descname"><span class="pre">default_namespace</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'end_braces':</span> <span class="pre">'}}',</span> <span class="pre">'looper':</span> <span class="pre">&lt;class</span> <span class="pre">'tempita._looper.looper'&gt;,</span> <span class="pre">'start_braces':</span> <span class="pre">'{{'}</span></em><a class="headerlink" href="#tempita.Template.default_namespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.Template.from_filename">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_inherit=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_template=&lt;function</span> <span class="pre">get_file_template&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#Template.from_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.Template.from_filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tempita.Template.substitute">
+<span class="sig-name descname"><span class="pre">substitute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#Template.substitute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.Template.substitute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="tempita.TemplateError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.</span></span><span class="sig-name descname"><span class="pre">TemplateError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#TemplateError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.TemplateError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised while parsing a template</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tempita.bunch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.</span></span><span class="sig-name descname"><span class="pre">bunch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#bunch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.bunch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tempita.html">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tempita.</span></span><span class="sig-name descname"><span class="pre">html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tempita.sub">
+<span class="sig-prename descclassname"><span class="pre">tempita.</span></span><span class="sig-name descname"><span class="pre">sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#sub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.sub" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tempita.sub_html">
+<span class="sig-prename descclassname"><span class="pre">tempita.</span></span><span class="sig-name descname"><span class="pre">sub_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tempita.html#sub_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tempita.sub_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyrosimple.util.html" class="btn btn-neutral float-left" title="pyrosimple.util package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../contributing.html" class="btn btn-neutral float-right" title="Contributing Guidelines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

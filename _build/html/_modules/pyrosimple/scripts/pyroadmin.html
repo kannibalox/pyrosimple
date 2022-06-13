@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.scripts.pyroadmin &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.scripts.pyroadmin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.scripts.pyroadmin</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=</span>
+<span class="sd">&quot;&quot;&quot; Administration Tool.</span>
+
+<span class="sd">    Copyright (c) 2010 The PyroScope Project &lt;pyroscope.project@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along</span>
+<span class="c1"># with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="c1"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="n">StringIO</span><span class="p">,</span> <span class="n">urllib</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="n">xmlrpc_client</span> <span class="k">as</span> <span class="n">xmlrpclib</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">pyrosimple.scripts.base</span> <span class="kn">import</span> <span class="n">ScriptBase</span><span class="p">,</span> <span class="n">ScriptBaseWithConfig</span>
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">error</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">os</span><span class="p">,</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">metafile</span><span class="p">,</span> <span class="n">matching</span><span class="p">,</span> <span class="n">fmt</span>
+
+
+<div class="viewcode-block" id="AdminTool"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyroadmin.AdminTool">[docs]</a><span class="k">class</span> <span class="nc">AdminTool</span><span class="p">(</span><span class="n">ScriptBaseWithConfig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Support for administrative tasks.&quot;&quot;&quot;</span>
+
+    <span class="c1"># argument description for the usage information</span>
+    <span class="n">ARGS_HELP</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># directories that should be created</span>
+    <span class="n">CONFIG_DIRS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;htdocs&quot;</span><span class="p">]</span>
+
+    <span class="n">OPTIONAL_CFG_FILES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;torque.ini&quot;</span><span class="p">]</span>
+
+    <span class="n">RC_CONTINUATION_THRESHOLD</span> <span class="o">=</span> <span class="mi">50</span>
+
+<div class="viewcode-block" id="AdminTool.add_options"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyroadmin.AdminTool.add_options">[docs]</a>    <span class="k">def</span> <span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add program options.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdminTool</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_options</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;--create-config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;create default configuration&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--remove-all-rc-files&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;write new versions of BOTH .rc and .rc.default files, and remove stale ones&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--dump-config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;pretty-print configuration including all defaults&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;--create-import&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;GLOB-PATTERN&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;create import file for a &#39;.d&#39; directory&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--dump-rc&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;pretty-print dynamic commands defined in &#39;rtorrent.rc&#39;&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--output&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;KEY,KEY1.KEY2=DEFAULT,...&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;select fields to print, output is separated by TABs;&quot;</span>
+            <span class="s2">&quot; default values can be provided after the key&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--reveal&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show config internals and full announce URL including keys&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;--screenlet&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;create screenlet stub&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AdminTool.download_resource"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyroadmin.AdminTool.download_resource">[docs]</a>    <span class="k">def</span> <span class="nf">download_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">download_url</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">guard</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper to download and install external resources.&quot;&quot;&quot;</span>
+        <span class="n">download_url</span> <span class="o">=</span> <span class="n">download_url</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">guard</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Already have &#39;</span><span class="si">%s</span><span class="s2">&#39; in &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">download_url</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading &#39;</span><span class="si">%s</span><span class="s2">&#39; to &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">download_url</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">download_url</span><span class="p">))</span> <span class="k">as</span> <span class="n">url_handle</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">download_url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">closing</span><span class="p">(</span>
+                    <span class="n">ZipFile</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">url_handle</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">zip_handle</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-member</span>
+                    <span class="n">zip_handle</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>  <span class="c1"># pylint: disable=no-member</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">guard</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">url_handle</span><span class="p">,</span> <span class="n">file_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AdminTool.mainloop"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyroadmin.AdminTool.mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The main loop.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_for_connection</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">create_config</span><span class="p">:</span>
+            <span class="c1"># Create configuration</span>
+            <span class="n">config_loader</span> <span class="o">=</span> <span class="n">load_config</span><span class="o">.</span><span class="n">ConfigLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">)</span>
+            <span class="n">config_loader</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">remove_all_rc_files</span><span class="p">)</span>
+
+            <span class="c1"># Create directories</span>
+            <span class="k">for</span> <span class="n">dirname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_DIRS</span><span class="p">:</span>
+                <span class="n">dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config_loader</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating </span><span class="si">%r</span><span class="s2">...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dirpath</span><span class="p">,))</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+
+            <span class="c1"># Initialize webserver stuff</span>
+            <span class="k">if</span> <span class="n">matching</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;torque&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;httpd.active&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;httpd.active&quot;</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">download_resource</span><span class="p">(</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">torque</span><span class="p">[</span><span class="s2">&quot;httpd.download_url.smoothie&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;htdocs/js&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;smoothie.js&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">dump_config</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+
+            <span class="c1"># Get public config attributes</span>
+            <span class="n">public</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reveal</span>
+                    <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span><span class="n">callable</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_PREDEFINED</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">dump_config</span><span class="p">:</span>
+                <span class="c1"># Dump configuration</span>
+                <span class="n">pprinter</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">pprint</span><span class="o">.</span><span class="n">PrettyPrinter</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reveal</span>
+                    <span class="k">else</span> <span class="n">metafile</span><span class="o">.</span><span class="n">MaskingPrettyPrinter</span>
+                <span class="p">)()</span>
+                <span class="n">pprinter</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">public</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="k">def</span> <span class="nf">splitter</span><span class="p">(</span><span class="n">fields</span><span class="p">):</span>
+                    <span class="s2">&quot;Yield single names for a list of comma-separated strings.&quot;</span>
+                    <span class="k">for</span> <span class="n">flist</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">flist</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">):</span>
+                            <span class="k">yield</span> <span class="n">field</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">splitter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output</span><span class="p">):</span>
+                    <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="s2">&quot;=&quot;</span> <span class="ow">in</span> <span class="n">field</span><span class="p">:</span>
+                        <span class="n">field</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">public</span>
+                        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">matches</span> <span class="o">=</span> <span class="p">[</span>
+                                    <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                                <span class="p">]</span>
+                                <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
+                                    <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Field </span><span class="si">%r</span><span class="s2"> not found (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">exc</span><span class="p">))</span>
+                            <span class="k">break</span>
+                        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">create_import</span><span class="p">:</span>
+            <span class="n">conf_dirs</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="c1"># Scan given directories</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">create_import</span><span class="p">:</span>
+                <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">error</span><span class="o">.</span><span class="n">UserError</span><span class="p">(</span>
+                        <span class="s2">&quot;Parent of --create-import is not a directory: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Read names of files to ignore</span>
+                <span class="n">ignore_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;.rcignore&quot;</span><span class="p">)</span>
+                <span class="n">rc_ignore</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;.*&quot;</span><span class="p">,</span> <span class="s2">&quot;*~&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ignore_file</span><span class="p">):</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ignore_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
+                            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                                <span class="n">rc_ignore</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+                <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">pattern</span><span class="p">)))</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">x</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">files</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rc_ignore</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Pattern &#39;</span><span class="si">{}</span><span class="s2">&#39; did not resolve to any files!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">conf_dirs</span><span class="p">[</span><span class="n">folder</span><span class="p">]</span> <span class="o">=</span> <span class="n">files</span>
+
+            <span class="c1"># Write &quot;.rc&quot; files</span>
+            <span class="k">for</span> <span class="n">folder</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">conf_dirs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">conf_rc</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s2">&quot;# Include for &#39;</span><span class="si">{}</span><span class="s2">&#39;, generated </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">folder</span><span class="p">),</span> <span class="n">fmt</span><span class="o">.</span><span class="n">iso_datetime</span><span class="p">()</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">folder</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s2">&quot;~&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+                    <span class="n">conf_rc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;import = &quot;</span><span class="si">{}{}{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating </span><span class="si">%r</span><span class="s2">...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s2">&quot;/.import.rc&quot;</span><span class="p">,))</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s2">&quot;/.import.rc&quot;</span><span class="p">),</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                    <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conf_rc</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]))</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">dump_rc</span><span class="p">:</span>
+            <span class="c1"># list all dynamic commands</span>
+            <span class="n">proxy</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+            <span class="n">methods</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">listMethods</span><span class="p">()</span>
+
+            <span class="c1"># XXX This is a heuristic and might break in newer rTorrent versions!</span>
+            <span class="n">builtins</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">methods</span><span class="p">[:</span> <span class="n">methods</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;view.sort_new&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span>
+            <span class="n">plain_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9_.]+$&quot;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">is_method</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                <span class="s2">&quot;Helper&quot;</span>
+                <span class="n">prefixes</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;d.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;f.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;p.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;t.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;choke_group.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;session.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;system.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;throttle.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;trackers.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ui.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;view.&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">plain_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="n">name</span> <span class="ow">in</span> <span class="n">methods</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">rc_quoted</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">in_brace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="s2">&quot;Helper&quot;</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">wrap_fmt</span> <span class="o">=</span> <span class="s2">&quot;{</span><span class="si">%s</span><span class="s2">}&quot;</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">method_name</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">is_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">):</span>
+                            <span class="n">wrap_fmt</span> <span class="o">=</span> <span class="s2">&quot;(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">in_brace</span> <span class="k">else</span> <span class="s2">&quot;((</span><span class="si">%s</span><span class="s2">))&quot;</span>
+                            <span class="k">if</span> <span class="p">(</span>
+                                <span class="s2">&quot;.set&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">method_name</span>
+                                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                                <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+                            <span class="p">):</span>
+                                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">wrap_fmt</span> <span class="o">%</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">rc_quoted</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">in_brace</span><span class="o">=</span><span class="p">(</span><span class="n">wrap_fmt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;{&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">text</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;))))&quot;</span><span class="p">,</span> <span class="s2">&quot;)) ))&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="s2">&quot;(value, </span><span class="si">{:d}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">plain_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_method</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">text</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">))</span>
+
+            <span class="n">group</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">methods</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">const</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">const</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="k">except</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Fault</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">faultCode</span> <span class="o">==</span> <span class="o">-</span><span class="mi">503</span> <span class="ow">and</span> <span class="n">exc</span><span class="o">.</span><span class="n">faultString</span> <span class="o">==</span> <span class="s2">&quot;Key not found.&quot;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">raise</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">group</span><span class="p">,</span> <span class="n">old_group</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">group</span>
+                    <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">&quot;event&quot;</span><span class="p">:</span>
+                        <span class="n">group</span> <span class="o">=</span> <span class="n">name</span>
+                    <span class="k">if</span> <span class="n">group</span> <span class="o">!=</span> <span class="n">old_group</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                    <span class="n">definition</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">objtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">objtype</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">rc_quoted</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+                        <span class="n">wrap_fmt</span> <span class="o">=</span> <span class="s2">&quot;((</span><span class="si">%s</span><span class="s2">))&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">and</span> <span class="n">is_method</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">else</span> <span class="s2">&quot;{</span><span class="si">%s</span><span class="s2">}&quot;</span>
+                        <span class="n">definition</span> <span class="o">=</span> <span class="n">wrap_fmt</span> <span class="o">%</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">objtype</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method.insert = </span><span class="si">{}</span><span class="s2">, multi|rlookup|static&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                            <span class="n">val</span> <span class="o">=</span> <span class="n">rc_quoted</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">RC_CONTINUATION_THRESHOLD</span><span class="p">:</span>
+                                <span class="n">val</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\\n</span><span class="s2">    &quot;</span> <span class="o">+</span> <span class="n">val</span>
+                            <span class="nb">print</span><span class="p">(</span>
+                                <span class="sa">u</span><span class="s1">&#39;method.set_key = </span><span class="si">{}</span><span class="s1">, &quot;</span><span class="si">{}</span><span class="s1">&quot;, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">to_unicode</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">fmt</span><span class="o">.</span><span class="n">to_unicode</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">objtype</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                        <span class="n">definition</span> <span class="o">=</span> <span class="n">rc_quoted</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">objtype</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+                        <span class="n">definition</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="s2">&quot;Cannot handle </span><span class="si">{!r}</span><span class="s2"> definition of method </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">objtype</span><span class="p">,</span> <span class="n">name</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="n">definition</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">builtins</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.set = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">definition</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">six</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>
+                                <span class="n">rctype</span> <span class="o">=</span> <span class="p">{</span>
+                                    <span class="nb">str</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                    <span class="nb">int</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
+                                    <span class="n">long</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
+                                <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">objtype</span><span class="p">,</span> <span class="s2">&quot;simple&quot;</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">rctype</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                                    <span class="n">objtype</span><span class="p">,</span> <span class="s2">&quot;simple&quot;</span>
+                                <span class="p">)</span>
+                            <span class="k">if</span> <span class="n">const</span><span class="p">:</span>
+                                <span class="n">rctype</span> <span class="o">+=</span> <span class="s2">&quot;|const&quot;</span>
+                                <span class="n">const</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">definition</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">RC_CONTINUATION_THRESHOLD</span><span class="p">:</span>
+                                <span class="n">definition</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\\n</span><span class="s2">    &quot;</span> <span class="o">+</span> <span class="n">definition</span>
+                            <span class="n">definition</span> <span class="o">=</span> <span class="n">definition</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                                <span class="s2">&quot; ;     &quot;</span><span class="p">,</span> <span class="s2">&quot; ;</span><span class="se">\\\n</span><span class="s2">     &quot;</span>
+                            <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,    &quot;</span><span class="p">,</span> <span class="s2">&quot;,</span><span class="se">\\\n</span><span class="s2">    &quot;</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span>
+                                <span class="s2">&quot;method.insert = </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="n">name</span><span class="p">,</span> <span class="n">rctype</span><span class="p">,</span> <span class="n">definition</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">const</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method.const.enable = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">screenlet</span><span class="p">:</span>
+            <span class="c1"># Create screenlet stub</span>
+            <span class="n">stub_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~/.screenlets/PyroScope&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">stub_dir</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;Screenlet stub </span><span class="si">%r</span><span class="s2"> already exists&quot;</span> <span class="o">%</span> <span class="n">stub_dir</span><span class="p">)</span>
+
+            <span class="n">stub_template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;screenlet&quot;</span>
+            <span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">stub_template</span><span class="p">,</span> <span class="n">stub_dir</span><span class="p">)</span>
+
+            <span class="n">py_stub</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stub_dir</span><span class="p">,</span> <span class="s2">&quot;PyroScopeScreenlet.py&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">py_stub</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="s2">&quot;#! </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
+                            <span class="s2">&quot;from pyrosimple.screenlet.rtorrent import PyroScopeScreenlet, run&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;if __name__ == &#39;__main__&#39;:&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;    run()&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">py_stub</span><span class="p">,</span> <span class="mo">0o755</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Print usage</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyroadmin.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
+    <span class="sd">&quot;&quot;&quot;The entry point.&quot;&quot;&quot;</span>
+    <span class="n">ScriptBase</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    <span class="n">AdminTool</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.scripts.pyrotorque &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.scripts.pyrotorque</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.scripts.pyrotorque</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=attribute-defined-outside-init</span>
+<span class="sd">&quot;&quot;&quot; rTorrent queue manager &amp; daemon.</span>
+
+<span class="sd">    Copyright (c) 2012 The PyroScope Project &lt;pyroscope.project@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along</span>
+<span class="c1"># with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="c1"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">asyncore</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">logutil</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util.parts</span> <span class="kn">import</span> <span class="n">Bunch</span>
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">error</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">os</span><span class="p">,</span> <span class="n">pymagic</span><span class="p">,</span> <span class="n">osmagic</span><span class="p">,</span> <span class="n">matching</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.scripts.base</span> <span class="kn">import</span> <span class="n">ScriptBase</span><span class="p">,</span> <span class="n">ScriptBaseWithConfig</span>
+
+
+<span class="k">def</span> <span class="nf">_raise_interrupt</span><span class="p">(</span><span class="n">signo</span><span class="p">,</span> <span class="n">dummy_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper for signal handling.&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">KeyboardInterrupt</span><span class="p">(</span><span class="s2">&quot;Caught signal #</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">signo</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RtorrentQueueManager"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyrotorque.RtorrentQueueManager">[docs]</a><span class="k">class</span> <span class="nc">RtorrentQueueManager</span><span class="p">(</span><span class="n">ScriptBaseWithConfig</span><span class="p">):</span>
+    <span class="c1">### Keep things wrapped to fit under this comment... ##############################</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    rTorrent queue manager &amp; daemon.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># argument description for the usage information</span>
+    <span class="n">ARGS_HELP</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">OPTIONAL_CFG_FILES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;torque.ini&quot;</span><span class="p">]</span>
+
+    <span class="n">POLL_TIMEOUT</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<div class="viewcode-block" id="RtorrentQueueManager.add_options"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyrotorque.RtorrentQueueManager.add_options">[docs]</a>    <span class="k">def</span> <span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add program options.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RtorrentQueueManager</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_options</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">httpd</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># basic options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--dry-run&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;advise jobs not to do any real work, just tell what would happen&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--no-fork&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--fg&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Don&#39;t fork into background (stay in foreground and log to console)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;--stop&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Stop running daemon&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--restart&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Stop running daemon, then fork into background&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;-?&quot;</span><span class="p">,</span> <span class="s2">&quot;--status&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Check daemon status&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;--pid-file&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;PATH&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;file holding the process ID of the daemon, when running in background&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;--guard-file&quot;</span><span class="p">,</span> <span class="s2">&quot;PATH&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;guard file for the process watchdog&quot;</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_parse_schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schedule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a job schedule.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">schedule</span><span class="p">)):</span>  <span class="c1"># do not feed unicode to shlex</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;Bad param &#39;</span><span class="si">%s</span><span class="s2">&#39; in job schedule &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">schedule</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_validate_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle and check configuration.&quot;&quot;&quot;</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">job</span><span class="o">=</span><span class="n">defaultdict</span><span class="p">(</span><span class="n">Bunch</span><span class="p">),</span>
+            <span class="n">httpd</span><span class="o">=</span><span class="n">defaultdict</span><span class="p">(</span><span class="n">Bunch</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">torque</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Auto-convert numbers and bools</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">torque</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="n">matching</span><span class="o">.</span><span class="n">TRUE</span> <span class="o">|</span> <span class="n">matching</span><span class="o">.</span><span class="n">FALSE</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">matching</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">key</span><span class="p">)</span>
+
+            <span class="c1"># Assemble grouped parameters</span>
+            <span class="n">stem</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;httpd.active&quot;</span><span class="p">:</span>
+                <span class="n">groups</span><span class="p">[</span><span class="n">stem</span><span class="p">][</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">elif</span> <span class="n">stem</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">stem</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span>
+                        <span class="s2">&quot;Bad </span><span class="si">%s</span><span class="s2"> configuration key </span><span class="si">%r</span><span class="s2"> (expecting </span><span class="si">%s</span><span class="s2">.NAME.PARAM)&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">stem</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">stem</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">groups</span><span class="p">[</span><span class="n">stem</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;job&quot;</span><span class="p">,</span> <span class="s2">&quot;jobs&quot;</span><span class="p">),</span> <span class="n">Bunch</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+        <span class="c1"># Validate httpd config</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">httpd</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">httpd</span><span class="o">.</span><span class="n">waitress</span><span class="o">.</span><span class="n">url_scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;HTTP URL scheme must be either &#39;http&#39; or &#39;https&#39;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">httpd</span><span class="o">.</span><span class="n">waitress</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span>
+                <span class="mi">1024</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">httpd</span><span class="o">.</span><span class="n">waitress</span><span class="o">.</span><span class="n">port</span> <span class="o">&lt;</span> <span class="mi">65536</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;HTTP port must be a 16 bit number &gt;= 1024&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Validate jobs</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;handler&quot;</span><span class="p">,</span> <span class="s2">&quot;schedule&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span>
+                        <span class="s2">&quot;Job &#39;</span><span class="si">%s</span><span class="s2">&#39; is missing the required &#39;job.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&#39; parameter&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+            <span class="n">bool_param</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">params</span><span class="p">:</span> <span class="n">matching</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default</span><span class="p">),</span> <span class="s2">&quot;job.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">params</span><span class="o">.</span><span class="n">job_name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="n">bool_param</span><span class="p">(</span><span class="s2">&quot;dry_run&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">dry_run</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">bool_param</span><span class="p">(</span><span class="s2">&quot;active&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_schedule</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">schedule</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">pymagic</span><span class="o">.</span><span class="n">import_name</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">handler</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span>
+                        <span class="s2">&quot;Bad handler name &#39;</span><span class="si">%s</span><span class="s2">&#39; for job &#39;</span><span class="si">%s</span><span class="s2">&#39;:</span><span class="se">\n</span><span class="s2">    </span><span class="si">%s</span><span class="s2">&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add configured jobs.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">handler</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sched</span><span class="o">.</span><span class="n">add_job</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">handler</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="s1">&#39;cron&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="o">.</span><span class="n">schedule</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_run_forever</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run configured jobs until termination request.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tick</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+                <span class="n">asyncore</span><span class="o">.</span><span class="n">loop</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POLL_TIMEOUT</span><span class="p">,</span> <span class="n">use_poll</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="c1"># Sleep for remaining poll cycle time</span>
+                <span class="n">tick</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">POLL_TIMEOUT</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">tick</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># wait POLL_TIMEOUT at most (robust against time shifts)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">tick</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">POLL_TIMEOUT</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Termination request received (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">SystemExit</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">code</span> <span class="ow">or</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;System exit (RC=</span><span class="si">%r</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Idle work</span>
+                <span class="c1"># self.LOG.warn(&quot;IDLE %s %r&quot; % (self.options.guard_file, os.path.exists(self.options.guard_file)))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">guard_file</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">guard_file</span>
+                <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Guard file &#39;</span><span class="si">%s</span><span class="s2">&#39; disappeared, exiting!&quot;</span>
+                        <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">guard_file</span>
+                    <span class="p">)</span>
+                    <span class="k">break</span>
+
+<div class="viewcode-block" id="RtorrentQueueManager.mainloop"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyrotorque.RtorrentQueueManager.mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The main loop.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_config</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+
+        <span class="c1"># Defaults for process control paths</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">no_fork</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">guard_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">guard_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="s2">&quot;run/pyrotorque&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="s2">&quot;run/pyrotorque.pid&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Process control</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">status</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">stop</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">):</span>
+                <span class="n">running</span><span class="p">,</span> <span class="n">pid</span> <span class="o">=</span> <span class="n">osmagic</span><span class="o">.</span><span class="n">check_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">running</span><span class="p">,</span> <span class="n">pid</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">stop</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">running</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span>
+
+                    <span class="c1"># Wait for termination (max. 10 secs)</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+                        <span class="n">running</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">osmagic</span><span class="o">.</span><span class="n">check_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">running</span><span class="p">:</span>
+                            <span class="k">break</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Process #</span><span class="si">%d</span><span class="s2"> stopped.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">pid</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Process #</span><span class="si">%d</span><span class="s2"> NOT running anymore.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;No pid file &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span> <span class="ow">or</span> <span class="s2">&quot;&lt;N/A&gt;&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Process #</span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> running.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="s2">&quot;UP and&quot;</span> <span class="k">if</span> <span class="n">running</span> <span class="k">else</span> <span class="s2">&quot;NOT&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">:</span>
+                    <span class="n">running</span><span class="p">,</span> <span class="n">pid</span> <span class="o">=</span> <span class="n">osmagic</span><span class="o">.</span><span class="n">check_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">running</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">EX_TEMPFAIL</span>
+                        <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">EX_OK</span> <span class="k">if</span> <span class="n">running</span> <span class="k">else</span> <span class="n">error</span><span class="o">.</span><span class="n">EX_UNAVAILABLE</span>
+                <span class="k">return</span>
+
+        <span class="c1"># Check for guard file and running daemon, abort if not OK</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">osmagic</span><span class="o">.</span><span class="n">guard</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">guard_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">EnvironmentError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">EX_TEMPFAIL</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Detach, if not disabled via option</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">no_fork</span>
+        <span class="p">):</span>  <span class="c1"># or getattr(sys.stdin, &quot;isatty&quot;, lambda: False)():</span>
+            <span class="n">osmagic</span><span class="o">.</span><span class="n">daemonize</span><span class="p">(</span>
+                <span class="n">pidfile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">,</span> <span class="n">logfile</span><span class="o">=</span><span class="n">logutil</span><span class="o">.</span><span class="n">get_logfile</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>  <span class="c1"># let things settle a little</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">_raise_interrupt</span><span class="p">)</span>
+
+        <span class="c1"># Set up services</span>
+        <span class="kn">from</span> <span class="nn">apscheduler.schedulers.background</span> <span class="kn">import</span> <span class="n">BackgroundScheduler</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sched</span> <span class="o">=</span> <span class="n">BackgroundScheduler</span><span class="p">()</span>
+
+        <span class="c1"># Run services</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sched</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_jobs</span><span class="p">()</span>
+            <span class="c1"># TODO: daemonize here, or before the scheduler starts?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_forever</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sched</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">EnvironmentError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Failed to remove pid file &#39;</span><span class="si">%s</span><span class="s2">&#39; (</span><span class="si">%s</span><span class="s2">)&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">pid_file</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">EX_IOERR</span></div></div>
+
+
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.pyrotorque.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
+    <span class="sd">&quot;&quot;&quot;The entry point.&quot;&quot;&quot;</span>
+    <span class="n">ScriptBase</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cron_cfg</span><span class="o">=</span><span class="s2">&quot;torque&quot;</span><span class="p">)</span>
+    <span class="n">RtorrentQueueManager</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

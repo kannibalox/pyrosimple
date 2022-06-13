@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>conf &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/js/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pyrosimple
+            <img src="../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migrating.html">Migrating from pyrocore</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>conf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for conf</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># pyrocore documentation build configuration file, created by</span>
+<span class="c1"># sphinx-quickstart on Sat May  2 16:17:52 2015.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is execfile()d with the current directory set to its containing dir.</span>
+<span class="c1">#</span>
+<span class="c1"># Note that not all possible configuration values are present in this</span>
+<span class="c1"># autogenerated file.</span>
+<span class="c1">#</span>
+<span class="c1"># All configuration values have a default; values that are commented out</span>
+<span class="c1"># serve to show the default.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># If extensions (or modules to document with autodoc) are in another directory,</span>
+<span class="c1"># add these directories to sys.path here. If the directory is relative to the</span>
+<span class="c1"># documentation root, use os.path.abspath to make it absolute, like shown here.</span>
+<span class="c1">#sys.path.insert(0, os.path.abspath(&#39;.&#39;))</span>
+
+<span class="n">project_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">project_version</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+
+<span class="n">on_rtd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;READTHEDOCS&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">on_rtd</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sphinx_rtd_theme</span>
+    <span class="n">html_theme</span> <span class="o">=</span> <span class="s1">&#39;sphinx_rtd_theme&#39;</span>
+    <span class="n">html_theme_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">sphinx_rtd_theme</span><span class="o">.</span><span class="n">get_html_theme_path</span><span class="p">()]</span>
+
+<span class="c1"># https://docs.readthedocs.io/en/latest/guides/adding-custom-css.html</span>
+<div class="viewcode-block" id="setup"><a class="viewcode-back" href="../apidoc/conf.html#conf.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_css_file</span><span class="p">(</span><span class="s1">&#39;css/custom.css&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_js_file</span><span class="p">(</span><span class="s1">&#39;js/custom.js&#39;</span><span class="p">)</span></div>
+
+<span class="c1"># -- General configuration -----------------------------------------------------</span>
+
+<span class="c1"># If your documentation needs a minimal Sphinx version, state it here.</span>
+<span class="c1">#needs_sphinx = &#39;1.0&#39;</span>
+
+<span class="c1"># Add any Sphinx extension module names here, as strings. They can be extensions</span>
+<span class="c1"># coming with Sphinx (named &#39;sphinx.ext.*&#39;) or your custom ones.</span>
+<span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;sphinx.ext.autodoc&#39;</span><span class="p">,</span> <span class="s1">&#39;sphinx.ext.intersphinx&#39;</span><span class="p">,</span> <span class="s1">&#39;sphinx.ext.todo&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sphinx.ext.coverage&#39;</span><span class="p">,</span> <span class="s1">&#39;sphinx.ext.ifconfig&#39;</span><span class="p">,</span> <span class="s1">&#39;sphinx.ext.viewcode&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Add any paths that contain templates here, relative to this directory.</span>
+<span class="n">templates_path</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_templates&#39;</span><span class="p">]</span>
+
+<span class="c1"># The suffix of source filenames.</span>
+<span class="n">source_suffix</span> <span class="o">=</span> <span class="s1">&#39;.rst&#39;</span>
+
+<span class="c1"># The encoding of source files.</span>
+<span class="c1">#source_encoding = &#39;utf-8-sig&#39;</span>
+
+<span class="c1"># The master toctree document.</span>
+<span class="n">master_doc</span> <span class="o">=</span> <span class="s1">&#39;index&#39;</span>
+
+<span class="c1"># General information about the project.</span>
+<span class="n">project</span> <span class="o">=</span> <span class="s1">&#39;pyrosimple&#39;</span>
+<span class="n">copyright</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="c1"># The version info for the project you&#39;re documenting, acts as replacement for</span>
+<span class="c1"># |version| and |release|, also used in various other places throughout the</span>
+<span class="c1"># built documents.</span>
+<span class="c1">#</span>
+<span class="c1"># The short X.Y version.</span>
+<span class="n">version</span> <span class="o">=</span> <span class="n">project_version</span>
+<span class="c1"># The full version, including alpha/beta/rc tags.</span>
+<span class="n">release</span> <span class="o">=</span> <span class="n">project_version</span>
+
+<span class="c1"># The language for content autogenerated by Sphinx. Refer to documentation</span>
+<span class="c1"># for a list of supported languages.</span>
+<span class="c1">#language = None</span>
+
+<span class="c1"># There are two options for replacing |today|: either, you set today to some</span>
+<span class="c1"># non-false value, then it is used:</span>
+<span class="c1">#today = &#39;&#39;</span>
+<span class="c1"># Else, today_fmt is used as the format for a strftime call.</span>
+<span class="c1">#today_fmt = &#39;%B %d, %Y&#39;</span>
+
+<span class="c1"># List of patterns, relative to source directory, that match files and</span>
+<span class="c1"># directories to ignore when looking for source files.</span>
+<span class="n">exclude_patterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;_build&#39;</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="s1">&#39;*~&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;advanced-*.rst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;references-*.rst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;usage-*.rst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;custom-*.rst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;include-*.rst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;SUPPORT.rst&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># The reST default role (used for this markup: `text`) to use for all documents.</span>
+<span class="c1">#default_role = None</span>
+
+<span class="c1"># If true, &#39;()&#39; will be appended to :func: etc. cross-reference text.</span>
+<span class="c1">#add_function_parentheses = True</span>
+
+<span class="c1"># If true, the current module name will be prepended to all description</span>
+<span class="c1"># unit titles (such as .. function::).</span>
+<span class="c1">#add_module_names = True</span>
+
+<span class="c1"># If true, sectionauthor and moduleauthor directives will be shown in the</span>
+<span class="c1"># output. They are ignored by default.</span>
+<span class="c1">#show_authors = False</span>
+
+<span class="c1"># The name of the Pygments (syntax highlighting) style to use.</span>
+<span class="n">pygments_style</span> <span class="o">=</span> <span class="s1">&#39;sphinx&#39;</span>
+
+<span class="c1"># A list of ignored prefixes for module index sorting.</span>
+<span class="c1">#modindex_common_prefix = []</span>
+
+
+<span class="c1"># -- Options for HTML output ---------------------------------------------------</span>
+
+<span class="c1"># The theme to use for HTML and HTML Help pages.  See the documentation for</span>
+<span class="c1"># a list of builtin themes.</span>
+<span class="c1">#html_theme = &#39;default&#39;</span>
+
+<span class="c1"># Theme options are theme-specific and customize the look and feel of a theme</span>
+<span class="c1"># further.  For a list of options available for each theme, see the</span>
+<span class="c1"># documentation.</span>
+<span class="c1">#html_theme_options = {}</span>
+
+<span class="c1"># Add any paths that contain custom themes here, relative to this directory.</span>
+<span class="c1">#html_theme_path = []</span>
+
+<span class="c1"># The name for this set of Sphinx documents.  If None, it defaults to</span>
+<span class="c1"># &quot;&lt;project&gt; v&lt;release&gt; documentation&quot;.</span>
+<span class="c1">#html_title = None</span>
+
+<span class="c1"># A shorter title for the navigation bar.  Default is the same as html_title.</span>
+<span class="c1">#html_short_title = None</span>
+
+<span class="c1"># The name of an image file (relative to this directory) to place at the top</span>
+<span class="c1"># of the sidebar.</span>
+<span class="n">html_logo</span> <span class="o">=</span> <span class="s1">&#39;_static/img/logo-75.png&#39;</span>
+
+<span class="c1"># The name of an image file (within the static path) to use as favicon of the</span>
+<span class="c1"># docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32</span>
+<span class="c1"># pixels large.</span>
+<span class="n">html_favicon</span> <span class="o">=</span> <span class="s1">&#39;_static/img/favicon.ico&#39;</span>
+
+<span class="c1"># Add any paths that contain custom static files (such as style sheets) here,</span>
+<span class="c1"># relative to this directory. They are copied after the builtin static files,</span>
+<span class="c1"># so a file named &quot;default.css&quot; will overwrite the builtin &quot;default.css&quot;.</span>
+<span class="n">html_static_path</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_static&#39;</span><span class="p">]</span>
+
+<span class="c1"># If not &#39;&#39;, a &#39;Last updated on:&#39; timestamp is inserted at every page bottom,</span>
+<span class="c1"># using the given strftime format.</span>
+<span class="c1">#html_last_updated_fmt = &#39;%b %d, %Y&#39;</span>
+
+<span class="c1"># If true, SmartyPants will be used to convert quotes and dashes to</span>
+<span class="c1"># typographically correct entities.</span>
+<span class="c1">#html_use_smartypants = True</span>
+
+<span class="c1"># Custom sidebar templates, maps document names to template names.</span>
+<span class="c1">#html_sidebars = {}</span>
+
+<span class="c1"># Additional templates that should be rendered to pages, maps page names to</span>
+<span class="c1"># template names.</span>
+<span class="c1">#html_additional_pages = {}</span>
+
+<span class="c1"># If false, no module index is generated.</span>
+<span class="c1">#html_domain_indices = True</span>
+
+<span class="c1"># If false, no index is generated.</span>
+<span class="c1">#html_use_index = True</span>
+
+<span class="c1"># If true, the index is split into individual pages for each letter.</span>
+<span class="c1">#html_split_index = False</span>
+
+<span class="c1"># If true, links to the reST sources are added to the pages.</span>
+<span class="c1">#html_show_sourcelink = True</span>
+
+<span class="c1"># If true, &quot;Created using Sphinx&quot; is shown in the HTML footer. Default is True.</span>
+<span class="c1">#html_show_sphinx = True</span>
+
+<span class="c1"># If true, &quot;(C) Copyright ...&quot; is shown in the HTML footer. Default is True.</span>
+<span class="c1">#html_show_copyright = True</span>
+
+<span class="c1"># If true, an OpenSearch description file will be output, and all pages will</span>
+<span class="c1"># contain a &lt;link&gt; tag referring to it.  The value of this option must be the</span>
+<span class="c1"># base URL from which the finished HTML is served.</span>
+<span class="c1">#html_use_opensearch = &#39;&#39;</span>
+
+<span class="c1"># This is the file name suffix for HTML files (e.g. &quot;.xhtml&quot;).</span>
+<span class="c1">#html_file_suffix = None</span>
+
+<span class="c1"># Output file base name for HTML help builder.</span>
+<span class="n">htmlhelp_basename</span> <span class="o">=</span> <span class="s1">&#39;pyrocoredoc&#39;</span>
+
+
+<span class="c1"># -- Options for LaTeX output --------------------------------------------------</span>
+
+<span class="n">latex_elements</span> <span class="o">=</span> <span class="p">{</span>
+<span class="c1"># The paper size (&#39;letterpaper&#39; or &#39;a4paper&#39;).</span>
+<span class="c1">#&#39;papersize&#39;: &#39;letterpaper&#39;,</span>
+
+<span class="c1"># The font size (&#39;10pt&#39;, &#39;11pt&#39; or &#39;12pt&#39;).</span>
+<span class="c1">#&#39;pointsize&#39;: &#39;10pt&#39;,</span>
+
+<span class="c1"># Additional stuff for the LaTeX preamble.</span>
+<span class="c1">#&#39;preamble&#39;: &#39;&#39;,</span>
+<span class="p">}</span>
+
+<span class="c1"># Grouping the document tree into LaTeX files. List of tuples</span>
+<span class="c1"># (source start file, target name, title, author, documentclass [howto/manual]).</span>
+<span class="n">latex_documents</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;pyrocore.tex&#39;</span><span class="p">,</span> <span class="s1">&#39;pyrocore Documentation&#39;</span><span class="p">,</span> <span class="s1">&#39;pyroscope&#39;</span><span class="p">,</span> <span class="s1">&#39;manual&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># The name of an image file (relative to this directory) to place at the top of</span>
+<span class="c1"># the title page.</span>
+<span class="c1">#latex_logo = None</span>
+
+<span class="c1"># For &quot;manual&quot; documents, if this is true, then toplevel headings are parts,</span>
+<span class="c1"># not chapters.</span>
+<span class="c1">#latex_use_parts = False</span>
+
+<span class="c1"># If true, show page references after internal links.</span>
+<span class="c1">#latex_show_pagerefs = False</span>
+
+<span class="c1"># If true, show URL addresses after external links.</span>
+<span class="c1">#latex_show_urls = False</span>
+
+<span class="c1"># Documents to append as an appendix to all manuals.</span>
+<span class="c1">#latex_appendices = []</span>
+
+<span class="c1"># If false, no module index is generated.</span>
+<span class="c1">#latex_domain_indices = True</span>
+
+
+<span class="c1"># -- Options for manual page output --------------------------------------------</span>
+
+<span class="c1"># One entry per manual page. List of tuples</span>
+<span class="c1"># (source start file, name, description, authors, manual section).</span>
+<span class="n">man_pages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;pyrocore&#39;</span><span class="p">,</span> <span class="s1">&#39;pyrocore Documentation&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pyroscope&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="c1"># If true, show URL addresses after external links.</span>
+<span class="c1">#man_show_urls = False</span>
+
+
+<span class="c1"># -- Options for Texinfo output ------------------------------------------------</span>
+
+<span class="c1"># Grouping the document tree into Texinfo files. List of tuples</span>
+<span class="c1"># (source start file, target name, title, author,</span>
+<span class="c1">#  dir menu entry, description, category)</span>
+<span class="n">texinfo_documents</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;pyrocore&#39;</span><span class="p">,</span> <span class="s1">&#39;pyrocore Documentation&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;pyroscope&#39;</span><span class="p">,</span> <span class="s1">&#39;pyrocore&#39;</span><span class="p">,</span> <span class="s1">&#39;One line description of project.&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Miscellaneous&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># Documents to append as an appendix to all manuals.</span>
+<span class="c1">#texinfo_appendices = []</span>
+
+<span class="c1"># If false, no module index is generated.</span>
+<span class="c1">#texinfo_domain_indices = True</span>
+
+<span class="c1"># How to display URL addresses: &#39;footnote&#39;, &#39;no&#39;, or &#39;inline&#39;.</span>
+<span class="c1">#texinfo_show_urls = &#39;footnote&#39;</span>
+
+
+<span class="c1"># Example configuration for intersphinx: refer to the Python standard library.</span>
+<span class="n">intersphinx_mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">python</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;https://docs.python.org/2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="n">rtdocs</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;https://rtorrent-docs.readthedocs.io/en/latest&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="n">rtps</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;https://rtorrent-ps.readthedocs.io/en/latest&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.io.scgi &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.io.scgi</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.io.scgi</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Handles RPC methods over various transports&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">URLError</span>
+<span class="kn">from</span> <span class="nn">xmlrpc</span> <span class="kn">import</span> <span class="n">client</span> <span class="k">as</span> <span class="n">xmlrpclib</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="register_scheme"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.register_scheme">[docs]</a><span class="k">def</span> <span class="nf">register_scheme</span><span class="p">(</span><span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to register protocols with urllib&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;uses_&quot;</span><span class="p">),</span> <span class="nb">dir</span><span class="p">(</span><span class="n">urlparse</span><span class="p">)):</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="n">urlparse</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scheme</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SCGIException"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.SCGIException">[docs]</a><span class="k">class</span> <span class="nc">SCGIException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SCGI protocol error&quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># Types of exceptions thrown</span>
+<span class="n">ERRORS</span> <span class="o">=</span> <span class="p">(</span><span class="n">SCGIException</span><span class="p">,</span> <span class="n">URLError</span><span class="p">,</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Fault</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># SCGI transports</span>
+<span class="c1">#</span>
+
+
+<div class="viewcode-block" id="RTorrentTransport"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.RTorrentTransport">[docs]</a><span class="k">class</span> <span class="nc">RTorrentTransport</span><span class="p">(</span><span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Transport</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handle transports. Primaarily exists to allow</span>
+<span class="sd">    using the same transport with a different underlying RPC mechanism&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">codec</span><span class="o">=</span><span class="n">xmlrpclib</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">codec</span> <span class="o">=</span> <span class="n">codec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RTorrentTransport.parse_response"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.RTorrentTransport.parse_response">[docs]</a>    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">codec</span> <span class="o">==</span> <span class="n">xmlrpclib</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">codec</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="TCPTransport"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.TCPTransport">[docs]</a><span class="k">class</span> <span class="nc">TCPTransport</span><span class="p">(</span><span class="n">RTorrentTransport</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transport via TCP socket.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TCPTransport.request"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.TCPTransport.request">[docs]</a>    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">request_body</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="k">with</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span> <span class="k">as</span> <span class="n">sock</span><span class="p">:</span>
+            <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)))</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">_encode_payload</span><span class="p">(</span><span class="n">request_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">))</span>
+            <span class="k">with</span> <span class="n">sock</span><span class="o">.</span><span class="n">makefile</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span>
+                    <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">_parse_response</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UnixTransport"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.UnixTransport">[docs]</a><span class="k">class</span> <span class="nc">UnixTransport</span><span class="p">(</span><span class="n">RTorrentTransport</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transport via UNIX domain socket.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="UnixTransport.request"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.UnixTransport.request">[docs]</a>    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">request_body</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="k">with</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_UNIX</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span> <span class="k">as</span> <span class="n">sock</span><span class="p">:</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">_encode_payload</span><span class="p">(</span><span class="n">request_body</span><span class="p">))</span>
+            <span class="k">with</span> <span class="n">sock</span><span class="o">.</span><span class="n">makefile</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_response</span><span class="p">(</span>
+                    <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">_parse_response</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SSHTransport"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.SSHTransport">[docs]</a><span class="k">class</span> <span class="nc">SSHTransport</span><span class="p">(</span><span class="n">RTorrentTransport</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stub for removed SSH support&quot;&quot;&quot;</span></div>
+
+
+<span class="n">TRANSPORTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;scgi&quot;</span><span class="p">:</span> <span class="n">TCPTransport</span><span class="p">,</span>
+    <span class="s2">&quot;scgi+unix&quot;</span><span class="p">:</span> <span class="n">UnixTransport</span><span class="p">,</span>
+    <span class="s2">&quot;scgi+ssh&quot;</span><span class="p">:</span> <span class="n">SSHTransport</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Register our schemes to be parsed as having a netloc</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">TRANSPORTS</span><span class="p">:</span>
+    <span class="n">register_scheme</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="transport_from_url"><a class="viewcode-back" href="../../../apidoc/pyrosimple.io.html#pyrosimple.io.scgi.transport_from_url">[docs]</a><span class="k">def</span> <span class="nf">transport_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Transport</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Create a transport for the given URL.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">url</span> <span class="ow">and</span> <span class="s2">&quot;:&quot;</span> <span class="ow">in</span> <span class="n">url</span> <span class="ow">and</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;scgi://&quot;</span> <span class="o">+</span> <span class="n">url</span>
+    <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;scgi+unix://&quot;</span>
+    <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;scgi&quot;</span><span class="p">,</span> <span class="n">allow_fragments</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">transport</span> <span class="o">=</span> <span class="n">TRANSPORTS</span><span class="p">[</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1"># pylint: disable=raise-missing-from</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">((</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">))</span> <span class="ow">and</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="c1"># Support simplified &quot;domain:port&quot; URLs</span>
+            <span class="k">return</span> <span class="n">transport_from_url</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;scgi://</span><span class="si">{</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">URLError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported scheme in URL </span><span class="si">{</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">geturl</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">transport</span></div>
+
+
+<span class="c1">#</span>
+<span class="c1"># Helpers to handle SCGI data</span>
+<span class="c1"># See spec at http://python.ca/scgi/protocol.txt</span>
+<span class="c1">#</span>
+
+
+<span class="k">def</span> <span class="nf">_encode_netstring</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="s2">&quot;Encode data as netstring.&quot;</span>
+    <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">:</span><span class="si">%s</span><span class="s2">,&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">data</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_encode_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="s2">&quot;Make SCGI header bytes from list of tuples.&quot;</span>
+    <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\0</span><span class="si">%s</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">),</span> <span class="n">v</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">]</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_encode_payload</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="s2">&quot;Wrap data in an SCGI request.&quot;</span>
+    <span class="n">prolog</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;CONTENT_LENGTH</span><span class="se">\0</span><span class="si">%d</span><span class="se">\0</span><span class="s2">SCGI</span><span class="se">\x00</span><span class="s2">1</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">headers</span><span class="p">:</span>
+        <span class="n">prolog</span> <span class="o">+=</span> <span class="n">_encode_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_encode_netstring</span><span class="p">(</span><span class="n">prolog</span><span class="p">)</span> <span class="o">+</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get headers dict from header bytestring.</span>
+
+<span class="sd">    :param headers: An SCGI header bytestring</span>
+<span class="sd">    :type headers: bytes</span>
+<span class="sd">    :return: A dictionary of string keys/values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">SCGIException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in SCGI headers </span><span class="si">{</span><span class="n">headers</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_response</span><span class="p">(</span><span class="n">resp</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get xmlrpc response from scgi response</span>
+
+<span class="sd">    :param headers: An SCGI bytestring payload</span>
+<span class="sd">    :type headers: bytes</span>
+<span class="sd">    :return: A tuple of a binary payload and a dictionary of string keys/values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Assume they care for standards and send us CRLF (not just LF)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">headers</span><span class="p">,</span> <span class="n">payload</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\r\n\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">SCGIException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;No header delimiter in SCGI response of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+    <span class="n">parsed_headers</span> <span class="o">=</span> <span class="n">_parse_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+
+    <span class="n">clen</span> <span class="o">=</span> <span class="n">parsed_headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">clen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Check length, just in case the transport is bogus</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">clen</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">payload</span><span class="p">,</span> <span class="n">parsed_headers</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

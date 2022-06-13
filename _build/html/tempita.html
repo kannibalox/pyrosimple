@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tempita Templating Engine &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/js/custom.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="references.html" />
+    <link rel="prev" title="Trouble-Shooting Guide" href="troubleshooting.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> pyrosimple
+            <img src="_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tempita Templating Engine</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#status-license">Status &amp; License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#why-another-templating-language">Why Another Templating Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-interface">The Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#unicode">Unicode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-tempita-language">The <cite>Tempita</cite> Language</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#substitution">Substitution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#if">if</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#for">for</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inherit-def">inherit &amp; def</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-blocks">Python blocks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bunch-and-looper">bunch and looper</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#htmltemplate">HTMLTemplate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#extending-tempita">Extending Tempita</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-use">Command-line Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#still-to-do">Still To Do</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#news">News</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">0.5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">0.4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">0.3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">0.2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Tempita Templating Engine</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tempita.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tempita-templating-engine">
+<h1>Tempita Templating Engine<a class="headerlink" href="#tempita-templating-engine" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">author</dt>
+<dd class="field-odd"><p>Ian Bicking &lt;<a class="reference external" href="mailto:ianb&#37;&#52;&#48;colorstudy&#46;com">ianb<span>&#64;</span>colorstudy<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">source</dt>
+<dd class="field-even"><p><a class="reference external" href="https://bitbucket.org/ianb/tempita">https://bitbucket.org/ianb/tempita</a></p>
+</dd>
+</dl>
+<section id="status-license">
+<h2>Status &amp; License<a class="headerlink" href="#status-license" title="Permalink to this headline">¶</a></h2>
+<p>Tempita is available under a <cite>MIT-style license</cite>.</p>
+<p>It is <em>not</em> actually actively developed, and not an ambitious project.  It does not
+seek to take over the templating world, or adopt many new features.
+I just wanted a small templating language for cases when <code class="docutils literal notranslate"><span class="pre">%</span></code> and
+<code class="docutils literal notranslate"><span class="pre">string.Template</span></code> weren’t enough.</p>
+</section>
+<section id="why-another-templating-language">
+<h2>Why Another Templating Language<a class="headerlink" href="#why-another-templating-language" title="Permalink to this headline">¶</a></h2>
+<p>Surely the world has enough templating languages?  So why did I write
+another.</p>
+<p>I initially used <a class="reference external" href="http://cheetahtemplate.org/">Cheetah</a> as the
+templating language for <a class="reference external" href="http://pythonpaste.org/script/">Paste Script</a>, but this caused quite a few
+problems.  People frequently had problems installing Cheetah because
+it includes a C extension.  Also, the errors and invocation can be a
+little confusing.  This might be okay for something that used
+Cheetah’s features extensively, except that the templating was a very
+minor feature of the system, and many people didn’t even understand or
+care about where templating came into the system.</p>
+<p>At the same time, I was starting to create reusable WSGI components
+that had some templating in them.  Not a lot of templating, but enough
+that <code class="docutils literal notranslate"><span class="pre">string.Template</span></code> had become too complicated – I need if
+statements and loops.</p>
+<p>Given this, I started looking around for a very small templating
+language, and I didn’t like anything I found.  Many of them seemed
+awkward or like toys that were more about the novelty of the
+implementation than the utility of the language.</p>
+<p>So one night when I felt like coding but didn’t feel like working on
+anything I was already working on, I wrote this.  It was first called
+<code class="docutils literal notranslate"><span class="pre">paste.util.template</span></code>, but I decided it deserved a life of its own,
+hence Tempita.</p>
+</section>
+<section id="the-interface">
+<h2>The Interface<a class="headerlink" href="#the-interface" title="Permalink to this headline">¶</a></h2>
+<p>The interface is intended to look a lot like <code class="docutils literal notranslate"><span class="pre">string.Template</span></code>.  You
+can create a template object like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">tempita</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;Hello {{name}}&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Bob&#39;</span><span class="p">)</span>
+<span class="go">&#39;Hello Bob&#39;</span>
+</pre></div>
+</div>
+<p>Or if you want to skip the class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tempita</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;Hello {{name}}&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Alice&#39;</span><span class="p">)</span>
+<span class="go">&#39;Hello Alice&#39;</span>
+</pre></div>
+</div>
+<p>Note that the language allows arbitrary Python to be executed, so
+your templates must be trusted.</p>
+<p>You can give a name to your template, which is handy when there is an
+error (the name will be displayed):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s1">&#39;Hi {{name}}&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tmpl&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">NameError</span>: <span class="n">name &#39;name&#39; is not defined at line 1 column 6 in file tmpl</span>
+</pre></div>
+</div>
+<p>You can also give a namespace to use by default, which
+<code class="docutils literal notranslate"><span class="pre">.substitute(...)</span></code> will augment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;Hi {{upper(name)}}&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">namespace</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Joe&#39;</span><span class="p">)</span>
+<span class="go">&#39;Hi JOE&#39;</span>
+</pre></div>
+</div>
+<p>Lastly, you can give a dictionary-like object as the argument to
+<code class="docutils literal notranslate"><span class="pre">.substitute</span></code>, like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Jane&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+<span class="go">&#39;Hi JANE&#39;</span>
+</pre></div>
+</div>
+<p>There’s also an <a class="reference internal" href="#htmltemplate">HTMLTemplate</a> class that is more appropriate for
+templates that produce HTML.</p>
+<p>You can also instantiate a template from a filename with
+<code class="docutils literal notranslate"><span class="pre">Template.from_filename(filename,</span> <span class="pre">namespace={},</span> <span class="pre">encoding=None)</span></code>.
+This is like calling:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Template</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span>
+         <span class="n">name</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="unicode">
+<h2>Unicode<a class="headerlink" href="#unicode" title="Permalink to this headline">¶</a></h2>
+<p>Tempita tries to handle unicode gracefully, for some value of
+“graceful”.  <code class="docutils literal notranslate"><span class="pre">Template</span></code> objects have a <code class="docutils literal notranslate"><span class="pre">default_encoding</span></code>
+attribute.  It will try to use that encoding whenever <code class="docutils literal notranslate"><span class="pre">unicode</span></code> and
+<code class="docutils literal notranslate"><span class="pre">str</span></code> objects are mixed in the template.  E.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;Hi {{name}}&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">):</span> <span class="c1"># unicode is the default in 3 -&gt; failing test</span>
+<span class="gp">... </span>    <span class="n">val</span> <span class="o">=</span> <span class="n">tmpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Jos</span><span class="se">\xc3\xa9</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">comparison</span> <span class="o">=</span> <span class="n">val</span> <span class="o">==</span> <span class="sa">u</span><span class="s1">&#39;Hi Jos</span><span class="se">\xe9</span><span class="s1">&#39;</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">comparison</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparison</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s1">&#39;Hi {{name}}&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="p">(</span><span class="n">tmpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">u</span><span class="s1">&#39;Jos</span><span class="se">\xe9</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="go">Hi José</span>
+</pre></div>
+</div>
+<p>The default encoding is UTF8.</p>
+</section>
+<section id="the-tempita-language">
+<span id="tempita-lang"></span><h2>The <cite>Tempita</cite> Language<a class="headerlink" href="#the-tempita-language" title="Permalink to this headline">¶</a></h2>
+<p>The language is fairly simple; all the constructs look like
+<code class="docutils literal notranslate"><span class="pre">{{stuff}}</span></code>.</p>
+<section id="substitution">
+<h3>Substitution<a class="headerlink" href="#substitution" title="Permalink to this headline">¶</a></h3>
+<p>To insert a variable or expression, use <code class="docutils literal notranslate"><span class="pre">{{expression}}</span></code>.  You can’t
+use <code class="docutils literal notranslate"><span class="pre">}}</span></code> in your expression, but if it comes up just use <code class="docutils literal notranslate"><span class="pre">}</span> <span class="pre">}</span></code>
+(put a space between them).  You can pass your expression through
+<em>filters</em> with <code class="docutils literal notranslate"><span class="pre">{{expression</span> <span class="pre">|</span> <span class="pre">filter}}</span></code>, for instance
+<code class="docutils literal notranslate"><span class="pre">{{expression</span> <span class="pre">|</span> <span class="pre">repr}}</span></code>.  This is entirely equivalent to
+<code class="docutils literal notranslate"><span class="pre">{{repr(expression)}}</span></code>.  But it might look nicer to some people; I
+took it from Django because I liked it.  There’s a shared namespace,
+so <code class="docutils literal notranslate"><span class="pre">repr</span></code> is just an object in the namespace.</p>
+<p>If you want to have <code class="docutils literal notranslate"><span class="pre">{{</span></code> or <code class="docutils literal notranslate"><span class="pre">}}</span></code> in your template, you must use
+the built-in variables like <code class="docutils literal notranslate"><span class="pre">{{start_braces}}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">{{end_braces}}</span></code>.  There’s no escape character.</p>
+<p>You may also specify the delimiters as an argument to the Template
+__init__ method:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tempita</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s1">&#39;Hello $</span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">delimiters</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;${&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;world&#39;</span><span class="p">)</span>
+<span class="go">&#39;Hello world&#39;</span>
+</pre></div>
+</div>
+<p>The delimiters argument must be of length two and both items must be strings.</p>
+<p>None, as a special case, is substituted as the empty string.</p>
+<p>Also there is a command for setting default values in your template:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="n">default</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">100</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>You can use this so that the <code class="docutils literal notranslate"><span class="pre">width</span></code> variable will always have a
+value in your template (the number <code class="docutils literal notranslate"><span class="pre">100</span></code>).  If someone calls
+<code class="docutils literal notranslate"><span class="pre">tmpl.substitute(width=200)</span></code> then this will have no effect; only if
+the variable is undefined will this default matter.  You can use any
+expression to the right of the <code class="docutils literal notranslate"><span class="pre">=</span></code>.</p>
+</section>
+<section id="if">
+<h3>if<a class="headerlink" href="#if" title="Permalink to this headline">¶</a></h3>
+<p>You can do an if statement with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">if</span> <span class="n">condition</span><span class="p">}}</span>
+  <span class="n">true</span> <span class="n">stuff</span>
+<span class="p">{{</span><span class="k">elif</span> <span class="n">other_condition</span><span class="p">}}</span>
+  <span class="n">other</span> <span class="n">stuff</span>
+<span class="p">{{</span><span class="k">else</span><span class="p">}}</span>
+  <span class="n">final</span> <span class="n">stuff</span>
+<span class="p">{{</span><span class="n">endif</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Some of the blank lines will be removed when, as in this case, they
+only contain a single directive.  A trailing <code class="docutils literal notranslate"><span class="pre">:</span></code> is optional (like
+<code class="docutils literal notranslate"><span class="pre">{{if</span> <span class="pre">condition:}}</span></code>).</p>
+</section>
+<section id="for">
+<h3>for<a class="headerlink" href="#for" title="Permalink to this headline">¶</a></h3>
+<p>Loops should be unsurprising:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">items</span><span class="p">}}</span>
+    <span class="p">{{</span><span class="n">a</span><span class="p">}}</span> <span class="o">=</span> <span class="p">{{</span><span class="n">b</span> <span class="o">|</span> <span class="nb">repr</span><span class="p">}}</span>
+<span class="p">{{</span><span class="n">endfor</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>See?  Unsurprising.  Note that nested tuples (like <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">a,</span> <span class="pre">(b,</span> <span class="pre">c)</span>
+<span class="pre">in...</span></code>) are not supported (patches welcome).</p>
+</section>
+<section id="inherit-def">
+<h3>inherit &amp; def<a class="headerlink" href="#inherit-def" title="Permalink to this headline">¶</a></h3>
+<p>You can do template inheritance.  To inherit from another template
+do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="n">inherit</span> <span class="s2">&quot;some_other_file&quot;</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>From Python you must also pass in, to <cite>Template</cite>, a <cite>get_template</cite>
+function; the implementation for <code class="docutils literal notranslate"><span class="pre">Template.from_filename(...)</span></code> is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_file_template</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">from_template</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">from_template</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">from_template</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">from_filename</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">from_template</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span>
+        <span class="n">get_template</span><span class="o">=</span><span class="n">from_template</span><span class="o">.</span><span class="n">get_template</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also pass in a constructor argument <cite>default_inherit</cite>, which
+will be the inherited template name when no <code class="docutils literal notranslate"><span class="pre">{{inherit}}</span></code> is in the
+template.</p>
+<p>The inherited template is executed with a variable <code class="docutils literal notranslate"><span class="pre">self</span></code>, which
+includes <code class="docutils literal notranslate"><span class="pre">self.body</span></code> which is the text of the child template.  You
+can also put in definitions in the child, like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">def</span> <span class="nf">sidebar</span><span class="p">}}</span>
+  <span class="n">sidebar</span> <span class="n">links</span><span class="o">...</span>
+<span class="p">{{</span><span class="n">enddef</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Then in the parent/inherited template:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="bp">self</span><span class="o">.</span><span class="n">sidebar</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>If you want to make the sidebar method optional, in the inherited
+template use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="o">.</span><span class="n">sidebar</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">sidebar</span></code> is not defined then this will just result in an object
+that shows up as the empty string (but is also callable).</p>
+<p>This can be called like <code class="docutils literal notranslate"><span class="pre">self.sidebar</span></code> or <code class="docutils literal notranslate"><span class="pre">self.sidebar()</span></code> – defs
+can have arguments (like <code class="docutils literal notranslate"><span class="pre">{{def</span> <span class="pre">sidebar(name)}}</span></code>), but when there
+are no arguments you can leave off <code class="docutils literal notranslate"><span class="pre">()</span></code> (in the call and
+definition).</p>
+</section>
+<section id="python-blocks">
+<h3>Python blocks<a class="headerlink" href="#python-blocks" title="Permalink to this headline">¶</a></h3>
+<p>For anything more complicated, you can use blocks of Python code,
+like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="n">py</span><span class="p">:</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">}}</span>
+
+<span class="p">{{</span><span class="n">py</span><span class="p">:</span>
+<span class="n">lots</span> <span class="n">of</span> <span class="n">code</span>
+<span class="p">}}</span>
+</pre></div>
+</div>
+<p>The first form allows statements, like an assignment or raising an
+exception.  The second form is for multiple lines.  If you have
+multiple lines, then <code class="docutils literal notranslate"><span class="pre">{{py:</span></code> must be on a line of its own and the
+code can’t start out indented (but if you have something like <code class="docutils literal notranslate"><span class="pre">def</span>
+<span class="pre">x():</span></code> you would indent the body).</p>
+<p>These blocks of code can’t output any values, but they can calculate
+values and define functions.  So you can do something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="n">py</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">pad</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">s</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="p">(</span><span class="mi">20</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+<span class="p">}}</span>
+<span class="p">{{</span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kw</span><span class="o">.</span><span class="n">items</span><span class="p">()}}</span>
+<span class="p">{{</span><span class="n">s</span> <span class="o">|</span> <span class="n">pad</span><span class="p">}}</span> <span class="p">{{</span><span class="n">value</span> <span class="o">|</span> <span class="nb">repr</span><span class="p">}}</span>
+<span class="p">{{</span><span class="n">endfor</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>As a last detail <code class="docutils literal notranslate"><span class="pre">{{#</span> <span class="pre">comments...}}</span></code> doesn’t do anything at all,
+because it is a comment.</p>
+</section>
+<section id="bunch-and-looper">
+<h3>bunch and looper<a class="headerlink" href="#bunch-and-looper" title="Permalink to this headline">¶</a></h3>
+<p>There’s two kinds of objects provided to help you in your templates.
+The first is <code class="docutils literal notranslate"><span class="pre">tempita.bunch</span></code>, which is just a dictionary that also
+lets you use attributes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bunch</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">bunch</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bunch</span><span class="o">.</span><span class="n">a</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">bunch</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+<span class="go">[(&#39;a&#39;, 1)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bunch</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="p">(</span><span class="n">bunch</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<p>This can be nice for passing options into a template.</p>
+<p>The other object is for use inside the template, and is part of the
+default namespace, <code class="docutils literal notranslate"><span class="pre">looper</span></code>.  This can be used in <code class="docutils literal notranslate"><span class="pre">for</span></code> loops in
+some convenient ways.  You basically use it like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">for</span> <span class="n">loop</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">looper</span><span class="p">(</span><span class="n">seq</span><span class="p">)}}</span>
+  <span class="o">...</span>
+<span class="p">{{</span><span class="n">endfor</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">loop</span></code> object has a bunch of useful methods and attributes:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">.index</span></code></dt><dd><p>The index of the current item (like you’d get with
+<code class="docutils literal notranslate"><span class="pre">enumerate()</span></code>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.number</span></code></dt><dd><p>The number: <code class="docutils literal notranslate"><span class="pre">.index</span> <span class="pre">+</span> <span class="pre">1</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.item</span></code></dt><dd><p>The item you are looking at.  Which you probably already have,
+but it’s there if you want it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.next</span></code></dt><dd><p>The next item in the sequence, or None if it’s the last item.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.previous</span></code></dt><dd><p>The previous item in the sequence, or None if it’s the first
+item.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.odd</span></code></dt><dd><p>True if this is an odd item.  The first item is even.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.even</span></code></dt><dd><p>True if it’s even.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.first</span></code></dt><dd><p>True if this is the first item.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.last</span></code></dt><dd><p>True if this is the last item.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.length</span></code></dt><dd><p>The total length of the sequence.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.first_group(getter=None)</span></code></dt><dd><p>Returns true if this item is the first in the group, where the
+group is either of equal objects (probably boring), or when you
+give a getter.  getter can be <code class="docutils literal notranslate"><span class="pre">'.attribute'</span></code>, like
+<code class="docutils literal notranslate"><span class="pre">'.last_name'</span></code> – this lets you group people by their last
+name.  Or a method, like <code class="docutils literal notranslate"><span class="pre">'.birth_year()'</span></code> – which calls the
+method.  If it’s just a string, it is expected to be a key in a
+dictionary, like <code class="docutils literal notranslate"><span class="pre">'name'</span></code> which groups on <code class="docutils literal notranslate"><span class="pre">item['name']</span></code>.
+Or you can give a function which returns the value to group on.
+This always returns true when <code class="docutils literal notranslate"><span class="pre">.first</span></code> returns true.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">.last_group(getter=None)</span></code></dt><dd><p>Like <code class="docutils literal notranslate"><span class="pre">first_group</span></code>, only returns True when it’s the last of
+the group.  This always returns true when <code class="docutils literal notranslate"><span class="pre">.last</span></code> returns true.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Note that there’s currently a limitation in the templating language,
+so you can’t do <code class="docutils literal notranslate"><span class="pre">{{for</span> <span class="pre">loop,</span> <span class="pre">(key,</span> <span class="pre">value)</span> <span class="pre">in</span> <span class="pre">looper(d.items())}}</span></code>.
+You’ll have to do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">for</span> <span class="n">loop</span><span class="p">,</span> <span class="n">key_value</span> <span class="ow">in</span> <span class="n">looper</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">())}}</span>
+  <span class="p">{{</span><span class="n">py</span><span class="p">:</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">key_value</span><span class="p">}}</span>
+  <span class="o">...</span>
+<span class="p">{{</span><span class="n">endfor</span><span class="p">}}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="htmltemplate">
+<h2>HTMLTemplate<a class="headerlink" href="#htmltemplate" title="Permalink to this headline">¶</a></h2>
+<p>In addition to <code class="docutils literal notranslate"><span class="pre">Template</span></code> there is a template specialized for HTML,
+<code class="docutils literal notranslate"><span class="pre">HTMLTemplate</span></code> (and the substitution function <code class="docutils literal notranslate"><span class="pre">sub_html</span></code>).</p>
+<p>The basic thing that it adds is automatic HTML quoting.  All values
+substituted into your template will be quoted unless they are
+specially marked.</p>
+<p>You mark objects as instances of <code class="docutils literal notranslate"><span class="pre">tempita.html</span></code>.  The easiest way is
+<code class="docutils literal notranslate"><span class="pre">{{some_string</span> <span class="pre">|</span> <span class="pre">html}}</span></code>, though you can also use
+<code class="docutils literal notranslate"><span class="pre">tempita.html(string)</span></code> in your functions.</p>
+<p>An example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">HTMLTemplate</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="gp">... </span><span class="s1">Hi {{name}}!</span>
+<span class="gp">... </span><span class="s1">&lt;a href=&quot;{{href}}&quot;&gt;{{title|html}}&lt;/a&gt;&#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="n">tempita</span><span class="o">.</span><span class="n">html</span><span class="p">(</span><span class="s1">&#39;&lt;img src=&quot;bob.jpg&quot;&gt;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span> <span class="o">=</span> <span class="s1">&#39;Attack!&quot;&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;&lt;i&gt;Homepage&lt;/i&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+<span class="go">&#39;Hi &lt;img src=&quot;bob.jpg&quot;&gt;!\n&lt;a href=&quot;Attack!&amp;quot;&amp;gt;&quot;&gt;&lt;i&gt;Homepage&lt;/i&gt;&lt;/a&gt;&#39;</span>
+</pre></div>
+</div>
+<p>It also adds a couple handy builtins:</p>
+<blockquote>
+<div><dl>
+<dt><code class="docutils literal notranslate"><span class="pre">html_quote(value)</span></code>:</dt><dd><p>HTML quotes the value.  Turns all unicode values into
+character references, so it always returns ASCII text.  Also
+it calls <code class="docutils literal notranslate"><span class="pre">str(value)</span></code> or <code class="docutils literal notranslate"><span class="pre">unicode(value)</span></code>, so you can do
+things like <code class="docutils literal notranslate"><span class="pre">html_quote(1)</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">url(value)</span></code>:</dt><dd><p>Does URL quoting, similar to <code class="docutils literal notranslate"><span class="pre">html_quote()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">attr(**kw)</span></code>:</dt><dd><p>Inserts attributes.  Use like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">div</span> <span class="p">{{</span><span class="n">attr</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="n">div_class</span><span class="p">)}}</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Then it’ll put in something like <code class="docutils literal notranslate"><span class="pre">width=&quot;{{width}}&quot;</span>
+<span class="pre">class={{div_class}}</span></code>.  Any attribute with a value of None is
+left out entirely.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="extending-tempita">
+<h2>Extending Tempita<a class="headerlink" href="#extending-tempita" title="Permalink to this headline">¶</a></h2>
+<p>It’s not really meant for extension.  Instead you should just write
+Python functions and classes that do what you want, and use them in
+the template.  You can either add the namespace to the constructor, or
+extend <code class="docutils literal notranslate"><span class="pre">default_namespace</span></code> in your own subclass.</p>
+<p>The extension that <code class="docutils literal notranslate"><span class="pre">HTMLTemplate</span></code> uses is to subclass and override
+the <code class="docutils literal notranslate"><span class="pre">_repr(value,</span> <span class="pre">pos)</span></code> function.  This is called on each object
+just before inserting it in the template.</p>
+<p>Two other methods you might want to look at are <code class="docutils literal notranslate"><span class="pre">_eval(code,</span> <span class="pre">ns,</span>
+<span class="pre">pos)</span></code> and <code class="docutils literal notranslate"><span class="pre">_exec(code,</span> <span class="pre">ns,</span> <span class="pre">pos)</span></code>, which evaluate and execute
+expressions and statements.  You could probably make this language
+safe with appropriate implementations of those methods.</p>
+</section>
+<section id="command-line-use">
+<h2>Command-line Use<a class="headerlink" href="#command-line-use" title="Permalink to this headline">¶</a></h2>
+<p>There’s also a command-line version of the program.  In Python 2.5+
+you can run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">tempita</span></code>; in previous versions you must run
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">path/to/tempita/__init__.py</span></code>.</p>
+<p>The usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span> <span class="n">TEMPLATE</span> <span class="n">arg</span><span class="o">=</span><span class="n">value</span>
+
+<span class="n">Use</span> <span class="n">py</span><span class="p">:</span><span class="n">arg</span><span class="o">=</span><span class="n">value</span> <span class="n">to</span> <span class="nb">set</span> <span class="n">a</span> <span class="n">Python</span> <span class="n">value</span><span class="p">;</span> <span class="n">otherwise</span> <span class="nb">all</span> <span class="n">values</span> <span class="n">are</span>
+<span class="n">strings</span><span class="o">.</span>
+
+
+<span class="n">Options</span><span class="p">:</span>
+  <span class="o">--</span><span class="n">version</span>             <span class="n">show</span> <span class="n">program</span><span class="s1">&#39;s version number and exit</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">o</span> <span class="n">FILENAME</span><span class="p">,</span> <span class="o">--</span><span class="n">output</span><span class="o">=</span><span class="n">FILENAME</span>
+                        <span class="n">File</span> <span class="n">to</span> <span class="n">write</span> <span class="n">output</span> <span class="n">to</span> <span class="p">(</span><span class="n">default</span> <span class="n">stdout</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">html</span>                <span class="n">Use</span> <span class="n">HTML</span> <span class="n">style</span> <span class="n">filling</span> <span class="p">(</span><span class="n">including</span> <span class="n">automatic</span> <span class="n">HTML</span>
+                        <span class="n">quoting</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">env</span>                 <span class="n">Put</span> <span class="n">the</span> <span class="n">environment</span> <span class="ow">in</span> <span class="k">as</span> <span class="n">top</span><span class="o">-</span><span class="n">level</span> <span class="n">variables</span>
+</pre></div>
+</div>
+<p>So you can use it like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m tempita --html mytemplate.tmpl \
+&gt;     var1=&quot;$var1&quot; var2=&quot;$var2&quot; &gt; mytemplate.html
+</pre></div>
+</div>
+</section>
+<section id="still-to-do">
+<h2>Still To Do<a class="headerlink" href="#still-to-do" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Currently nested structures in <code class="docutils literal notranslate"><span class="pre">for</span></code> loop assignments don’t work,
+like <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">(a,</span> <span class="pre">b),</span> <span class="pre">c</span> <span class="pre">in</span> <span class="pre">x</span></code>.  They should.</p></li>
+<li><p>There’s no way to handle exceptions, except in your <code class="docutils literal notranslate"><span class="pre">py:</span></code> code.
+I’m not sure what there should be, if anything.</p></li>
+<li><p>Probably I should try to dedent <code class="docutils literal notranslate"><span class="pre">py:</span></code> code.</p></li>
+<li><p>There should be some way of calling a function with a chunk of the
+template.  Maybe like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="n">call</span> <span class="n">expr</span><span class="p">}}</span>
+  <span class="n">template</span> <span class="n">code</span><span class="o">...</span>
+<span class="p">{{</span><span class="n">endcall</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>That would mean <code class="docutils literal notranslate"><span class="pre">{{expr(result_of_template_code)}}</span></code>.  But maybe
+there should be another assignment form too, if you don’t want to
+immediately put the output in the code (<code class="docutils literal notranslate"><span class="pre">{{x</span> <span class="pre">=</span>
+<span class="pre">call}}...{{endcall}}?</span></code>).  For now defs could be used for this,
+like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">def</span> <span class="nf">something</span><span class="p">}}</span>
+  <span class="n">template</span> <span class="n">code</span><span class="o">...</span>
+<span class="p">{{</span><span class="n">enddef</span><span class="p">}}</span>
+<span class="p">{{</span><span class="n">expr</span><span class="p">(</span><span class="n">something</span><span class="p">())}}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="news">
+<h2>News<a class="headerlink" href="#news" title="Permalink to this headline">¶</a></h2>
+<section id="id1">
+<h3>0.5<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Python 3 compatible.</p></li>
+<li><p>Fixed bug where file-relative filenames wouldn’t work well.</p></li>
+<li><p>Fixed the stripping of empty lines.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>0.4<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">line_offset</span></code> constructor argument, which can be used to
+adjust the line numbers reported in error messages (e.g., if a
+template is embedded in a file).</p></li>
+<li><p>Allow non-dictionary namespace objects (with
+<code class="docutils literal notranslate"><span class="pre">tmpl.substitute(namespace)</span></code> (in Python 2.5+).</p></li>
+<li><p>Instead of defining <code class="docutils literal notranslate"><span class="pre">__name__</span></code> in template namespaces (which has special
+rules, and must be a module name) the template name is put into
+<code class="docutils literal notranslate"><span class="pre">__template_name__</span></code>.  This became important in Python 2.5.</p></li>
+<li><p>Fix some issues with r</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>0.3<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">{{inherit}}</span></code> and <code class="docutils literal notranslate"><span class="pre">{{def}}</span></code> for doing template inheritance.</p></li>
+<li><p>Make error message annotation slightly more robust.</p></li>
+<li><p>Fix whitespace stripping for the beginning and end of lines.</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>0.2<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">html_quote</span></code> to default functions provided in
+<code class="docutils literal notranslate"><span class="pre">HTMLTemplate</span></code>.</p></li>
+<li><p>HTML literals have an <code class="docutils literal notranslate"><span class="pre">.__html__()</span></code> method, and the presence of
+that method is used to determine if values need to be quoted in
+<code class="docutils literal notranslate"><span class="pre">HTMLTemplate</span></code>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="troubleshooting.html" class="btn btn-neutral float-left" title="Trouble-Shooting Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.ui package &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/js/custom.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyrosimple.util package" href="pyrosimple.util.html" />
+    <link rel="prev" title="pyrosimple.torrent package" href="pyrosimple.torrent.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pyrosimple
+            <img src="../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#packages-modules">Packages &amp; Modules</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pyrosimple.html">pyrosimple package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="pyrosimple.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyrosimple.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyrosimple.html#module-pyrosimple.config">pyrosimple.config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyrosimple.html#module-pyrosimple.error">pyrosimple.error module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyrosimple.html#module-pyrosimple">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">API Documentation</a> &raquo;</li>
+          <li><a href="pyrosimple.html">pyrosimple package</a> &raquo;</li>
+      <li>pyrosimple.ui package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/apidoc/pyrosimple.ui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyrosimple-ui-package">
+<h1>pyrosimple.ui package<a class="headerlink" href="#pyrosimple-ui-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-pyrosimple.ui.categories">
+<span id="pyrosimple-ui-categories-module"></span><h2>pyrosimple.ui.categories module<a class="headerlink" href="#module-pyrosimple.ui.categories" title="Permalink to this headline">¶</a></h2>
+<p>Category management.</p>
+<p>Copyright (c) 2017 The PyroScope Project &lt;<a class="reference external" href="mailto:pyroscope&#46;project&#37;&#52;&#48;gmail&#46;com">pyroscope<span>&#46;</span>project<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyrosimple.ui.categories.CategoryManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyrosimple.ui.categories.</span></span><span class="sig-name descname"><span class="pre">CategoryManager</span></span><a class="reference internal" href="../_modules/pyrosimple/ui/categories.html#CategoryManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.categories.CategoryManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyrosimple.scripts.html#pyrosimple.scripts.base.ScriptBaseWithConfig" title="pyrosimple.scripts.base.ScriptBaseWithConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyrosimple.scripts.base.ScriptBaseWithConfig</span></code></a></p>
+<p>Rotate through category views.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyrosimple.ui.categories.CategoryManager.ARGS_HELP">
+<span class="sig-name descname"><span class="pre">ARGS_HELP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#pyrosimple.ui.categories.CategoryManager.ARGS_HELP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyrosimple.ui.categories.CategoryManager.PREFIX">
+<span class="sig-name descname"><span class="pre">PREFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'category_'</span></em><a class="headerlink" href="#pyrosimple.ui.categories.CategoryManager.PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyrosimple.ui.categories.CategoryManager.PREFIX_LEN">
+<span class="sig-name descname"><span class="pre">PREFIX_LEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#pyrosimple.ui.categories.CategoryManager.PREFIX_LEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyrosimple.ui.categories.CategoryManager.add_options">
+<span class="sig-name descname"><span class="pre">add_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyrosimple/ui/categories.html#CategoryManager.add_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.categories.CategoryManager.add_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add program options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyrosimple.ui.categories.CategoryManager.mainloop">
+<span class="sig-name descname"><span class="pre">mainloop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyrosimple/ui/categories.html#CategoryManager.mainloop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.categories.CategoryManager.mainloop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage category views.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyrosimple.ui.categories.run">
+<span class="sig-prename descclassname"><span class="pre">pyrosimple.ui.categories.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyrosimple/ui/categories.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.categories.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The entry point.</p>
+</dd></dl>
+
+</section>
+<section id="module-pyrosimple.ui.theming">
+<span id="pyrosimple-ui-theming-module"></span><h2>pyrosimple.ui.theming module<a class="headerlink" href="#module-pyrosimple.ui.theming" title="Permalink to this headline">¶</a></h2>
+<p>Color theme support.</p>
+<p>Copyright (c) 2017 The PyroScope Project &lt;<a class="reference external" href="mailto:pyroscope&#46;project&#37;&#52;&#48;gmail&#46;com">pyroscope<span>&#46;</span>project<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyrosimple.ui.theming.ThemeSwitcher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyrosimple.ui.theming.</span></span><span class="sig-name descname"><span class="pre">ThemeSwitcher</span></span><a class="reference internal" href="../_modules/pyrosimple/ui/theming.html#ThemeSwitcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.theming.ThemeSwitcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyrosimple.scripts.html#pyrosimple.scripts.base.ScriptBaseWithConfig" title="pyrosimple.scripts.base.ScriptBaseWithConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyrosimple.scripts.base.ScriptBaseWithConfig</span></code></a></p>
+<p>Rotate through color themes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyrosimple.ui.theming.ThemeSwitcher.ARGS_HELP">
+<span class="sig-name descname"><span class="pre">ARGS_HELP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#pyrosimple.ui.theming.ThemeSwitcher.ARGS_HELP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyrosimple.ui.theming.ThemeSwitcher.add_options">
+<span class="sig-name descname"><span class="pre">add_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyrosimple/ui/theming.html#ThemeSwitcher.add_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.theming.ThemeSwitcher.add_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add program options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyrosimple.ui.theming.ThemeSwitcher.mainloop">
+<span class="sig-name descname"><span class="pre">mainloop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyrosimple/ui/theming.html#ThemeSwitcher.mainloop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.theming.ThemeSwitcher.mainloop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle theme selection changes, or rotate through selection.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyrosimple.ui.theming.run">
+<span class="sig-prename descclassname"><span class="pre">pyrosimple.ui.theming.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyrosimple/ui/theming.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyrosimple.ui.theming.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The entry point.</p>
+</dd></dl>
+
+</section>
+<section id="module-pyrosimple.ui">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyrosimple.ui" title="Permalink to this headline">¶</a></h2>
+<p>Curses UI helpers and extensions.</p>
+<p>Copyright (c) 2017 The PyroScope Project &lt;<a class="reference external" href="mailto:pyroscope&#46;project&#37;&#52;&#48;gmail&#46;com">pyroscope<span>&#46;</span>project<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyrosimple.torrent.html" class="btn btn-neutral float-left" title="pyrosimple.torrent package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyrosimple.util.html" class="btn btn-neutral float-right" title="pyrosimple.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.scripts.rtxmlrpc &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.scripts.rtxmlrpc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.scripts.rtxmlrpc</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=</span>
+<span class="sd">&quot;&quot;&quot; Perform raw XMLRPC calls.</span>
+
+<span class="sd">    Copyright (c) 2010 The PyroScope Project &lt;pyroscope.project@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along</span>
+<span class="c1"># with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="c1"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">requests</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">requests</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="kn">from</span> <span class="nn">xmlrpc</span> <span class="kn">import</span> <span class="n">client</span> <span class="k">as</span> <span class="n">xmlrpc_client</span>
+
+<span class="kn">import</span> <span class="nn">bencode</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util.parts</span> <span class="kn">import</span> <span class="n">Bunch</span>
+
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">error</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">xmlrpc</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.scripts.base</span> <span class="kn">import</span> <span class="n">ScriptBase</span><span class="p">,</span> <span class="n">ScriptBaseWithConfig</span>
+
+
+<div class="viewcode-block" id="read_blob"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.read_blob">[docs]</a><span class="k">def</span> <span class="nf">read_blob</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read a BLOB from given ``@arg``.&quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="s2">&quot;@-&quot;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;@</span><span class="si">{}</span><span class="s2">://&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">,</span> <span class="s2">&quot;ftp&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">}</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">requests</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="o">.</span><span class="n">UserError</span><span class="p">(</span>
+                <span class="s2">&quot;You must &#39;pip install requests&#39; to support @URL arguments.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="o">.</span><span class="n">UserError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="RtorrentXmlRpc"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc">[docs]</a><span class="k">class</span> <span class="nc">RtorrentXmlRpc</span><span class="p">(</span><span class="n">ScriptBaseWithConfig</span><span class="p">):</span>
+    <span class="c1">### Keep things wrapped to fit under this comment... ##############################</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform raw rTorrent XMLRPC calls, like &quot;rtxmlrpc throttle.global_up.max_rate&quot;.</span>
+<span class="sd">    To enter a XMLRPC REPL, pass no arguments at all.</span>
+
+<span class="sd">    Start arguments with &quot;+&quot; or &quot;-&quot; to indicate they&#39;re numbers (type i4 or i8).</span>
+<span class="sd">    Use &quot;[1,2,...&quot; for arrays. Use &quot;@&quot; to indicate binary data, which can be</span>
+<span class="sd">    followed by a file path (e.g. &quot;@/path/to/file&quot;), a URL (https, http, ftp,</span>
+<span class="sd">    and file are supported), or &#39;-&#39; to read from stdin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># log level for user-visible standard logging</span>
+    <span class="n">STD_LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+
+    <span class="c1"># argument description for the usage information</span>
+    <span class="n">ARGS_HELP</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;&lt;method&gt; &lt;args&gt;...&quot;</span>
+        <span class="s2">&quot; |</span><span class="se">\n</span><span class="s2">           -i &lt;commands&gt;... | -i @&lt;filename&gt; | -i @-&quot;</span>
+        <span class="s2">&quot; |</span><span class="se">\n</span><span class="s2">           --session &lt;session-file&gt;... | --session &lt;directory&gt;&quot;</span>
+        <span class="s2">&quot; |</span><span class="se">\n</span><span class="s2">           --session @&lt;filename-list&gt; | --session @-&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.add_options"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.add_options">[docs]</a>    <span class="k">def</span> <span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add program options.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_options</span><span class="p">()</span>
+
+        <span class="c1"># basic options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;--repr&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show Python pretty-printed response&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;-x&quot;</span><span class="p">,</span> <span class="s2">&quot;--xml&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show XML response&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--as-import&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;execute each argument as a private command using &#39;import&#39;&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--session&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--restore&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;restore session state from .rtorrent session file(s)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># TODO: Tempita with &quot;result&quot; object in namespace</span>
+        <span class="c1"># self.add_value_option(&quot;-o&quot;, &quot;--output-format&quot;, &quot;FORMAT&quot;,</span>
+        <span class="c1">#    help=&quot;pass result to a template for formatting&quot;)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.open"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open connection and return proxy.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">scgi_url</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">scgi_url</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;You need to configure a XMLRPC connection, read&quot;</span>
+                    <span class="s2">&quot; https://pyrosimple.readthedocs.io/en/latest/setup.html&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">RTorrentProxy</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">scgi_url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">_set_mappings</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.cooked"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.cooked">[docs]</a>    <span class="k">def</span> <span class="nf">cooked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return interpreted / typed list of args.&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">raw_args</span><span class="p">:</span>
+            <span class="c1"># TODO: use the xmlrpc-c type indicators instead / additionally</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="ow">and</span> <span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s2">&quot;+-&quot;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">arg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Not a valid number: </span><span class="si">%r</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">exc</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;[[&quot;</span><span class="p">):</span>  <span class="c1"># escaping, not a list</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">elif</span> <span class="n">arg</span> <span class="o">==</span> <span class="s2">&quot;[]&quot;</span><span class="p">:</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">):</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">):</span>
+                    <span class="n">arg</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">):</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="n">xmlrpc_client</span><span class="o">.</span><span class="n">Binary</span><span class="p">(</span><span class="n">read_blob</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">args</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.execute"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proxy</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute given XMLRPC call.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">method</span><span class="p">)(</span><span class="n">raw_xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">xml</span><span class="p">,</span> <span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">ERRORS</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;While calling </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">),</span> <span class="n">exc</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">error</span><span class="o">.</span><span class="n">EX_NOINPUT</span>
+                <span class="k">if</span> <span class="s2">&quot;not find&quot;</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;faultString&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">else</span> <span class="n">error</span><span class="o">.</span><span class="n">EX_DATAERR</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">xmlrpc_result_to_string</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">repr</span><span class="p">)</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="s2">&quot;buffer&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">to_console</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.repl_usage"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.repl_usage">[docs]</a>    <span class="k">def</span> <span class="nf">repl_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print a short REPL usage summary.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            rTorrent XMLRPC REPL Help Summary</span>
+<span class="sd">            =================================</span>
+
+<span class="sd">            ? / help            Show this help text.</span>
+<span class="sd">            Ctrl-D              Exit the REPL and show call stats.</span>
+<span class="sd">            stats               Show current call stats.</span>
+<span class="sd">            cmd=arg1,arg2,..    Call a XMLRPC command.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.do_repl"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.do_repl">[docs]</a>    <span class="k">def</span> <span class="nf">do_repl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;REPL for rTorrent XMLRPC commands.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">prompt_toolkit</span> <span class="kn">import</span> <span class="n">prompt</span>
+        <span class="kn">from</span> <span class="nn">prompt_toolkit.history</span> <span class="kn">import</span> <span class="n">FileHistory</span>
+        <span class="kn">from</span> <span class="nn">prompt_toolkit.auto_suggest</span> <span class="kn">import</span> <span class="n">AutoSuggestFromHistory</span>
+        <span class="kn">from</span> <span class="nn">prompt_toolkit.contrib.completers</span> <span class="kn">import</span> <span class="n">WordCompleter</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">proxy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="n">ps1</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">+</span> <span class="sa">u</span><span class="s2">&quot;&gt; &quot;</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">,</span> <span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="s2">&quot;exit&quot;</span><span class="p">]</span>
+        <span class="n">words</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">proxy</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">listMethods</span><span class="p">()]</span>
+        <span class="n">history_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="s2">&quot;.rtxmlrpc_history&quot;</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">(</span>
+                        <span class="n">ps1</span><span class="p">,</span>
+                        <span class="n">completer</span><span class="o">=</span><span class="n">WordCompleter</span><span class="p">(</span><span class="n">words</span><span class="p">),</span>
+                        <span class="n">auto_suggest</span><span class="o">=</span><span class="n">AutoSuggestFromHistory</span><span class="p">(),</span>
+                        <span class="n">history</span><span class="o">=</span><span class="n">FileHistory</span><span class="p">(</span><span class="n">history_file</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;Enter &#39;?&#39; or &#39;help&#39; for usage information, &#39;Ctrl-D&#39; to exit.&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;help&quot;</span><span class="p">}:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">repl_usage</span><span class="p">()</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;stats&quot;</span><span class="p">}:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;exit&quot;</span><span class="p">}:</span>
+                    <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">()</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">method</span><span class="p">,</span> <span class="n">raw_args</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: &#39;=&#39; not found&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="n">raw_args</span> <span class="o">=</span> <span class="n">raw_args</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cooked</span><span class="p">(</span><span class="n">raw_args</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bye from </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">proxy</span><span class="p">))</span>
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.do_import"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.do_import">[docs]</a>    <span class="k">def</span> <span class="nf">do_import</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle import files or streams passed with &#39;-i&#39;.&quot;&quot;&quot;</span>
+        <span class="n">tmp_import</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;@-&quot;</span><span class="p">:</span>
+                <span class="n">import_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">import_file</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s2">&quot;File not found (or not a file): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">import_file</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmlrpc</span><span class="o">.</span><span class="n">NOHASH</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">import_file</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">script_text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">script_text</span> <span class="o">==</span> <span class="s2">&quot;@-</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
+                    <span class="n">script_text</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+                <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span>
+                    <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.rc&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;rtxmlrpc-&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                    <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">script_text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+                    <span class="n">tmp_import</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmlrpc</span><span class="o">.</span><span class="n">NOHASH</span><span class="p">,</span> <span class="n">tmp_import</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">(),</span> <span class="s2">&quot;import&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tmp_import</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tmp_import</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_import</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.do_command"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.do_command">[docs]</a>    <span class="k">def</span> <span class="nf">do_command</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call a single command with arguments.&quot;&quot;&quot;</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">raw_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="s2">&quot;=&quot;</span> <span class="ow">in</span> <span class="n">method</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raw_args</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Please don&#39;t mix rTorrent and shell argument styles!&quot;</span>
+                <span class="p">)</span>
+            <span class="n">method</span><span class="p">,</span> <span class="n">raw_args</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">raw_args</span> <span class="o">=</span> <span class="n">raw_args</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">(),</span> <span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cooked</span><span class="p">(</span><span class="n">raw_args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.do_session"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.do_session">[docs]</a>    <span class="k">def</span> <span class="nf">do_session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Restore state from session files.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">filenames</span><span class="p">():</span>
+            <span class="s2">&quot;Helper&quot;</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;*.torrent.rtorrent&quot;</span><span class="p">)):</span>
+                        <span class="k">yield</span> <span class="n">name</span>
+                <span class="k">elif</span> <span class="n">arg</span> <span class="o">==</span> <span class="s2">&quot;@-&quot;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                            <span class="k">yield</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="s2">&quot;File not found (or not a file): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                        <span class="p">)</span>
+                    <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                                <span class="k">yield</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">arg</span>
+
+        <span class="n">proxy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">():</span>
+            <span class="c1"># Check filename and extract infohash</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;(?:.+?[-._])?([a-fA-F0-9]</span><span class="si">{40}</span><span class="s2">)(?:[-._].+?)?\.torrent\.rtorrent&quot;</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Skipping badly named session file &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">infohash</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Read bencoded data</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+                    <span class="n">raw_data</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="n">bencode</span><span class="o">.</span><span class="n">bdecode</span><span class="p">(</span><span class="n">raw_data</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">EnvironmentError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;Can&#39;t read &#39;</span><span class="si">%s</span><span class="s2">&#39; (</span><span class="si">%s</span><span class="s2">)&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">filename</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1">##print(infohash, &#39;=&#39;, repr(data))</span>
+            <span class="k">if</span> <span class="s2">&quot;state_changed&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Skipping invalid session file &#39;</span><span class="si">%s</span><span class="s2">&#39;...&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Restore metadata</span>
+            <span class="n">was_active</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">is_active</span><span class="p">(</span><span class="n">infohash</span><span class="p">)</span>
+            <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">ignore_commands</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">ignore_commands</span><span class="p">)</span>
+            <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">priority</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">throttle_name</span><span class="p">(</span><span class="n">infohash</span><span class="p">)</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">throttle_name</span><span class="p">:</span>
+                <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="n">infohash</span><span class="p">)</span>
+                <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">throttle_name</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">throttle_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">directory</span><span class="p">(</span><span class="n">infohash</span><span class="p">)</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">directory</span><span class="p">:</span>
+                <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">infohash</span><span class="p">)</span>
+                <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">directory_base</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;custom</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">views</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">proxy</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">xmlrpc_client</span><span class="o">.</span><span class="n">Fault</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s2">&quot;Could not find view&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+                        <span class="k">raise</span>
+
+            <span class="k">if</span> <span class="n">was_active</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">is_active</span><span class="p">(</span><span class="n">infohash</span><span class="p">):</span>
+                <span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">resume</span> <span class="k">if</span> <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">is_open</span><span class="p">(</span><span class="n">infohash</span><span class="p">)</span> <span class="k">else</span> <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">)(</span>
+                    <span class="n">infohash</span>
+                <span class="p">)</span>
+            <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">save_full_session</span><span class="p">(</span><span class="n">infohash</span><span class="p">)</span>
+
+            <span class="sd">&quot;&quot;&quot; TODO:</span>
+<span class="sd">                NO public &quot;set&quot; command! &#39;timestamp.finished&#39;: 1503012786,</span>
+<span class="sd">                NO public &quot;set&quot; command! &#39;timestamp.started&#39;: 1503012784,</span>
+<span class="sd">                NO public &quot;set&quot; command! &#39;total_uploaded&#39;: 0,</span>
+<span class="sd">            &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="RtorrentXmlRpc.mainloop"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.RtorrentXmlRpc.mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The main loop.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_for_connection</span><span class="p">()</span>
+
+        <span class="c1"># Enter REPL if no args</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_repl</span><span class="p">()</span>
+
+        <span class="c1"># Check for bad options</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">repr</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">xml</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;You cannot combine --repr and --xml!&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">as_import</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">session</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;You cannot combine -i and --session!&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Dispatch to handlers</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">as_import</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_import</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_session</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_command</span><span class="p">()</span>
+
+        <span class="c1"># XMLRPC stats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;XMLRPC stats: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.rtxmlrpc.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
+    <span class="sd">&quot;&quot;&quot;The entry point.&quot;&quot;&quot;</span>
+    <span class="n">ScriptBase</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    <span class="n">RtorrentXmlRpc</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+Migrating from pyrocore
+=======================
+
+*pyrosimple* aims to be `mostly` backwards compatible with the pyroscope tools, however due to the deep level of customization possible not everything can be used directly.
+
+Configuration
+-------------
+
+The easiest thing to do is to copy your existing configuration to pyrosimple's dedicated folder
+
+.. code-block:: bash
+
+    cp -r ~/.pyroscope ~/.config/pyrosimple
+
+Edit the config files to use ``pyrosimple`` instead of ``pyrocore``
+
+Differences in CLI commands
+===========================
+
+This is not meant to be an exhaustive list of changes, but may help if you find certain commands no longer work as expected.
+
+General
+-------
+
+- ``--cron`` no longer writes to a different file, but is instead an alias for ``--quiet``.
+- Tempita has been replaced with `jinja2`_.
+- The ``@connection`` syntax has been replaced by the ``-U``/``--url`` flag
+  
+.. _jinja2: https://jinja.palletsprojects.com/en/3.1.x/
+
+rtcontrol
+---------
+
+- The ``--anneal`` flag has been removed. Use shell scripting with core utilities to replace its' functionality.
+
+rtxmlrpc
+--------
+
+- ``-r``/``--repr`` and ``-x``/``--xml`` have be replaced with ``-o {pretty,xml,repr,json}, --output-format {pretty,xml,repr,json}``.
+
+mktor
+=====
+
+- The ``-X``/``--cross-seed`` flags have been removed. Instead, the more conventional ``info.source`` field is filled with the alias of the tracker. This can be overridden with the ``-s``/``--set`` flag.

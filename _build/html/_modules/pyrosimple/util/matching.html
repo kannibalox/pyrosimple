@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.util.matching &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.util.matching</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.util.matching</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=attribute-defined-outside-init</span>
+<span class="sd">&quot;&quot;&quot; Torrent Item Filters.</span>
+
+<span class="sd">    Copyright (c) 2009, 2010, 2011 The PyroScope Project &lt;pyroscope.project@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along</span>
+<span class="c1"># with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="c1"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">parsimonious.grammar</span> <span class="kn">import</span> <span class="n">Grammar</span>
+<span class="kn">from</span> <span class="nn">parsimonious.nodes</span> <span class="kn">import</span> <span class="n">NodeVisitor</span>
+
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">torrent</span><span class="p">,</span> <span class="n">util</span>
+
+
+<span class="n">TRUE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;t&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;+&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">FALSE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;false&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;no&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="FilterOperator"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FilterOperator">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">FilterOperator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Small class to hold operator information&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">query_repr</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+<span class="n">Operators</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;eq&quot;</span><span class="p">:</span> <span class="n">FilterOperator</span><span class="p">(</span><span class="s2">&quot;eq&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;ne&quot;</span><span class="p">:</span> <span class="n">FilterOperator</span><span class="p">(</span><span class="s2">&quot;ne&quot;</span><span class="p">,</span> <span class="s2">&quot;!=&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="n">FilterOperator</span><span class="p">(</span><span class="s2">&quot;gt&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;lt&quot;</span><span class="p">:</span> <span class="n">FilterOperator</span><span class="p">(</span><span class="s2">&quot;lt&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;ge&quot;</span><span class="p">:</span> <span class="n">FilterOperator</span><span class="p">(</span><span class="s2">&quot;ge&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;=&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;le&quot;</span><span class="p">:</span> <span class="n">FilterOperator</span><span class="p">(</span><span class="s2">&quot;le&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;=&quot;</span><span class="p">),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="truth"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.truth">[docs]</a><span class="k">def</span> <span class="nf">truth</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert truth value in &quot;val&quot; to a boolean.&quot;&quot;&quot;</span>
+    <span class="c1"># Try coercing it to an int then a bool</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="n">val</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">lower_val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">lower_val</span> <span class="ow">in</span> <span class="n">TRUE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">lower_val</span> <span class="ow">in</span> <span class="n">FALSE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">raise</span> <span class="n">FilterError</span><span class="p">(</span>
+        <span class="s2">&quot;Bad boolean value </span><span class="si">%r</span><span class="s2"> in </span><span class="si">%r</span><span class="s2"> (expected one of &#39;</span><span class="si">%s</span><span class="s2">&#39;, or &#39;</span><span class="si">%s</span><span class="s2">&#39;)&quot;</span>
+        <span class="o">%</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="s2">&quot;&#39; &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TRUE</span><span class="p">),</span> <span class="s2">&quot;&#39; &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FALSE</span><span class="p">))</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="unquote_pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.unquote_pre_filter">[docs]</a><span class="k">def</span> <span class="nf">unquote_pre_filter</span><span class="p">(</span>
+    <span class="n">pre_filter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">regex_</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[</span><span class="se">\\</span><span class="s2">]+&quot;</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Unquote a pre-filter condition.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pre_filter</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pre_filter</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">):</span>
+        <span class="c1"># Unquote outer level</span>
+        <span class="n">pre_filter</span> <span class="o">=</span> <span class="n">pre_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">pre_filter</span> <span class="o">=</span> <span class="n">regex_</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">//</span> <span class="mi">2</span><span class="p">],</span> <span class="n">pre_filter</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pre_filter</span></div>
+
+
+<div class="viewcode-block" id="FilterError"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FilterError">[docs]</a><span class="k">class</span> <span class="nc">FilterError</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">UserError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;(Syntax) error in filter.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="MatcherNode"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherNode">[docs]</a><span class="k">class</span> <span class="nc">MatcherNode</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base class for the tree structure.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">children</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MatcherNode.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherNode.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check if the item matches. All logic is deferred to subclasses.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="GroupNode"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.GroupNode">[docs]</a><span class="k">class</span> <span class="nc">GroupNode</span><span class="p">(</span><span class="n">MatcherNode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This simply groups another node, and optionally inverts it (a logical NOT)&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">children</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert</span> <span class="o">=</span> <span class="n">invert</span>
+
+<div class="viewcode-block" id="GroupNode.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.GroupNode.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">:</span>
+            <span class="k">return</span> <span class="ow">not</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="GroupNode.pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.GroupNode.pre_filter">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">inner</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pre_filter</span><span class="p">())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">inner</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&quot;not=$&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">inner</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inner</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">inner</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># double negation, return inner command</span>
+            <span class="k">elif</span> <span class="n">inner</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">):</span>
+                <span class="n">inner</span> <span class="o">=</span> <span class="s1">&#39;&quot;$&#39;</span> <span class="o">+</span> <span class="n">inner</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inner</span> <span class="o">=</span> <span class="s2">&quot;$&quot;</span> <span class="o">+</span> <span class="n">inner</span>
+            <span class="k">return</span> <span class="s2">&quot;not=&quot;</span> <span class="o">+</span> <span class="n">inner</span>
+        <span class="k">return</span> <span class="n">inner</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="si">}{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span></div>
+
+
+<div class="viewcode-block" id="AndNode"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.AndNode">[docs]</a><span class="k">class</span> <span class="nc">AndNode</span><span class="p">(</span><span class="n">MatcherNode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This node performs a logical AND for all of it&#39;s children.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AndNode.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.AndNode.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AndNode.pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.AndNode.pre_filter">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">pre_filter</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FAST_QUERY&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># using just one simple expression is safer</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># TODO: make this purely value-based (is.nz=…)</span>
+                <span class="k">return</span> <span class="s2">&quot;and={</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="OrNode"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.OrNode">[docs]</a><span class="k">class</span> <span class="nc">OrNode</span><span class="p">(</span><span class="n">MatcherNode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This node performs a logical OR for all of it&#39;s children.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OrNode.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.OrNode.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OrNode.pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.OrNode.pre_filter">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FAST_QUERY&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pre_filter</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">pre_filter</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                <span class="c1"># TODO: make this purely value-based (is.nz=…)</span>
+                <span class="k">return</span> <span class="s2">&quot;or={</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="FieldFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter">[docs]</a><span class="k">class</span> <span class="nc">FieldFilter</span><span class="p">(</span><span class="n">MatcherNode</span><span class="p">):</span>  <span class="c1"># pylint: disable=abstract-method</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all field filters.</span>
+
+<span class="sd">    Subclasses of FieldFilter act as the leaves of the tree, providing</span>
+<span class="sd">    matching and pre-filtering functionality.&quot;&quot;&quot;</span>
+
+    <span class="n">PRE_FILTER_FIELDS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="c1"># alias=&quot;&quot;,</span>
+        <span class="nb">hash</span><span class="o">=</span><span class="s2">&quot;d.hash=&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;d.name=&quot;</span><span class="p">,</span>
+        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;d.message=&quot;</span><span class="p">,</span>
+        <span class="n">metafile</span><span class="o">=</span><span class="s2">&quot;d.tied_to_file=&quot;</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="s2">&quot;d.base_path=&quot;</span><span class="p">,</span>
+        <span class="c1"># realpath=&quot;=&quot;,</span>
+        <span class="n">throttle</span><span class="o">=</span><span class="s2">&quot;d.throttle_name=&quot;</span><span class="p">,</span>
+        <span class="c1"># tracker=&quot;=&quot;,</span>
+        <span class="n">is_active</span><span class="o">=</span><span class="s2">&quot;d.is_active=&quot;</span><span class="p">,</span>
+        <span class="n">is_complete</span><span class="o">=</span><span class="s2">&quot;d.complete=&quot;</span><span class="p">,</span>
+        <span class="n">is_ignored</span><span class="o">=</span><span class="s2">&quot;d.ignore_commands=&quot;</span><span class="p">,</span>
+        <span class="n">is_multi_file</span><span class="o">=</span><span class="s2">&quot;d.is_multi_file=&quot;</span><span class="p">,</span>
+        <span class="n">is_open</span><span class="o">=</span><span class="s2">&quot;d.is_open=&quot;</span><span class="p">,</span>
+        <span class="c1"># done=&quot;=&quot;,</span>
+        <span class="n">down</span><span class="o">=</span><span class="s2">&quot;d.down.rate=&quot;</span><span class="p">,</span>
+        <span class="c1"># fno=&quot;=&quot;,</span>
+        <span class="n">prio</span><span class="o">=</span><span class="s2">&quot;d.priority=&quot;</span><span class="p">,</span>
+        <span class="n">ratio</span><span class="o">=</span><span class="s2">&quot;d.ratio=&quot;</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="s2">&quot;d.size_bytes=&quot;</span><span class="p">,</span>
+        <span class="n">up</span><span class="o">=</span><span class="s2">&quot;d.up.rate=&quot;</span><span class="p">,</span>
+        <span class="n">uploaded</span><span class="o">=</span><span class="s2">&quot;d.up.total=&quot;</span><span class="p">,</span>
+        <span class="n">completed</span><span class="o">=</span><span class="s2">&quot;d.custom=tm_completed&quot;</span><span class="p">,</span>
+        <span class="n">loaded</span><span class="o">=</span><span class="s2">&quot;d.custom=tm_loaded&quot;</span><span class="p">,</span>
+        <span class="n">started</span><span class="o">=</span><span class="s2">&quot;d.custom=tm_started&quot;</span><span class="p">,</span>
+        <span class="c1"># stopped=&quot;&quot;,</span>
+        <span class="n">custom_tm_completed</span><span class="o">=</span><span class="s2">&quot;d.custom=tm_completed&quot;</span><span class="p">,</span>
+        <span class="n">custom_tm_loaded</span><span class="o">=</span><span class="s2">&quot;d.custom=tm_loaded&quot;</span><span class="p">,</span>
+        <span class="n">custom_tm_started</span><span class="o">=</span><span class="s2">&quot;d.custom=tm_started&quot;</span><span class="p">,</span>
+        <span class="c1"># XXX: bad result: rtcontrol -Q2 -o- -v tagged=&#39;!&#39;new,foo</span>
+        <span class="c1">#       use a &#39;d.is_tagged=tag&#39; command?</span>
+        <span class="n">tagged</span><span class="o">=</span><span class="s2">&quot;d.custom=tags&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># active                last time a peer was connected</span>
+    <span class="c1"># directory             directory containing download data</span>
+    <span class="c1"># files                 list of files in this item</span>
+    <span class="c1"># is_ghost              has no data file or directory?</span>
+    <span class="c1"># is_private            private flag set (no DHT/PEX)?</span>
+    <span class="c1"># leechtime             time taken from start to completion</span>
+    <span class="c1"># seedtime              total seeding time after completion</span>
+    <span class="c1"># traits                automatic classification of this item (audio, video, tv, movie, etc.)</span>
+    <span class="c1"># views                 views this item is attached to</span>
+    <span class="c1"># xfer                  transfer rate</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">FilterOperator</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store field name and filter value for later evaluations.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([])</span>  <span class="c1"># Filters are the leaves of the tree and have no children</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="p">:</span> <span class="n">FilterOperator</span> <span class="o">=</span> <span class="n">op</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">query_repr</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_condition</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FieldFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span></div>
+
+    <span class="c1"># def pre_filter(self) -&gt; str: # pylint: disable=no-self-use</span>
+    <span class="c1">#     &quot;&quot;&quot;Return a condition for use in d.multicall.filtered.&quot;&quot;&quot;</span>
+    <span class="c1">#     return &quot;&quot;</span>
+
+<div class="viewcode-block" id="FieldFilter.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Test if item matches filter.</span>
+
+<span class="sd">        By default this will defer to the operator functions in subclasses,</span>
+<span class="sd">        but that behaivor can be overridden.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span><span class="p">)(</span><span class="n">item</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="FieldFilter.eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.eq">[docs]</a>    <span class="k">def</span> <span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Test equality against item&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">FilterError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Filter &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; for field &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">&#39; does not support comparison &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FieldFilter.gt"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.gt">[docs]</a>    <span class="k">def</span> <span class="nf">gt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Test if item is greater than value&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">FilterError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Filter &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; for field &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">&#39; does not support comparison &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span></div>
+
+    <span class="c1"># Unfortunate but necessary boilerplate functions</span>
+    <span class="c1"># pylint: disable=missing-function-docstring</span>
+<div class="viewcode-block" id="FieldFilter.ge"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.ge">[docs]</a>    <span class="k">def</span> <span class="nf">ge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FieldFilter.ne"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.ne">[docs]</a>    <span class="k">def</span> <span class="nf">ne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FieldFilter.le"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.le">[docs]</a>    <span class="k">def</span> <span class="nf">le</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FieldFilter.lt"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.lt">[docs]</a>    <span class="k">def</span> <span class="nf">lt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+    <span class="c1"># pylint: enable=missing-function-docstring</span>
+
+<div class="viewcode-block" id="FieldFilter.pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.pre_filter">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a prefilter condition (if possible).</span>
+
+<span class="sd">        By default this will defer to the operator functions in subclasses,</span>
+<span class="sd">        but that behaivor can be overridden.&quot;&quot;&quot;</span>
+        <span class="n">method_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;pre_filter_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)())</span></div>
+
+<div class="viewcode-block" id="FieldFilter.pre_filter_eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.pre_filter_eq">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns empty if not defined in subclass.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="FieldFilter.pre_filter_gt"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.pre_filter_gt">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter_gt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns empty if not defined.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="FieldFilter.pre_filter_ne"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FieldFilter.pre_filter_ne">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter_ne</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a prefilter by creating a NOT[name=filter] object and rendering it.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_filter_eq</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">GroupNode</span><span class="p">(</span>
+                <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;eq&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)],</span> <span class="kc">True</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">pre_filter</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="PatternFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.PatternFilter">[docs]</a><span class="k">class</span> <span class="nc">PatternFilter</span><span class="p">(</span><span class="n">FieldFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Case-insensitive pattern filter, either a glob or a /regex/ pattern.&quot;&quot;&quot;</span>
+
+    <span class="n">CLEAN_PRE_VAL_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?:\[.*?]\])|(?:\(.*?]\))|(?:{.*?]})|(?:</span><span class="se">\\</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">SPLIT_PRE_VAL_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-zA-Z0-9/_]+&quot;</span><span class="p">)</span>
+    <span class="n">SPLIT_PRE_GLOB_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[?*]+&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PatternFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.PatternFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="s2">&quot;/.*/&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">__</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{{&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}}&quot;</span><span class="p">):</span>
+
+            <span class="k">def</span> <span class="nf">_template_globber</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;Helper.&quot;&quot;&quot;</span>
+                <span class="n">pattern</span> <span class="o">=</span> <span class="n">torrent</span><span class="o">.</span><span class="n">formatting</span><span class="o">.</span><span class="n">format_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s2">&quot;[&quot;</span><span class="p">,</span> <span class="s2">&quot;[[]&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatchcase</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">pattern</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span> <span class="o">=</span> <span class="n">_template_globber</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatchcase</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PatternFilter.pre_filter_eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.PatternFilter.pre_filter_eq">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&quot;equal=</span><span class="si">{}</span><span class="s1">,cat=&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+            <span class="n">needle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">needle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLEAN_PRE_VAL_RE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">needle</span><span class="p">)</span>
+            <span class="n">split_needle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_PRE_VAL_RE</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">needle</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">needle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLEAN_PRE_VAL_RE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+            <span class="n">split_needle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_PRE_GLOB_RE</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">needle</span><span class="p">)</span>
+        <span class="n">needle</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">split_needle</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">needle</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">needle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">return</span> <span class="sa">r</span><span class="s1">&#39;&quot;string.contains_i=$</span><span class="si">{}</span><span class="s1">,\&quot;</span><span class="si">{}</span><span class="s1">\&quot;&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">],</span> <span class="n">needle</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;</span><span class="se">\\\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="PatternFilter.eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.PatternFilter.eq">[docs]</a>    <span class="k">def</span> <span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if filter matches item.&quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+
+
+<div class="viewcode-block" id="FilesFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FilesFilter">[docs]</a><span class="k">class</span> <span class="nc">FilesFilter</span><span class="p">(</span><span class="n">PatternFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Case-insensitive pattern filter on filenames in a torrent.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FilesFilter.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FilesFilter.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if filter matches item.&quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatchcase</span><span class="p">(</span><span class="n">fileinfo</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="TaggedAsFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TaggedAsFilter">[docs]</a><span class="k">class</span> <span class="nc">TaggedAsFilter</span><span class="p">(</span><span class="n">FieldFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Case-insensitive tags filter. Tag fields are white-space separated lists</span>
+<span class="sd">    of tags.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TaggedAsFilter.pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TaggedAsFilter.pre_filter">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;&quot;not=$</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exact</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">return</span> <span class="sa">r</span><span class="s1">&#39;&quot;string.contains_i=$</span><span class="si">{}</span><span class="s1">,\&quot;</span><span class="si">{}</span><span class="s1">\&quot;&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">],</span> <span class="n">val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;</span><span class="se">\\\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="TaggedAsFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TaggedAsFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># If the tag starts with &#39;=&#39;, test on equality (just this tag, no others)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exact</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exact</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+
+        <span class="c1"># For exact matches, value is the set to compare to</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exact</span><span class="p">:</span>
+            <span class="c1"># Empty tag means empty set, not set of one empty string</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="k">else</span> <span class="nb">set</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TaggedAsFilter.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TaggedAsFilter.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if filter matches item.&quot;&quot;&quot;</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exact</span><span class="p">:</span>
+            <span class="c1"># Equality check</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Is given tag in list?</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="ow">in</span> <span class="n">tags</span></div></div>
+
+
+<div class="viewcode-block" id="BoolFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.BoolFilter">[docs]</a><span class="k">class</span> <span class="nc">BoolFilter</span><span class="p">(</span><span class="n">FieldFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter boolean values.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BoolFilter.pre_filter_eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.BoolFilter.pre_filter_eq">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&quot;equal=</span><span class="si">{}</span><span class="s1">,value=</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="BoolFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.BoolFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">truth</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span> <span class="o">=</span> <span class="s2">&quot;yes&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="k">else</span> <span class="s2">&quot;no&quot;</span></div>
+
+<div class="viewcode-block" id="BoolFilter.eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.BoolFilter.eq">[docs]</a>    <span class="k">def</span> <span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if filter matches item.&quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span></div></div>
+
+
+<div class="viewcode-block" id="NumericFilterBase"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.NumericFilterBase">[docs]</a><span class="k">class</span> <span class="nc">NumericFilterBase</span><span class="p">(</span><span class="n">FieldFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for numerical value filters.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NumericFilterBase.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.NumericFilterBase.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">not_null</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="NumericFilterBase.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.NumericFilterBase.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if filter matches item.&quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_null</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">val</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Grab the function from the native operator module</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="FloatFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FloatFilter">[docs]</a><span class="k">class</span> <span class="nc">FloatFilter</span><span class="p">(</span><span class="n">NumericFilterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter float values.&quot;&quot;&quot;</span>
+
+    <span class="n">FIELD_SCALE</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">ratio</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="FloatFilter.pre_filter_eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FloatFilter.pre_filter_eq">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">FIELD_SCALE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">return</span> <span class="s1">&#39;&quot;equal=value=$</span><span class="si">{}</span><span class="s1">,value=</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">],</span> <span class="n">val</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="FloatFilter.pre_filter_old"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FloatFilter.pre_filter_old">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter_old</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="n">conditions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="s2">&quot;greater&quot;</span><span class="p">,</span> <span class="s2">&quot;lt&quot;</span><span class="p">:</span> <span class="s2">&quot;less&quot;</span><span class="p">,</span> <span class="s2">&quot;eq&quot;</span><span class="p">:</span> <span class="s2">&quot;equal&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">conditions</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">FIELD_SCALE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">return</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">=value=$</span><span class="si">{}</span><span class="s1">,value=</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">conditions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">],</span> <span class="n">val</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="FloatFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.FloatFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FilterError</span><span class="p">(</span>
+                <span class="s2">&quot;Bad numerical value </span><span class="si">%r</span><span class="s2"> in </span><span class="si">%r</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span></div></div>
+
+
+<div class="viewcode-block" id="TimeFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TimeFilter">[docs]</a><span class="k">class</span> <span class="nc">TimeFilter</span><span class="p">(</span><span class="n">NumericFilterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter UNIX timestamp values.&quot;&quot;&quot;</span>
+
+    <span class="n">TIMEDELTA_UNITS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">y</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">t</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">*</span> <span class="mi">86400</span><span class="p">,</span>
+        <span class="n">M</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">t</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">86400</span><span class="p">,</span>
+        <span class="n">w</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">t</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">86400</span><span class="p">,</span>
+        <span class="n">d</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">t</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="mi">86400</span><span class="p">,</span>
+        <span class="n">h</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">t</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">,</span>
+        <span class="n">m</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">t</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">t</span> <span class="o">-</span> <span class="n">d</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">TIMEDELTA_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="s2">&quot;^</span><span class="si">%s</span><span class="s2">$&quot;</span>
+        <span class="o">%</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?:(?P&lt;</span><span class="si">%s</span><span class="s2">&gt;\d+)[</span><span class="si">%s%s</span><span class="s2">])?&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="s2">&quot;ymwdhis&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="TimeFilter.pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TimeFilter.pre_filter">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">:</span>
+            <span class="c1"># Adding a day of fuzz to avoid any possible timezone problems</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;gt&quot;</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">+</span> <span class="mi">86400</span>
+                <span class="n">cmp_</span> <span class="o">=</span> <span class="s2">&quot;greater&quot;</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;lt&quot;</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">-</span> <span class="mi">86400</span>
+                <span class="n">cmp_</span> <span class="o">=</span> <span class="s2">&quot;less&quot;</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;eq&quot;</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">cmp_</span> <span class="o">=</span> <span class="s2">&quot;equal&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="o">-</span><span class="mi">86400</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;gt&quot;</span>
+                <span class="k">else</span> <span class="mi">86400</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;lt&quot;</span>
+                <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">=value=$</span><span class="si">{}</span><span class="s1">,value=</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">cmp_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="TimeFilter.validate_time"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TimeFilter.validate_time">[docs]</a>    <span class="k">def</span> <span class="nf">validate_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method) for timestamps and durations.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="c1"># Literal UNIX timestamp</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FilterError</span><span class="p">(</span>
+                    <span class="s2">&quot;Bad timestamp value </span><span class="si">%r</span><span class="s2"> in </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span><span class="p">)</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Something human readable</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIMEDELTA_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">delta</span><span class="p">:</span>
+                <span class="c1"># Time delta</span>
+                <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">delta</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
+                        <span class="n">timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIMEDELTA_UNITS</span><span class="p">[</span><span class="n">unit</span><span class="p">](</span><span class="n">timestamp</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">duration</span><span class="p">:</span>
+                    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timestamp</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Assume it&#39;s an absolute date</span>
+                <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+                    <span class="c1"># U.S.</span>
+                    <span class="n">dtfmt</span> <span class="o">=</span> <span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y&quot;</span>
+                <span class="k">elif</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
+                    <span class="c1"># European</span>
+                    <span class="n">dtfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.%m.%Y&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Fall back to ISO</span>
+                    <span class="n">dtfmt</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span>
+
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="c1"># Time also given</span>
+                    <span class="n">dtfmt</span> <span class="o">+=</span> <span class="s2">&quot;T%H:%M:%S&quot;</span><span class="p">[:</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">val</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)]</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">dtfmt</span><span class="p">)))</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">FilterError</span><span class="p">(</span>
+                        <span class="s2">&quot;Bad timestamp value </span><span class="si">%r</span><span class="s2"> in </span><span class="si">%r</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+                <span class="k">if</span> <span class="n">duration</span><span class="p">:</span>
+                    <span class="n">timestamp</span> <span class="o">-=</span> <span class="n">now</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">timestamp</span></div>
+
+<div class="viewcode-block" id="TimeFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TimeFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_time</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TimeFilterNotNull"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TimeFilterNotNull">[docs]</a><span class="k">class</span> <span class="nc">TimeFilterNotNull</span><span class="p">(</span><span class="n">TimeFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter UNIX timestamp values, ignore unset values unless compared to 0.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TimeFilterNotNull.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.TimeFilterNotNull.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">not_null</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="DurationFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.DurationFilter">[docs]</a><span class="k">class</span> <span class="nc">DurationFilter</span><span class="p">(</span><span class="n">TimeFilter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter durations in seconds.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DurationFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.DurationFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate_time</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DurationFilter.match"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.DurationFilter.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return True if filter matches item.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Never match &quot;N/A&quot; items, except when &quot;-0&quot; was specified</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ByteSizeFilter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.ByteSizeFilter">[docs]</a><span class="k">class</span> <span class="nc">ByteSizeFilter</span><span class="p">(</span><span class="n">NumericFilterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter size and bandwidth values.&quot;&quot;&quot;</span>
+
+    <span class="n">UNITS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ByteSizeFilter.pre_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.ByteSizeFilter.pre_filter">[docs]</a>    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return rTorrent condition to speed up data transfer.&quot;&quot;&quot;</span>
+        <span class="n">comparers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="s2">&quot;greater&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lt&quot;</span><span class="p">:</span> <span class="s2">&quot;less&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;eq&quot;</span><span class="p">:</span> <span class="s2">&quot;equal&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">comparers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="s1">,value=</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">comparers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PRE_FILTER_FIELDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">],</span>
+                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="ByteSizeFilter.validate"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.ByteSizeFilter.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate filter condition (template method).&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+        <span class="c1"># Get scale</span>
+        <span class="n">lower_val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">lower_val</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNITS</span><span class="p">):</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNITS</span><span class="p">[</span><span class="n">lower_val</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Get float value</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FilterError</span><span class="p">(</span>
+                <span class="s2">&quot;Bad numerical value </span><span class="si">%r</span><span class="s2"> in </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span><span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+        <span class="c1"># Scale to bytes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">*</span> <span class="n">scale</span></div></div>
+
+
+<span class="n">QueryGrammar</span> <span class="o">=</span> <span class="n">Grammar</span><span class="p">(</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    query = (group / stmt)+</span>
+<span class="sd">    group = (not ws)? lpar ws stmt ws rpar</span>
+<span class="sd">    stmt = (or_stmt / conds)</span>
+<span class="sd">    or_stmt = conds ws or ws conds</span>
+<span class="sd">    conds = cond (ws cond)*</span>
+<span class="sd">    cond = (&amp;or / &amp;lpar / &amp;rpar / &amp;not / named_cond / unnamed_cond)</span>
+<span class="sd">    named_cond = word conditional filter</span>
+<span class="sd">    unnamed_cond = filter</span>
+<span class="sd">    filter      = (regex / glob / quoted / word)</span>
+<span class="sd">    glob = ~r&quot;[*\.\/\-?!\w]+&quot;</span>
+<span class="sd">    regex = ~&quot;/[^/]*/&quot;</span>
+<span class="sd">    quoted      = ~&#39;&quot;[^\&quot;]*&quot;&#39;</span>
+<span class="sd">    word        = ~r&quot;[\w]+&quot;</span>
+<span class="sd">    conditional = (ne / ge / le / lt / gt / eq)</span>
+<span class="sd">    ne          = (&quot;!=&quot; / &quot;&lt;&gt;&quot;)</span>
+<span class="sd">    eq          = (&quot;==&quot; / &quot;=&quot;)</span>
+<span class="sd">    gt          = &quot;&gt;&quot;</span>
+<span class="sd">    lt          = &quot;&lt;&quot;</span>
+<span class="sd">    ge          = (&quot;&gt;=&quot; / &quot;=+&quot;)</span>
+<span class="sd">    le          = (&quot;&lt;=&quot; / &quot;=-&quot;)</span>
+<span class="sd">    fws         = ~r&quot;\s+&quot;</span>
+<span class="sd">    ws          = ~r&quot;\s*&quot;</span>
+<span class="sd">    lpar = &quot;[&quot;</span>
+<span class="sd">    rpar = &quot;]&quot;</span>
+<span class="sd">    or = &quot;OR&quot;</span>
+<span class="sd">    not = ( &quot;NOT&quot; / &quot;!&quot; )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="KeyNameVisitor"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.KeyNameVisitor">[docs]</a><span class="k">class</span> <span class="nc">KeyNameVisitor</span><span class="p">(</span><span class="n">NodeVisitor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Walk through a query tree and returns an array of key names.</span>
+<span class="sd">    Implicit key names are not included.&quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=no-self-use,unused-argument,missing-function-docstring</span>
+<div class="viewcode-block" id="KeyNameVisitor.visit_expr"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.KeyNameVisitor.visit_expr">[docs]</a>    <span class="k">def</span> <span class="nf">visit_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">visited_children</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="KeyNameVisitor.visit_named_cond"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.KeyNameVisitor.visit_named_cond">[docs]</a>    <span class="k">def</span> <span class="nf">visit_named_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">visited_children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="KeyNameVisitor.visit_word"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.KeyNameVisitor.visit_word">[docs]</a>    <span class="k">def</span> <span class="nf">visit_word</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="KeyNameVisitor.generic_visit"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.KeyNameVisitor.generic_visit">[docs]</a>    <span class="k">def</span> <span class="nf">generic_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">visited_children</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">visited_children</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div></div>
+
+
+<div class="viewcode-block" id="create_filter"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.create_filter">[docs]</a><span class="k">def</span> <span class="nf">create_filter</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a filter class with the given name, operation and value&quot;&quot;&quot;</span>
+    <span class="n">filt</span> <span class="o">=</span> <span class="n">torrent</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">FieldDefinition</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">_matcher</span>
+    <span class="k">return</span> <span class="n">filt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MatcherBuilder"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder">[docs]</a><span class="k">class</span> <span class="nc">MatcherBuilder</span><span class="p">(</span><span class="n">NodeVisitor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build a simplified tree of MatcherNodes to match an item against.&quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=no-self-use,unused-argument,missing-function-docstring</span>
+<div class="viewcode-block" id="MatcherBuilder.visit_named_cond"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_named_cond">[docs]</a>    <span class="k">def</span> <span class="nf">visit_named_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">cond</span><span class="p">,</span> <span class="n">needle</span> <span class="o">=</span> <span class="n">visited_children</span>
+        <span class="k">return</span> <span class="n">create_filter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">cond</span><span class="p">,</span> <span class="n">needle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_group"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_group">[docs]</a>    <span class="k">def</span> <span class="nf">visit_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">GroupNode</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">visited_children</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">],</span> <span class="n">visited_children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_not"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_not">[docs]</a>    <span class="k">def</span> <span class="nf">visit_not</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="nf">__pare_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">class_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all non-None children, and if there&#39;s only one child left,</span>
+<span class="sd">        return the child instead of wrapping it in the parent class.</span>
+
+<span class="sd">        We should hopefully never have to deal with all None children,</span>
+<span class="sd">        due to the grammar combined with the generic_visit method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">real_children</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">children</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">real_children</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">real_children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">class_</span><span class="p">(</span><span class="n">real_children</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_or_stmt"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_or_stmt">[docs]</a>    <span class="k">def</span> <span class="nf">visit_or_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pare_children</span><span class="p">(</span><span class="n">visited_children</span><span class="p">,</span> <span class="n">OrNode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_conds"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_conds">[docs]</a>    <span class="k">def</span> <span class="nf">visit_conds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pare_children</span><span class="p">(</span><span class="n">visited_children</span><span class="p">,</span> <span class="n">AndNode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_cond"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_cond">[docs]</a>    <span class="k">def</span> <span class="nf">visit_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">visited_children</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">visited_children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="n">create_filter</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;eq&quot;</span><span class="p">],</span> <span class="n">visited_children</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">)</span></div>
+
+    <span class="c1"># Unfortunate but necessary boilerplate methods</span>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_word"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_word">[docs]</a>    <span class="k">def</span> <span class="nf">visit_word</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_quoted"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_quoted">[docs]</a>    <span class="k">def</span> <span class="nf">visit_quoted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_glob"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_glob">[docs]</a>    <span class="k">def</span> <span class="nf">visit_glob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_regex"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_regex">[docs]</a>    <span class="k">def</span> <span class="nf">visit_regex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_eq"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_eq">[docs]</a>    <span class="k">def</span> <span class="nf">visit_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;eq&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_ne"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_ne">[docs]</a>    <span class="k">def</span> <span class="nf">visit_ne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;ne&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_gt"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_gt">[docs]</a>    <span class="k">def</span> <span class="nf">visit_gt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;gt&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_ge"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_ge">[docs]</a>    <span class="k">def</span> <span class="nf">visit_ge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;ge&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_lt"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_lt">[docs]</a>    <span class="k">def</span> <span class="nf">visit_lt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;lt&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.visit_le"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.visit_le">[docs]</a>    <span class="k">def</span> <span class="nf">visit_le</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Operators</span><span class="p">[</span><span class="s2">&quot;le&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MatcherBuilder.generic_visit"><a class="viewcode-back" href="../../../apidoc/pyrosimple.util.html#pyrosimple.util.matching.MatcherBuilder.generic_visit">[docs]</a>    <span class="k">def</span> <span class="nf">generic_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">visited_children</span><span class="p">):</span>
+        <span class="n">real_children</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">visited_children</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">real_children</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">real_children</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">real_children</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">real_children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">real_children</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">QueryGrammar</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;name=/asdfsd/ OR /.*/ tagged=test2&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+    <span class="n">match_tree</span> <span class="o">=</span> <span class="n">MatcherBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">match_tree</span><span class="p">)</span>
+    <span class="n">match_result</span> <span class="o">=</span> <span class="n">match_tree</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">parts</span><span class="o">.</span><span class="n">Bunch</span><span class="p">(</span><span class="n">tagged</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;The Thing&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">match_result</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

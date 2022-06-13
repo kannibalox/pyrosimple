@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.torrent.queue &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.torrent.queue</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.torrent.queue</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=I0011</span>
+<span class="sd">&quot;&quot;&quot; rTorrent Queue Manager.</span>
+
+<span class="sd">    Copyright (c) 2012 The PyroScope Project &lt;pyroscope.project@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along</span>
+<span class="c1"># with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="c1"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">error</span>
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">config</span> <span class="k">as</span> <span class="n">config_ini</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">xmlrpc</span><span class="p">,</span> <span class="n">pymagic</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.torrent</span> <span class="kn">import</span> <span class="n">engine</span><span class="p">,</span> <span class="n">matching</span><span class="p">,</span> <span class="n">formatting</span>
+
+
+<div class="viewcode-block" id="QueueManager"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.queue.QueueManager">[docs]</a><span class="k">class</span> <span class="nc">QueueManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;rTorrent queue manager implementation.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Special view containing all items that are transferring data, have peers connected, or are incomplete</span>
+    <span class="n">VIEWNAME</span> <span class="o">=</span> <span class="s2">&quot;pyrotorque&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set up queue manager.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span> <span class="o">=</span> <span class="n">pymagic</span><span class="o">.</span><span class="n">get_class_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;log_level&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Queue manager created with config </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="n">bool_param</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">matching</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">),</span> <span class="s2">&quot;job.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">job_name</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">bool_param</span><span class="p">(</span><span class="s2">&quot;quiet&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">startable</span> <span class="o">=</span> <span class="n">matching</span><span class="o">.</span><span class="n">ConditionParser</span><span class="p">(</span>
+            <span class="n">engine</span><span class="o">.</span><span class="n">FieldDefinition</span><span class="o">.</span><span class="n">lookup</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+            <span class="s2">&quot;[ </span><span class="si">%s</span><span class="s2"> ] [ </span><span class="si">%s</span><span class="s2"> ]&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">config_ini</span><span class="o">.</span><span class="n">torque</span><span class="p">[</span><span class="s2">&quot;queue_startable_base&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">startable</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Startable matcher for &#39;</span><span class="si">%s</span><span class="s2">&#39; is: [ </span><span class="si">%s</span><span class="s2"> ]&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">job_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">startable</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading</span> <span class="o">=</span> <span class="n">matching</span><span class="o">.</span><span class="n">ConditionParser</span><span class="p">(</span>
+            <span class="n">engine</span><span class="o">.</span><span class="n">FieldDefinition</span><span class="o">.</span><span class="n">lookup</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+            <span class="s2">&quot;is_active=1 is_complete=0&quot;</span>
+            <span class="o">+</span> <span class="p">(</span>
+                <span class="s2">&quot; [ </span><span class="si">%s</span><span class="s2"> ]&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading</span>
+                <span class="k">if</span> <span class="s2">&quot;downloading&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Downloading matcher for &#39;</span><span class="si">%s</span><span class="s2">&#39; is: [ </span><span class="si">%s</span><span class="s2"> ]&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">job_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sort_key</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">formatting</span><span class="o">.</span><span class="n">validate_sort_fields</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sort_fields</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sort_fields</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start some items if conditions are met.&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Filter by a custom date field, for scheduled downloads starting at a certain time, or after a given delay</span>
+
+        <span class="c1"># TODO: Don&#39;t start anything more if download BW is used &gt;= config threshold in %</span>
+
+        <span class="c1"># Check if anything more is ready to start downloading</span>
+        <span class="n">startable</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">startable</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">startable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Checked </span><span class="si">%d</span><span class="s2"> item(s), none startable according to [ </span><span class="si">%s</span><span class="s2"> ]&quot;</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">startable</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check intermission delay</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">now</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_start</span><span class="p">:</span>
+            <span class="c1"># compensate for summer time and other oddities</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_start</span> <span class="o">=</span> <span class="n">now</span>
+        <span class="n">delayed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">intermission</span> <span class="o">-</span> <span class="n">now</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">delayed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Delaying start of </span><span class="si">{:d}</span><span class="s2"> item(s),&quot;</span>
+                <span class="s2">&quot; due to </span><span class="si">{:d}</span><span class="s2">s intermission with </span><span class="si">{:d}</span><span class="s2">s left&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">startable</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">intermission</span><span class="p">,</span> <span class="n">delayed</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># TODO: sort by priority, then loaded time</span>
+
+        <span class="c1"># Stick to &quot;start_at_once&quot; parameter, unless &quot;downloading_min&quot; is violated</span>
+        <span class="n">downloading</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span>
+        <span class="n">start_now</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_at_once</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading_min</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">downloading</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">start_now</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">start_now</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">startable</span><span class="p">))</span>
+
+        <span class="c1"># down_traffic = sum(i.down for i in downloading)</span>
+        <span class="c1">##self.LOG.info(&quot;%d downloading, down %d&quot; % (len(downloading), down_traffic))</span>
+
+        <span class="c1"># Start eligible items</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">startable</span><span class="p">):</span>
+            <span class="c1"># Check if we reached &#39;start_now&#39; in this run</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">start_now</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;Only starting </span><span class="si">%d</span><span class="s2"> item(s) in this run, </span><span class="si">%d</span><span class="s2"> more could be downloading&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">start_now</span><span class="p">,</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">startable</span><span class="p">)</span> <span class="o">-</span> <span class="n">idx</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">break</span>
+
+            <span class="c1"># TODO: Prevent start of more torrents that can fit on the drive (taking &quot;off&quot; files into account)</span>
+            <span class="c1"># (restarts items that were stopped due to the &quot;low_diskspace&quot; schedule, and also avoids triggering it at all)</span>
+
+            <span class="c1"># Only check the other conditions when we have `downloading_min` covered</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">downloading</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading_min</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;Catching up from </span><span class="si">%d</span><span class="s2"> to a minimum of </span><span class="si">%d</span><span class="s2"> downloading item(s)&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">downloading</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading_min</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Limit to the given maximum of downloading items</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">downloading</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading_max</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;Already downloading </span><span class="si">%d</span><span class="s2"> item(s) out of </span><span class="si">%d</span><span class="s2"> max, </span><span class="si">%d</span><span class="s2"> more could be downloading&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">downloading</span><span class="p">),</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">downloading_max</span><span class="p">,</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">startable</span><span class="p">)</span> <span class="o">-</span> <span class="n">idx</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="c1"># If we made it here, start it!</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_start</span> <span class="o">=</span> <span class="n">now</span>
+            <span class="n">downloading</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">u</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> &#39;</span><span class="si">%s</span><span class="s2">&#39; [</span><span class="si">%s</span><span class="s2">, #</span><span class="si">%s</span><span class="s2">]&quot;</span>
+                <span class="o">%</span> <span class="p">(</span>
+                    <span class="s2">&quot;WOULD start&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dry_run</span> <span class="k">else</span> <span class="s2">&quot;Starting&quot;</span><span class="p">,</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">alias</span><span class="p">,</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">hash</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="n">xmlrpc</span><span class="o">.</span><span class="n">NOHASH</span><span class="p">,</span>
+                        <span class="sa">u</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: Started &#39;</span><span class="si">%s</span><span class="s2">&#39; {</span><span class="si">%s</span><span class="s2">}&quot;</span>
+                        <span class="o">%</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                            <span class="n">fmt</span><span class="o">.</span><span class="n">to_unicode</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">alias</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+
+<div class="viewcode-block" id="QueueManager.run"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.queue.QueueManager.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Queue manager job callback.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">config_ini</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+
+            <span class="c1"># Get items from &#39;pyrotorque&#39; view</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config_ini</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VIEWNAME</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_key</span><span class="p">:</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sort_key</span><span class="p">)</span>
+                <span class="c1"># self.LOG.debug(&quot;Sorted: %r&quot; % [i.name for i in items])</span>
+
+            <span class="c1"># Handle found items</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">config_ini</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">engine_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">LoggableError</span><span class="p">,</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">ERRORS</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># only debug, let the statistics logger do its job</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

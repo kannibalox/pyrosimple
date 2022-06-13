@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User’s Manual &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/js/custom.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Migrating from pyrocore" href="migrating.html" />
+    <link rel="prev" title="Configuration Guide" href="setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> pyrosimple
+            <img src="_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Configuration Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User’s Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-tools">Command Line Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview-of-cli-tools">Overview of CLI Tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#common-options">Common Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rtxmlrpc">rtxmlrpc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rtcontrol">rtcontrol</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#purpose">Purpose</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filter-conditions">Filter Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#mktor">mktor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lstor">lstor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chtor">chtor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bash-completion">Bash Completion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-completion">Using completion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#activating-completion">Activating completion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rtcontrol-examples">‘rtcontrol’ Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#useful-filter-conditions">Useful Filter Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#integrating-rtcontrol-into-the-curses-ui">Integrating ‘rtcontrol’ into the Curses UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reports">Reports</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-bash-aliases-for-common-reports">Using bash Aliases for Common Reports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-and-using-custom-output-formats">Defining and Using Custom Output Formats</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statistics">Statistics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#printing-some-statistics-to-the-terminal">Printing Some Statistics to the Terminal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#normalized-histogram-of-ratio-distribution">Normalized Histogram of Ratio Distribution</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#performing-management-tasks">Performing Management Tasks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fixing-items-with-an-empty-base-path">Fixing Items With an Empty “Base Path”</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deleting-download-items-and-their-data">Deleting Download Items and Their Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pruning-partial-downloads">Pruning Partial Downloads</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#performing-periodic-tasks">Performing Periodic Tasks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#simple-queue-management">Simple Queue Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#move-on-completion">Move on Completion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ratio-management">Ratio Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bandwidth-management">Bandwidth Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#automatic-stop-of-items-having-problems">Automatic Stop of Items Having Problems</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-output-templates">Using Output Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-jinja2-to-format-single-items">Using jinja2 to format single items</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-jinja2-for-full-output-control">Using jinja2 for full output control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-a-rtorstat-like-template-as-a-cgi-bin">Running a rtorstat-like template as a cgi-bin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-rtorrent-status-display-to-conky">Adding a rTorrent status display to <code class="docutils literal notranslate"><span class="pre">conky</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#listing-all-orphans-in-your-download-directory">Listing all orphans in your download directory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#standard-configuration-explained">Standard Configuration Explained</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#miscellaneous-features">Miscellaneous Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-views">Additional Views</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#custom-views-key-bindings">Custom Views: Key Bindings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-tagged-view">The <cite>tagged</cite> View</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#modified-active-view">Modified <cite>active</cite> View</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#category-views">Category Views</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#color-themes">Color Themes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#watches-with-dynamic-start">Watches With Dynamic Start</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>User’s Manual</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-s-manual">
+<h1>User’s Manual<a class="headerlink" href="#user-s-manual" title="Permalink to this headline">¶</a></h1>
+<p>This chapter provides an overview of all the command line tools and their everyday use,
+focussing on <strong class="command">rtcontrol</strong> as the most powerful of them.
+The following chapters then go into more advanced use-cases and features.</p>
+<section id="command-line-tools">
+<span id="commandlinetools"></span><span id="id1"></span><h2>Command Line Tools<a class="headerlink" href="#command-line-tools" title="Permalink to this headline">¶</a></h2>
+<section id="overview-of-cli-tools">
+<h3>Overview of CLI Tools<a class="headerlink" href="#overview-of-cli-tools" title="Permalink to this headline">¶</a></h3>
+<p><strong class="command">rtcontrol</strong> is the work-horse for rTorrent automation, it takes filter conditions
+of the form <code class="docutils literal notranslate"><span class="pre">‹field›=‹value›</span></code> and selects a set of download items according to them.
+That result can then be printed to the console according to a specified format,
+or put into any rTorrent view for further inspection.
+You can also take some bulk action on the selected items, e.g. starting, stopping, or deleting them.</p>
+<p><strong class="command">rtxmlrpc</strong> sends single XMLRPC commands to rTorrent, and <strong class="command">rtmv</strong> allows you to move around the
+data of download items in the file system, while continuing to seed that data.</p>
+<p>The following commands help you with managing metafiles:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong class="command">lstor</strong> safely lists their contents in various formats.</p></li>
+<li><p><strong class="command">mktor</strong> creates them, with support for painless cross-seeding.</p></li>
+<li><p><strong class="command">chtor</strong> changes existing metafiles, e.g. to add fast-resume information.</p></li>
+</ul>
+</div></blockquote>
+<p><strong class="command">pyrotorque</strong> is a companion daemon process to rTorrent that handles
+automation tasks like queue management, instant metafile loading from
+a directory tree via file system notifications, and other background tasks.</p>
+<p><strong class="command">pyroadmin</strong> is a helper for administrative tasks (mostly configuration handling).</p>
+</section>
+<section id="common-options">
+<h3>Common Options<a class="headerlink" href="#common-options" title="Permalink to this headline">¶</a></h3>
+<p>All commands share some common options.</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-version">
+<span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the command’s version number and exit.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-h">
+<span id="cmdoption-help"></span><span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the command’s help information and exit.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-q">
+<span id="cmdoption-quiet"></span><span id="cmdoption-cron"></span><span class="sig-name descname"><span class="pre">-q</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--quiet</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--cron</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omit informational logging, like the time it took to run the command.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-v">
+<span id="cmdoption-verbose"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increase informational logging, including some of the internal operations
+like configuration loading, and XMLRPC statistics.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-debug">
+<span class="sig-name descname"><span class="pre">--debug</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Always use <a class="reference internal" href="#cmdoption-debug"><code class="xref std std-option docutils literal notranslate"><span class="pre">--debug</span></code></a> when including logs in a bug report,
+since it shows stack traces for errors even when normally they’d
+be replaced by a more friendlier error message.</p>
+<p>This option also generates even more logging output than <a class="reference internal" href="#cmdoption-v"><code class="xref std std-option docutils literal notranslate"><span class="pre">-v</span></code></a>,
+including detailed XMLRPC diagnostics.
+Often it’ll point you to the root of a problem, so you <em>don’t</em> have to create an issue.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-config-dir">
+<span class="sig-name descname"><span class="pre">--config-dir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;DIR&gt;</span></span><a class="headerlink" href="#cmdoption-config-dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a different configuration directory instead of the <code class="file docutils literal notranslate"><span class="pre">~/.pyroscope</span></code> default one.</p>
+</dd></dl>
+
+<p>Also see the <a class="reference internal" href="references.html#cli-usage"><span class="std std-ref">PyroScope CLI Tools Usage</span></a> section for an automatically generated and thus
+comprehensive listing of all the current options.</p>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-PYRO_CONFIG_DIR">
+<span class="sig-name descname"><span class="pre">PYRO_CONFIG_DIR</span></span><a class="headerlink" href="#envvar-PYRO_CONFIG_DIR" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.6.1.</span></p>
+</div>
+<p>This environment variable can be used to change the default <code class="file docutils literal notranslate"><span class="pre">~/.pyroscope</span></code>
+of the <a class="reference internal" href="#cmdoption-config-dir"><code class="xref std std-option docutils literal notranslate"><span class="pre">--config-dir</span></code></a> option, for the duration of a shell session,
+or within a <cite>systemd</cite> unit.</p>
+</dd></dl>
+
+</section>
+<section id="rtxmlrpc">
+<span id="id2"></span><h3>rtxmlrpc<a class="headerlink" href="#rtxmlrpc" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="references.html#cli-usage-rtxmlrpc"><span class="std std-ref">rtxmlrpc</span></a> allows you to call raw XMLRPC methods on the rTorrent
+instance that you have specified in your configuration. See the
+<a class="reference internal" href="references.html#cli-usage-rtxmlrpc"><span class="std std-ref">usage information</span></a> for available options.</p>
+<p>The method name and optional arguments are provided using standard shell
+rules, i.e. where you would use <code class="docutils literal notranslate"><span class="pre">^X</span> <span class="pre">throttle_down=slow,120</span></code> in
+rTorrent you just list the arguments in the usual shell way
+(<code class="docutils literal notranslate"><span class="pre">rtxmlrpc</span> <span class="pre">throttle_down</span> <span class="pre">slow</span> <span class="pre">120</span></code>). The rTorrent format is also
+recognized though, but without any escaping rules (i.e. you cannot have
+a <code class="docutils literal notranslate"><span class="pre">,</span></code> in your arguments then).</p>
+<p>Remember that almost all commands require a ‘target’ as the first parameter
+in newer rTorrent versions, and you have to provide that explicitly.
+Thus, it must be <code class="docutils literal notranslate"><span class="pre">rtxmlrpc</span> <span class="pre">view.size</span> <span class="pre">''</span> <span class="pre">main</span></code>, with an extra empty argument
+– otherwise you’ll get a <code class="docutils literal notranslate"><span class="pre">Unsupported</span> <span class="pre">target</span> <span class="pre">type</span> <span class="pre">found</span></code> fault.</p>
+<p>There are some special ways to write arguments of certain types:
+<code class="docutils literal notranslate"><span class="pre">+‹number›</span></code> and <code class="docutils literal notranslate"><span class="pre">-‹number›</span></code> send an integer value,
+<code class="docutils literal notranslate"><span class="pre">&#64;‹filename›</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;‹URL›</span></code>, or <code class="docutils literal notranslate"><span class="pre">&#64;-</span></code> (for stdin) reads the argument’s content into a XMLRPC binary value,
+and finally <code class="docutils literal notranslate"><span class="pre">[‹item1›〈,‹item2›,…〉</span></code> produces an array of strings.
+These typed arguments only cover some common use-cases,
+at some point you have to write Python code to build up more intricate data structures.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;‹URL›</span></code> form supports <code class="docutils literal notranslate"><span class="pre">http</span></code>, <code class="docutils literal notranslate"><span class="pre">https</span></code>, and <code class="docutils literal notranslate"><span class="pre">ftp</span></code>, here is an example call:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rtxmlrpc load.raw_verbose <span class="s1">&#39;&#39;</span> <span class="se">\</span>
+  @<span class="s2">&quot;https://cdimage.debian.org/debian-cd/current/amd64/bt-cd/debian-9.0.0-amd64-netinst.iso.torrent&quot;</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>To get a list of available methods, just call <code class="docutils literal notranslate"><span class="pre">rtxmlrpc</span> <span class="pre">system.listMethods</span></code>.
+The <a class="reference internal" href="advanced.html#rtxmlrpcexamples"><span class="std std-ref">Using ‘rtxmlrpc’</span></a> section shows some typical examples for querying global information
+and controlling rTorrent behaviour.</p>
+</section>
+<section id="rtcontrol">
+<span id="id3"></span><h3>rtcontrol<a class="headerlink" href="#rtcontrol" title="Permalink to this headline">¶</a></h3>
+<section id="purpose">
+<h4>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference internal" href="references.html#cli-usage-rtcontrol"><span class="std std-ref">rtcontrol</span></a> allows you to select torrents loaded into rTorrent using
+various filter conditions. You can then either display the matches found
+in any rTorrent view for further inspection,
+list them to the console using flexible output formatting,
+or perform some management action like starting and stopping torrents.
+<a class="reference internal" href="advanced.html#rtxmlrpcexamples"><span class="std std-ref">Using ‘rtxmlrpc’</span></a> shows examples for sending commands
+that don’t target a specific item.</p>
+<p>For example, the command <code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">up=+0</span> <span class="pre">up=-10k</span></code> will list all
+torrents that are currently uploading any data, but at a rate of below
+10 KiB/s. See the <a class="reference internal" href="#rtcontrol-examples"><span class="std std-ref">‘rtcontrol’ Examples</span></a> for more real-world examples,
+and the following section on basics regarding the filter conditions.</p>
+</section>
+<section id="filter-conditions">
+<span id="id4"></span><h4>Filter Conditions<a class="headerlink" href="#filter-conditions" title="Permalink to this headline">¶</a></h4>
+<p>Filter conditions take the form <code class="docutils literal notranslate"><span class="pre">‹field›=‹value›</span></code>, and by default
+all given conditions must be met (AND). If a field name is omitted,
+<code class="docutils literal notranslate"><span class="pre">name</span></code> is assumed. Multiple values separated by a comma indicate
+several possible choices (OR). <code class="docutils literal notranslate"><span class="pre">!</span></code> in front of a filter value
+negates it (NOT). Use uppercase <code class="docutils literal notranslate"><span class="pre">OR</span></code> to combine multiple alternative
+sets of conditions. And finally brackets can be used to group conditions
+and alter the default “AND before OR” behaviour; be sure to separate
+both the opening and closing bracket by white space from surrounding
+text. <code class="docutils literal notranslate"><span class="pre">NOT</span></code> at the start of a bracket pair inverts the contained condition.</p>
+<p>For string fields, the value is a
+<a class="reference external" href="https://docs.python.org/library/fnmatch.html">glob pattern</a>
+which you are used to from shell filename patterns (<code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">?</span></code>, <code class="docutils literal notranslate"><span class="pre">[a-z]</span></code>,
+<code class="docutils literal notranslate"><span class="pre">[!a-z]</span></code>); glob patterns must match the whole field value, i.e. use
+<code class="docutils literal notranslate"><span class="pre">*...*</span></code> for ‘contains’ type searches. To use
+<a class="reference external" href="https://docs.python.org/howto/regex.html">regex matches</a> instead of globbing,
+enclose the pattern in slashes (<code class="docutils literal notranslate"><span class="pre">/regex/</span></code>). Since regex can express
+anchoring the match at the head (<code class="docutils literal notranslate"><span class="pre">^</span></code>) or tail (<code class="docutils literal notranslate"><span class="pre">$</span></code>), they’re by
+default of the ‘contains’ type.
+All string comparisons are case-ignoring.</p>
+<p>If a string field’s filter value starts with <code class="docutils literal notranslate"><span class="pre">{{</span></code> or ends with <code class="docutils literal notranslate"><span class="pre">}}</span></code>,
+it is evaluated as a template for each item before matching it with the current field value.
+See <a class="reference internal" href="advanced.html#rtcontrol-filter-templates"><span class="std std-ref">Using Templates as Filter Values</span></a> for a practical use of that.</p>
+<p>For numeric fields, a leading <code class="docutils literal notranslate"><span class="pre">+</span></code> means greater than, a leading
+<code class="docutils literal notranslate"><span class="pre">-</span></code> means less than (just like with the standard <code class="docutils literal notranslate"><span class="pre">find</span></code> command).</p>
+<p>Selection on fields that are lists of tags or names (e.g. <code class="docutils literal notranslate"><span class="pre">tagged</span></code> and
+<code class="docutils literal notranslate"><span class="pre">views</span></code>) works by just providing the tags you want to search for. The
+difference to the glob patterns for string fields is that tagged search
+respects word boundaries (whitespace), and to get a match the given tag
+just has to appear anywhere in the list (<code class="docutils literal notranslate"><span class="pre">bar</span></code> matches on
+<code class="docutils literal notranslate"><span class="pre">foo</span> <span class="pre">bar</span> <span class="pre">baz</span></code>).</p>
+<p>In time filtering conditions (e.g. for the <code class="docutils literal notranslate"><span class="pre">completed</span></code> and <code class="docutils literal notranslate"><span class="pre">loaded</span></code>
+fields), you have three possible options to specify the value:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>time deltas in the form “<code class="docutils literal notranslate"><span class="pre">&lt;number&gt;&lt;unit&gt;...</span></code>”, where unit is a single
+upper- or lower-case letter and one of <code class="docutils literal notranslate"><span class="pre">Y</span></code>ear, <code class="docutils literal notranslate"><span class="pre">M</span></code>onth, <code class="docutils literal notranslate"><span class="pre">W</span></code>eek,
+<code class="docutils literal notranslate"><span class="pre">D</span></code>ay, <code class="docutils literal notranslate"><span class="pre">H</span></code>our, m<code class="docutils literal notranslate"><span class="pre">I</span></code>nute, or <code class="docutils literal notranslate"><span class="pre">S</span></code>econd. The order is important
+(<code class="docutils literal notranslate"><span class="pre">y</span></code> before <code class="docutils literal notranslate"><span class="pre">m</span></code>), and a <code class="docutils literal notranslate"><span class="pre">+</span></code> before the delta means <em>older than</em>,
+while <code class="docutils literal notranslate"><span class="pre">-</span></code> means <em>younger than</em>.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">-1m2w3d</span></code></p>
+</li>
+<li><p>a certain date and time in human readable form, where the date can be given in ISO
+(<code class="docutils literal notranslate"><span class="pre">Y-M-D</span></code>), American (<code class="docutils literal notranslate"><span class="pre">M/D/Y</span></code>), or European (<code class="docutils literal notranslate"><span class="pre">D.M.Y</span></code>) format.
+A date can be followed by a time, with minutes and seconds optional and
+separated by <code class="docutils literal notranslate"><span class="pre">:</span></code>. Put either a space or a <code class="docutils literal notranslate"><span class="pre">T</span></code> between the date and
+the time.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">+2010-08-15t14:50</span></code></p>
+</li>
+<li><p>absolute numerical UNIX timestamp, i.e. what <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-l</span> <span class="pre">--time-style</span> <span class="pre">'+%s'</span></code> returns.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">+1281876597</span></code></p>
+</li>
+</ol>
+</div></blockquote>
+<p>See <a class="reference internal" href="#useful-filter-conditions"><span class="std std-ref">Useful Filter Conditions</span></a> for some concrete examples with an explanation of what they do.</p>
+</section>
+</section>
+<section id="mktor">
+<span id="id5"></span><h3>mktor<a class="headerlink" href="#mktor" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="references.html#cli-usage-mktor"><span class="std std-ref">mktor</span></a> creates <code class="docutils literal notranslate"><span class="pre">*.torrent</span></code> files (metafiles), given the <strong>path to the data</strong> in a
+file, directory, or named pipe (more on that below) and a <strong>tracker URL or alias name</strong>
+(see <a class="reference internal" href="setup.html#config-ini"><span class="std std-ref">Setting values in ‘config.ini’</span></a> on how to define aliases).
+Optionally, you can also set an additional comment and a different name for the
+resulting torrent file. Peer exchange and DHT can be disabled by using
+the <code class="docutils literal notranslate"><span class="pre">--private</span></code> option.</p>
+<p>If you want to create metafiles in bulk, use one of the many options
+a Linux shell offers you, among them:</p>
+<blockquote>
+<div><ul>
+<li><p><em>Anything</em> in the current directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ls -1 <span class="p">|</span> xargs -d<span class="s1">$&#39;\n&#39;</span> -I<span class="o">{}</span> mktor -p -o /tmp <span class="s2">&quot;{}&quot;</span> <span class="s2">&quot;</span><span class="nv">$ANNOUNCE_URL</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Just for directories:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>find . -mindepth <span class="m">1</span> -maxdepth <span class="m">1</span> -type d <span class="se">\!</span> -name <span class="s2">&quot;.*&quot;</span> -print0 <span class="p">|</span> sort -z <span class="se">\</span>
+    <span class="p">|</span> xargs -0I<span class="o">{}</span> mktor -p <span class="s2">&quot;{}&quot;</span> <span class="s2">&quot;</span><span class="nv">$ANNOUNCE_URL</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<p>If you create torrents for different trackers, they’re
+<em>automatically enabled for cross-seeding</em>, i.e. you can load several torrents for
+exactly the same data into your client. For the technically inclined,
+this is done by adding a unique key so that the info hash is always
+different.
+Use the <code class="docutils literal notranslate"><span class="pre">--no-cross-seed</span></code> option to disable this.
+You can also set the ‘source’ field many trackers use for unique info hashes,
+use <code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">info.source=LABEL</span></code> for that.</p>
+<p>To exclude files stored on disk from the resulting torrent, use the
+<code class="docutils literal notranslate"><span class="pre">--exclude</span></code> option to extend the list of standard glob patterns that
+are ignored. These standard patterns are: <code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">CVS</span></code>, <code class="docutils literal notranslate"><span class="pre">.*</span></code>,
+<code class="docutils literal notranslate"><span class="pre">*~</span></code>, <code class="docutils literal notranslate"><span class="pre">*.swp</span></code>, <code class="docutils literal notranslate"><span class="pre">*.tmp</span></code>, <code class="docutils literal notranslate"><span class="pre">*.bak</span></code>, <code class="docutils literal notranslate"><span class="pre">[Tt]humbs.db</span></code>,
+<code class="docutils literal notranslate"><span class="pre">[Dd]esktop.ini</span></code>, and <code class="docutils literal notranslate"><span class="pre">ehthumbs_vista.db</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--fast-resume</span></code> option creates a second metafile
+<code class="docutils literal notranslate"><span class="pre">*-resume.torrent</span></code> that contains special entries which, when loaded
+into rTorrent, makes it skip the redundant hashing phase (after all, you
+hashed the files just now). It is <strong>very</strong> important to upload the
+<em>other</em> file without <code class="docutils literal notranslate"><span class="pre">resume</span></code> in its name to your tracker, else you
+cause leechers using rTorrent problems with starting their download.</p>
+<p>As a unique feature, if you want to change the root directory of the
+torrent to something different than the basename of the data directory,
+you can do so with the <code class="docutils literal notranslate"><span class="pre">--root-name</span></code> option. This is especially useful
+if you have hierarchical paths like <code class="docutils literal notranslate"><span class="pre">documents/2009/myproject/specs</span></code> -
+normally, all the context information but <code class="docutils literal notranslate"><span class="pre">specs</span></code> would be lost on the
+receiving side. Just don’t forget to provide a symlink in your download
+directory with the chosen name that points to the actual data directory.</p>
+</section>
+<section id="lstor">
+<span id="id6"></span><h3>lstor<a class="headerlink" href="#lstor" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="references.html#cli-usage-lstor"><span class="std std-ref">lstor</span></a> lists the contents of bittorrent metafiles. The resulting
+output looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NAME</span> <span class="n">pavement</span><span class="o">.</span><span class="n">torrent</span>
+<span class="n">SIZE</span> <span class="mf">3.6</span> <span class="n">KiB</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="mf">32.0</span> <span class="n">KiB</span> <span class="o">+</span> <span class="mf">3.6</span> <span class="n">KiB</span><span class="p">)</span>
+<span class="n">HASH</span> <span class="mi">2</span><span class="n">D1A7E443D23907E5118FA4A1065CCA191D62C0B</span>
+<span class="n">URL</span>  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span>
+<span class="n">PRV</span>  <span class="n">NO</span> <span class="p">(</span><span class="n">DHT</span><span class="o">/</span><span class="n">PEX</span> <span class="n">enabled</span><span class="p">)</span>
+<span class="n">TIME</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">06</span> <span class="mi">00</span><span class="p">:</span><span class="mi">49</span><span class="p">:</span><span class="mi">52</span>
+<span class="n">BY</span>   <span class="n">PyroScope</span> <span class="mf">0.1.1</span>
+
+<span class="n">FILE</span> <span class="n">LISTING</span>
+<span class="n">pavement</span><span class="o">.</span><span class="n">py</span>                                                             <span class="mf">3.6</span> <span class="n">KiB</span>
+
+<span class="o">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+<span class="n">NAME</span> <span class="n">tests</span><span class="o">.</span><span class="n">torrent</span>
+<span class="n">SIZE</span> <span class="mf">2.6</span> <span class="n">KiB</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="mf">32.0</span> <span class="n">KiB</span> <span class="o">+</span> <span class="mf">2.6</span> <span class="n">KiB</span><span class="p">)</span>
+<span class="n">HASH</span> <span class="mf">8E37</span><span class="n">EB6F4D3807EB26F267D3A9D31C4262530AB2</span>
+<span class="n">URL</span>  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span>
+<span class="n">PRV</span>  <span class="n">YES</span> <span class="p">(</span><span class="n">DHT</span><span class="o">/</span><span class="n">PEX</span> <span class="n">disabled</span><span class="p">)</span>
+<span class="n">TIME</span> <span class="mi">2009</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">06</span> <span class="mi">00</span><span class="p">:</span><span class="mi">49</span><span class="p">:</span><span class="mi">52</span>
+<span class="n">BY</span>   <span class="n">PyroScope</span> <span class="mf">0.1.1</span>
+
+<span class="n">FILE</span> <span class="n">LISTING</span>
+<span class="n">pyroscope</span> <span class="n">tests</span><span class="o">/</span>
+    <span class="n">test_bencode</span><span class="o">.</span><span class="n">py</span>                                                     <span class="mf">2.6</span> <span class="n">KiB</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">lstor</span></code> has these options:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">reveal</span>       <span class="n">show</span> <span class="n">full</span> <span class="n">announce</span> <span class="n">URL</span> <span class="n">including</span> <span class="n">keys</span>
+<span class="o">--</span><span class="n">raw</span>          <span class="nb">print</span> <span class="n">the</span> <span class="n">metafile</span><span class="s1">&#39;s raw content in all detail</span>
+<span class="o">-</span><span class="n">V</span><span class="p">,</span> <span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">validation</span>
+               <span class="n">show</span> <span class="n">broken</span> <span class="n">metafiles</span> <span class="k">with</span> <span class="n">an</span> <span class="n">invalid</span> <span class="n">structure</span>
+<span class="o">--</span><span class="n">output</span><span class="o">=</span><span class="n">KEY</span><span class="p">,</span><span class="n">KEY1</span><span class="o">.</span><span class="n">KEY2</span><span class="p">,</span><span class="o">...</span>
+               <span class="n">select</span> <span class="n">fields</span> <span class="n">to</span> <span class="nb">print</span><span class="p">,</span> <span class="n">output</span> <span class="ow">is</span> <span class="n">separated</span> <span class="n">by</span> <span class="n">TABs</span><span class="p">;</span>
+               <span class="n">note</span> <span class="n">that</span> <span class="vm">__file__</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">metafile</span><span class="p">,</span>
+               <span class="fm">__hash__</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">info</span> <span class="nb">hash</span><span class="p">,</span> <span class="ow">and</span> <span class="n">__size__</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">data</span>
+               <span class="n">size</span> <span class="ow">in</span> <span class="n">byte</span>
+</pre></div>
+</div>
+<p>Starting with v0.3.6, you can select to output specific fields from the
+metafile, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ lstor -qo __hash__,info.piece\ length,info.name *.torrent
+00319ED92914E30C9104DA30BF39AF862513C4C8    262144  Execute My Liberty - The Cursed Way -- Jamendo - OGG Vorbis q7 - 2010.07.29 [www.jamendo.com]
+</pre></div>
+</div>
+<p>This can also be used to rename <code class="docutils literal notranslate"><span class="pre">‹infohash›.torrent</span></code> metafiles
+from a session directory to a human readable name,
+using parts of the hash to ensure unique names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ls -1 *.torrent | egrep &#39;^[0-9a-fA-F]{40}\.torrent&#39; | while read i; do
+    humanized=&quot;$(lstor -qo info.name,__hash__ &quot;$i&quot; | awk -F$&#39;\t&#39; &#39;{print $1&quot;-&quot;substr($2,1,7)}&#39;)&quot;
+    mv &quot;$i&quot; &quot;$humanized.torrent&quot;
+done
+</pre></div>
+</div>
+<p>And to see a metafile with all the guts hanging out, use the <code class="docutils literal notranslate"><span class="pre">--raw</span></code>
+option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;announce&#39;</span><span class="p">:</span> <span class="s1">&#39;http://tracker.example.com/announce&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;created by&#39;</span><span class="p">:</span> <span class="s1">&#39;PyroScope 0.3.2dev-r410&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;creation date&#39;</span><span class="p">:</span> <span class="mi">1268581272</span><span class="p">,</span>
+ <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+          <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;lab-rats&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;piece length&#39;</span><span class="p">:</span> <span class="mi">32768</span><span class="p">,</span>
+          <span class="s1">&#39;pieces&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;1 piece hashes&gt;&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;x_cross_seed&#39;</span><span class="p">:</span> <span class="s1">&#39;142e0ae6d40bd9d3bcccdc8a9683e2fb&#39;</span><span class="p">},</span>
+ <span class="s1">&#39;libtorrent_resume&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bitfield&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                       <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;completed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                  <span class="s1">&#39;mtime&#39;</span><span class="p">:</span> <span class="mi">1283007315</span><span class="p">,</span>
+                                  <span class="s1">&#39;priority&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}],</span>
+                       <span class="s1">&#39;peers&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                       <span class="s1">&#39;trackers&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;http://tracker.example.com/announce&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}},</span>
+ <span class="s1">&#39;rtorrent&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;chunks_done&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="s1">&#39;complete&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="s1">&#39;connection_leech&#39;</span><span class="p">:</span> <span class="s1">&#39;leech&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;connection_seed&#39;</span><span class="p">:</span> <span class="s1">&#39;seed&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;custom&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;activations&#39;</span><span class="p">:</span> <span class="s1">&#39;R1283007474P1283007494R1283007529P1283007537&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="s1">&#39;100%_&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;tm_loaded&#39;</span><span class="p">:</span> <span class="s1">&#39;1283007442&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;tm_started&#39;</span><span class="p">:</span> <span class="s1">&#39;1283007474&#39;</span><span class="p">},</span>
+              <span class="s1">&#39;custom1&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;custom2&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;custom3&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;custom4&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;custom5&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;directory&#39;</span><span class="p">:</span> <span class="s1">&#39;~/rtorrent/work&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;hashing&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="s1">&#39;ignore_commands&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+              <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="mi">357633323</span><span class="p">,</span>
+              <span class="s1">&#39;loaded_file&#39;</span><span class="p">:</span> <span class="s1">&#39;~/rtorrent/.session/38DE398D332AE856B509EF375C875FACFA1C939F.torrent&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;priority&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+              <span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="s1">&#39;state_changed&#39;</span><span class="p">:</span> <span class="mi">1283017194</span><span class="p">,</span>
+              <span class="s1">&#39;state_counter&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+              <span class="s1">&#39;throttle_name&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;tied_to_file&#39;</span><span class="p">:</span> <span class="s1">&#39;~/rtorrent/watch/lab-rats.torrent&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;total_uploaded&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="s1">&#39;views&#39;</span><span class="p">:</span> <span class="p">[]}}</span>
+</pre></div>
+</div>
+</section>
+<section id="chtor">
+<span id="id7"></span><h3>chtor<a class="headerlink" href="#chtor" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="references.html#cli-usage-chtor"><span class="std std-ref">chtor</span></a> is able to change common attributes of a metafile, or clean
+any non-standard data from them (namely, rTorrent session information).</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">chtor</span></code> automatically changes only those metafiles whose
+existing announce URL starts with the scheme and location of the new URL
+when using <code class="docutils literal notranslate"><span class="pre">--reannounce</span></code>. To change <em>all</em> given
+metafiles unconditionally, use the <code class="docutils literal notranslate"><span class="pre">--reannounce-all</span></code> option and be
+very sure you provide only those files you actually want to be changed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">chtor</span></code> only rewrites metafiles that were actually changed, and those
+changes are first written to a temporary file, which is then renamed.</p>
+</section>
+<section id="bash-completion">
+<h3>Bash Completion<a class="headerlink" href="#bash-completion" title="Permalink to this headline">¶</a></h3>
+<p>If you don’t know what <strong class="command">bash</strong> completion is, or want to handle this later,
+you can skip to <a class="reference internal" href="#id8"><span class="std std-ref">‘rtcontrol’ Examples</span></a>.</p>
+<section id="using-completion">
+<h4>Using completion<a class="headerlink" href="#using-completion" title="Permalink to this headline">¶</a></h4>
+<p>In case you don’t know what <strong class="command">bash</strong> completion looks like, watch this…</p>
+<img alt="_images/bash-completion.gif" src="_images/bash-completion.gif" />
+<p>Every time you’re unsure what options you have, you can press <kbd class="kbd docutils literal notranslate">TAB↹</kbd> twice
+to get a menu of choices, and if you already know roughly what you want,
+you can start typing and save keystrokes by pressing <kbd class="kbd docutils literal notranslate">TAB↹</kbd> once, to
+complete whatever you provided so far.</p>
+<p>So for example, enter a partial command name like <kbd class="kbd docutils literal notranslate">rtco</kbd> and then <kbd class="kbd docutils literal notranslate">TAB↹</kbd> to
+get <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code>, then type <kbd class="kbd docutils literal notranslate">--</kbd> followed by 2 times <kbd class="kbd docutils literal notranslate">TAB↹</kbd> to get a list of
+possible command line options.</p>
+</section>
+<section id="activating-completion">
+<h4>Activating completion<a class="headerlink" href="#activating-completion" title="Permalink to this headline">¶</a></h4>
+<p>To add <cite>pyrocore</cite>’s completion definitions to your shell, call these commands:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pyroadmin --create-config
+touch ~/.bash_completion
+grep /<span class="se">\.</span>pyroscope/ ~/.bash_completion &gt;/dev/null <span class="o">||</span> <span class="se">\</span>
+    <span class="nb">echo</span> &gt;&gt;.bash_completion <span class="s2">&quot;. ~/.pyroscope/bash-completion.default&quot;</span>
+. /etc/bash_completion
+</pre></div>
+</div>
+<p>After that, completion should work, see the above section for things to try out.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On <cite>Ubuntu</cite>, you need to have the <code class="docutils literal notranslate"><span class="pre">bash-completion</span></code> package
+installed on your machine. Other Linux systems will have a similar
+pre-condition.</p>
+</div>
+</section>
+</section>
+</section>
+<section id="rtcontrol-examples">
+<span id="id8"></span><span id="id9"></span><h2>‘rtcontrol’ Examples<a class="headerlink" href="#rtcontrol-examples" title="Permalink to this headline">¶</a></h2>
+<section id="useful-filter-conditions">
+<span id="condition-examples"></span><span id="id10"></span><h3>Useful Filter Conditions<a class="headerlink" href="#useful-filter-conditions" title="Permalink to this headline">¶</a></h3>
+<p>The following <a class="reference internal" href="#rtcontrol"><span class="std std-ref">rtcontrol</span></a> <a class="reference internal" href="#filter-conditions"><span class="std std-ref">Filter Conditions</span></a> give you a hint on what you can do, and some
+building blocks for more complex conditions.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">*HDTV*</span></code></dt><dd><p>Anything with “HDTV” in its name</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">/s\d+e\d+/</span></code></dt><dd><p>Anything with typical TV episode numbering in its name (regex match)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ratio=+1</span></code></dt><dd><p>All downloads seeded to at least 1:1</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">xfer=+0</span></code></dt><dd><p>All active torrents (transferring data)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">up=+0</span></code></dt><dd><p>All seeding torrents (uploading data)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">down=+0</span> <span class="pre">down=-5k</span></code></dt><dd><p>Slow torrents (downloading, but with &lt; 5 KiB/s)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">down=0</span> <span class="pre">is_complete=no</span> <span class="pre">is_open=yes</span></code></dt><dd><p>Stuck torrents</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">size=+4g</span></code></dt><dd><p>Big stuff (DVD size or larger)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">is_complete=no</span></code></dt><dd><p>Incomplete downloads</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">is_open=y</span> <span class="pre">is_active=n</span></code></dt><dd><p>Paused items</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">is_ghost=yes</span></code></dt><dd><p>Torrents that have no data (were never started or lost their data; <em>since v0.3.3</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">alias=obt</span></code></dt><dd><p>Torrents tracked by <cite>openbittorrent.com</cite> (see <a class="reference internal" href="setup.html"><span class="doc">Configuration Guide</span></a> on how to add aliases for trackers)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">'path=!'</span></code></dt><dd><p>Has a non-empty <cite>path</cite></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ratio=+1</span> <span class="pre">realpath=\!/mnt/*</span></code></dt><dd><p>1:1 seeds not on a mounted path (i.e. likely on localhost)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">completed=+2w</span></code></dt><dd><p>Completed more than 2 weeks ago (<em>since v0.3.4</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tagged=</span></code></dt><dd><p>Not tagged at all (<em>since v0.3.5</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tagged=\!</span></code></dt><dd><p>Has at least one tag (<em>since v0.3.5</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tagged=foo,bar</span></code></dt><dd><p>Tagged with “foo” or “bar” (<em>since v0.3.5</em>) — tags are white-space separated
+lists of names in the field <code class="docutils literal notranslate"><span class="pre">custom_tags</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tagged==highlander</span></code></dt><dd><p><em>Only</em> tagged with “highlander” and nothing else (<em>since v0.3.6</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kind=flac,mp3</span></code></dt><dd><p>Music downloads (<em>since v0.3.6</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">files=sample/*</span></code></dt><dd><p>Items with a top-level <cite>sample</cite> folder (<em>since v0.3.6</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ratio=+2.5</span> <span class="pre">OR</span> <span class="pre">seedtime=+1w</span></code></dt><dd><p>Items seeded to 5:2 <strong>or</strong> for more than a week (<em>since v0.3.6</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">alias=foo</span> <span class="pre">[</span> <span class="pre">ratio=+2.5</span> <span class="pre">OR</span> <span class="pre">seedtime=+7d</span> <span class="pre">]</span></code></dt><dd><p>The same as above, but for one tracker only (<em>since v0.3.7</em>)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">traits=avi</span> <span class="pre">traits=tv,movies</span></code></dt><dd><p>TV or movies in AVI containers (<em>since v0.3.7</em>)</p>
+</dd>
+</dl>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">!</span></code> character has to be escaped in shell commands. For a
+current full list of all the field names and their meaning, see the
+output of the <code class="docutils literal notranslate"><span class="pre">--help-fields</span></code> option of <a class="reference internal" href="references.html#cli-usage-rtcontrol"><span class="std std-ref">rtcontrol</span></a>
+which gives you a complete list for your installation.</p>
+</section>
+<section id="integrating-rtcontrol-into-the-curses-ui">
+<h3>Integrating ‘rtcontrol’ into the Curses UI<a class="headerlink" href="#integrating-rtcontrol-into-the-curses-ui" title="Permalink to this headline">¶</a></h3>
+<p>Anyone who ever dreamt about a <a class="reference external" href="http://www.youtube.com/watch?v=y8gHEfA1w3Y">search box</a>
+in their rtorrent UI, dream no more…</p>
+<figure class="align-center">
+<img alt="Search in the curses UI" src="_images/rtcontrol-curses.gif" />
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You already have the following configuration commands,
+if you followed the <a class="reference internal" href="setup.html"><span class="doc">Configuration Guide</span></a>.</p>
+</div>
+<p>Just add this to your <code class="docutils literal notranslate"><span class="pre">.rtorrent.rc</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># VIEW: Use rtcontrol filter (^X s=KEYWORD, ^X t=TRACKER, ^X f=&quot;FILTER&quot;)</span><span class="w"></span>
+<span class="na">method.insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">s,simple|private,&quot;execute.nothrow=rtcontrol,--detach,-qV,\&quot;$cat=*,$argument.0=,*\&quot;&quot;</span><span class="w"></span>
+<span class="na">method.insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">t,simple|private,&quot;execute.nothrow=rtcontrol,--detach,-qV,\&quot;$cat=\\\&quot;alias=\\\&quot;,$argument.0=\&quot;&quot;</span><span class="w"></span>
+<span class="na">method.insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">f,simple|private,&quot;execute.nothrow=rtcontrol,--detach,-qV,$argument.0=&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>You can of course add as many commands as you like, and include sorting
+options and whatever else <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> offers.</p>
+<p>The ‘trick’ here is the <code class="docutils literal notranslate"><span class="pre">-V</span></code> (<code class="docutils literal notranslate"><span class="pre">--view-only</span></code>) option, which shows the
+selection result in a rTorrent view instead of on the console. You can
+add this to any query you execute on the command line, and then
+interactively work with the result. The above commands are just
+shortcuts for common use-cases, directly callable from the curses UI.</p>
+</section>
+<section id="reports">
+<h3>Reports<a class="headerlink" href="#reports" title="Permalink to this headline">¶</a></h3>
+<section id="using-bash-aliases-for-common-reports">
+<h4>Using bash Aliases for Common Reports<a class="headerlink" href="#using-bash-aliases-for-common-reports" title="Permalink to this headline">¶</a></h4>
+<p>You might want to add the following alias definitions to your
+<code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">alias</span> <span class="nv">rt2days</span><span class="o">=</span><span class="s2">&quot;rtcontrol -scompleted -ocompleted,is_open,up.sz,ratio,alias,name completed=-2d&quot;</span>
+<span class="nb">alias</span> <span class="nv">rtls</span><span class="o">=</span><span class="s2">&quot;rtcontrol -qo &#39;{{chr(10).join([d.directory+chr(47)+x.path for x in d.files])|h.subst(chr(47)+chr(43),chr(47))}}&#39;&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rt2days</span></code> gives the completion history of the last 48 hours,
+and <code class="docutils literal notranslate"><span class="pre">rtls</span></code> lets you create lists of files just like <code class="docutils literal notranslate"><span class="pre">ls</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ rtls /a.boy/ <span class="p">|</span> xargs -d<span class="s1">&#39;\n&#39;</span> ls -lgGh
+-rw-r----- <span class="m">1</span> 702M Mar  <span class="m">7</span> <span class="m">17</span>:42 /var/torrent/work/A_Boy_and_His_Dog.avi
+</pre></div>
+</div>
+<p>If you feed the list of paths into normal <code class="docutils literal notranslate"><span class="pre">ls</span></code> as shown,
+you have all the usual options available to you.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the
+<a class="reference external" href="https://github.com/pyroscope/pimp-my-box/blob/master/roles/pyroscope-cli/files/profile.d/rt-alias.sh">rt-alias.sh</a>
+file of the <a class="reference external" href="https://github.com/pyroscope/pimp-my-box/">pimp-my-box</a> project
+for these and some more aliases.</p>
+</div>
+</section>
+<section id="defining-and-using-custom-output-formats">
+<h4>Defining and Using Custom Output Formats<a class="headerlink" href="#defining-and-using-custom-output-formats" title="Permalink to this headline">¶</a></h4>
+<p>Before describing the possible options for output formatting in more
+details below, here’s a short overview of the possible methods, each
+with an example:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">size.sz,name</span></code> — simple field lists, possibly with
+format specifiers; in the output, fields are separated by a TAB character.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">%(size.sz)s</span> <span class="pre">%(name)s</span></code> — string interpolation, i.e. like the above
+lists, but interspersed with literal text instead of TABs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{{d.size|sz}}</span> <span class="pre">{{d.name}}</span></code> — Tempita templates, see <a class="reference internal" href="#output-templates"><span class="std std-ref">Using Output Templates</span></a>
+for more details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">file:template.tmpl</span></code> — File URLs that point to a
+template file, which is especially useful for more complicated
+templates. The filenames can be absolute (starting with a <code class="docutils literal notranslate"><span class="pre">/</span></code>),
+relative to your home (starting with a <code class="docutils literal notranslate"><span class="pre">~</span></code>), or relative to
+<code class="docutils literal notranslate"><span class="pre">templates</span></code> in the configuration directory (anything else).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">«formatname»</span></code> — A name of a custom format from the <code class="docutils literal notranslate"><span class="pre">[FORMATS]</span></code>
+configuration section, see <code class="docutils literal notranslate"><span class="pre">~/.pyroscope/config.ini.default</span></code> for the
+predefined ones (including the special <code class="docutils literal notranslate"><span class="pre">default</span></code> format).</p></li>
+</ul>
+</div></blockquote>
+<p>Starting with version 0.3.5, you can define custom output formats and
+print column headers, the <code class="docutils literal notranslate"><span class="pre">rt2days</span></code> example from the previous section
+becomes this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">alias</span> <span class="nv">rt2days</span><span class="o">=</span><span class="s2">&quot;rtcontrol --column-headers -scompleted -ocompletion completed=-2d&quot;</span>
+</pre></div>
+</div>
+<p>You need to define the custom output format used there, so also add this
+to your <code class="docutils literal notranslate"><span class="pre">~/.pyroscope/config.ini</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[FORMATS]</span><span class="w"></span>
+<span class="c1"># Custom output formats</span><span class="w"></span>
+<span class="na">completion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">$(completed.raw.delta)13.13s $(leechtime)9.9s $(is_open)4.4s $(up.sz)10s/s $(ratio.pc)5d$(pc)s $(alias)-8s $(kind_50)-4.4s  $(name)s</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="https://pyformat.info/">PyFormat</a>
+for a description how the formatting options work, and notice that <code class="docutils literal notranslate"><span class="pre">$</span></code>
+is used instead of <code class="docutils literal notranslate"><span class="pre">%</span></code> here, because <code class="docutils literal notranslate"><span class="pre">%</span></code> has a special meaning in
+INI files. For the same reason, a single <code class="docutils literal notranslate"><span class="pre">%</span></code> in the final output
+becomes <code class="docutils literal notranslate"><span class="pre">$(pc)s</span></code> in the configuration (<code class="docutils literal notranslate"><span class="pre">pc</span></code> is a system field that
+is simply a percent sign).</p>
+<p>You can also append one or more format specifiers to a field name,
+separated by a <code class="docutils literal notranslate"><span class="pre">.</span></code>. These take the current value and transform it —
+in the above example <code class="docutils literal notranslate"><span class="pre">.raw.delta</span></code> means “take an unformatted time
+value and then convert it into a time delta relative to just now.” The
+option <code class="docutils literal notranslate"><span class="pre">--help-fields</span></code> lists the available format specifiers.</p>
+<p>Then, calling <code class="docutils literal notranslate"><span class="pre">rt2days</span> <span class="pre">-q</span></code> will print something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">COMPLETED</span> <span class="n">LEECHTIME</span> <span class="n">IS_O</span>         <span class="n">UP</span><span class="o">/</span><span class="n">s</span> <span class="n">RATIO</span><span class="o">%</span> <span class="n">ALIAS</span>    <span class="n">KIND</span>  <span class="n">NAME</span>
+<span class="mi">1</span><span class="n">d</span> <span class="mi">21</span><span class="n">h</span> <span class="n">ago</span>   <span class="mi">10</span><span class="n">m</span>  <span class="mi">2</span><span class="n">s</span>  <span class="n">OPN</span>    <span class="mi">0</span> <span class="nb">bytes</span><span class="o">/</span><span class="n">s</span>   <span class="mi">100</span><span class="o">%</span> <span class="n">SeedBox</span>  <span class="n">rar</span>   <span class="n">lab</span><span class="o">-</span><span class="n">rats</span>
+</pre></div>
+</div>
+<p>And with version 0.3.6 installed, you can create a full listing of all
+the files you have loaded into rTorrent using the predefined format
+“<code class="docutils literal notranslate"><span class="pre">files</span></code>”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rtcontrol \* -ofiles | less
+STP    1970-01-01 01:00:00   25.6 MiB Execute My Liberty - The Cursed Way -- Jamendo - OGG Vorbis q7 - 2010.07.29 [www.jamendo.com] {Jamendo}
+       2010-08-21 01:25:27    2.0 MiB | 01 - Midnight (Intro).ogg
+       ...
+       2010-08-21 01:25:27   48.7 KiB | [cover] Execute My Liberty - The Cursed Way.jpg
+                                      = 9 file(s) [ogg txt]
+...
+</pre></div>
+</div>
+<p>And finally, from version 0.4.1 onwards, you can use a full templating
+language instead of the simple field lists or string interpolation
+described above, more on that in <a class="reference internal" href="#output-templates"><span class="std std-ref">Using Output Templates</span></a>.</p>
+</section>
+</section>
+<section id="statistics">
+<h3>Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline">¶</a></h3>
+<section id="printing-some-statistics-to-the-terminal">
+<h4>Printing Some Statistics to the Terminal<a class="headerlink" href="#printing-some-statistics-to-the-terminal" title="Permalink to this headline">¶</a></h4>
+<p>Create a list of all your trackers and how many torrents are loaded for
+each:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol -q -o <span class="nb">alias</span> -s <span class="nb">alias</span> <span class="se">\*</span> <span class="p">|</span> uniq -c
+</pre></div>
+</div>
+<p>You can easily modify this by using conditions other than <code class="docutils literal notranslate"><span class="pre">*</span></code>, e.g. show the
+count of fully seeded downloads using <code class="docutils literal notranslate"><span class="pre">ratio=+1</span></code>. Or try the same command with
+<code class="docutils literal notranslate"><span class="pre">traits</span></code> instead of <code class="docutils literal notranslate"><span class="pre">alias</span></code> (version 0.3.7 only).</p>
+<p>The total amount of data you have loaded in GiB:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol -qosize <span class="se">\*</span> <span class="p">|</span> awk <span class="s1">&#39;{ SUM += $1} END { print SUM/1024/1024/1024 }&#39;</span>
+</pre></div>
+</div>
+<p>The amount uploaded per tracker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol -qo alias,uploaded // <span class="se">\</span>
+    <span class="p">|</span> awk <span class="s1">&#39;{arr[$1]+=$2} END {for (i in arr) {printf &quot;%20s %7.1f GiB\n&quot;,i,arr[i]/1024^3}}&#39;</span> <span class="se">\</span>
+    <span class="p">|</span> sort -bnk2
+</pre></div>
+</div>
+<p>Starting with version 0.4.1, you can also request a statistical summary
+of your numerical output columns, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rtcontrol -qo size.sz,uploaded.sz,ratio.pc --summary &quot;a*&quot;
+      SIZE    UPLOADED      RATIO
+  14.5 GiB     9.3 GiB      2592.0 [SUM of 32 item(s)]
+ 462.4 MiB   298.9 MiB      81.0 [AVG of 32 item(s)]
+</pre></div>
+</div>
+</section>
+<section id="normalized-histogram-of-ratio-distribution">
+<h4>Normalized Histogram of Ratio Distribution<a class="headerlink" href="#normalized-histogram-of-ratio-distribution" title="Permalink to this headline">¶</a></h4>
+<p>The following will create a normalized histogram of ratio distribution
+of your loaded torrents. Each bar indicates the percentage of items in a
+ratio class (i.e. the first bar shows ratios up to 1).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol <span class="nv">alias</span><span class="o">=</span>* -qo ratio -s ratio &gt;/tmp/data <span class="se">\</span>
+    <span class="o">&amp;&amp;</span> octave -q --persist --eval <span class="se">\</span>
+              <span class="s2">&quot;load /tmp/data; hist(data, </span><span class="k">$(</span>tail -n1 /tmp/data<span class="k">)</span><span class="s2">, 100); print -dpng /tmp/ratio.png&quot;</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<img alt="Normalized histogram of ratio distribution" src="_images/ratio_histo.png" />
+</figure>
+<p>You need to have <a class="reference external" href="http://www.gnu.org/software/octave/">Octave</a>
+installed, on Debian/Ubuntu all you need is
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">aptitude</span> <span class="pre">install</span> <span class="pre">octave3.0</span></code>.</p>
+</section>
+</section>
+<section id="performing-management-tasks">
+<h3>Performing Management Tasks<a class="headerlink" href="#performing-management-tasks" title="Permalink to this headline">¶</a></h3>
+<section id="fixing-items-with-an-empty-base-path">
+<h4>Fixing Items With an Empty “Base Path”<a class="headerlink" href="#fixing-items-with-an-empty-base-path" title="Permalink to this headline">¶</a></h4>
+<p>Sometimes rTorrent loses track of where it stores the data for an item,
+leading to an empty <code class="docutils literal notranslate"><span class="pre">Base</span> <span class="pre">path</span></code> in the <code class="docutils literal notranslate"><span class="pre">Info</span></code> panel. You can try to
+fix this by selectively rehashing those, with these commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol <span class="nv">path</span><span class="o">=</span> <span class="nv">is_complete</span><span class="o">=</span>y -V
+rtcontrol <span class="nv">path</span><span class="o">=</span> <span class="nv">is_complete</span><span class="o">=</span>y --hash -i
+</pre></div>
+</div>
+<p>The first command selects the broken items into a rTorrent view, so that
+you can watch the progress of hashing and the results afterwards. If all
+of them are finished, you can then start those that were successfully
+restored like so:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol <span class="nv">path</span><span class="o">=</span><span class="se">\!</span> <span class="k">done</span><span class="o">=</span><span class="m">100</span> --from-view rtcontrol --start<span class="sb">``</span>
+</pre></div>
+</div>
+<p>(note that the <code class="docutils literal notranslate"><span class="pre">--from-view</span></code> option needs version 0.3.7)</p>
+</section>
+<section id="deleting-download-items-and-their-data">
+<h4>Deleting Download Items and Their Data<a class="headerlink" href="#deleting-download-items-and-their-data" title="Permalink to this headline">¶</a></h4>
+<p>Using the option <code class="docutils literal notranslate"><span class="pre">--cull</span></code> of version 0.3.10, an item can be deleted
+including its data. You can do this either manually, or automatically as
+a part of <a class="reference internal" href="#ratio-management"><span class="std std-ref">Ratio Management</span></a>.
+A full example of automatic space management is shown in the <a class="reference external" href="https://github.com/pyroscope/pimp-my-box/blob/master/roles/pyroscope-cli/files/bin/_cron_sweep">_cron_sweep</a> script,
+and its <a class="reference external" href="https://github.com/pyroscope/pimp-my-box/blob/master/roles/pyroscope-cli/files/etc/sweep_rules">sweep_rules</a> include file with customizable rules.</p>
+<p>When you call <code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">--cull</span> <span class="pre">…</span></code> from the shell,
+you will first be presented with the number of items found
+and then asked for each of them whether you want to delete it
+(interactive mode is on by default). Therefor, for automatic uses in
+cron, you should also specify the <code class="docutils literal notranslate"><span class="pre">--yes</span></code> option.</p>
+<p>If you define the following command shortcut, you can also delete the
+current item directly from ncurses (needs version 0.4.1 to work):</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">method.insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">cull,simple|private,&quot;execute.nothrow=rtcontrol,-q,--detach,--cull,--yes,\&quot;$cat=hash=,$d.hash=\&quot;&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Just select the item you want to annihilate and enter <code class="docutils literal notranslate"><span class="pre">cull=</span></code> into the
+command prompt (<code class="docutils literal notranslate"><span class="pre">Ctrl-X</span></code>).
+Note that <em>you already have that command added</em> if you followed the <a class="reference internal" href="setup.html"><span class="doc">Configuration Guide</span></a>.</p>
+</section>
+<section id="pruning-partial-downloads">
+<h4>Pruning Partial Downloads<a class="headerlink" href="#pruning-partial-downloads" title="Permalink to this headline">¶</a></h4>
+<p>Starting with version 0.3.10, the <code class="docutils literal notranslate"><span class="pre">--purge</span></code> option (a/k/a
+<code class="docutils literal notranslate"><span class="pre">--delete-partial</span></code>) allows you to not only delete the selected items
+from the client, but at the same time delete any incomplete files
+contained in them (i.e. files that are part of an incomplete chunk).</p>
+<p>For technical reasons, rTorrent has to create files that you have
+deselected from download to save data of chunks that border selected
+files, and this option can be a great time saver, especially on large
+torrents containing hundreds of files. So, unless you have filtered out
+incomplete items by the appropriate conditions, using <code class="docutils literal notranslate"><span class="pre">--purge</span></code>
+instead of <code class="docutils literal notranslate"><span class="pre">--delete</span></code> is always the better option.</p>
+<p>As with <code class="docutils literal notranslate"><span class="pre">--cull</span></code>, a shortcut command to call this from the curses UI
+is useful:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">method.insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">purge,simple,&quot;execute.nothrow=rtcontrol,-q,--detach,--purge,--yes,\&quot;$cat=hash=,$d.get_hash=\&quot;&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Note that <em>you already have that command added</em> if you followed the <a class="reference internal" href="setup.html"><span class="doc">Configuration Guide</span></a>.</p>
+</section>
+</section>
+<section id="performing-periodic-tasks">
+<h3>Performing Periodic Tasks<a class="headerlink" href="#performing-periodic-tasks" title="Permalink to this headline">¶</a></h3>
+<section id="simple-queue-management">
+<h4>Simple Queue Management<a class="headerlink" href="#simple-queue-management" title="Permalink to this headline">¶</a></h4>
+<p>This is a queue management one-liner (well, logically one line). Before
+you run it automatically, add a trailing “-n” to test it out, e.g. play
+with the queue size parameter and check out what would be started. Then
+put it into a script, crontab that and run it every (few) minute(s).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">rt_max_start</span><span class="o">=</span><span class="m">6</span><span class="p">;</span> rtcontrol -q --start --yes <span class="nv">hash</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span> <span class="se">\</span>
+    rtcontrol -qrs is_active -o is_open,hash <span class="nv">is_complete</span><span class="o">=</span>no <span class="nv">is_ignored</span><span class="o">=</span>no <span class="se">\</span>
+    <span class="p">|</span> head -n <span class="nv">$rt_max_start</span> <span class="p">|</span> grep ^CLS <span class="p">|</span> cut -f2 <span class="k">)</span> <span class="p">|</span> tr <span class="s2">&quot; &quot;</span> ,<span class="k">)</span>
+</pre></div>
+</div>
+<p>It works by listing all incomplete downloads that heed commands and
+sorting the already active ones to the top. Then it looks at the first
+<code class="docutils literal notranslate"><span class="pre">rt_max_start</span></code> entries and starts any closed ones.</p>
+<p>Note that this means you can exempt items from queue management easily
+by using the <code class="docutils literal notranslate"><span class="pre">I</span></code> key in the curses interface. See <a class="reference internal" href="advanced.html#queuemanager"><span class="std std-ref">rTorrent Queue Manager</span></a> for a
+much better solution.</p>
+</section>
+<section id="move-on-completion">
+<h4>Move on Completion<a class="headerlink" href="#move-on-completion" title="Permalink to this headline">¶</a></h4>
+<p>The following moves completed downloads <em>still physically residing</em> in a
+<code class="docutils literal notranslate"><span class="pre">work</span></code> directory (change the <code class="docutils literal notranslate"><span class="pre">realpath</span></code> filter when you named your
+download directory differently), to another directory (note that you can
+restrict this further, e.g. to a specific tracker by using
+“alias=NAME”). You don’t need any multiple watch folders or other
+prerequisites for this.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol --from-view <span class="nb">complete</span> <span class="s1">&#39;realpath=*/work/*&#39;</span> -qo <span class="s1">&#39;~/bin/rtmv &quot;$(path)s&quot; ~/rtorrent/done --cron&#39;</span> <span class="p">|</span> bash
+</pre></div>
+</div>
+<p>Test it first <strong>without the</strong> <code class="docutils literal notranslate"><span class="pre">|</span> <span class="pre">bash</span></code> <strong>part</strong> at the end, to make sure
+it’ll in fact do what you intended.</p>
+<p>Another advantage is that in case you ever wanted to switch clients, or
+exchange the drive you host the data on, you can do so easily since all
+the active downloads still reside at one place in your download
+directory (in form of a bunch of symlinks) — even if their data is
+scattered all over the place in reality.</p>
+<p>You can also extend it to create more organized completion structures,
+e.g. creating a directory tree organized by month and item type, as
+follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>RT_SOCKET=/home/bt/rtorrent/.scgi_local
+
+# Move completed torrents to &quot;done&quot;, organized by month and item type (e.g. &quot;2010-09/tv/avi&quot;)
+*/15    * * * *         test -S $RT_SOCKET &amp;&amp; ~/bin/rtcontrol --from-view complete &#39;realpath=*/work/*&#39; -qo &#39;~/bin/rtmv &quot;$(path)s&quot; ~/rtorrent/done//$(now.iso).7s/$(traits)s --cron&#39; | bash
+</pre></div>
+</div>
+<p>The above is a fully working crontab example, you just have to adapt the paths to your system.
+If you want to create other organizational hierarchies, like “by tracker”,
+just replace the <code class="docutils literal notranslate"><span class="pre">$(now.iso).7s/$(traits)s</span></code> part by <code class="docutils literal notranslate"><span class="pre">$(alias)s</span></code>.
+And if you don’t want the file type in there (i.e. just “tv”),
+use <code class="docutils literal notranslate"><span class="pre">$(traits.pathdir)s</span></code> to have it removed.</p>
+<p>To get themed trackers specially treated, you can add hints to the
+<code class="docutils literal notranslate"><span class="pre">[TRAITS_BY_ALIAS]</span></code> section of the config (see <code class="docutils literal notranslate"><span class="pre">config.ini.default</span></code>
+for examples).</p>
+<p>Afterwards, you can always move and rename stuff at will
+<em>and still continue seeding</em>, by using the <code class="docutils literal notranslate"><span class="pre">rtmv</span></code> tool in version 0.3.7 ­— this
+will rename the data file or directory at its current location and
+automatically fix the symlink in the download directory to point at the
+new path. Example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/rtorrent/done/2010-09/tv/avi
+rtmv foo.avi bar.avi
+</pre></div>
+</div>
+</section>
+<section id="ratio-management">
+<span id="id11"></span><h4>Ratio Management<a class="headerlink" href="#ratio-management" title="Permalink to this headline">¶</a></h4>
+<p>While rTorrent has a built-in form of ratio management since a few
+versions, it’s hard to use after-the-fact and also hard to understand —
+you need to have different watch directories and complex settings in
+your <code class="docutils literal notranslate"><span class="pre">.rtorrent.rc</span></code> to use that.</p>
+<p>It can be much simpler — a basic form of ratio management using <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> looks like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtcontrol <span class="nv">is_complete</span><span class="o">=</span>yes <span class="nv">is_open</span><span class="o">=</span>yes <span class="nv">ratio</span><span class="o">=</span>+1.1 <span class="nv">alias</span><span class="o">=</span>sometracker,othertracker --stop
+</pre></div>
+</div>
+<p>You will always want to have the
+<code class="docutils literal notranslate"><span class="pre">is_complete=yes</span> <span class="pre">is_open=yes</span> <span class="pre">ratio=+1.1</span></code> part, which excludes all
+torrents that are still downloading, closed or not having the necessary
+ratio. Another basic filter is <code class="docutils literal notranslate"><span class="pre">is_ignored=no</span></code>, which excludes items
+that have their <em>ignore commands</em> flag set (via the <code class="docutils literal notranslate"><span class="pre">I</span></code> key) from
+ratio management.</p>
+<p>To that you can add anything you think fits your needs, and also use
+several commands with different minimum ratios for different trackers by
+selecting them using <code class="docutils literal notranslate"><span class="pre">alias</span></code> or <code class="docutils literal notranslate"><span class="pre">tracker</span></code>, like in the example
+above. Assuming you have your original seeds in a directory named
+<code class="docutils literal notranslate"><span class="pre">seed</span></code> and don’t want to ratio-limit them, one thing you might add is
+<code class="docutils literal notranslate"><span class="pre">'datapath=!*/seed/*'</span></code> to prevent them from being stopped. Only your
+imagination (and the available fields) are the limit here.</p>
+<p>If you then put these commands into a script that runs every few minutes
+via <code class="docutils literal notranslate"><span class="pre">cron</span></code>, you have a very flexible form of ratio management that can
+be changed on a whim.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For cron use, you’ll want to add the <code class="docutils literal notranslate"><span class="pre">--cron</span> <span class="pre">--yes</span></code> options to
+any <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> commands. The first one redirects logging to
+a special logfile <code class="docutils literal notranslate"><span class="pre">~/.pyroscope/log/cron.log</span></code>,
+and the second positively answers any prompts that would appear
+when using <code class="docutils literal notranslate"><span class="pre">--delete</span></code> or <code class="docutils literal notranslate"><span class="pre">--cull</span></code>.</p>
+</div>
+<p>To complete your command line, you add the action you want to take on
+the torrents found, in the above example <code class="docutils literal notranslate"><span class="pre">--stop</span></code>; <code class="docutils literal notranslate"><span class="pre">--delete</span></code> is
+another possibility, which removes the item from the client, but leaves
+the data intact. Starting with version 0.3.10, you can also delete the
+downloaded data by using the <code class="docutils literal notranslate"><span class="pre">--cull</span></code> option.</p>
+<p>You can also protect items from removal by using activity indicators,
+specifically the <code class="docutils literal notranslate"><span class="pre">active</span></code> and <code class="docutils literal notranslate"><span class="pre">last_xfer</span></code> fields.
+The condition <code class="docutils literal notranslate"><span class="pre">active=+10i</span></code> checks that no peer was connected in the last 10 minutes,
+while <code class="docutils literal notranslate"><span class="pre">last_xfer=+10i</span></code> does the same for the last time data was transferred.
+Note that <em>data transferred</em> means either upload or download went over the threshold
+defined by <code class="docutils literal notranslate"><span class="pre">pyro.last_xfer.min_rate</span></code> (in bytes/s, with a default of 5000).</p>
+</section>
+<section id="bandwidth-management">
+<h4>Bandwidth Management<a class="headerlink" href="#bandwidth-management" title="Permalink to this headline">¶</a></h4>
+<p>Say you want to have torrents that are already seeded back take a
+back-seat when other torrents with a ratio less than 100% are active —
+but when they’re not, all torrents should take full advantage of the
+available bandwidth. The last part is not possible with the built-in
+throttle groups, but here’s a fix that works by setting the maximum rate
+on the <code class="docutils literal notranslate"><span class="pre">seed</span></code> throttle dynamically.</p>
+<p>Put this into your <code class="docutils literal notranslate"><span class="pre">.rtorrent.rc</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">throttle_up</span><span class="o">=</span><span class="s">seed,900</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Then save the <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rt_cron_throttle_seed">dynamic seed throttle</a> script into <code class="docutils literal notranslate"><span class="pre">~/bin/rt_cron_throttle_seed</span></code>.</p>
+<p>Finally, extend your crontab with these lines (<code class="docutils literal notranslate"><span class="pre">crontab</span> <span class="pre">-e</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>RT_SOCKET=/home/bt/rtorrent/.scgi_local
+BW_SEED_MAX=900
+BW_SEED_SLOW=200
+
+# Throttle torrents that are seeded 1:1 when there are other active ones
+*   * * * *         test -S $RT_SOCKET &amp;&amp; ~/bin/rt_cron_throttle_seed seed $BW_SEED_MAX $BW_SEED_SLOW --cron
+
+# Put torrents seeded above 1:1 into the seed throttle
+*/10        * * * *         test -S $RT_SOCKET &amp;&amp; rtcontrol ratio=+1.05 is_complete=1 is_ignored=0 throttle=none -q -T seed --yes --cron
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">900</span></code> and <code class="docutils literal notranslate"><span class="pre">200</span></code> in the above examples are the bandwidth limits
+in KiB/s, you need to adapt them to your connection of course, and all
+paths need to be changed to fit your system. Each time the throttle rate
+is changed, a line like the following will be appended to the file
+<code class="docutils literal notranslate"><span class="pre">~/.pyroscope/log/cron.log</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2010</span><span class="o">-</span><span class="mi">08</span><span class="o">-</span><span class="mi">30</span> <span class="mi">14</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">01</span> <span class="n">INFO</span>     <span class="n">THROTTLE</span> <span class="s1">&#39;seed&#39;</span> <span class="n">up</span><span class="o">=</span><span class="mf">200.0</span> <span class="n">KiB</span><span class="o">/</span><span class="n">s</span> <span class="p">[</span><span class="mi">2</span> <span class="n">prioritized</span><span class="p">]</span> <span class="p">[</span><span class="n">__main__</span><span class="o">.</span><span class="n">SeedThrottle</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="automatic-stop-of-items-having-problems">
+<h4>Automatic Stop of Items Having Problems<a class="headerlink" href="#automatic-stop-of-items-having-problems" title="Permalink to this headline">¶</a></h4>
+<p>This job takes away a lot of manual monitoring work you had to do previously:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>HOME=/home/rtorrent
+RT_SOCKET=/var/torrent/.scgi_local
+
+# Stops any torrent that isn&#39;t known by the tracker anymore,
+# or has other authorization problems, or lost its data
+* * * * *   test -S $RT_SOCKET &amp;&amp; sleep 21 &amp;&amp; nice ~/bin/_cron_rt_invalid_items --stop --cron
+</pre></div>
+</div>
+<p>Just call <code class="docutils literal notranslate"><span class="pre">crontab</span> <span class="pre">-e</span></code> as the <code class="docutils literal notranslate"><span class="pre">rtorrent</span></code> user and add the above lines.
+You also need to install the <a class="reference external" href="https://raw.githubusercontent.com/pyroscope/pimp-my-box/master/roles/pyroscope-cli/files/bin/_cron_rt_invalid_items">_cron_rt_invalid_items</a> script into <code class="docutils literal notranslate"><span class="pre">~/bin</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">prio=-3</span></code> in the script’s list of conditions enables you to keep items running in case of errors, by setting their
+priority to <code class="docutils literal notranslate"><span class="pre">high</span></code>, e.g. when only some trackers in a longer list return errors.
+The <code class="docutils literal notranslate"><span class="pre">is_complete=yes</span> <span class="pre">is_ghost=yes</span></code> part means you can simply stop torrents by removing their data,
+it won’t take more than a minute for the related item to be force-stopped.</p>
+</section>
+</section>
+</section>
+<section id="using-output-templates">
+<span id="output-templates"></span><h2>Using Output Templates<a class="headerlink" href="#using-output-templates" title="Permalink to this headline">¶</a></h2>
+<section id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h3>
+<p>One of the output formatting options described in the <a class="reference internal" href="#rtcontrol-examples"><span class="std std-ref">‘rtcontrol’ Examples</span></a>
+section are jinja2 templates. Compared to the other options, they offer
+more versatile formatting because you can use conditionals and loops,
+e.g. coloring the output based on some value thresholds (see the example
+below). The <a class="reference external" href="https://jinja.palletsprojects.com/en/3.0.x/">jinja2 documentation</a> is an excellent resource to learn the full
+capabilities.</p>
+<p>Note that in order for them to be recognized as such, jinja2 templates
+<strong>MUST</strong> start with two braces <code class="docutils literal notranslate"><span class="pre">{{</span></code>, or use <code class="docutils literal notranslate"><span class="pre">{##}</span></code> (an empty template
+comment) if you want to start the output with some literal text.</p>
+</section>
+<section id="using-jinja2-to-format-single-items">
+<h3>Using jinja2 to format single items<a class="headerlink" href="#using-jinja2-to-format-single-items" title="Permalink to this headline">¶</a></h3>
+<p>The most common form of using Tempita for formatting a single output
+item of a <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> result is probably by defining it in the
+configuration as a custom format, so it can be simply used by its name.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">colored</span></code> predefined format is a typical example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[FORMATS]</span><span class="w"></span>
+
+<span class="na">colored</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s">{{default ESC = &#39;\x1B&#39;}}{{d.size|sz}} {{d.uploaded|sz}} {{#</span><span class="w"></span>
+<span class="w">    </span><span class="na">}}{{if d.seedtime &lt; 8*7*86400}}{{ESC}}[36m{{d.seedtime|duration}}{{ESC}}[0m{{else}}{{d.seedtime|duration}}{{endif}}{{#</span><span class="w"></span>
+<span class="w">    </span><span class="na">}}{{if d.ratio &lt; 0.8}}{{ESC}}[1m{{ESC}}[31m{{elif d.ratio &lt; 1.0}}{{ESC}}[36m{{elif type(d.ratio) is float}}{{ESC}}[32m{{endif}}{{#</span><span class="w"></span>
+<span class="w">    </span><span class="na">}} {{str(pc(d.ratio)).rjust(8)}}{{chr(37)}}{{if type(d.ratio) is float}}{{ESC}}[0m{{endif}}{{#</span><span class="w"></span>
+<span class="w">    </span><span class="na">}} {{(d.alias or &#39;&#39;).ljust(8)}} {{d.name or &#39;&#39;}}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The main reason to use template here are the if conditions that color the
+output depending on threshold values, for the ratio and seed time
+columns. Additionally to what Tempita provides, the global namespace of
+the template contains the usual format specifiers (see the output of the
+<code class="docutils literal notranslate"><span class="pre">--help-fields</span></code> option), and the current result item as <code class="docutils literal notranslate"><span class="pre">d</span></code> (think
+<strong>d</strong>ownload item).</p>
+<p>If you look at some of the if conditions, you might find them peculiar,
+especially the <code class="docutils literal notranslate"><span class="pre">{{if</span> <span class="pre">type(d.ratio)</span> <span class="pre">is</span> <span class="pre">float}}</span></code> one. This is so that
+the column headers, which are obviously not the usual float values but
+strings, are exempt from any special coloring. Similarly, the
+<code class="docutils literal notranslate"><span class="pre">{{d.name</span> <span class="pre">or</span> <span class="pre">''}}</span></code> caters for the fact that when you use the
+<code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">--summary</span></code> option, fields that could normally never
+be <code class="docutils literal notranslate"><span class="pre">None</span></code> suddenly are — because what’s the average of a string,
+really?</p>
+<p>Notable here is also the use of a named default value <code class="docutils literal notranslate"><span class="pre">ESC</span></code>, and using
+template comments <code class="docutils literal notranslate"><span class="pre">{{#}}</span></code> to escape the line endings we don’t want to
+have in the final output, which looks like this:</p>
+<img alt="rtcontrol coloured output example" src="_images/rtcontrol-colors.png" />
+</section>
+<section id="using-jinja2-for-full-output-control">
+<h3>Using jinja2 for full output control<a class="headerlink" href="#using-jinja2-for-full-output-control" title="Permalink to this headline">¶</a></h3>
+<p>If you use the <code class="docutils literal notranslate"><span class="pre">--output-template</span></code> option of <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code>, flow
+control of presenting the query result is passed fully to a Tempita
+template. That means that in addition to iterating over the query
+result, you can also show any value available via the rTorrent XMLRPC
+connection, since the proxy object that allows access to the client is
+passed to the template.</p>
+<p>This example shows the output of such a
+<a class="reference external" href="rtorstat.html">template that resembles the rtorstat output</a>:</p>
+<img alt="_images/rtorstat.png" src="_images/rtorstat.png" />
+<p>To generate a similar result with your installation, follow these steps
+after updating it:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Call <code class="docutils literal notranslate"><span class="pre">pyroadmin</span> <span class="pre">--create-config</span></code> to copy the
+builtin <code class="docutils literal notranslate"><span class="pre">rtorstat.html</span></code> template to your configuration.</p></li>
+<li><p>Call <code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">-qO</span> <span class="pre">rtorstat.html</span> <span class="pre">done=-100</span> <span class="pre">OR</span> <span class="pre">xfer=+0</span> <span class="pre">-sdone</span> <span class="pre">&gt;/var/www/cron/rtorrent.html</span></code>
+to create a HTML page.</p></li>
+<li><p>Open that page in your browser.</p></li>
+</ol>
+</div></blockquote>
+<p>You can add the command from step #2 as a cronjob and always have a
+current status display; instead of copying to the local web server
+space, you could also put the output into your Dropbox folder to have a
+status display on your mobile gear.</p>
+<p>The namespace of these templates is populated with the following
+objects:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code> = the version of PyroScope</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">proxy</span></code> = the client proxy (you can call any XMLRPC method on that)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">view</span></code> = the <a class="reference external" href="http://packages.python.org/pyrocore/apidocs/pyrocore.torrent.engine.TorrentView-class.html">view</a>
+that was queried</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query</span></code> = the query conditions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">matches</span></code> = the query result (a list of
+<a class="reference external" href="http://packages.python.org/pyrocore/apidocs/pyrocore.torrent.rtorrent.RtorrentItem-class.html">RtorrentItem</a> objects)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="running-a-rtorstat-like-template-as-a-cgi-bin">
+<h3>Running a rtorstat-like template as a cgi-bin<a class="headerlink" href="#running-a-rtorstat-like-template-as-a-cgi-bin" title="Permalink to this headline">¶</a></h3>
+<p>To get the output of the above example template on-demand, which likely
+puts less stress on the system and also gives you current information,
+you can add a cgi-bin wrapper to your webserver. We assume a Debian or
+Ubuntu Apache standard installation here, and put the cgi-bin into the
+file <code class="docutils literal notranslate"><span class="pre">/usr/lib/cgi-bin/rtorstat</span></code> with the following content:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /bin/bash</span>
+<span class="nb">echo</span> <span class="s2">&quot;Content-Type: text/html; charset=UTF-8&quot;</span>
+<span class="nb">echo</span>
+
+<span class="nb">export</span> <span class="nv">HOME</span><span class="o">=</span>/home/bt
+<span class="nv">$HOME</span>/bin/rtcontrol -qO rtorstat.html <span class="k">done</span><span class="o">=</span>-100 OR <span class="nv">xfer</span><span class="o">=</span>+0 -sdone
+</pre></div>
+</div>
+<p>This will only work if permissions are given to the webserver user (normally
+<code class="docutils literal notranslate"><span class="pre">www-data</span></code>) to access the configuration files belonging to the <code class="docutils literal notranslate"><span class="pre">bt</span></code> user.
+In case you use a <code class="docutils literal notranslate"><span class="pre">scgi_local</span></code> connection (i.e. a UNIX domain socket),
+this also applies the the XMLRPC socket file.</p>
+<p>That can be done by making all things group-readable, and add
+<code class="docutils literal notranslate"><span class="pre">www-data</span></code> to the <code class="docutils literal notranslate"><span class="pre">bt</span></code> group. Also, the socket file must be
+group-writeable when you use one (TCP sockets are available to all users
+on the machine anyway).</p>
+<p>Finally, you can put a <code class="docutils literal notranslate"><span class="pre">&lt;meta</span> <span class="pre">http-equiv=&quot;refresh&quot;</span> <span class="pre">content=&quot;60&quot;&gt;</span></code> into
+the template to automatically refresh the page every minute.</p>
+</section>
+<section id="adding-a-rtorrent-status-display-to-conky">
+<h3>Adding a rTorrent status display to <code class="docutils literal notranslate"><span class="pre">conky</span></code><a class="headerlink" href="#adding-a-rtorrent-status-display-to-conky" title="Permalink to this headline">¶</a></h3>
+<p>You can add a status display to the well-known <code class="docutils literal notranslate"><span class="pre">conky</span></code> system monitor
+tool by using the <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/templates/conky/rtorstat.txt">conky rtorstat template</a> together with a matching <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/templates/conky/conkyrc">conkyrc</a>:</p>
+<img alt="_images/conky-rtorstat.png" src="_images/conky-rtorstat.png" />
+<p>To display the example, run these commands, assuming you have conky
+already installed:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pyroadmin</span> <span class="pre">--create-config</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conky</span> <span class="pre">-c</span> <span class="pre">~/.pyroscope/templates/conky/conkyrc</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>If you change the <code class="docutils literal notranslate"><span class="pre">execpi</span></code> in the conky configuration to call a
+remotely installed <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> via <code class="docutils literal notranslate"><span class="pre">ssh</span></code>, you can also beam the
+status of a remote rTorrent instance onto your desktop. It is advisable
+to increase the poll intervall to at least 15 seconds in that case. Note
+that this setup means you have the <code class="docutils literal notranslate"><span class="pre">.conkyrc</span></code> on your local host, but
+the template used is on the remote host!</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>...
+${execp ssh -o ConnectTimeout=15 -o SetupTimeOut=15 -T REMOTEHOST &quot;~/bin/rtcontrol -qO conky/rtorstat.txt --from-view incomplete is_open=yes is_ignored=no&quot;}
+</pre></div>
+</div>
+<p>Change <code class="docutils literal notranslate"><span class="pre">REMOTEHOST</span></code> to the name of the remote host, and make sure you
+have public key login enabled.</p>
+</section>
+<section id="listing-all-orphans-in-your-download-directory">
+<span id="orphans"></span><h3>Listing all orphans in your download directory<a class="headerlink" href="#listing-all-orphans-in-your-download-directory" title="Permalink to this headline">¶</a></h3>
+<p>This example shows how easily you can use templates to extract some
+information out of the client that is otherwise not directly available.
+The <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/templates/orphans.txt">orphans.txt</a> template lists all paths in the download directory
+<em>not</em> loaded into the client, and can be called like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rtcontrol</span> <span class="o">-</span><span class="n">qO</span> <span class="n">orphans</span><span class="o">.</span><span class="n">txt</span><span class="o">.</span><span class="n">default</span> <span class="o">//</span>
+</pre></div>
+</div>
+<p>To check a specific directory, set the <code class="docutils literal notranslate"><span class="pre">dir</span></code> config value
+– in this case the current working directory is checked:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>rtcontrol -qO orphans.txt.default // -Ddir=$PWD
+</pre></div>
+</div>
+<p>Finally, pass found paths to <code class="docutils literal notranslate"><span class="pre">du</span></code> to get some statistics on the space used up by orphans:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>rtcontrol -qO orphans.txt.default // | xargs -d$&#39;\n&#39; -- du -sch
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">mv</span> <span class="pre">-n</span> <span class="pre">-t</span> <span class="pre">‹directory›</span></code> instead of the <code class="docutils literal notranslate"><span class="pre">du</span></code> command to move orphans away to a different directory.</p>
+</section>
+</section>
+<section id="standard-configuration-explained">
+<span id="std-config"></span><h2>Standard Configuration Explained<a class="headerlink" href="#standard-configuration-explained" title="Permalink to this headline">¶</a></h2>
+<section id="id12">
+<h3>Introduction<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>This section provides details on the use of the features that
+are added by the <a class="reference internal" href="setup.html#rtorrent-pyro-rc"><span class="std std-ref">standard rTorrent configuration include</span></a>.
+Many of them work on a vanilla release of rTorrent – but see the note below.</p>
+<p>See also the <a class="reference external" href="https://rtorrent-ps.readthedocs.io/en/latest/manual.html#features-std-cfg" title="(in rtorrent-ps v1.2)"><span class="xref std std-ref">full list of additional features</span></a> in the rTorrent-PS documentation.
+There’s also some features that are located in the <a class="reference external" href="https://github.com/pyroscope/pimp-my-box/tree/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d">pimp-my-box configuration includes</a>,
+which means in order to get them you either need to use that way of setup,
+or follow the <a class="reference external" href="https://rtorrent-ps.readthedocs.io/en/latest/install.html#debianinstallfromsource" title="(in rtorrent-ps v1.2)"><span>Manual Turn-Key System Setup</span></a> instructions in the rTorrent-PS manual
+(specifically the <a class="reference external" href="https://rtorrent-ps.readthedocs.io/en/latest/install.html#make-rtorrent-config" title="(in rtorrent-ps v1.2)"><span>rTorrent Configuration</span></a> part).</p>
+<p>If you think this is too complicated and scattered all over the place,
+the <a class="reference external" href="https://pimp-my-box.readthedocs.io/">pimp-my-box project</a> packages all this into a nicely integrated experience.
+Just sayin’. ☺</p>
+<p>If you don’t want to use <cite>Ansible</cite>, then the <a class="reference external" href="https://rtorrent-ps.readthedocs.io/en/latest/install.html#make-rtorrent-config" title="(in rtorrent-ps v1.2)"><span class="xref std std-ref">make-rtorrent-config.sh</span></a> script
+gives you the same setup with a bit more manual work involved.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Any feature that mentions some form of custom key binding <strong>does</strong>
+require that you run a build of <a class="reference external" href="https://github.com/pyroscope/rtorrent-ps">rTorrent-PS</a>!</p>
+</div>
+</section>
+<section id="miscellaneous-features">
+<span id="std-cfg-misc"></span><h3>Miscellaneous Features<a class="headerlink" href="#miscellaneous-features" title="Permalink to this headline">¶</a></h3>
+<p>In this section, some smaller added features are mentioned
+– quite often, their effects are not directly visible in the user interface.
+When filenames are mentioned, they can be found in <code class="docutils literal notranslate"><span class="pre">~/.pyroscope/rtorrent.d</span></code>
+(look at the <code class="docutils literal notranslate"><span class="pre">*.default</span></code> files, those are up-to-date).</p>
+<p><code class="docutils literal notranslate"><span class="pre">auto-scrape.rc</span></code> regularly updates scrape information for all torrents, even stopped ones.
+It makes the peer counter columns show actually useful and reasonably up-to-date information.</p>
+<p><code class="docutils literal notranslate"><span class="pre">commands.rc</span></code> adds convenience commands for the <code class="docutils literal notranslate"><span class="pre">Ctrl-X</span></code> prompt, like <code class="docutils literal notranslate"><span class="pre">s=</span></code> and <code class="docutils literal notranslate"><span class="pre">t=</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">logging.rc</span></code> enables feedback on a few major events like completion,
+announces day changes, and warns when the <code class="docutils literal notranslate"><span class="pre">~/NOCRON</span></code> flag file exists.</p>
+<p><code class="docutils literal notranslate"><span class="pre">quick-help.rc</span></code> contains the help information shown when you press <code class="docutils literal notranslate"><span class="pre">F2</span></code> in <cite>rTorrent-PS</cite>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">timestamps.rc</span></code> records the time at which various events happen into custom fields.
+This is the basis for sorting views like <code class="docutils literal notranslate"><span class="pre">indemand</span></code> or <code class="docutils literal notranslate"><span class="pre">last_xfer</span></code>.</p>
+</section>
+<section id="additional-views">
+<span id="id13"></span><h3>Additional Views<a class="headerlink" href="#additional-views" title="Permalink to this headline">¶</a></h3>
+<section id="custom-views-key-bindings">
+<h4>Custom Views: Key Bindings<a class="headerlink" href="#custom-views-key-bindings" title="Permalink to this headline">¶</a></h4>
+<p>Here’s an overview of additonal views and view customizations that are
+part of the standard configuration.</p>
+<ol class="arabic simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">:</span></code> key shows the <code class="docutils literal notranslate"><span class="pre">tagged</span></code> view, more on that one below.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">t</span></code> key is bound to a <code class="docutils literal notranslate"><span class="pre">trackers</span></code> view that shows all items
+sorted by tracker and then by name.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">!</span></code> key is bound to a <code class="docutils literal notranslate"><span class="pre">messages</span></code> view, listing all items
+that currently have a non-empty message, sorted in order of the
+message text.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">^</span></code> key is bound to the <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> search result view, so
+you can easily return to your last search.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">?</span></code> key is bound to the <code class="docutils literal notranslate"><span class="pre">indemand</span></code> view, which sorts all
+open items by their activity (last time a peer was connected),
+with the most recently active on top.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">%</span></code> key is bound to the <code class="docutils literal notranslate"><span class="pre">ratio</span></code> view, which sorts all
+open items by their ratio (descending) – equal ratios sort by uploaded data.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">°</span></code> key is bound to the <code class="docutils literal notranslate"><span class="pre">uploaded</span></code> view, which sorts all
+open items by their total upload amount (descending).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">&quot;</span></code> key is bound to the <code class="docutils literal notranslate"><span class="pre">datasize</span></code> view, which sorts all
+open items by the size of their content data (descending).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">¬</span></code> key (<code class="docutils literal notranslate"><span class="pre">AltGr+^</span></code> on some keyboards) is bound to the <code class="docutils literal notranslate"><span class="pre">last_xfer</span></code> view,
+which sorts all items by their <em>last_xfer</em> + <em>active</em> timestamps, or else event times.</p></li>
+</ol>
+<p>For the <code class="docutils literal notranslate"><span class="pre">uploaded</span></code> and <code class="docutils literal notranslate"><span class="pre">ratio</span></code> view, there’s a tail of items with zero values.
+That is sorted by completed / loaded / downloaded event timestamps,
+with the first non-zero time used.</p>
+<p>If certain key bindings are not convenient or even accessible for you (say <code class="docutils literal notranslate"><span class="pre">°</span></code> and <code class="docutils literal notranslate"><span class="pre">¬</span></code>),
+define your own <em>in addition</em> in <code class="docutils literal notranslate"><span class="pre">_rtlocal.rc</span></code> or a similar customization file.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Bind last_xfer / uploaded views to F5 / F6</span><span class="w"></span>
+<span class="na">pyro.bind_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">my_last_xfer_view, 0415, \</span><span class="w"></span>
+<span class="w">    </span><span class="na">&quot;view.sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">last_xfer ; ui.current_view.set = last_xfer&quot;</span><span class="w"></span>
+<span class="na">pyro.bind_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">my_uploaded_view, 0416, \</span><span class="w"></span>
+<span class="w">    </span><span class="na">&quot;view.sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">uploaded ; ui.current_view.set = uploaded&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="https://rtorrent-ps.readthedocs.io/en/latest/manual.html#extended-canvas" title="(in rtorrent-ps v1.2)"><span>Extended Canvas Explained</span></a> section in the <cite>rTorrent-PS</cite> manual has a list
+of columns in those views, and what they mean.</p>
+</section>
+<section id="the-tagged-view">
+<span id="view-tagged"></span><h4>The <cite>tagged</cite> View<a class="headerlink" href="#the-tagged-view" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">.</span></code> key toggles the membership in the <code class="docutils literal notranslate"><span class="pre">tagged</span></code> view for the
+item in focus, <code class="docutils literal notranslate"><span class="pre">:</span></code> shows the <code class="docutils literal notranslate"><span class="pre">tagged</span></code> view, and <code class="docutils literal notranslate"><span class="pre">T</span></code> clears
+that view (i.e. removes the tagged state on all items). This can be
+very useful to manually select a few items and then run
+<code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> on them, or alternatively use <code class="docutils literal notranslate"><span class="pre">--to-view</span> <span class="pre">tagged</span></code> to
+populate the <code class="docutils literal notranslate"><span class="pre">tagged</span></code> view, then deselect some items interactively
+with the <code class="docutils literal notranslate"><span class="pre">.</span></code> key, and finally mass-control the rest.</p>
+<p class="rubric">Examples using the <cite>tagged</cite> view</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="howto.html#move-data"><span class="std std-ref">Moving All Data for Selected Items to a New Location</span></a></p></li>
+<li><p><a class="reference internal" href="howto.html#tag-tv-season-cull"><span class="std std-ref">Tag Episodes in rT-PS, Then Delete Their Whole Season</span></a></p></li>
+</ul>
+</section>
+<section id="modified-active-view">
+<span id="view-active"></span><h4>Modified <cite>active</cite> View<a class="headerlink" href="#modified-active-view" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">active</span></code> view is changed to include all incomplete items
+regardless of whether they have any traffic, and then groups the
+list into complete, incomplete, and queued items, in that order.
+Within each group, they’re sorted by download and then upload speed.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>This feature is added by <code class="docutils literal notranslate"><span class="pre">views.rc</span></code> in the <a class="reference external" href="https://github.com/pyroscope/pimp-my-box/tree/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d">pimp-my-box configuration includes</a>.</p>
+</div>
+</section>
+<section id="category-views">
+<span id="id14"></span><h4>Category Views<a class="headerlink" href="#category-views" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> keys rotate through all added category views
+(<code class="docutils literal notranslate"><span class="pre">pyro.category.add=‹name›</span></code>), with filtering based on the
+ruTorrent label (<code class="docutils literal notranslate"><span class="pre">custom_1=‹name›</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">|</span></code> re-applies the category filter and thus updates the current
+category view.</p>
+<p>See <span class="xref std std-ref">howto-categories</span> for more details.</p>
+</section>
+</section>
+<section id="color-themes">
+<span id="id15"></span><h3>Color Themes<a class="headerlink" href="#color-themes" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">~</span></code> key rotates through all available color themes,
+or a user-selected subset of them.</p>
+<p>Here are screen shots of some of the default schemes
+– from left to right: Default (256 xterm colors), Happy Pastel, Solarized Blue, and Solarized Yellow.</p>
+<p><a class="reference internal" href="https://rtorrent-ps.readthedocs.io/en/latest/_images/color-scheme-default.png"><img alt="color-scheme-default" src="https://rtorrent-ps.readthedocs.io/en/latest/_images/color-scheme-default.png" style="width: 320px;" /></a>   <a class="reference internal" href="https://rtorrent-ps.readthedocs.io/en/latest/_images//color-scheme-happy-pastel.png"><img alt="color-scheme-happy-pastel" src="https://rtorrent-ps.readthedocs.io/en/latest/_images//color-scheme-happy-pastel.png" style="width: 320px;" /></a></p>
+<p><a class="reference internal" href="https://rtorrent-ps.readthedocs.io/en/latest/_images//color-scheme-solarized-blue.png"><img alt="color-scheme-solarized-blue" src="https://rtorrent-ps.readthedocs.io/en/latest/_images//color-scheme-solarized-blue.png" style="width: 320px;" /></a>   <a class="reference internal" href="https://rtorrent-ps.readthedocs.io/en/latest/_images//color-scheme-solarized-yellow.png"><img alt="color-scheme-solarized-yellow" src="https://rtorrent-ps.readthedocs.io/en/latest/_images//color-scheme-solarized-yellow.png" style="width: 320px;" /></a></p>
+<p>What they actually look like depends on the color palette of your terminal,
+so adapt the examples to your liking and terminal setup.</p>
+<p>Read more on the configuration of color schemes
+and the necessary setup of <cite>rTorrent-PS</cite> in its
+<a class="reference external" href="https://rtorrent-ps.readthedocs.io/en/latest/customize.html#color-schemes" title="(in rtorrent-ps v1.2)"><span>Color Scheme Configuration</span></a> section of the manual.
+It explains how to create new files in the <code class="docutils literal notranslate"><span class="pre">~/.pyroscope/color-schemes/</span></code> directory.</p>
+<p><cite>pyrocore</cite> provides the commands to select your favourites amongst the different schemes stored there,
+and then rotate through the selection using <code class="docutils literal notranslate"><span class="pre">~</span></code>.</p>
+<ul class="simple">
+<li><p>(De-)select a theme:  <code class="docutils literal notranslate"><span class="pre">python-pyrocore</span> <span class="pre">-m</span> <span class="pre">pyrocore.ui.theming</span> <span class="pre">-t</span> <span class="pre">‹name(s)›</span></code></p></li>
+<li><p>Select all themes:    <code class="docutils literal notranslate"><span class="pre">python-pyrocore</span> <span class="pre">-m</span> <span class="pre">pyrocore.ui.theming</span> <span class="pre">-a</span></code></p></li>
+<li><p>List all themes:      <code class="docutils literal notranslate"><span class="pre">python-pyrocore</span> <span class="pre">-m</span> <span class="pre">pyrocore.ui.theming</span> <span class="pre">-l</span></code></p></li>
+<li><p>Rotate to next:       <code class="docutils literal notranslate"><span class="pre">python-pyrocore</span> <span class="pre">-m</span> <span class="pre">pyrocore.ui.theming</span> <span class="pre">-qn</span></code></p></li>
+<li><p>Print current path:   <code class="docutils literal notranslate"><span class="pre">python-pyrocore</span> <span class="pre">-m</span> <span class="pre">pyrocore.ui.theming</span> <span class="pre">-qc</span></code></p></li>
+</ul>
+<p>Only the first three are the ones you want to call directly,
+the last two are used internally to implement the rotation.</p>
+<p>Here is an example for selecting the themes which are shown above as screen shots:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python-pyrocore -m pyrocore.ui.theming -a -t <span class="se">\</span>
+    default-256,solarized-blue,solarized-yellow,happy-pastel -l
+</pre></div>
+</div>
+<p>Call this command on a shell prompt as the user you installed <cite>pyrocore</cite> for.
+Selection changes are in effect immediately, you don’t need to restart rTorrent.</p>
+</section>
+<section id="watches-with-dynamic-start">
+<span id="watch-start"></span><h3>Watches With Dynamic Start<a class="headerlink" href="#watches-with-dynamic-start" title="Permalink to this headline">¶</a></h3>
+<p>The new <code class="docutils literal notranslate"><span class="pre">d.watch.startable</span></code> and <code class="docutils literal notranslate"><span class="pre">load.category</span></code> commands allow you to easily change
+whether an item loaded by a watch is started immediately (the default), or not.</p>
+<p>This is especially useful when combined with automatic downloaders like <a class="reference external" href="https://flexget.com/">FlexGet</a> or <a class="reference external" href="https://github.com/autodl-community/autodl-irssi">autodl-irssi</a>.
+Usually, newly added items are started immediately – that is the whole point of automation.</p>
+<p>In some cases though, you might want to disable that and delay downloading until later.
+Testing configuration changes is a typical reason, because an innocent mistake could
+swamp you with lots of downloads. If they stay dormant at first, that is easily fixed.</p>
+<p>Just call <code class="docutils literal notranslate"><span class="pre">rtxmlrpc</span> <span class="pre">-i</span> <span class="pre">cfg.watch.start.set=0</span></code> and you get exactly that, <em>without</em> a rTorrent restart.
+If everything looks OK, re-enable instant downloading by changing the <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code> again.
+Calling <code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">--from</span> <span class="pre">stopped</span> <span class="pre">done=0</span> <span class="pre">custom_watch_start=1</span> <span class="pre">--start</span></code> will start anything added in the meantime.</p>
+<p>To get such a watch directory, add a schedule like this to your configuration:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">schedule2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">watch_dynamic, 10, 10, \</span><span class="w"></span>
+<span class="w">    </span><span class="na">((load.verbose, (cat, (cfg.watch), &quot;dynamic/*.torrent&quot;), &quot;d.watch.startable</span><span class="o">=</span><span class="s">&quot;))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>It is important to either use <code class="docutils literal notranslate"><span class="pre">load.verbose</span></code> or <code class="docutils literal notranslate"><span class="pre">load.normal</span></code> so the item stays idle,
+and then add the post-load <code class="docutils literal notranslate"><span class="pre">d.watch.startable</span></code> command to mark this item as eligible to be started.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">load.category</span></code> command (added by <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/categories.rc">rtorrent.d/categories.rc</a>) already integrates
+this behaviour. It can be used like shown in this example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">schedule2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">watch_hdtv, 10, 10, ((load.category, hdtv))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See <span class="xref std std-ref">howto-categories</span> for more on categories.</p>
+<div class="topic">
+<p class="topic-title">Technical Details</p>
+<p>Since you cannot call <code class="docutils literal notranslate"><span class="pre">d.start</span></code> as a post-load command (the item is not fully initialized yet),
+the conditional start has to happen <em>after</em> the load is finished.</p>
+<p>Therefor, a <code class="docutils literal notranslate"><span class="pre">event.download.inserted_new</span></code> handler checks for the custom attribute <code class="docutils literal notranslate"><span class="pre">watch_start</span></code>
+set by <code class="docutils literal notranslate"><span class="pre">d.watch.startable</span></code> (thus only acting on items loaded by specifically marked watch schedules),
+and then continues to call <code class="docutils literal notranslate"><span class="pre">d.start</span></code> <em>only if</em> the <code class="docutils literal notranslate"><span class="pre">cfg.watch.start</span></code> value is currently set to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>See the <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/00-default.rc">rtorrent.d/00-default.rc</a> file for the full command definitions.</p>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="setup.html" class="btn btn-neutral float-left" title="Configuration Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="migrating.html" class="btn btn-neutral float-right" title="Migrating from pyrocore" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

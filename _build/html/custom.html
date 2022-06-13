@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Python Code &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/js/custom.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Trouble-Shooting Guide" href="troubleshooting.html" />
+    <link rel="prev" title="Advanced Features" href="advanced.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> pyrosimple
+            <img src="_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Custom Python Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#defining-custom-fields">Defining Custom Fields</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-custom-field-code">Basic Custom Field Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-field-examples">Custom Field Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#adding-rtorrent-fields-not-supported-by-default">Adding rTorrent fields not supported by default</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#checking-that-certain-files-are-present">Checking that certain files are present</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#calculating-information-about-partial-downloads">Calculating information about partial downloads</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#extract-tv-data-from-item-name">Extract TV data from item name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#only-start-items-that-you-have-disk-space-for">Only start items that you have disk space for</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-custom-template-helpers">Adding Custom Template Helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-your-own-scripts">Writing Your Own Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#intro">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interactive-use-in-a-python-shell">Interactive use in a Python shell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interactive-use-on-a-shell-prompt">Interactive use on a shell prompt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-pyrocore-as-a-library-in-other-projects">Using <code class="docutils literal notranslate"><span class="pre">pyrocore</span></code> as a library in other projects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-scripts">Example Scripts</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accessing-files-in-download-items">Accessing files in download items</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core-stats-of-active-downloads">Core stats of active downloads</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#list-stuck-tracker-announces">List Stuck Tracker Announces</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-custom-jobs">Writing Custom Jobs</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Custom Python Code</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/custom.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="custom-python-code">
+<h1>Custom Python Code<a class="headerlink" href="#custom-python-code" title="Permalink to this headline">¶</a></h1>
+<p>You can write your own code for <code class="docutils literal notranslate"><span class="pre">pyrocore</span></code> implementing custom features,
+by adding fields, your own command line scripts, or <code class="docutils literal notranslate"><span class="pre">pyrotorque</span></code> jobs.
+You probably need a <a class="reference external" href="https://github.com/TechBookHunter/Free-Python-Books#free-python-books">solid grasp of Python</a> for this.</p>
+<section id="defining-custom-fields">
+<span id="customfields"></span><h2>Defining Custom Fields<a class="headerlink" href="#defining-custom-fields" title="Permalink to this headline">¶</a></h2>
+<section id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h3>
+<p>As mentioned in the <a class="reference internal" href="setup.html"><span class="doc">Configuration Guide</span></a>, the <code class="docutils literal notranslate"><span class="pre">config.py</span></code> script can be used to add
+custom logic to your setup. The most common use for this file is adding
+custom fields.</p>
+<p>To add user-defined fields you can put code describing them into your
+<code class="docutils literal notranslate"><span class="pre">~/.pyroscope/config.py</span></code> file. You can then use your custom field just
+like any built-in one, e.g. issue a command like
+<code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">--from-view</span> <span class="pre">incomplete</span> <span class="pre">\*</span> <span class="pre">-qco</span> <span class="pre">partial_done,name</span></code> (see
+below examples). They’re also listed when you call
+<code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">--help-fields</span></code>.</p>
+</section>
+<section id="basic-custom-field-code">
+<h3>Basic Custom Field Code<a class="headerlink" href="#basic-custom-field-code" title="Permalink to this headline">¶</a></h3>
+<p>The following is the framework you need to add before putting in your
+field definitions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_custom_fields</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Yield custom field definitions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Import some commonly needed modules</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">pyrocore.torrent</span> <span class="kn">import</span> <span class="n">engine</span><span class="p">,</span> <span class="n">matching</span>
+    <span class="kn">from</span> <span class="nn">pyrocore.util</span> <span class="kn">import</span> <span class="n">fmt</span>
+
+    <span class="c1"># PUT CUSTOM FIELD CODE HERE</span>
+
+<span class="c1"># Register our factory with the system</span>
+<span class="n">custom_field_factories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_custom_fields</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In place of the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">PUT</span> <span class="pre">CUSTOM</span> <span class="pre">FIELD</span> <span class="pre">CODE</span> <span class="pre">HERE</span></code> comment you can add any
+combination of the examples below, or your own code.
+Be sure to do so at the correct indent level, the example snippets
+are left-aligned and need to be indented by 4 spaces.</p>
+</section>
+<section id="custom-field-examples">
+<h3>Custom Field Examples<a class="headerlink" href="#custom-field-examples" title="Permalink to this headline">¶</a></h3>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#adding-rtorrent-fields-not-supported-by-default" id="id3">Adding rTorrent fields not supported by default</a></p></li>
+<li><p><a class="reference internal" href="#checking-that-certain-files-are-present" id="id4">Checking that certain files are present</a></p></li>
+<li><p><a class="reference internal" href="#calculating-information-about-partial-downloads" id="id5">Calculating information about partial downloads</a></p></li>
+<li><p><a class="reference internal" href="#extract-tv-data-from-item-name" id="id6">Extract TV data from item name</a></p></li>
+<li><p><a class="reference internal" href="#only-start-items-that-you-have-disk-space-for" id="id7">Only start items that you have disk space for</a></p></li>
+</ul>
+</div>
+<section id="adding-rtorrent-fields-not-supported-by-default">
+<h4><a class="toc-backref" href="#id3">Adding rTorrent fields not supported by default</a><a class="headerlink" href="#adding-rtorrent-fields-not-supported-by-default" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add rTorrent attributes not available by default</span>
+<span class="k">def</span> <span class="nf">get_tracker_field</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">aggregator</span><span class="o">=</span><span class="nb">sum</span><span class="p">):</span>
+    <span class="s2">&quot;Get an aggregated tracker field.&quot;</span>
+    <span class="k">return</span> <span class="n">aggregator</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_engine</span><span class="o">.</span><span class="n">_rpc</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">multicall</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="s2">&quot;hash&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;t.</span><span class="si">%s</span><span class="s2">=&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">OnDemandField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;peers_connected&quot;</span><span class="p">,</span> <span class="s2">&quot;number of connected peers&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">)</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;downloaders&quot;</span><span class="p">,</span> <span class="s2">&quot;number of completed downloads&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">get_tracker_field</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;scrape_downloaded&quot;</span><span class="p">))</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;seeds&quot;</span><span class="p">,</span> <span class="s2">&quot;number of seeds&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">get_tracker_field</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;scrape_complete&quot;</span><span class="p">))</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;leeches&quot;</span><span class="p">,</span> <span class="s2">&quot;number of leeches&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">get_tracker_field</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;scrape_incomplete&quot;</span><span class="p">))</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">untyped</span><span class="p">,</span> <span class="s2">&quot;lastscraped&quot;</span><span class="p">,</span> <span class="s2">&quot;time of last scrape&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TimeFilter</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">get_tracker_field</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;scrape_time_last&quot;</span><span class="p">,</span> <span class="nb">max</span><span class="p">),</span>
+    <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">dt</span><span class="p">:</span> <span class="n">fmt</span><span class="o">.</span><span class="n">human_duration</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="p">),</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">short</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="c1"># Add peer attributes not available by default</span>
+<span class="k">def</span> <span class="nf">get_peer_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">aggregator</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="s2">&quot;Get some peer data via a multicall.&quot;</span>
+    <span class="n">aggregator</span> <span class="o">=</span> <span class="n">aggregator</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">_</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">_engine</span><span class="o">.</span><span class="n">_rpc</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">multicall</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="s2">&quot;hash&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;p.</span><span class="si">%s</span><span class="s2">=&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">aggregator</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="p">])</span>
+
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="nb">set</span><span class="p">,</span> <span class="s2">&quot;peers_ip&quot;</span><span class="p">,</span> <span class="s2">&quot;list of IP addresses for connected peers&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TaggedAsFilter</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">get_peer_data</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</section>
+<section id="checking-that-certain-files-are-present">
+<h4><a class="toc-backref" href="#id4">Checking that certain files are present</a><a class="headerlink" href="#checking-that-certain-files-are-present" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add file checkers</span>
+<span class="k">def</span> <span class="nf">has_nfo</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="s2">&quot;Check for .NFO file.&quot;</span>
+    <span class="n">pathname</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">path</span>
+    <span class="k">if</span> <span class="n">pathname</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">pathname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.nfo&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">pathname</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">pathname</span> <span class="k">else</span> <span class="kc">None</span>
+
+<span class="k">def</span> <span class="nf">has_thumb</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="s2">&quot;Check for folder.jpg file.&quot;</span>
+    <span class="n">pathname</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">path</span>
+    <span class="k">if</span> <span class="n">pathname</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">pathname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;folder.jpg&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">pathname</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">pathname</span> <span class="k">else</span> <span class="kc">None</span>
+
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">untyped</span><span class="p">,</span> <span class="s2">&quot;has_nfo&quot;</span><span class="p">,</span> <span class="s2">&quot;does download have a .NFO file?&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span> <span class="n">accessor</span><span class="o">=</span><span class="n">has_nfo</span><span class="p">,</span>
+    <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;NFO&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;!DTA&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;----&quot;</span><span class="p">)</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">untyped</span><span class="p">,</span> <span class="s2">&quot;has_thumb&quot;</span><span class="p">,</span> <span class="s2">&quot;does download have a folder.jpg file?&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span> <span class="n">accessor</span><span class="o">=</span><span class="n">has_thumb</span><span class="p">,</span>
+    <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;THMB&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;!DTA&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;----&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="calculating-information-about-partial-downloads">
+<h4><a class="toc-backref" href="#id5">Calculating information about partial downloads</a><a class="headerlink" href="#calculating-information-about-partial-downloads" title="Permalink to this headline">¶</a></h4>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">partial_done</span></code> value can be a little lower than it
+actually should be, when chunks shared by different files are not yet
+complete; but it will eventually reach <code class="docutils literal notranslate"><span class="pre">100</span></code> when all selected chunks
+are downloaded in full.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fields for partial downloads</span>
+<span class="k">def</span> <span class="nf">partial_info</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="s2">&quot;Helper for partial download info&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">f_attr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;get_completed_chunks&quot;</span><span class="p">,</span> <span class="s2">&quot;get_size_chunks&quot;</span><span class="p">,</span> <span class="s2">&quot;get_range_first&quot;</span><span class="p">,</span> <span class="s2">&quot;get_range_second&quot;</span><span class="p">]</span>
+        <span class="n">chunk_size</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;chunk_size&quot;</span><span class="p">)</span>
+        <span class="n">prev_chunk</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">size</span><span class="p">,</span> <span class="n">completed</span><span class="p">,</span> <span class="n">chunks</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">_get_files</span><span class="p">(</span><span class="n">f_attr</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">prio</span><span class="p">:</span> <span class="c1"># selected?</span>
+                <span class="n">shared</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">range_first</span> <span class="o">==</span> <span class="n">prev_chunk</span><span class="p">)</span>
+                <span class="n">size</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">size</span>
+                <span class="n">completed</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">completed_chunks</span> <span class="o">-</span> <span class="n">shared</span>
+                <span class="n">chunks</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">size_chunks</span> <span class="o">-</span> <span class="n">shared</span>
+                <span class="n">prev_chunk</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">range_second</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="s2">&quot;partial_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="s2">&quot;partial_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">chunks</span> <span class="o">-</span> <span class="n">completed</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk_size</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="s2">&quot;partial_done&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">completed</span> <span class="o">/</span> <span class="n">chunks</span> <span class="k">if</span> <span class="n">chunks</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;partial_size&quot;</span><span class="p">,</span> <span class="s2">&quot;bytes selected for download&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">ByteSizeFilter</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">partial_info</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;partial_size&quot;</span><span class="p">))</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;partial_missing&quot;</span><span class="p">,</span> <span class="s2">&quot;bytes missing from selected chunks&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">ByteSizeFilter</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">partial_info</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;partial_missing&quot;</span><span class="p">))</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;partial_done&quot;</span><span class="p">,</span> <span class="s2">&quot;percent complete of selected chunks&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">,</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">partial_info</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;partial_done&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="extract-tv-data-from-item-name">
+<h4><a class="toc-backref" href="#id6">Extract TV data from item name</a><a class="headerlink" href="#extract-tv-data-from-item-name" title="Permalink to this headline">¶</a></h4>
+<p>This defines the <code class="docutils literal notranslate"><span class="pre">tv_series</span></code> and <code class="docutils literal notranslate"><span class="pre">tv_episode</span></code> fields, that are
+non-empty when the item name follows the “usual” naming conventions. Try
+it using something like
+<code class="docutils literal notranslate"><span class="pre">rtcontrol</span> <span class="pre">loaded=-2w</span> <span class="pre">traits=tv</span> <span class="pre">-co</span> <span class="pre">tv_series,tv_episode,name</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Map name field to TV series name, if applicable, else an empty string</span>
+<span class="kn">from</span> <span class="nn">pyrocore.util</span> <span class="kn">import</span> <span class="n">traits</span>
+
+<span class="k">def</span> <span class="nf">tv_mapper</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">templ</span><span class="p">):</span>
+    <span class="s2">&quot;Helper for TV name mapping&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">itemname</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">kind</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">traits</span><span class="o">.</span><span class="n">name_trait</span><span class="p">(</span><span class="n">itemname</span><span class="p">,</span> <span class="n">add_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;tv&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;show&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;show&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()])</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">templ</span> <span class="o">%</span> <span class="n">info</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="c1">#print exc</span>
+                <span class="k">pass</span>
+
+        <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">to_unicode</span><span class="p">,</span> <span class="s2">&quot;tv_series&quot;</span><span class="p">,</span> <span class="s2">&quot;series name of a TV item&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span> <span class="n">accessor</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">tv_mapper</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;tv_series&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%(show)s</span><span class="s2">&quot;</span><span class="p">))</span>
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">to_unicode</span><span class="p">,</span> <span class="s2">&quot;tv_episode&quot;</span><span class="p">,</span> <span class="s2">&quot;series name and episode number of a TV item&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span> <span class="n">accessor</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">tv_mapper</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;tv_episode&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%(show)s</span><span class="s2">.S</span><span class="si">%(season)s</span><span class="s2">E</span><span class="si">%(episode)s</span><span class="s2">&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="only-start-items-that-you-have-disk-space-for">
+<span id="has-room"></span><h4><a class="toc-backref" href="#id7">Only start items that you have disk space for</a><a class="headerlink" href="#only-start-items-that-you-have-disk-space-for" title="Permalink to this headline">¶</a></h4>
+<p>This example works together with <a class="reference internal" href="advanced.html#queuemanager"><span class="std std-ref">rTorrent Queue Manager</span></a>, so that only items that pass a disk
+space check are actually started. Meaning you can safely employ automatic downloading
+via e.g. RSS, without fear of a disk full situation when your disk space housekeeping fails.</p>
+<p>It is also much more robust than a schedule using rTorrent’s <code class="docutils literal notranslate"><span class="pre">close_low_diskspace</span></code> command
+– pre-allocation of a started item still eats up disk space, and stopping an item
+shortly afterwards doesn’t fix that. Which means if a RSS feed constantly adds new auto-started
+items, your disk <em>will</em> fill up when using only such a schedule.</p>
+<p>The first step is to add a custom field that checks whether an item has
+room on the target device. As with the other examples, place this in
+your <code class="docutils literal notranslate"><span class="pre">config.py</span></code> (read the 1st two sections, before the “Examples” one).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Disk space check</span>
+<span class="k">def</span> <span class="nf">has_room</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="s2">&quot;Check disk space.&quot;</span>
+    <span class="n">pathname</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">path</span>
+    <span class="k">if</span> <span class="n">pathname</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pathname</span><span class="p">):</span>
+        <span class="n">pathname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pathname</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pathname</span><span class="p">):</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">statvfs</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">f_bavail</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">f_frsize</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">diskspace_threshold_mb</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span>
+            <span class="o">&gt;</span> <span class="n">obj</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">obj</span><span class="o">.</span><span class="n">done</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<span class="k">yield</span> <span class="n">engine</span><span class="o">.</span><span class="n">DynamicField</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">untyped</span><span class="p">,</span> <span class="s2">&quot;has_room&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;check whether the download will fit on its target device&quot;</span><span class="p">,</span>
+    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span> <span class="n">accessor</span><span class="o">=</span><span class="n">has_room</span><span class="p">,</span>
+    <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;??&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;NO&quot;</span><span class="p">)</span>
+<span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;diskspace_threshold_mb&quot;</span><span class="p">,</span> <span class="s2">&quot;500&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And now, all you need is to add <code class="docutils literal notranslate"><span class="pre">has_room=y</span></code> to your
+<code class="docutils literal notranslate"><span class="pre">job.queue.startable</span></code> conditions in <code class="docutils literal notranslate"><span class="pre">torque.ini</span></code>. Done.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>To ensure that checking for free space works as expected, only start one item at a time,
+and enforce a delay after each start, so that disk space can be claimed
+before the next item’s check is performed.</p>
+<p>In other words, use queue configuation values similar to these:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">job.queue.schedule</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s">second=*/5</span><span class="w"></span>
+<span class="na">job.queue.start_at_once</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="w"></span>
+<span class="na">job.queue.intermission</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">120</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<p>Note that you can set the threshold of space to keep free (in MiB) in
+the <code class="docutils literal notranslate"><span class="pre">GLOBAL</span></code> section of <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>, and the default is 500MiB.
+You should <strong>keep</strong> your <code class="docutils literal notranslate"><span class="pre">close_low_diskspace</span></code> schedule for rTorrent as a fallback,
+and set <code class="docutils literal notranslate"><span class="pre">diskspace_threshold_mb</span></code> <strong>higher</strong> than the limit given there
+(so that normally, the low space check never triggers).</p>
+<p>It’s a good idea to set <code class="docutils literal notranslate"><span class="pre">diskspace_threshold_mb</span></code> a good deal higher than
+the hard limit that <code class="docutils literal notranslate"><span class="pre">close_low_diskspace</span></code> enforces.
+That makes automatic downloading stop at the higher threshold,
+but leaves you with wiggle room for manual starting of important stuff
+that won’t be stopped just a moment later, as long as it fits into that gap
+between the two values.</p>
+</section>
+</section>
+</section>
+<section id="adding-custom-template-helpers">
+<span id="custom-template-helpers"></span><h2>Adding Custom Template Helpers<a class="headerlink" href="#adding-custom-template-helpers" title="Permalink to this headline">¶</a></h2>
+<p>In templating contexts, there is an empty <code class="docutils literal notranslate"><span class="pre">c</span></code> namespace (think <code class="docutils literal notranslate"><span class="pre">custom</span></code> or <code class="docutils literal notranslate"><span class="pre">config</span></code>),
+just like <code class="docutils literal notranslate"><span class="pre">h</span></code> for helpers.
+You can populate that namespace with your own helpers as you need them,
+from simple string transformations to calling external programs or web interfaces.</p>
+<p>The following example illustrates the concept, and belongs into <code class="docutils literal notranslate"><span class="pre">~/.pyroscope/config.py</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_hostname</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper to e.g. look up peer IPs.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">socket</span>
+
+    <span class="k">return</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyaddr</span><span class="p">(</span><span class="n">ip</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ip</span> <span class="k">else</span> <span class="n">ip</span>
+
+<span class="n">custom_template_helpers</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">_hostname</span>
+</pre></div>
+</div>
+<p>This demonstrates the call of that helper using a custom field,
+a real use-case would be to resolve peer IPs and the like.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ rtcontrol -qo <span class="s1">&#39;{{d.fetch(&quot;custom_ip&quot;)}} → {{d.fetch(&quot;custom_ip&quot;) | c.hostname}}&#39;</span> // -/1
+<span class="m">8</span>.8.8.8 → google-public-dns-a.google.com
+</pre></div>
+</div>
+</section>
+<section id="writing-your-own-scripts">
+<span id="scripts"></span><h2>Writing Your Own Scripts<a class="headerlink" href="#writing-your-own-scripts" title="Permalink to this headline">¶</a></h2>
+<section id="intro">
+<span id="id1"></span><h3>Introduction<a class="headerlink" href="#intro" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyrocore</span></code> Python package contains powerful helper classes that
+make remote access to <em>rTorrent</em> child’s play (see <a class="reference internal" href="api.html#api"><span class="std std-ref">API Documentation</span></a>).
+And your tools get the same <em>Look &amp; Feel</em> like the built-in <em>PyroScope</em>
+commands, as long as you use the provided base class
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pyrocore.scripts.base.ScriptBaseWithConfig</span></code>.</p>
+<p>See for yourself:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python-pyrocore</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Enter the magic kingdom</span>
+<span class="kn">from</span> <span class="nn">pyrocore</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">pyrocore.scripts</span> <span class="kn">import</span> <span class="n">base</span>
+
+
+<span class="k">class</span> <span class="nc">UserScript</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">ScriptBaseWithConfig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Just some script you wrote.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># argument description for the usage information</span>
+    <span class="n">ARGS_HELP</span> <span class="o">=</span> <span class="s2">&quot;&lt;arg_1&gt;... &lt;arg_n&gt;&quot;</span>
+
+    <span class="c1"># set your own version</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+
+    <span class="c1"># (optionally) define your licensing</span>
+    <span class="n">COPYRIGHT</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;Copyright (c) …&#39;</span>
+
+    <span class="k">def</span> <span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add program options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UserScript</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_options</span><span class="p">()</span>
+
+        <span class="c1"># basic options</span>
+        <span class="c1">##self.add_bool_option(&quot;-n&quot;, &quot;--dry-run&quot;,</span>
+        <span class="c1">##    help=&quot;don&#39;t do anything, just tell what would happen&quot;)</span>
+
+
+    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The main loop.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Grab your magic wand</span>
+        <span class="n">proxy</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+
+        <span class="c1"># Wave it</span>
+        <span class="n">torrents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="c1"># Abracadabra</span>
+        <span class="nb">print</span> <span class="s2">&quot;You have loaded </span><span class="si">%d</span><span class="s2"> torrents tracked by </span><span class="si">%d</span><span class="s2"> trackers.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">torrents</span><span class="p">),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">alias</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">torrents</span><span class="p">)),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;XMLRPC stats: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">proxy</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">base</span><span class="o">.</span><span class="n">ScriptBase</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    <span class="n">UserScript</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Another full example is the <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rt_cron_throttle_seed">dynamic seed throttle script</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you wondered about the first line referring to a <code class="docutils literal notranslate"><span class="pre">python-pyrocore</span></code>
+command, that is an alias the installation scripts create for
+the Python interpreter of the <em>pyrocore</em> virtualenv. This way,
+your script will always use the correct environment that actually
+offers the right packages.</p>
+</div>
+<p>For simple calls, you can also use the <code class="docutils literal notranslate"><span class="pre">rtxmlrpc</span></code> command on a shell
+prompt, see <a class="reference internal" href="advanced.html#rtxmlrpcexamples"><span class="std std-ref">Using ‘rtxmlrpc’</span></a> for that. For a reference of the <em>rTorrent</em>
+XMLRPC interface, see <a class="reference internal" href="references.html#rtxmlrpcreference"><span class="std std-ref">rTorrent XMLRPC</span></a>. Another common way to add your
+own extensions is <a class="reference internal" href="#customfields"><span class="std std-ref">Defining Custom Fields</span></a>, usable by <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> just
+like built-in ones.</p>
+</section>
+<section id="interactive-use-in-a-python-shell">
+<h3>Interactive use in a Python shell<a class="headerlink" href="#interactive-use-in-a-python-shell" title="Permalink to this headline">¶</a></h3>
+<p>You can also access rTorrent interactively, like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyrocore</span> <span class="kn">import</span> <span class="n">connect</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rt</span> <span class="o">=</span> <span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">tracker</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rt</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rt</span><span class="o">.</span><span class="n">engine_software</span>
+<span class="go">&#39;rTorrent 0.9.2/0.13.2&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rt</span><span class="o">.</span><span class="n">uptime</span>
+<span class="go">1325.6771779060364</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">proxy</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">listMethods</span><span class="p">())</span>
+<span class="go">1033</span>
+</pre></div>
+</div>
+</section>
+<section id="interactive-use-on-a-shell-prompt">
+<span id="rtpy"></span><h3>Interactive use on a shell prompt<a class="headerlink" href="#interactive-use-on-a-shell-prompt" title="Permalink to this headline">¶</a></h3>
+<p>Besides <code class="docutils literal notranslate"><span class="pre">connect</span></code>, there is another convenience function called <code class="docutils literal notranslate"><span class="pre">view</span></code>.
+If you install <a class="reference external" href="https://github.com/Russell91/pythonpy#usage">pythonpy</a> into your <cite>pyrocore</cite> virtualenv,
+that means you can do <cite>rtcontrol</cite>-like things with the full expressiveness of <cite>Python</cite>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>~/.local/pyroscope/bin/pip -q install <span class="s1">&#39;pythonpy&#39;</span>
+<span class="gp">$ </span>ln -nfs ~/.local/pyroscope/bin/py ~/bin/rtpy
+<span class="gp">$ </span>rtpy <span class="s2">&quot;[x.name for x in pyrocore.view(&#39;stopped&#39;) if x.size &gt; 1.4*1024**3]&quot;</span>
+<span class="go">robolinux64-mate3d-v9.3.iso</span>
+<span class="gp">$ </span>rtpy <span class="s2">&quot;sorted(x.name for x in pyrocore.view() if x.name.endswith(&#39;.iso&#39;))&quot;</span>
+<span class="go">Container Linux 1745.7.0.iso</span>
+<span class="go">debian-9.4.0-amd64-netinst.iso</span>
+<span class="go">debian-9.4.0-amd64-xfce-CD-1.iso</span>
+<span class="go">robolinux64-mate3d-v9.3.iso</span>
+<span class="gp">$ </span>rtpy <span class="s2">&quot;json.dumps(indent=4, sort_keys=True,</span>
+<span class="go">        obj=[x.as_dict() for x in pyrocore.view() if &#39;robolinux&#39; in x.name])&quot;</span>
+<span class="go">[</span>
+<span class="go">    {</span>
+<span class="go">        &quot;custom_m_alias&quot;: …</span>
+<span class="go">        &quot;name&quot;: &quot;robolinux64-mate3d-v9.3.iso&quot;,</span>
+<span class="go">        …</span>
+<span class="go">        &quot;size&quot;: 1527775232,</span>
+<span class="go">        …</span>
+<span class="go">        &quot;up_total&quot;: 0</span>
+<span class="go">    }</span>
+<span class="go">]</span>
+</pre></div>
+</div>
+<p>If you do not pass a view name, <code class="docutils literal notranslate"><span class="pre">default</span></code> is assumed.</p>
+</section>
+<section id="using-pyrocore-as-a-library-in-other-projects">
+<h3>Using <code class="docutils literal notranslate"><span class="pre">pyrocore</span></code> as a library in other projects<a class="headerlink" href="#using-pyrocore-as-a-library-in-other-projects" title="Permalink to this headline">¶</a></h3>
+<p>The example in the first section is an easy way to create user-defined
+scripts. If you want to use <code class="docutils literal notranslate"><span class="pre">pyrocore</span></code>’s features in another runtime
+environment, you just have to load the configuration manually (what
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pyrocore.scripts.base.ScriptBaseWithConfig</span></code>
+does for you otherwise).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Details depend on the system you want to extend, of course</span>
+<span class="kn">from</span> <span class="nn">some_system</span> <span class="kn">import</span> <span class="n">plugin</span>
+<span class="kn">from</span> <span class="nn">pyrocore</span> <span class="kn">import</span> <span class="n">error</span>
+<span class="kn">from</span> <span class="nn">pyrocore.util</span> <span class="kn">import</span> <span class="n">load_config</span>
+
+<span class="k">def</span> <span class="nf">my_rtorrent_plugin</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Initialize plugin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">load_config</span><span class="o">.</span><span class="n">ConfigLoader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">error</span><span class="o">.</span><span class="n">LoggableError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># Handle accordingly...</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Do some other stuff...</span>
+
+<span class="n">plugin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">my_rtorrent_plugin</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="example-scripts">
+<h3>Example Scripts<a class="headerlink" href="#example-scripts" title="Permalink to this headline">¶</a></h3>
+<div class="contents local topic" id="id2">
+<ul class="simple">
+<li><p><a class="reference internal" href="#accessing-files-in-download-items" id="id8">Accessing files in download items</a></p></li>
+<li><p><a class="reference internal" href="#core-stats-of-active-downloads" id="id9">Core stats of active downloads</a></p></li>
+<li><p><a class="reference internal" href="#list-stuck-tracker-announces" id="id10">List Stuck Tracker Announces</a></p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following snippets are meant to be placed and executed within
+the <code class="docutils literal notranslate"><span class="pre">mainloop</span></code> of the script skeleton found in <a class="reference internal" href="#intro"><span class="std std-ref">Introduction</span></a>.</p>
+</div>
+<section id="accessing-files-in-download-items">
+<h4><a class="toc-backref" href="#id8">Accessing files in download items</a><a class="headerlink" href="#accessing-files-in-download-items" title="Permalink to this headline">¶</a></h4>
+<p>To get all the files for several items at once, we combine
+<code class="docutils literal notranslate"><span class="pre">system.multicall</span></code> and <code class="docutils literal notranslate"><span class="pre">f.multicall</span></code> to one big efficient mess.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span><span class="p">,</span> <span class="n">pformat</span>
+
+<span class="c1"># The attributes we want to fetch</span>
+<span class="n">methods</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;f.get_path&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f.get_size_bytes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f.get_last_touched&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f.get_priority&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f.is_created&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;f.is_open&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Build the multicall argument</span>
+<span class="n">f_calls</span> <span class="o">=</span> <span class="p">[</span><span class="n">method</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">]</span>
+<span class="n">calls</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;methodName&quot;</span><span class="p">:</span> <span class="s2">&quot;f.multicall&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">infohash</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">f_calls</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">infohash</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
+<span class="p">]</span>
+
+<span class="c1"># Make the calls</span>
+<span class="n">multicall</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">multicall</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">multicall</span><span class="p">(</span><span class="n">calls</span><span class="p">)</span>
+
+<span class="c1"># Print the results</span>
+<span class="k">for</span> <span class="n">infohash</span><span class="p">,</span> <span class="p">(</span><span class="n">files</span><span class="p">,)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;~~~ </span><span class="si">%s</span><span class="s2"> [</span><span class="si">%d</span><span class="s2"> file(s)] &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)))</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">78</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">)</span>
+    <span class="n">pprint</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Multicall stats: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">multicall</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="core-stats-of-active-downloads">
+<h4><a class="toc-backref" href="#id9">Core stats of active downloads</a><a class="headerlink" href="#core-stats-of-active-downloads" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">rt-down-stats</span></code> script prints some statistics about currently active downloads,
+particularly the range of expected arrival times.</p>
+<p>It shows how nicely you can handle the result of <code class="docutils literal notranslate"><span class="pre">config.engine.multicall</span></code>,
+which is using Python’s <code class="docutils literal notranslate"><span class="pre">namedtuple</span></code> under the hood,
+based on a simple field list like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+    <span class="n">FIELDS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;is_active&#39;</span><span class="p">,</span> <span class="s1">&#39;left_bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;size_bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;down.rate&#39;</span><span class="p">,</span> <span class="s1">&#39;priority&#39;</span><span class="p">)</span>
+    <span class="n">MIN_STALLED_RATE</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">1024</span>
+    <span class="n">STALLED_PERCENT</span> <span class="o">=</span> <span class="mi">10</span>
+
+</pre></div>
+</div>
+<p>The first few lines of the <code class="docutils literal notranslate"><span class="pre">mainloop</span></code> then use the <code class="docutils literal notranslate"><span class="pre">multicall</span></code> helper method,
+to make accessing the result list actually readable.
+So instead of obscuring intent with numerical indexes or similar,
+the actual names of the fetched attributes are used to access them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">proxy</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="n">all_items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">multicall</span><span class="p">(</span><span class="s2">&quot;incomplete&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FIELDS</span><span class="p">))</span>
+
+        <span class="n">pending</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">all_items</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">is_active</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">priority</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Queued items:          &quot;</span><span class="p">,</span>
+            <span class="n">fmt</span><span class="o">.</span><span class="n">human_size</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">size_bytes</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">pending</span><span class="p">)),</span>
+            <span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pending</span><span class="p">),</span> <span class="s1">&#39;item(s)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;[</span><span class="si">{}</span><span class="s1"> free]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">human_size</span><span class="p">(</span><span class="n">disk_free</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">default</span><span class="p">()))</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">all_items</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_active</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">items</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No active downloads!&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">good_rates</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">down_rate</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">down_rate</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_STALLED_RATE</span><span class="p">]</span>
+        <span class="n">stalled_rate</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MIN_STALLED_RATE</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">STALLED_PERCENT</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">good_rates</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">good_rates</span><span class="p">)</span> <span class="k">if</span> <span class="n">good_rates</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">stalled_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">down_rate</span> <span class="o">&lt;</span> <span class="n">stalled_rate</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">items</span><span class="p">)</span>
+        <span class="n">global_down_rate</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">throttle</span><span class="o">.</span><span class="n">global_down</span><span class="o">.</span><span class="n">rate</span><span class="p">()</span>
+
+        <span class="n">total_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">size_bytes</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">items</span><span class="p">)</span>
+        <span class="n">total_left</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">left_bytes</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">items</span><span class="p">)</span>
+        <span class="n">eta_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">stalled_count</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+            <span class="n">eta_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">left_bytes</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">down_rate</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">down_rate</span> <span class="o">&gt;=</span> <span class="n">stalled_rate</span><span class="p">]</span>
+        <span class="n">eta_max</span> <span class="o">=</span> <span class="n">total_left</span> <span class="o">/</span> <span class="p">(</span><span class="n">global_down_rate</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">stalled_info</span> <span class="o">=</span> <span class="s1">&#39;, </span><span class="si">{}</span><span class="s1"> stalled below </span><span class="si">{}</span><span class="s1">/s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">stalled_count</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">human_size</span><span class="p">(</span><span class="n">stalled_rate</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">if</span> <span class="n">stalled_count</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Size left to download: &quot;</span><span class="p">,</span>
+            <span class="n">fmt</span><span class="o">.</span><span class="n">human_size</span><span class="p">(</span><span class="n">total_left</span><span class="p">),</span> <span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">human_size</span><span class="p">(</span><span class="n">total_size</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall download speed:&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">human_size</span><span class="p">(</span><span class="n">global_down_rate</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/s&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ETA (min → max):       &quot;</span><span class="p">,</span>
+            <span class="n">fmt_duration</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">eta_list</span><span class="p">)),</span> <span class="s1">&#39;→&#39;</span><span class="p">,</span> <span class="n">fmt_duration</span><span class="p">(</span><span class="n">eta_max</span><span class="p">),</span> <span class="s1">&#39;…&#39;</span><span class="p">,</span> <span class="n">fmt_duration</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">eta_list</span><span class="p">)),</span>
+            <span class="s1">&#39;[</span><span class="si">{}</span><span class="s1"> item(s)</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span> <span class="n">stalled_info</span><span class="p">),</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rt-down-stats.py">full rt-down-stats script</a> for all the details.
+If you call it, this is what you get:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docs/examples/rt-down-stats.py -q
+<span class="go">Size left to download:   997.0 MiB of 1.1 GiB</span>
+<span class="go">Overall download speed:   70.8 KiB/s</span>
+<span class="go">ETA (min / max):        3h 11m … 4h 40m [3 item(s)]</span>
+</pre></div>
+</div>
+</section>
+<section id="list-stuck-tracker-announces">
+<h4><a class="toc-backref" href="#id10">List Stuck Tracker Announces</a><a class="headerlink" href="#list-stuck-tracker-announces" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">rt-stuck-trackers</span></code> script lists started items whose announces are stuck,
+i.e. where last activity is older than the normal announce interval.</p>
+<p>It shows how to use <code class="docutils literal notranslate"><span class="pre">namedtuple</span></code>, as mentioned in the previous example,
+on rTorrent entities other than download items
+– in this case the tracker list of an item.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">Counter</span>
+
+        <span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">xmlrpc</span><span class="p">,</span> <span class="n">fmt</span>
+
+        <span class="n">proxy</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;is_enabled is_busy url min_interval normal_interval&#39;</span>
+                  <span class="s1">&#39; activity_time_last success_counter failed_counter scrape_counter&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">t_multicall</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;multicall&#39;</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">multicall</span><span class="p">(</span><span class="s1">&#39;started&#39;</span><span class="p">,</span> <span class="s1">&#39;d.hash=&#39;</span><span class="p">,</span> <span class="s1">&#39;t.multicall=,</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;t.</span><span class="si">{}</span><span class="s1">=&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">])))</span>
+        <span class="n">stuck</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+
+        <span class="n">view</span> <span class="o">=</span> <span class="s1">&#39;tagged&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">to_tagged</span> <span class="ow">and</span> <span class="n">view</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">proxy</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">list</span><span class="p">():</span>
+            <span class="n">proxy</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">xmlrpc</span><span class="o">.</span><span class="n">NOHASH</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&gt;5s}</span><span class="s1">  </span><span class="si">{:&gt;2s}</span><span class="s1">  </span><span class="si">{:&gt;5s}</span><span class="s1">  </span><span class="si">{:&gt;5s}</span><span class="s1"> </span><span class="si">{:&gt;6s}</span><span class="s1">  </span><span class="si">{:&gt;13s}</span><span class="s1">  </span><span class="si">{:40s}</span><span class="s1">  </span><span class="si">{}</span><span class="s1">&#39;</span>
+              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;S#&#39;</span><span class="p">,</span> <span class="s1">&#39;T#&#39;</span><span class="p">,</span> <span class="s1">&#39;OK&#39;</span><span class="p">,</span> <span class="s1">&#39;Error&#39;</span><span class="p">,</span> <span class="s1">&#39;Scrape&#39;</span><span class="p">,</span> <span class="s1">&#39;Last Announce&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;Infohash&#39;</span><span class="p">,</span> <span class="s1">&#39;Tracker Domain&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">trackers</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">trackers</span> <span class="o">=</span> <span class="p">[</span><span class="n">t_multicall</span><span class="p">(</span><span class="o">*</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trackers</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">is_enabled</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trackers</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">stuck_only</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">to_tagged</span><span class="p">:</span>
+                    <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">push_back_unique</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
+                    <span class="n">proxy</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
+                <span class="n">domain</span> <span class="o">=</span> <span class="s1">&#39;ALL TRACKERS DISABLED&#39;</span> <span class="k">if</span> <span class="n">trackers</span> <span class="k">else</span> <span class="s1">&#39;NO TRACKERS&#39;</span>
+                <span class="n">stuck</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{i:5d}</span><span class="s1">  </span><span class="si">{n:&gt;2s}</span><span class="s1">  </span><span class="si">{n:&gt;5s}</span><span class="s1">  </span><span class="si">{n:&gt;5s}</span><span class="s1">  </span><span class="si">{n:&gt;5s}</span><span class="s1">  </span><span class="si">{delta:&gt;13s}</span><span class="s1">  </span><span class="si">{hash}</span><span class="s1">  </span><span class="si">{domain}</span><span class="s1">&#39;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="nb">hash</span><span class="o">=</span><span class="n">infohash</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="s1">&#39;N/A&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trackers</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">t</span><span class="o">.</span><span class="n">activity_time_last</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">all</span> <span class="ow">or</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">normal_interval</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">to_tagged</span><span class="p">:</span>
+                        <span class="n">proxy</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">push_back_unique</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
+                        <span class="n">proxy</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">infohash</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
+                    <span class="n">domain</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">stuck</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{i:5d}</span><span class="s1">  </span><span class="si">{n:2d}</span><span class="s1">  &#39;</span>
+                          <span class="s1">&#39;</span><span class="si">{t.success_counter:5d}</span><span class="s1">  </span><span class="si">{t.scrape_counter:5d}</span><span class="s1">  </span><span class="si">{t.failed_counter:5d}</span><span class="s1">  &#39;</span>
+                          <span class="s1">&#39;</span><span class="si">{delta}</span><span class="s1">  </span><span class="si">{hash}</span><span class="s1">  </span><span class="si">{domain}</span><span class="s1">&#39;</span>
+                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="nb">hash</span><span class="o">=</span><span class="n">infohash</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+                                  <span class="n">delta</span><span class="o">=</span><span class="n">fmt</span><span class="o">.</span><span class="n">human_duration</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">activity_time_last</span><span class="p">,</span>
+                                                           <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">short</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">stuck</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">to_tagged</span><span class="p">:</span>
+                <span class="n">proxy</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">current_view</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stuck items: TOTAL=</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">stuck</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">stuck</span><span class="o">.</span><span class="n">most_common</span><span class="p">()])))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;XMLRPC stats: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">proxy</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rt-stuck-trackers.py">full rt-stuck-trackers script</a> for all the details.
+If you call it, this is what you get:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docs/examples/rt-stuck-trackers.py -a
+<span class="go">   S#  T#     OK  Error Scrape  Last Announce  Infohash      Tracker Domain</span>
+<span class="go">    1   1    180      4      0    53m 48s ago  00……………………FF  tracker.example.com</span>
+<span class="go">INFO     Stuck items: TOTAL=1, tracker.example.com=1</span>
+<span class="go">INFO     Total time: 0.163 seconds.</span>
+</pre></div>
+</div>
+<p>The index shown is the item’s position in the <code class="docutils literal notranslate"><span class="pre">started</span></code> view.</p>
+</section>
+</section>
+</section>
+<section id="writing-custom-jobs">
+<span id="torque-custom-jobs"></span><h2>Writing Custom Jobs<a class="headerlink" href="#writing-custom-jobs" title="Permalink to this headline">¶</a></h2>
+<p>First off, you really need to know a good amount of Python to be able to do this.
+But if you do, you can easily add your own background processing,
+more versatile and more efficient than calling <code class="docutils literal notranslate"><span class="pre">rtcontrol</span></code> in a cron job.
+The description here is terse, and mostly just tells you where to look for code examples,
+and the basics of how a job implementation interacts with the core system.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While some effort will be spent on keeping the API backwards compatible,
+there is no guarantee of a stable API.
+Follow the commit log and changelogs of releases
+to get notified when you need to adapt your code.</p>
+</div>
+<p>Jobs are created during <code class="docutils literal notranslate"><span class="pre">pyrotorque</span></code> startup and registered with the scheduler.
+Configuration is taken from the <code class="docutils literal notranslate"><span class="pre">[TORQUE]</span></code> section of <code class="docutils literal notranslate"><span class="pre">torque.ini</span></code>,
+and any <code class="docutils literal notranslate"><span class="pre">job.«job-name».«param-name»</span></code> setting contributes to a job named <code class="docutils literal notranslate"><span class="pre">job-name</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">handler</span></code>, <code class="docutils literal notranslate"><span class="pre">schedule</span></code>, and <code class="docutils literal notranslate"><span class="pre">active</span></code> settings are used by the core,
+the rest is passed to the <code class="docutils literal notranslate"><span class="pre">handler</span></code> class for customization and depends on the job type.</p>
+<p>To locate the job implementation, <code class="docutils literal notranslate"><span class="pre">handler</span></code> contains a <code class="docutils literal notranslate"><span class="pre">module.path:ClassName</span></code> coordinate of its class.
+So <code class="docutils literal notranslate"><span class="pre">job.foo.handler</span> <span class="pre">=</span> <span class="pre">my.code:FooJob</span></code> registers <code class="docutils literal notranslate"><span class="pre">FooJob</span></code> under the name <code class="docutils literal notranslate"><span class="pre">foo</span></code>.
+This means a job can be scheduled several times,
+given the right configuration and if the job implementation is designed for it.
+The given module must be importable of course,
+i.e. <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> it into your <code class="docutils literal notranslate"><span class="pre">pyrocore</span></code> virtualenv.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">schedule</span></code> defines the call frequency of the job’s <code class="docutils literal notranslate"><span class="pre">run</span></code> method,
+and <code class="docutils literal notranslate"><span class="pre">active</span></code> allows to easily disable a job without removing its configuration
+– which is used to provide all the default jobs and their settings.
+A job with <code class="docutils literal notranslate"><span class="pre">active</span> <span class="pre">=</span> <span class="pre">False</span></code> is simply ignored and not added to the scheduler on startup.</p>
+<p>The most simple of jobs is the <a class="reference internal" href="apidoc/pyrosimple.torrent.html#pyrosimple.torrent.jobs.EngineStats" title="pyrosimple.torrent.jobs.EngineStats"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EngineStats</span></code></a> one.
+Click on the link and then on <code class="docutils literal notranslate"><span class="pre">[source]</span></code> to see its source code.
+Some noteworthy facts:</p>
+<ul class="simple">
+<li><p>the initializer gets passed a <code class="docutils literal notranslate"><span class="pre">config</span></code> parameter, holding all the settings from <code class="docutils literal notranslate"><span class="pre">torque.ini</span></code>
+for a particular job instance, with the <code class="docutils literal notranslate"><span class="pre">job.«name»</span></code> prefix removed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pyrocore.config</span></code> is imported as <code class="docutils literal notranslate"><span class="pre">config_ini</span></code>, to not clash with the <code class="docutils literal notranslate"><span class="pre">config</span></code> dict passed into jobs.</p></li>
+<li><p>create a <code class="docutils literal notranslate"><span class="pre">LOG</span></code> attribute as shown, for your logging needs.</p></li>
+<li><p>to interact with <em>rTorrent</em>, open a proxy connection in <code class="docutils literal notranslate"><span class="pre">run</span></code>.</p></li>
+<li><p>raise <a class="reference internal" href="apidoc/pyrosimple.html#pyrosimple.error.UserError" title="pyrosimple.error.UserError"><code class="xref any py py-exc docutils literal notranslate"><span class="pre">UserError</span></code></a> in the initializer to report configuration mishaps and prevent <code class="docutils literal notranslate"><span class="pre">pyrotorque</span></code> from starting.</p></li>
+</ul>
+<p>More complex jobs that you can look at are the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pyrocore.torrent.watch.TreeWatch</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pyrocore.torrent.queue.QueueManager</span></code> ones.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="advanced.html" class="btn btn-neutral float-left" title="Advanced Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="troubleshooting.html" class="btn btn-neutral float-right" title="Trouble-Shooting Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

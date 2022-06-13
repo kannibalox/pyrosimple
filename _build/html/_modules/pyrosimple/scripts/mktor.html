@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.scripts.mktor &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.scripts.mktor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.scripts.mktor</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=</span>
+<span class="sd">&quot;&quot;&quot; Metafile Creator.</span>
+
+<span class="sd">    Copyright (c) 2009, 2010, 2011 The PyroScope Project &lt;pyroscope.project@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along</span>
+<span class="c1"># with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="c1"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">bencode</span>
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.scripts.base</span> <span class="kn">import</span> <span class="n">ScriptBase</span><span class="p">,</span> <span class="n">ScriptBaseWithConfig</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">metafile</span><span class="p">,</span> <span class="n">os</span>
+
+
+<div class="viewcode-block" id="MetafileCreator"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.mktor.MetafileCreator">[docs]</a><span class="k">class</span> <span class="nc">MetafileCreator</span><span class="p">(</span><span class="n">ScriptBaseWithConfig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a bittorrent metafile.</span>
+
+<span class="sd">    If passed a magnet URI as the only argument, a metafile is created</span>
+<span class="sd">    in the directory specified via the configuration value &#39;magnet_watch&#39;,</span>
+<span class="sd">    loadable by rTorrent. Which means you can register &#39;mktor&#39; as a magnet:</span>
+<span class="sd">    URL handler in Firefox.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># argument description for the usage information</span>
+    <span class="n">ARGS_HELP</span> <span class="o">=</span> <span class="s2">&quot;&lt;dir-or-file&gt; &lt;tracker-url-or-alias&gt;... | &lt;magnet-uri&gt;&quot;</span>
+
+    <span class="n">ENTROPY_BITS</span> <span class="o">=</span> <span class="mi">512</span>
+
+<div class="viewcode-block" id="MetafileCreator.add_options"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.mktor.MetafileCreator.add_options">[docs]</a>    <span class="k">def</span> <span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add program options.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MetafileCreator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_options</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--private&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;disallow DHT and PEX&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span><span class="s2">&quot;--no-date&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;leave out creation date&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--output-filename&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;PATH&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;optional file name (or target directory) for the metafile&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--root-name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NAME&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;optional root name (default is basename of the data path)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;-x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--exclude&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;PATTERN [-x ...]&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;exclude files matching a glob pattern from hashing&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;--comment&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;optional human-readable comment&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--set&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;KEY=VAL [-s ...]&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set a specific key to the given value; omit the &#39;=&#39; to delete a key&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;--no-cross-seed&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;do not automatically add a field to the info dict ensuring unique info hashes&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_value_option</span><span class="p">(</span>
+            <span class="s2">&quot;-X&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--cross-seed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;LABEL&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set additional explicit label for cross-seeding&quot;</span>
+            <span class="s2">&quot; (changes info hash, use &#39;@entropy&#39; to randomize it)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bool_option</span><span class="p">(</span>
+            <span class="s2">&quot;-H&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--hashed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--fast-resume&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;create second metafile containing libtorrent fast-resume information&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="c1"># TODO: Optionally pass torrent directly to rTorrent (--load / --start)</span>
+    <span class="c1"># TODO: Optionally limit disk I/O bandwidth used (incl. a config default!)</span>
+    <span class="c1"># TODO: Set &quot;encoding&quot; correctly</span>
+    <span class="c1"># TODO: Support multi-tracker extension (&quot;announce-list&quot; field)</span>
+    <span class="c1"># TODO: DHT &quot;nodes&quot; field?! [[str IP, int port], ...]</span>
+    <span class="c1"># TODO: Web-seeding http://www.getright.com/seedtorrent.html</span>
+    <span class="c1">#       field &#39;url-list&#39;: [&#39;http://...&#39;] on top-level</span>
+
+<div class="viewcode-block" id="MetafileCreator.make_magnet_meta"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.mktor.MetafileCreator.make_magnet_meta">[docs]</a>    <span class="k">def</span> <span class="nf">make_magnet_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">magnet_uri</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a magnet-uri torrent.&quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">cgi</span>
+        <span class="kn">import</span> <span class="nn">hashlib</span>
+
+        <span class="k">if</span> <span class="n">magnet_uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;magnet:&quot;</span><span class="p">):</span>
+            <span class="n">magnet_uri</span> <span class="o">=</span> <span class="n">magnet_uri</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;magnet-uri&quot;</span><span class="p">:</span> <span class="s2">&quot;magnet:&quot;</span> <span class="o">+</span> <span class="n">magnet_uri</span><span class="p">}</span>
+        <span class="n">magnet_params</span> <span class="o">=</span> <span class="n">cgi</span><span class="o">.</span><span class="n">parse_qs</span><span class="p">(</span><span class="n">magnet_uri</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">))</span>
+
+        <span class="n">meta_name</span> <span class="o">=</span> <span class="n">magnet_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xt&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">magnet_uri</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;dn&quot;</span> <span class="ow">in</span> <span class="n">magnet_params</span><span class="p">:</span>
+            <span class="n">meta_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">magnet_params</span><span class="p">[</span><span class="s2">&quot;dn&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">meta_name</span><span class="p">)</span>
+        <span class="n">meta_name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^-_,a-zA-Z0-9]+&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">meta_name</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;urn.btih.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">magnet_watch</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;You MUST set the &#39;magnet_watch&#39; config option!&quot;</span><span class="p">)</span>
+        <span class="n">meta_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">magnet_watch</span><span class="p">,</span> <span class="s2">&quot;magnet-</span><span class="si">%s</span><span class="s2">.torrent&quot;</span> <span class="o">%</span> <span class="n">meta_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Writing magnet-uri metafile </span><span class="si">%r</span><span class="s2">...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">meta_path</span><span class="p">,))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bencode</span><span class="o">.</span><span class="n">bwrite</span><span class="p">(</span><span class="n">meta_path</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">EnvironmentError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span>
+                <span class="s2">&quot;Error writing magnet-uri metafile </span><span class="si">%r</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span>
+                <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">meta_path</span><span class="p">,</span>
+                    <span class="n">exc</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="MetafileCreator.mainloop"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.mktor.MetafileCreator.mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The main loop.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="s2">&quot;=urn:btih:&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="c1"># Handle magnet link</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">make_magnet_meta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;Expected a path and at least one announce URL, got: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">),)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create and configure metafile factory</span>
+        <span class="n">datapath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+        <span class="n">metapath</span> <span class="o">=</span> <span class="n">datapath</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_filename</span><span class="p">:</span>
+            <span class="n">metapath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_filename</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">metapath</span><span class="p">):</span>
+                <span class="n">metapath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metapath</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">datapath</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metapath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.torrent&quot;</span><span class="p">):</span>
+            <span class="n">metapath</span> <span class="o">+=</span> <span class="s2">&quot;.torrent&quot;</span>
+        <span class="n">torrent</span> <span class="o">=</span> <span class="n">metafile</span><span class="o">.</span><span class="n">Metafile</span><span class="p">(</span><span class="n">metapath</span><span class="p">)</span>
+        <span class="n">torrent</span><span class="o">.</span><span class="n">ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">exclude</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">meta</span><span class="p">):</span>
+            <span class="s2">&quot;Callback to set label and resume data.&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">cross_seed</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">cross_seed</span> <span class="o">==</span> <span class="s2">&quot;@entropy&quot;</span><span class="p">:</span>
+                    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">][</span><span class="s2">&quot;entropy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span>
+                        <span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ENTROPY_BITS</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ENTROPY_BITS</span> <span class="o">//</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">][</span><span class="s2">&quot;x_cross_seed_label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">cross_seed</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">no_cross_seed</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">][</span><span class="s2">&quot;x_cross_seed&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Set specific keys?</span>
+            <span class="n">metafile</span><span class="o">.</span><span class="n">assign_fields</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">set</span><span class="p">)</span>
+
+        <span class="c1"># Create and write the metafile(s)</span>
+        <span class="c1"># TODO: make it work better with multiple trackers (hash only once), also create fast-resume file for each tracker</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">torrent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">datapath</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+            <span class="n">progress</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">quiet</span> <span class="k">else</span> <span class="n">metafile</span><span class="o">.</span><span class="n">console_progress</span><span class="p">(),</span>
+            <span class="n">root_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">root_name</span><span class="p">,</span>
+            <span class="n">private</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">private</span><span class="p">,</span>
+            <span class="n">no_date</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">no_date</span><span class="p">,</span>
+            <span class="n">comment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">comment</span><span class="p">,</span>
+            <span class="n">created_by</span><span class="o">=</span><span class="s2">&quot;PyroScope&quot;</span><span class="p">,</span>
+            <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create second metafile with fast-resume?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">hashed</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">metafile</span><span class="o">.</span><span class="n">add_fast_resume</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">datapath</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">EnvironmentError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;Error making fast-resume data (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exc</span><span class="p">,))</span>
+                <span class="k">raise</span>
+
+            <span class="n">hashed_path</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\.torrent$&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">metapath</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-resume.torrent&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Writing fast-resume metafile </span><span class="si">%r</span><span class="s2">...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hashed_path</span><span class="p">,))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bencode</span><span class="o">.</span><span class="n">bwrite</span><span class="p">(</span><span class="n">hashed_path</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">EnvironmentError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span>
+                    <span class="s2">&quot;Error writing fast-resume metafile </span><span class="si">%r</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">hashed_path</span><span class="p">,</span>
+                        <span class="n">exc</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">raise</span></div></div>
+
+
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../apidoc/pyrosimple.scripts.html#pyrosimple.scripts.mktor.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
+    <span class="sd">&quot;&quot;&quot;The entry point.&quot;&quot;&quot;</span>
+    <span class="n">ScriptBase</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    <span class="n">MetafileCreator</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

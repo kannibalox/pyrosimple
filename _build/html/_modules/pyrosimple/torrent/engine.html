@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyrosimple.torrent.engine &mdash; pyrosimple 0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/custom.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pyrosimple
+            <img src="../../../_static/logo-75.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">User’s Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html">Migrating from pyrocore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#differences-in-cli-commands">Differences in CLI commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migrating.html#mktor">mktor</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">Tips &amp; How-Tos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../custom.html">Custom Python Code</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../troubleshooting.html">Trouble-Shooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tempita.html">Tempita Templating Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Experimental Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing Guidelines</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyrosimple</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../pyrosimple.html">pyrosimple</a> &raquo;</li>
+      <li>pyrosimple.torrent.engine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyrosimple.torrent.engine</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># pylint: disable=</span>
+<span class="sd">&quot;&quot;&quot; Torrent Engine Interface.</span>
+
+<span class="sd">    Copyright (c) 2009, 2010, 2011 The PyroScope Project &lt;pyroscope.project@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along</span>
+<span class="c1"># with this program; if not, write to the Free Software Foundation, Inc.,</span>
+<span class="c1"># 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">pyrosimple</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">error</span>
+<span class="kn">from</span> <span class="nn">pyrosimple.util</span> <span class="kn">import</span> <span class="n">os</span><span class="p">,</span> <span class="n">pymagic</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">traits</span><span class="p">,</span> <span class="n">matching</span><span class="p">,</span> <span class="n">metafile</span><span class="p">,</span> <span class="n">xmlrpc</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># Conversion Helpers</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="untyped"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.untyped">[docs]</a><span class="k">def</span> <span class="nf">untyped</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A type specifier for fields that does nothing.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="ratio_float"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.ratio_float">[docs]</a><span class="k">def</span> <span class="nf">ratio_float</span><span class="p">(</span><span class="n">intval</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert scaled integer ratio to a normalized float.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">intval</span> <span class="o">/</span> <span class="mf">1000.0</span></div>
+
+
+<div class="viewcode-block" id="percent"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.percent">[docs]</a><span class="k">def</span> <span class="nf">percent</span><span class="p">(</span><span class="n">floatval</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert float ratio to a percent value.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">floatval</span> <span class="o">*</span> <span class="mf">100.0</span></div>
+
+
+<span class="k">def</span> <span class="nf">_duration</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return time delta.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">end</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="k">elif</span> <span class="n">start</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_interval_split</span><span class="p">(</span>
+    <span class="n">interval</span><span class="p">,</span> <span class="n">only</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_re</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[A-Z][0-9]+&quot;</span><span class="p">)</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split C{interval} into a series of event type and timestamp tuples.</span>
+<span class="sd">    An exaple of the input is &quot;R1283008245P1283008268&quot;.</span>
+<span class="sd">    Returns events in reversed order (latest first).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">split_event</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="s2">&quot;Helper to parse events.&quot;</span>
+        <span class="n">kind</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">event</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">event</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">kind</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">):</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;custom_activations&quot;</span><span class="p">)</span>
+    <span class="c1">##import sys; print &gt;&gt;sys.stderr, &quot;!!!!!isplit&quot;, interval, event_re.findall(interval)</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">reversed</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">split_event</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">event_re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">only</span> <span class="ow">or</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">only</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_interval_sum</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return sum of intervals between &quot;R&quot;esume and &quot;P&quot;aused events</span>
+<span class="sd">    in C{interval}, optionally limited by a time window defined</span>
+<span class="sd">    by C{start} and C{end}. Return ``None`` if there&#39;s no sensible</span>
+<span class="sd">    information.</span>
+
+<span class="sd">    C{interval} is a series of event types and timestamps,</span>
+<span class="sd">    e.g. &quot;R1283008245P1283008268&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="k">if</span> <span class="n">end</span> <span class="k">else</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">_interval_split</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1">##import sys; print &gt;&gt;sys.stderr, &quot;!!!!!isum&quot;, interval.fetch(&quot;custom_activations&quot;), events, start, end</span>
+
+    <span class="k">while</span> <span class="n">events</span><span class="p">:</span>
+        <span class="n">event</span><span class="p">,</span> <span class="n">resumed</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="c1">##print &quot;~~~~~~~~~~&quot;, context, event, resumed</span>
+
+        <span class="k">if</span> <span class="n">event</span> <span class="o">!=</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
+            <span class="c1"># Ignore other events</span>
+            <span class="k">continue</span>
+        <span class="n">resumed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">resumed</span><span class="p">,</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">resumed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">events</span><span class="p">:</span>  <span class="c1"># Further events?</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">events</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>  <span class="c1"># If not followed by &quot;P&quot;, it&#39;s not a valid interval</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">paused</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">paused</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">paused</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Currently active, ends at time window</span>
+            <span class="n">paused</span> <span class="o">=</span> <span class="n">end</span>
+
+        <span class="c1">##print &quot;~~~~~~~~~~ R: %r, P: %r&quot; % (resumed, paused)</span>
+        <span class="c1">##print &quot;~~~~~~~~~~ I: %r&quot; % (paused - resumed)</span>
+        <span class="k">if</span> <span class="n">resumed</span> <span class="o">&gt;=</span> <span class="n">paused</span><span class="p">:</span>
+            <span class="c1"># Ignore empty intervals</span>
+            <span class="k">continue</span>
+
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">paused</span> <span class="o">-</span> <span class="n">resumed</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">if</span> <span class="n">result</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_fmt_duration</span><span class="p">(</span><span class="n">duration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format duration value.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">human_duration</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_fmt_tags</span><span class="p">(</span><span class="n">tagset</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert set of strings to sorted space-separated list as a string.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tagset</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_fmt_files</span><span class="p">(</span><span class="n">filelist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Produce a file listing.&quot;&quot;&quot;</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">)</span>
+    <span class="n">pad</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\uFFFE</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">depth</span>
+
+    <span class="n">base_indent</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">38</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prev_path</span> <span class="o">=</span> <span class="n">pad</span>
+    <span class="n">sorted_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">pad</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">filelist</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="n">sorted_files</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="n">depth</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">!=</span> <span class="n">prev_path</span><span class="p">:</span>
+            <span class="n">common</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">depth</span><span class="p">]</span>
+                <span class="o">+</span> <span class="p">[</span>
+                    <span class="n">idx</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">prev_name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prev_path</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">dirname</span> <span class="o">!=</span> <span class="n">prev_name</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="c1"># result.append(&quot;!!%r %r&quot; % (indent, common))</span>
+            <span class="c1"># result.append(&quot;!!%r&quot; % (prev_path,))</span>
+            <span class="c1"># result.append(&quot;!!%r&quot; % (path,))</span>
+
+            <span class="k">while</span> <span class="n">indent</span> <span class="o">&gt;</span> <span class="n">common</span><span class="p">:</span>
+                <span class="n">indent</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">/&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">base_indent</span><span class="p">,</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">dirname</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[</span><span class="n">common</span><span class="p">:]:</span>
+                <span class="k">if</span> <span class="n">dirname</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\uFFFE</span><span class="s2">&quot;</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="se">\\</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">base_indent</span><span class="p">,</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="p">,</span> <span class="n">dirname</span><span class="p">))</span>
+                <span class="n">indent</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1">##result.append(&quot;!!%r %r&quot; % (path, name))</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">&quot;  </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">| </span><span class="si">%s</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span>
+                <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;off &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;    &quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fileinfo</span><span class="o">.</span><span class="n">prio</span><span class="p">,</span> <span class="s2">&quot;????&quot;</span><span class="p">),</span>
+                <span class="n">fmt</span><span class="o">.</span><span class="n">iso_datetime</span><span class="p">(</span><span class="n">fileinfo</span><span class="o">.</span><span class="n">mtime</span><span class="p">),</span>
+                <span class="n">fmt</span><span class="o">.</span><span class="n">human_size</span><span class="p">(</span><span class="n">fileinfo</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+                <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">prev_path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="k">while</span> <span class="n">indent</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">indent</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">/&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">base_indent</span><span class="p">,</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="p">))</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">= </span><span class="si">%d</span><span class="s2"> file(s)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">base_indent</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">filelist</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="detect_traits"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.detect_traits">[docs]</a><span class="k">def</span> <span class="nf">detect_traits</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build traits list from attributes of the passed item. Currently,</span>
+<span class="sd">    &quot;kind_51&quot;, &quot;name&quot; and &quot;alias&quot; are considered.</span>
+
+<span class="sd">    See pyrosimple.util.traits:dectect_traits for more details.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">traits</span><span class="o">.</span><span class="n">detect_traits</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">alias</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">alias</span><span class="p">,</span>
+        <span class="n">filetype</span><span class="o">=</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;kind_51&quot;</span><span class="p">))</span> <span class="ow">or</span> <span class="p">[</span><span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1">#</span>
+<span class="c1"># Field Descriptors</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="FieldDefinition"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.FieldDefinition">[docs]</a><span class="k">class</span> <span class="nc">FieldDefinition</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download item field.&quot;&quot;&quot;</span>
+
+    <span class="n">FIELDS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="FieldDefinition.lookup"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.FieldDefinition.lookup">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Try to find field C{name}.</span>
+
+<span class="sd">        @return: Field descriptions, see C{matching.ConditionParser} for details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FIELDS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># Is it a custom attribute?</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="n">TorrentProxy</span><span class="o">.</span><span class="n">add_manifold_attribute</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;matcher&quot;</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">_matcher</span><span class="p">}</span> <span class="k">if</span> <span class="n">field</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">valtype</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">doc</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">engine_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valtype</span> <span class="o">=</span> <span class="n">valtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_name</span> <span class="o">=</span> <span class="n">engine_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_accessor</span> <span class="o">=</span> <span class="n">accessor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_matcher</span> <span class="o">=</span> <span class="n">matcher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formatter</span> <span class="o">=</span> <span class="n">formatter</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">FieldDefinition</span><span class="o">.</span><span class="n">FIELDS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;INTERNAL ERROR: Duplicate field definition&quot;</span><span class="p">)</span>
+        <span class="n">FieldDefinition</span><span class="o">.</span><span class="n">FIELDS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a representation of internal state.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%r</span><span class="s2">, </span><span class="si">%r</span><span class="s2">, </span><span class="si">%r</span><span class="s2">)&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valtype</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">valtype</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_accessor</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_accessor</span> <span class="k">else</span> <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__delete__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t delete field </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,))</span></div>
+
+
+<div class="viewcode-block" id="ImmutableField"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.ImmutableField">[docs]</a><span class="k">class</span> <span class="nc">ImmutableField</span><span class="p">(</span><span class="n">FieldDefinition</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read-only download item field.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__set__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Immutable field </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,))</span></div>
+
+
+<div class="viewcode-block" id="ConstantField"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.ConstantField">[docs]</a><span class="k">class</span> <span class="nc">ConstantField</span><span class="p">(</span><span class="n">ImmutableField</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read-only download item field with constant value.&quot;&quot;&quot;</span></div>
+
+    <span class="c1"># This can be cached</span>
+
+
+<div class="viewcode-block" id="DynamicField"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.DynamicField">[docs]</a><span class="k">class</span> <span class="nc">DynamicField</span><span class="p">(</span><span class="n">ImmutableField</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read-only download item field with dynamic value.&quot;&quot;&quot;</span></div>
+
+    <span class="c1"># This cannot be cached</span>
+
+
+<div class="viewcode-block" id="OnDemandField"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.OnDemandField">[docs]</a><span class="k">class</span> <span class="nc">OnDemandField</span><span class="p">(</span><span class="n">DynamicField</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Field that is fetched on first access only.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">_fields</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MutableField"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.MutableField">[docs]</a><span class="k">class</span> <span class="nc">MutableField</span><span class="p">(</span><span class="n">FieldDefinition</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Writable download item field&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__set__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<span class="c1">#</span>
+<span class="c1"># [Somewhat] Generic Engine Interface (abstract base classes)</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="TorrentProxy"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy">[docs]</a><span class="k">class</span> <span class="nc">TorrentProxy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A single download item.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TorrentProxy.add_manifold_attribute"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.add_manifold_attribute">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_manifold_attribute</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Register a manifold engine attribute.</span>
+
+<span class="sd">        @return: field definition object, or None if &quot;name&quot; isn&#39;t a manifold attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;custom_&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">FieldDefinition</span><span class="o">.</span><span class="n">FIELDS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">field</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;custom attribute </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>  <span class="c1"># add field to all proxy objects</span>
+
+                <span class="k">return</span> <span class="n">field</span>
+        <span class="k">elif</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;kind_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">FieldDefinition</span><span class="o">.</span><span class="n">FIELDS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">limit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">limit</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">error</span><span class="o">.</span><span class="n">UserError</span><span class="p">(</span><span class="s2">&quot;kind_N: N &gt; 100 in </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">field</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+                    <span class="nb">set</span><span class="p">,</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;kinds of files that make up more than </span><span class="si">%d%%</span><span class="s2"> of this item&#39;s size&quot;</span>
+                    <span class="o">%</span> <span class="n">limit</span><span class="p">,</span>
+                    <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TaggedAsFilter</span><span class="p">,</span>
+                    <span class="n">formatter</span><span class="o">=</span><span class="n">_fmt_tags</span><span class="p">,</span>
+                    <span class="n">engine_name</span><span class="o">=</span><span class="s2">&quot;kind_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">limit</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">field</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.add_custom_fields"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.add_custom_fields">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_custom_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add any custom fields defined in the configuration.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">factory</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">custom_field_factories</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">factory</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize object.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make item hashable for Python.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare items based on their infohash.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">other</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a representation of internal state.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+            <span class="s2">&quot;helper to hide sensitive stuff&quot;</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tracker&quot;</span><span class="p">,</span> <span class="s2">&quot;custom_m_alias&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">key</span><span class="p">,</span> <span class="n">metafile</span><span class="o">.</span><span class="n">mask_keys</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span>
+
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">field</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">FieldDefinition</span><span class="o">.</span><span class="n">FIELDS</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">_accessor</span> <span class="ow">or</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">=</span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mask</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="p">[</span>
+                        <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">=</span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mask</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span> <span class="o">-</span> <span class="n">attrs</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="TorrentProxy.fetch"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.fetch">[docs]</a>    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">engine_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a field on demand.</span>
+
+<span class="sd">        &quot;engine_name&quot; is the internal name of the client engine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.datapath"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.datapath">[docs]</a>    <span class="k">def</span> <span class="nf">datapath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get an item&#39;s data path.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.announce_urls"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.announce_urls">[docs]</a>    <span class="k">def</span> <span class="nf">announce_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[]):</span>  <span class="c1"># pylint: disable=dangerous-default-value</span>
+        <span class="sd">&quot;&quot;&quot;Get a list of all announce URLs.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.start"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;(Re-)start downloading or seeding.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.stop"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stop and close download.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.ignore"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.ignore">[docs]</a>    <span class="k">def</span> <span class="nf">ignore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set ignore status.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.tag"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.tag">[docs]</a>    <span class="k">def</span> <span class="nf">tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add or remove tags.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.set_throttle"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.set_throttle">[docs]</a>    <span class="k">def</span> <span class="nf">set_throttle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Assign to throttle group.&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: A better way would be to have a MutableField class, i.e. item.throttle = &quot;name&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.set_custom"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.set_custom">[docs]</a>    <span class="k">def</span> <span class="nf">set_custom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a custom value. C{key} might have the form &quot;key=value&quot; when value is C{None}.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.hash_check"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.hash_check">[docs]</a>    <span class="k">def</span> <span class="nf">hash_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Hash check a download.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.delete"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove torrent from client.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentProxy.flush"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentProxy.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write volatile data to disk.&quot;&quot;&quot;</span></div>
+        <span class="c1"># This can be empty in derived classes</span>
+
+    <span class="c1"># Basic fields</span>
+    <span class="nb">hash</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;hash&quot;</span><span class="p">,</span> <span class="s2">&quot;info hash&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;name (file or root directory)&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span>
+    <span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="s2">&quot;data size&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">ByteSizeFilter</span><span class="p">)</span>
+    <span class="n">prio</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;prio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;priority (0=off, 1=low, 2=normal, 3=high)&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;X- +&quot;</span><span class="p">[</span><span class="n">val</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">tracker</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;tracker&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;first in the list of announce URLs&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">announce_urls</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">])</span> <span class="ow">or</span> <span class="p">[</span><span class="kc">None</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">alias</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">map_announce2alias</span><span class="p">,</span>
+        <span class="s2">&quot;alias&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tracker alias or domain&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">_memoize</span><span class="p">(</span><span class="s2">&quot;alias&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="s2">&quot;tracker&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="c1"># matcher=matching.PatternFilter, accessor=operator.attrgetter(&quot;tracker&quot;))</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;current tracker message&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span>
+    <span class="p">)</span>
+
+    <span class="c1"># State</span>
+    <span class="n">is_private</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;is_private&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;private flag set (no DHT/PEX)?&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;PRV&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;PUB&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">is_open</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;is_open&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;download open?&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;OPN&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;CLS&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;is_active&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;download active?&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;ACT&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;STP&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">is_complete</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;is_complete&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;download complete?&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;DONE&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;PART&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">is_multi_file</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;is_multi_file&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;single- or multi-file download?&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;DIR &quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;FILE&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">is_ignored</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;is_ignored&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ignore commands?&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;IGN!&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;HEED&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">is_ghost</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;is_ghost&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;has no data file or directory?&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">BoolFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">datapath</span><span class="p">())</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">datapath</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s2">&quot;GHST&quot;</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="s2">&quot;DATA&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Paths</span>
+    <span class="sd">&quot;&quot;&quot; Shining a light on the naming and paths mess:</span>
+
+<span class="sd">        hash=xxx</span>
+<span class="sd">        for i in d.name d.base_filename d.base_path d.directory d.directory_base d.is_multi_file; do \</span>
+<span class="sd">            echo -n &quot;$(printf &#39;%20.20s &#39; $i)&quot;; rtxmlrpc $i $hash</span>
+<span class="sd">        done</span>
+
+<span class="sd">        Basics:</span>
+<span class="sd">            * d.base_filename is always the basename of d.base_path</span>
+<span class="sd">            * d.directory_base and d.directory are always the same</span>
+<span class="sd">            * d.base_filename and d.base_path are empty on closed items, after a restart, i.e. not too useful (since 0.9.1 or so)</span>
+
+<span class="sd">        Behaviour of d.directory.set + d.directory_base.set (tested with 0.9.4):</span>
+<span class="sd">            * d.base_path always remains unchanged, and item gets closed</span>
+<span class="sd">            * d.start sets d.base_path if resume data ok</span>
+<span class="sd">            * single:</span>
+<span class="sd">                * d.directory[_base].set → d.name NEVER appended (only in d.base_path)</span>
+<span class="sd">                * after start, d.base_path := d.directory/d.name</span>
+<span class="sd">            * multi:</span>
+<span class="sd">                * d.directory.set → d.name is appended</span>
+<span class="sd">                * d.directory_base.set → d.name is NOT appended (i.e. item renamed to last path part)</span>
+<span class="sd">                * after start, d.base_path := d.directory</span>
+
+<span class="sd">        Making sense of it (trying to at least):</span>
+<span class="sd">            * d.directory is *always* a directory (thus, single items auto-append d.name in d.base_path and cannot be renamed)</span>
+<span class="sd">            * d.directory_base.set means set path PLUS basename together for a multi item (thus allowing a rename)</span>
+<span class="sd">            * only d.directory.set behaves consistently for single+multi, regarding the end result in d.base_path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;directory&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;directory containing download data&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;path to download data&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">datapath</span><span class="p">(),</span>
+    <span class="p">)</span>
+    <span class="n">realpath</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;realpath&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;real path to download data&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">datapath</span><span class="p">()),</span>
+    <span class="p">)</span>
+    <span class="n">metafile</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;metafile&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;path to torrent file&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="s2">&quot;metafile&quot;</span><span class="p">])),</span>
+    <span class="p">)</span>
+    <span class="n">sessionfile</span> <span class="o">=</span> <span class="n">ConstantField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;sessionfile&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;path to session file&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;session_file&quot;</span><span class="p">))),</span>
+    <span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">,</span>
+        <span class="s2">&quot;files&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;list of files in this item&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FilesFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">_fmt_files</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fno</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;fno&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;number of files in this item&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">,</span>
+        <span class="n">engine_name</span><span class="o">=</span><span class="s2">&quot;size_files&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Bandwidth &amp; Data Transfer</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="n">percent</span><span class="p">,</span> <span class="s2">&quot;done&quot;</span><span class="p">,</span> <span class="s2">&quot;completion in percent&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span>
+    <span class="p">)</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="n">ratio_float</span><span class="p">,</span>
+        <span class="s2">&quot;ratio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;normalized ratio (1:1 = 1.0)&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">FloatFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">uploaded</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;uploaded&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;amount of uploaded data&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">ByteSizeFilter</span><span class="p">,</span>
+        <span class="n">engine_name</span><span class="o">=</span><span class="s2">&quot;up_total&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">xfer</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;xfer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;transfer rate&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">ByteSizeFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;up&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;down&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="c1"># last_xfer = DynamicField(int, &quot;last_xfer&quot;, &quot;last time data was transferred&quot;, matcher=matching.TimeFilter,</span>
+    <span class="c1">#     accessor=lambda o: int(o.fetch(&quot;timestamp.last_xfer&quot;) or 0), formatter=fmt.iso_datetime_optional)</span>
+    <span class="n">down</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;down&quot;</span><span class="p">,</span> <span class="s2">&quot;download rate&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">ByteSizeFilter</span><span class="p">)</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">,</span> <span class="s2">&quot;upload rate&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">ByteSizeFilter</span><span class="p">)</span>
+    <span class="n">throttle</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;throttle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;throttle group name (NULL=unlimited, NONE=global)&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">PatternFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="s2">&quot;throttle&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Lifecyle</span>
+    <span class="n">loaded</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;loaded&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time metafile was loaded&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TimeFilterNotNull</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;custom_tm_loaded&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">fmt</span><span class="o">.</span><span class="n">iso_datetime_optional</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">started</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;started&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time download was FIRST started&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TimeFilterNotNull</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;custom_tm_started&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">fmt</span><span class="o">.</span><span class="n">iso_datetime_optional</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">leechtime</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="n">untyped</span><span class="p">,</span>
+        <span class="s2">&quot;leechtime&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time taken from start to completion&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">DurationFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">_interval_sum</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">o</span><span class="o">.</span><span class="n">completed</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">_duration</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">started</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">completed</span><span class="p">),</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">_fmt_duration</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">completed</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;completed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time download was finished&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TimeFilterNotNull</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;custom_tm_completed&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">fmt</span><span class="o">.</span><span class="n">iso_datetime_optional</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">seedtime</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="n">untyped</span><span class="p">,</span>
+        <span class="s2">&quot;seedtime&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;total seeding time after completion&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">DurationFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">_interval_sum</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">o</span><span class="o">.</span><span class="n">completed</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">is_complete</span>
+        <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">_fmt_duration</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># active = DynamicField(int, &quot;active&quot;, &quot;last time a peer was connected&quot;, matcher=matching.TimeFilter,</span>
+    <span class="c1">#    accessor=lambda o: int(o.fetch(&quot;timestamp.last_active&quot;) or 0), formatter=fmt.iso_datetime_optional)</span>
+    <span class="n">stopped</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;stopped&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time download was last stopped or paused&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TimeFilterNotNull</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="p">(</span><span class="n">_interval_split</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">only</span><span class="o">=</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])[</span><span class="mi">0</span><span class="p">][</span>
+            <span class="mi">1</span>
+        <span class="p">],</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">fmt</span><span class="o">.</span><span class="n">iso_datetime_optional</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Classification</span>
+    <span class="n">tagged</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">set</span><span class="p">,</span>
+        <span class="s2">&quot;tagged&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;has certain tags? (not related to the &#39;tagged&#39; view)&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TaggedAsFilter</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;custom_tags&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()),</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">_fmt_tags</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">views</span> <span class="o">=</span> <span class="n">OnDemandField</span><span class="p">(</span>
+        <span class="nb">set</span><span class="p">,</span>
+        <span class="s2">&quot;views&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;views this item is attached to&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TaggedAsFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">_fmt_tags</span><span class="p">,</span>
+        <span class="n">engine_name</span><span class="o">=</span><span class="s2">&quot;=views&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">kind</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">set</span><span class="p">,</span>
+        <span class="s2">&quot;kind&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ALL kinds of files in this item (the same as kind_0)&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TaggedAsFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="n">_fmt_tags</span><span class="p">,</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s2">&quot;kind_0&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">traits</span> <span class="o">=</span> <span class="n">DynamicField</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">,</span>
+        <span class="s2">&quot;traits&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;automatic classification of this item (audio, video, tv, movie, etc.)&quot;</span><span class="p">,</span>
+        <span class="n">matcher</span><span class="o">=</span><span class="n">matching</span><span class="o">.</span><span class="n">TaggedAsFilter</span><span class="p">,</span>
+        <span class="n">formatter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;misc&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">]),</span>
+        <span class="n">accessor</span><span class="o">=</span><span class="n">detect_traits</span><span class="p">,</span>
+    <span class="p">)</span></div>
+    <span class="c1"># = DynamicField(, &quot;&quot;, &quot;&quot;)</span>
+
+    <span class="c1"># TODO: metafile data cache (sqlite, shelve or maybe .ini)</span>
+    <span class="c1"># cache data indexed by hash</span>
+    <span class="c1"># store ctime per cache entry</span>
+    <span class="c1"># scan metafiles of new hashes not yet in cache</span>
+    <span class="c1"># on cache read, for unknown hashes setdefault() a purge date, then remove entries after a while</span>
+    <span class="c1"># clear purge date for known hashes (unloaded and then reloaded torrents)</span>
+    <span class="c1"># store a version marker and other global metadata in cache under key = None, so it can be upgraded</span>
+    <span class="c1"># add option to pyroadmin to inspect the cache, mainly for debugging</span>
+
+    <span class="c1"># TODO: created (metafile creation date, i.e. the bencoded field; same as downloaded if missing; cached by hash)</span>
+    <span class="c1"># add .age formatter (age = &quot; 1y 6m&quot;, &quot; 2w 6d&quot;, &quot;12h30m&quot;, etc.)</span>
+
+
+<div class="viewcode-block" id="TorrentView"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentView">[docs]</a><span class="k">class</span> <span class="nc">TorrentView</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A view on a subset of torrent items.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">engine</span><span class="p">,</span> <span class="n">viewname</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize view on torrent items.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">engine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewname</span> <span class="o">=</span> <span class="n">viewname</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matcher</span> <span class="o">=</span> <span class="n">matcher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch to attribute.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span>
+
+    <span class="k">def</span> <span class="nf">_check_hash_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return infohash if view name refers to a single item, else None.&quot;&quot;&quot;</span>
+        <span class="n">infohash</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+            <span class="n">infohash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewname</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewname</span><span class="p">)</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewname</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">infohash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewname</span>
+        <span class="k">return</span> <span class="n">infohash</span>
+
+<div class="viewcode-block" id="TorrentView.size"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentView.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Total unfiltered size of view.&quot;&quot;&quot;</span>
+        <span class="c1"># return len(self._fetch_items())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_hash_view</span><span class="p">():</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">open</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">xmlrpc</span><span class="o">.</span><span class="n">NOHASH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TorrentView.items"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentView.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get list of download items.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matcher</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matcher</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">item</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_items</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">item</span></div></div>
+
+
+<div class="viewcode-block" id="TorrentEngine"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine">[docs]</a><span class="k">class</span> <span class="nc">TorrentEngine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A torrent backend.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize torrent backend engine.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LOG</span> <span class="o">=</span> <span class="n">pymagic</span><span class="o">.</span><span class="n">get_class_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine_id</span> <span class="o">=</span> <span class="s2">&quot;N/A&quot;</span>  <span class="c1"># ID of the instance we&#39;re connecting to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine_software</span> <span class="o">=</span> <span class="s2">&quot;N/A&quot;</span>  <span class="c1"># Name and version of software</span>
+
+<div class="viewcode-block" id="TorrentEngine.load_config"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rcfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load engine configuration file.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentEngine.open"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open connection.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentEngine.log"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Log a message in the torrent client.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentEngine.view"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewname</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get list of download items.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">TorrentView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewname</span><span class="p">,</span> <span class="n">matcher</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TorrentEngine.items"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefetch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get list of download items.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentEngine.show"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualize a set of items (search result), and return the view name.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TorrentEngine.group_by"><a class="viewcode-back" href="../../../apidoc/pyrosimple.torrent.html#pyrosimple.torrent.engine.TorrentEngine.group_by">[docs]</a>    <span class="k">def</span> <span class="nf">group_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dict of lists of items, grouped by the given fields.</span>
+
+<span class="sd">        ``fields`` can be a string (one field) or an iterable of field names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">fields</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">key</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">fields</span><span class="p">)):</span>
+                <span class="s2">&quot;Helper to return group key tuple&quot;</span>
+                <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">names</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">(</span><span class="n">item</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
