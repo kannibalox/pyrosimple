@@ -108,7 +108,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                         f"Job '{name}' is missing the required '{key}' parameter"
                     )
             self.jobs[name] = dict(params)
-            if self.options().dry_run:
+            if self.options.dry_run:
                 self.jobs[name]["dry_run"] = True
             if params.get("active", False):
                 self.jobs[name]["handler"] = pymagic.import_name(params.handler)

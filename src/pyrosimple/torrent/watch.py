@@ -150,7 +150,6 @@ class MetafileHandler:
 
         self.addinfo()
 
-        # TODO: dry_run
         try:
             # TODO: Scrub metafile if requested
 
