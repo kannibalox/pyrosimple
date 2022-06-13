@@ -54,7 +54,7 @@ settings = Dynaconf(
             default='{%set ESC = "\x1B" %}{%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{%if d.is_open%}O{%else%} {%endif%}{%if  d.is_active%}A{%else%} {%endif%}{%if not d.is_complete%}{{ESC+"[36m"}}{{ "{:>3}".format(d.done | round | int) }}{{ESC+"[0m"}}{%else%}  D{%endif%} {{"{:>10}".format(d.size | filesizeformat(True))}} {%if d.message%}{{ESC+"[31m"}}{%endif%} {{d.alias.rjust(3)}}{{ESC+"[0m"}} {%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{{d.name}}{{ESC+"[0m"}}',
         ),
         Validator(
-            "FORMATS__filesize",
+            "FORMATS__filelist",
             default="{% for f in d.files %}{{d.realpath}}{% if d.is_multi_file %}/{{f.path}}{% endif %}{% if loop.index != loop.length %}\n{% endif %}{% endfor %}",
         ),
         Validator(
