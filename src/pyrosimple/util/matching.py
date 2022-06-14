@@ -612,6 +612,17 @@ class TimeFilter(NumericFilterBase):
 
                 if duration:
                     timestamp = now - timestamp
+                # Invert the value for more intuitive matching (in line with original code too)
+                # e.g. 'completed<1d' should return things completed less than one day *ago*
+                else:
+                    if self._op.name == "gt":
+                        self._op = Operators["le"]
+                    elif self._op.name == "ge":
+                        self._op = Operators["lt"]
+                    elif self._op.name == "lt":
+                        self._op = Operators["ge"]
+                    elif self._op.name == "le":
+                        self._op = Operators["gt"]
             else:
                 # Assume it's an absolute date
                 if "/" in self._value:
