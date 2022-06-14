@@ -417,7 +417,7 @@ def core_fields():
 
         if memoized_alias != new_alias:
             o.rpc_call("d.custom.set", ["memo_alias", new_alias])
-        return a
+        return new_alias
 
     yield ConstantField(
         str,
