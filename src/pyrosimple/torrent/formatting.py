@@ -88,8 +88,7 @@ def fmt_mtime(val: str) -> float:
     p = Path(str(val))
     if p.exists():
         return p.stat().st_mtime
-    else:
-        return 0.0
+    return 0.0
 
 
 def fmt_pathbase(val: str) -> str:

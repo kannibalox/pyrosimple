@@ -172,7 +172,7 @@ class MetafileHandler:
             self.job.LOG.debug(
                 "Templating values are:\n    %s"
                 % "\n    ".join(
-                    "{}={}".format(key, repr(val))
+                    f"{key}={repr(val)}"
                     for key, val in sorted(self.ns.items())
                 )
             )
@@ -182,10 +182,10 @@ class MetafileHandler:
                     f"Would load: {self.ns.pathname} with commands {self.ns.commands}"
                 )
                 return
-            else:
-                self.job.LOG.debug(
-                    f"Loading {self.ns.pathname} with commands {self.ns.commands}"
-                )
+
+            self.job.LOG.debug(
+                f"Loading {self.ns.pathname} with commands {self.ns.commands}"
+            )
 
             load_cmd(rpc.NOHASH, self.ns.pathname, *tuple(self.ns.commands))
             time.sleep(0.05)  # let things settle

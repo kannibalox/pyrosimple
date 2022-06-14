@@ -293,29 +293,29 @@ class PromptDecorator:
         """
         if self.script.options.yes:
             return True
-        elif self.script.options.dry_run or not self.script.options.interactive:
+        if self.script.options.dry_run or not self.script.options.interactive:
             return default
-        else:
-            # Let the user decide
-            choice = "*"
-            while choice not in "YNAQ":
-                choice = input(
-                    "%s? [%s)es, %s)o, a)ll yes, q)uit]: "
-                    % (
-                        question,
-                        "yY"[int(default)],
-                        "Nn"[int(default)],
-                    )
+
+        # Let the user decide
+        choice = "*"
+        while choice not in "YNAQ":
+            choice = input(
+                "%s? [%s)es, %s)o, a)ll yes, q)uit]: "
+                % (
+                    question,
+                    "yY"[int(default)],
+                    "Nn"[int(default)],
                 )
-                choice = choice[:1].upper() or "NY"[int(default)]
+            )
+            choice = choice[:1].upper() or "NY"[int(default)]
 
-            if choice == "Q":
-                self.quit()
-            if choice == "A":
-                self.script.options.yes = True
-                choice = "Y"
+        if choice == "Q":
+            self.quit()
+        if choice == "A":
+            self.script.options.yes = True
+            choice = "Y"
 
-            return choice == "Y"
+        return choice == "Y"
 
     def quit(self):
         """Exit the program due to user's choices."""

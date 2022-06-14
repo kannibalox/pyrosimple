@@ -125,8 +125,7 @@ def human_duration(
 
     if precision and short:
         return result.rjust(1 + precision * 4 + (4 if time2 else 0))
-    else:
-        return result
+    return result
 
 
 def convert_strings_in_iter(obj):
@@ -148,9 +147,8 @@ def rpc_result_to_string(result) -> str:
 
     if isinstance(result, str):
         return result
-    elif isinstance(result, bytes):
+    if isinstance(result, bytes):
         return result.decode()
-    elif hasattr(result, "__iter__"):
+    if hasattr(result, "__iter__"):
         return "\n".join(i if isinstance(i, str) else pformat(i) for i in result)
-    else:
-        return repr(result)
+    return repr(result)

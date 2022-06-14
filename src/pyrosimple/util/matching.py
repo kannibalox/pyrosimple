@@ -145,7 +145,7 @@ class GroupNode(MatcherNode):
         if self.invert:
             if inner.startswith('"not=$') and inner.endswith('"') and "\\" not in inner:
                 return inner[6:-1]  # double negation, return inner command
-            elif inner.startswith('"'):
+            if inner.startswith('"'):
                 inner = '"$' + inner[1:]
             else:
                 inner = "$" + inner
@@ -170,8 +170,7 @@ class AndNode(MatcherNode):
         if result:
             if int(config.settings.get("FAST_QUERY")) == 1 or len(result) == 1:
                 return result[0]  # using just one simple expression is safer
-            else:
-                return "and={%s}" % ",".join(result)
+            return "and={%s}" % ",".join(result)
         return ""
 
     def __repr__(self):
@@ -190,11 +189,10 @@ class OrNode(MatcherNode):
             return ""
         if len(self.children) == 1:
             return str(self.children[0].pre_filter())
-        else:
-            result = [x.pre_filter() for x in self.children]
-            result = [x for x in result if x]
-            if result:
-                return "or={%s}" % ",".join(result)
+        result = [x.pre_filter() for x in self.children]
+        result = [x for x in result if x]
+        if result:
+            return "or={%s}" % ",".join(result)
         return ""
 
     def __repr__(self):
@@ -460,9 +458,8 @@ class TaggedAsFilter(FieldFilter):
         if self._exact:
             # Equality check
             return self._value == set(tags)
-        else:
-            # Is given tag in list?
-            return self._value in tags
+        # Is given tag in list?
+        return self._value in tags
 
 
 class BoolFilter(FieldFilter):
@@ -503,10 +500,9 @@ class NumericFilterBase(FieldFilter):
         val = getattr(item, self._name) or 0
         if self.not_null and self._value and not val:
             return False
-        else:
-            # Grab the function from the native operator module
-            op = getattr(operator, self._op.name)
-            return bool(op(float(val), self._value))
+        # Grab the function from the native operator module
+        op = getattr(operator, self._op.name)
+        return bool(op(float(val), self._value))
 
 
 class FloatFilter(NumericFilterBase):
@@ -679,8 +675,7 @@ class DurationFilter(TimeFilter):
         if getattr(item, self._name) is None:
             # Never match "N/A" items, except when "-0" was specified
             return bool(self._value)
-        else:
-            return super().match(item)
+        return super().match(item)
 
 
 class ByteSizeFilter(NumericFilterBase):

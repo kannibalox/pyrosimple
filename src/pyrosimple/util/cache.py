@@ -42,8 +42,7 @@ class ExpiringCache(abc.MutableMapping):
             if expires_at == 0 or expires_at > time.time():
                 if with_age:
                     return item, expires_at - time.time()
-                else:
-                    return item
+                return item
             del self[key]
             raise KeyError(key)
 

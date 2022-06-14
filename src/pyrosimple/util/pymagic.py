@@ -71,7 +71,6 @@ class JSONEncoder(json.JSONEncoder):
         """Support more object types."""
         if isinstance(o, set):
             return list(sorted(o))
-        elif hasattr(o, "as_dict"):
+        if hasattr(o, "as_dict"):
             return o.as_dict()
-        else:
-            return super().default(o)
+        return super().default(o)

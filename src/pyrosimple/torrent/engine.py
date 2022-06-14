@@ -53,9 +53,8 @@ def _duration(start: Optional[float], end: Optional[float]) -> Optional[float]:
     if start and end:
         if start > end:
             return None
-        else:
-            return end - start
-    elif start:
+        return end - start
+    if start:
         return time.time() - start
     return None
 
@@ -747,10 +746,9 @@ class TorrentProxy:
 
         def mask(key, val):
             "helper to hide sensitive stuff"
-            if key in ("tracker", "custom_m_alias"):
+            if key in ("tracker", "custom_memo_alias"):
                 return key, metafile.mask_keys(val)
-            else:
-                return key, val
+            return key, val
 
         return "<{}({})>".format(
             self.__class__.__name__,
@@ -812,8 +810,7 @@ class TorrentView:
         """Total unfiltered size of view."""
         if self._check_hash_view():
             return 1
-        else:
-            return int(self.engine.open().view.size(rpc.NOHASH, self.viewname))
+        return int(self.engine.open().view.size(rpc.NOHASH, self.viewname))
 
     def items(self):
         """Get list of download items."""

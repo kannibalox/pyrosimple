@@ -652,12 +652,11 @@ class RtorrentEngine:
                 fmt.human_duration(self.uptime, 0, 2, True).strip(),
                 config.settings.SCGI_URL,
             )
-        else:
-            # Unconnected state
-            return "{} connectable via {!r}".format(
-                self.__class__.__name__,
-                config.settings.SCGI_URL,
-            )
+        # Unconnected state
+        return "{} connectable via {!r}".format(
+            self.__class__.__name__,
+            config.settings.SCGI_URL,
+        )
 
     @property
     def uptime(self):
