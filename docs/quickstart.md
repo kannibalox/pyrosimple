@@ -104,11 +104,12 @@ In addition to rTorrent, pyrosimple can also work with .torrent files
 directly. The commands `mktor`, `lstor` and `chtor` can make, list
 and modify files, respectively
 
-Let's try creating an example torrent from the file `/etc/hostname`
+Let's try creating an example torrent from an example file
 with the (fake) tracker `http://example.com`.
 
 ```bash
-mktor -o example.torrent /etc/hostname http://example.com
+date > example.txt
+mktor -o example.torrent example.txt http://example.com
 ```
 
 Now we can check our newly created torrent:

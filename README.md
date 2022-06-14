@@ -4,7 +4,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pyrosimple)](https://pypi.org/project/pyrosimple/)
 ![PyPI -	Python Version](https://img.shields.io/pypi/pyversions/pyrosimple)
 
-A simplified and python-3 oriented version of the [pyrocore tools](https://github.com/pyroscope/pyrocore), for working with the [rTorrent client](https://github.com/rakshasa/rtorrent).
+A overhauled Python 3 fork  of the [pyrocore tools](https://github.com/pyroscope/pyrocore), for working with the [rTorrent client](https://github.com/rakshasa/rtorrent).
 
 ## Installation
 
@@ -12,32 +12,31 @@ A simplified and python-3 oriented version of the [pyrocore tools](https://githu
 pip install pyrosimple
 ```
 
-Usage is pretty much the same as regular pyroscope: https://github.com/pyroscope/pyrocore/blob/master/README.md
+See the [documentation for usage](https://kannibalox.github.io/pyrosimple/). If you've used rtcontrol/rtxmlrpc before, you should feel right at home.
 
 ## What's the point of this?
 
-I needed something simpler for use with personal tools, and this allows me to keep the code base *mostly* compatible while
-dropping more experimental features. There are also several changes that aren't easily suitable for upstream incorporation.
+The pyrocore tools are great, but being stuck on python 2, along with the complicated install procedure made integrating both the tools and the code into other processes very painfule.
 
 ## Significant differences from pyrocore
 
 The following lists are not exhaustive, and don't cover many of the internal improvements and refactoring.
 
-- Only supports python 3 and rtorrent 0.9.8 (0.9.6/0.9.7 should still work, just not officially supported)
+- Only supports python 3 and rtorrent 0.9.8 (0.9.6/0.9.7 should still work just fine, but aren't officially supported)
 - Simpler poetry-based build/install system
 - Everything in one package (no separate pyrobase)
   - Use external lib for bencode
 
 ### Added
-- Jinja2 templatiing if package is present (tempita's use of eval can chew up a surprising amount of cpu)
+- Multi-instance support for rtcontrol/rtxmlrpc
+- Replaced Tempita with jinja2
 - Support for JSON-RPC (only implemented by https://github.com/jesec/rtorrent)
 - pyrotorque job to move torrents between hosts
 - pyrotorque job to move torrent paths
 
-### Removed/deprecated
+### Removed
 - the `rtsweep`, `rtmv`, and `rtevent` commands
 - `pyrotorque`'s guard file, influxdb job and web server
-- Connecting via SSH (planned to be re-added)
 
 ### Changed
 - `rtxmlrpc`'s `--raw` now outputs JSON

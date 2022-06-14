@@ -17,10 +17,16 @@ nav:
       - Tips & Tricks: tips.md
 theme:
   name: material
+  font:
+    code: Share Tech Mono
+    text: Lato
+  icon:
+    logo: fontawesome/regular/sun
   palette:
-
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
+      scheme: slate
+      primary: blue grey
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
@@ -28,6 +34,7 @@ theme:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: blue grey
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
@@ -35,6 +42,7 @@ theme:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: blue grey
       toggle:
         icon: material/brightness-4
         name: Switch to system preference

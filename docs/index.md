@@ -8,13 +8,6 @@ Welcome to pyrosimple, a collection of tools for working with rTorrent. With pyr
 you can do everything ranging from making low-level RPC calls, to running a full-fledged daemon that
 will manage rTorrent according to user-defined rules.
 
-```console
-$ rtxmlrpc '' system.hostname
-rtorrent.example.com
-$ rtcontrol //
-TODO
-```
-
 ## Installation
 
 ```bash
