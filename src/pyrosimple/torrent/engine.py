@@ -396,14 +396,35 @@ def core_fields():
     )
 
     def _alias_accessor(o):
-        return config.map_announce2alias(o.tracker)
+        """Check the memoized alias custom field
+        If it's defined as a key in the config, just return it
+        Otherwise, check if it can be reduced down further.
+        The worst case is that it doesn't exist to begin with,
+        and then the tracker field needs to be referenced to figure it
+        out properly.
+        """
+        memoized_alias = o.rpc_call("d.custom", ["memo_alias"])
+        if memoized_alias in config.settings["ALIASES"]:
+            return memoized_alias
+        if memoized_alias:
+            new_alias = config.map_announce2alias(memoized_alias)
+            if new_alias:
+                o.rpc_call("d.custom.set", ["memo_alias", new_alias])
+            else:
+                return memoized_alias
+        else:
+            new_alias = config.map_announce2alias(o.tracker)
+
+        if memoized_alias != new_alias:
+            o.rpc_call("d.custom.set", ["memo_alias", new_alias])
+        return a
 
     yield ConstantField(
         str,
         "alias",
         "tracker alias or domain",
         matcher=matching.PatternFilter,
-        accessor=lambda o: o.memoize("alias", _alias_accessor, o),
+        accessor=_alias_accessor,
         requires=["d.custom=memo_alias"],
     )
     yield DynamicField(
