@@ -45,7 +45,6 @@ class RTorrentTransport(xmlrpclib.Transport):
         # We need to handle the headers differently based on the RPC protocols
         self._headers = list(headers)
         # Pass them to the transport in py 3.8+ only
-        kwargs["headers"] = self._headers
         if sys.version_info.minor >= 8:
             kwargs["headers"] = self._headers
         super().__init__(*args, **kwargs)
