@@ -646,7 +646,7 @@ torque = ["APScheduler", "pyinotify"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4"
-content-hash = "8ea6a05346386cce683538d42c67c5723e4fc8569b0cc4d5bd2526049f482595"
+content-hash = "953377db12095000f17364dea4763ae6a7d5b6b992c808fa9cadef9d5ee5db14"
 
 [metadata.files]
 apscheduler = [
