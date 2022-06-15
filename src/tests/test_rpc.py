@@ -25,8 +25,9 @@ import pytest
 
 from pyrosimple.util import rpc
 
+
 @pytest.mark.parametrize(
-    'url',
+    "url",
     [
         "scgi://example.com:7000",
         "scgi:///var/tmp/rtorrent.sock",
@@ -34,7 +35,7 @@ from pyrosimple.util import rpc
         "http://example.com:7000?rpc=json",
         "http://example.com:7000/RPC3",
         "scgi+ssh://example.com:7000/RPC3",
-    ]
+    ],
 )
 def test_rpc_url(url):
     rpc.RTorrentProxy(url)
