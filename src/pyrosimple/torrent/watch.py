@@ -172,8 +172,7 @@ class MetafileHandler:
             self.job.LOG.debug(
                 "Templating values are:\n    %s"
                 % "\n    ".join(
-                    f"{key}={repr(val)}"
-                    for key, val in sorted(self.ns.items())
+                    f"{key}={repr(val)}" for key, val in sorted(self.ns.items())
                 )
             )
 

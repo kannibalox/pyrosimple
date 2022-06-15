@@ -463,8 +463,8 @@ class RtorrentControl(ScriptBaseWithConfig):
             else:
                 yield f"{name}="
 
-            yield fr"{name}=+"
-            yield fr"{name}=-"
+            yield rf"{name}=+"
+            yield rf"{name}=-"
 
         yield "custom_"
         yield "kind_"

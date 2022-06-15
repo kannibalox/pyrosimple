@@ -441,7 +441,7 @@ class TaggedAsFilter(FieldFilter):
         self._value = self._value.lower()
 
         # If the tag starts with '=', test on equality (just this tag, no others)
-        if self._value.startswith("="):
+        if self._value.startswith(":"):
             self._exact = True
             self._value = self._value[1:]
         else:
