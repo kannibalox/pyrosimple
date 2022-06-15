@@ -33,6 +33,7 @@ class PathMover:
         """Set up statistics logger."""
         self.config = config or {}
         self.config.setdefault("max_workers", 1)
+        self.config.setdefault("dry_run", False)
         if not self.config["target"]:
             raise Exception("'target' not defined!")
         self.engine = None
@@ -48,7 +49,7 @@ class PathMover:
         if i.fetch("directory") == target:
             self.LOG.debug("%s already moved, skipping", i.hash)
             return
-        if self.config.dry_run:
+        if self.config['dry_run']:
             self.LOG.info("Would move %s to %s", i.hash, target)
             return
         self.LOG.info("Moving path for %s to %s", i.hash, target)
