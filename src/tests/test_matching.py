@@ -110,5 +110,48 @@ def test_conditions_prefilter(cond, expected):
         matching.QueryGrammar.parse(cond)).pre_filter()
     assert str(filt) == expected
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize(
+    ("matcher", "item"),
+    [
+        ("name=arch", Bunch(name="arch")),
+        ("name=arch*", Bunch(name="arch-linux")),
+        ("name=*arch", Bunch(name="base-arch")),
+        ("name=/arch/", Bunch(name="base-arch")),
+        ("name=/arch$/", Bunch(name="base-arch")),        
+        ('message=""', Bunch(message="")),
+        ('message!=""', Bunch(message="Oh no!")),
+        ("is_complete=no", Bunch(is_complete=False)),
+        ("ratio>2", Bunch(ratio=5.0)),
+        ("ratio>2 ratio<6.0", Bunch(ratio=5.0)),
+        ("size>1G", Bunch(size=2*(1024**3))),
+        ("size>1G", Bunch(size=2*(1024**3))),
+        ("leechtime>1h", Bunch(leechtime=60*60*2)),
+        ("completed>2h", Bunch(completed=time.time()-(60*60*2))),
+        ("completed<1h", Bunch(completed=time.time()-1)),
+        ("tagged=test", Bunch(tagged=["test","notest"])),
+        ("tagged=notest", Bunch(tagged=["test","notest"])),
+        ("files=test*", Bunch(files=[Bunch(path="test/test.mkv"),Bunch(path="test.nfo")])),
+    ],
+)
+def test_matcher(matcher, item):
+    m = matching.create_matcher(matcher)
+    assert m.match(item)
+
+@pytest.mark.parametrize(
+    ("matcher", "item"),
+    [
+        ("name=arch", Bunch(name="asdfsafad")),
+        ("name!=arch*", Bunch(name="arch-linux")),
+        ("name!=/arch$/", Bunch(name="base-arch")),
+        ("is_complete=yes", Bunch(is_complete=False)),
+        ("ratio<2", Bunch(ratio=5.0)),
+        ("size<1G", Bunch(size=2*(1024**3))),
+        ("leechtime<1h", Bunch(leechtime=60*60*2)),
+        ("completed>1h", Bunch(completed=time.time()-1)),
+        ("tagged=:test", Bunch(tagged=["test","notest"])),
+        ("tagged=faketest", Bunch(tagged=["test","notest"])),
+    ],
+)
+def test_matcher_fail(matcher, item):
+    m = matching.create_matcher(matcher)
+    assert not m.match(item)

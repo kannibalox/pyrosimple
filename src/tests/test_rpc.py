@@ -21,17 +21,20 @@
 import logging
 import unittest
 
+import pytest
+
 from pyrosimple.util import rpc
 
-
-log = logging.getLogger(__name__)
-log.debug("module loaded")
-
-
-class RpcTest(unittest.TestCase):
-    def test_rpc(self):
-        pass
-
-
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize(
+    'url',
+    [
+        "scgi://example.com:7000",
+        "scgi:///var/tmp/rtorrent.sock",
+        "http://example.com:7000",
+        "http://example.com:7000?rpc=json",
+        "http://example.com:7000/RPC3",
+        "scgi+ssh://example.com:7000/RPC3",
+    ]
+)
+def test_rpc_url(url):
+    rpc.RTorrentProxy(url)
