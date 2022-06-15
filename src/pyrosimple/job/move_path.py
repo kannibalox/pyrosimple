@@ -41,7 +41,7 @@ class PathMover:
 
     def check_and_move(self, i: rtorrent.RtorrentItem):
         """Conditionally move data"""
-        target = formatting.format_item(self.config["target"], i)
+        target = formatting.format_item_str(self.config["target"], i)
         if not target:
             self.LOG.debug("Empty target for %s", i.hash)
             return
