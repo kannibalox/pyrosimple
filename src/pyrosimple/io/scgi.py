@@ -3,6 +3,7 @@ import io
 import logging
 import socket
 import subprocess
+import sys
 import urllib.request
 
 from typing import Dict, List, Tuple, Type
@@ -43,8 +44,10 @@ class RTorrentTransport(xmlrpclib.Transport):
         self.verbose = False
         # We need to handle the headers differently based on the RPC protocols
         self._headers = list(headers)
-        # Pass them to the transport as well though
+        # Pass them to the transport in py 3.8+ only
         kwargs["headers"] = self._headers
+        if sys.version_info.minor >= 8:
+            kwargs["headers"] = self._headers
         super().__init__(*args, **kwargs)
 
     def parse_response(self, response):
