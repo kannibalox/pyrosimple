@@ -50,9 +50,9 @@ class PathMover:
             self.LOG.debug("%s already moved, skipping", i.hash)
             return
         if self.config['dry_run']:
-            self.LOG.info("Would move %s to %s", i.hash, target)
+            self.LOG.info("Would move %s from '%s' to '%s'", i.hash, i.datapath(), target)
             return
-        self.LOG.info("Moving path for %s to %s", i.hash, target)
+        self.LOG.info("Moving path for '%s' to '%s'", i.hash, i.datapath(), target)
         move(i, target)
         i.flush()
 
