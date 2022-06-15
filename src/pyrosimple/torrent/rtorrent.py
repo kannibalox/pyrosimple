@@ -61,7 +61,6 @@ class RtorrentItem(engine.TorrentProxy):
                 "d.name",
                 "d.size_bytes",
                 "d.size_chunks",
-                "d.custom=memo_alias",
             }
         )
         if rpc_fields is not None:
@@ -77,7 +76,7 @@ class RtorrentItem(engine.TorrentProxy):
         try:
             for call in calls:
                 self._engine.LOG.debug(
-                    "%s%s torrent #%s (%s)",
+                    "%s%s torrent %s (%s)",
                     command[0].upper(),
                     command[1:],
                     self._fields["hash"],
@@ -92,7 +91,7 @@ class RtorrentItem(engine.TorrentProxy):
                     observer(result)
         except rpc.ERRORS as exc:
             raise error.EngineError(
-                f"While {command} torrent #{self._fields['hash']}: {exc}"
+                f"While {command} torrent {self._fields['hash']}: {exc}"
             )
 
     def _get_files(self, attrs: Optional[List[str]] = None):
@@ -100,8 +99,6 @@ class RtorrentItem(engine.TorrentProxy):
         attributes C{path} (relative to root), C{size} (in bytes),
         C{mtime}, C{prio} (0=off, 1=normal, 2=high), C{created},
         and C{opened}.
-
-        This is UNCACHED, use C{fetch("files")} instead.
 
         @param attrs: Optional list of additional attributes to fetch.
         """
