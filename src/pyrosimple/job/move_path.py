@@ -5,6 +5,8 @@ import concurrent.futures
 import shutil
 import time
 
+from pathlib import Path
+
 import pyrosimple
 
 from pyrosimple import error
@@ -46,7 +48,7 @@ class PathMover:
         if not target:
             self.LOG.debug("Empty target for %s", i.hash)
             return
-        if i.fetch("directory") == target:
+        if Path(i.fetch("directory")) == Path(target):
             self.LOG.debug("%s already moved, skipping", i.hash)
             return
         if self.config['dry_run']:
