@@ -48,13 +48,13 @@ class PathMover:
         if not target:
             self.LOG.debug("Empty target for %s", i.hash)
             return
-        if Path(i.fetch("directory")) == Path(target):
+        if (Path(i.fetch("directory")) == Path(target)) or (i.rpc_call("d.is_multi_file") and Path(i.fetch("directory")).parent == Path(target)):
             self.LOG.debug("%s already moved, skipping", i.hash)
             return
         if self.config['dry_run']:
             self.LOG.info("Would move %s from '%s' to '%s'", i.hash, i.datapath(), target)
             return
-        self.LOG.info("Moving path for '%s' to '%s'", i.hash, i.datapath(), target)
+        self.LOG.info("Moving path for %s from '%s' to '%s'", i.hash, i.datapath(), target)
         move(i, target)
         i.flush()
 
