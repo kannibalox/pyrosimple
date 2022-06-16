@@ -18,7 +18,7 @@ def move(i: rtorrent.RtorrentItem, target: str):
     """Move a torrent path"""
     i.stop()
     for _ in range(0, 5):
-        if i.rpc_call("is_open", cache=False):
+        if i.rpc_call("d.is_open", cache=False):
             time.sleep(0.1)
         else:
             break
