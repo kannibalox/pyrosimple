@@ -18,6 +18,8 @@ class BaseJob:
         self.config.setdefault("dry_run", False)
         self.engine = pyrosimple.connect()
         self.log = pymagic.get_class_logger(__name__)
+        if "log_level" in self.config:
+            self.log.setLevel(config["log_level"])
         self.log.debug("%s created with config %r", __name__, self.config)
 
     def run(self):
@@ -29,8 +31,8 @@ class MatchableJob(BaseJob):
     """Set up a job that loops through torrents that match a query and performs an action on each"""
 
     def __init__(self, config=None):
-        super().__init__()
-        self.config.setdefault("view", "default")
+        super().__init__(config)
+        self.config.setdefault("view", "main")
         self.matcher = matching.create_matcher(self.config["matcher"])
         self.sort_key = formatting.validate_sort_fields(
             self.config.get("sort", "name,hash")
