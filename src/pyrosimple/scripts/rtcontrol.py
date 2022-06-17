@@ -1,4 +1,4 @@
-# pylint: disable=no-self-use,too-many-lines,too-many-nested-blocks
+# pylint: disable=no-self-use,too-many-nested-blocks
 """ rTorrent Control.
 
     Copyright (c) 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>

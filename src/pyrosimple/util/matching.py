@@ -1,4 +1,3 @@
-# pylint: disable=attribute-defined-outside-init
 """ Torrent Item Filters.
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -199,7 +198,7 @@ class OrNode(MatcherNode):
         return f"{type(self).__name__}{[repr(c) for c in self.children]}"
 
 
-class FieldFilter(MatcherNode):  # pylint: disable=abstract-method
+class FieldFilter(MatcherNode):
     """Base class for all field filters.
 
     Subclasses of FieldFilter act as the leaves of the tree, providing

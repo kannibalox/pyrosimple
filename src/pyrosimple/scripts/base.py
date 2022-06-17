@@ -45,7 +45,7 @@ class ScriptBase:
     ADDITIONAL_HELP: List[str] = []
 
     # Can be empty or None in derived classes
-    COPYRIGHT = "Copyright (c) 2009 - 2018 Pyroscope Project"
+    COPYRIGHT = ""
 
     # Can be made explicit in derived classes (for external tools)
     VERSION = None
@@ -86,7 +86,7 @@ class ScriptBase:
             + textwrap.dedent(self.__doc__.rstrip()).lstrip("\n")
             + "\n".join(self.ADDITIONAL_HELP)
             + "\n\nFor more details, see the full documentation at"
-            + "\n\n    https://pyrosimple.readthedocs.io/",
+            + "\n\n    https://kannibalox.github.io/pyrosimple/",
         )
 
         self.parser.add_argument(

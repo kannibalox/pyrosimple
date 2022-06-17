@@ -74,14 +74,13 @@ class RtorrentItem(engine.TorrentProxy):
         """Perform some error-checked RPC calls."""
         args = (self._fields["hash"],) + args
         try:
+            self._engine.LOG.debug(
+                "%s%s torrent %s",
+                command[0].upper(),
+                command[1:],
+                self._fields["hash"],
+            )
             for call in calls:
-                self._engine.LOG.debug(
-                    "%s%s torrent %s (%s)",
-                    command[0].upper(),
-                    command[1:],
-                    self._fields["hash"],
-                    call,
-                )
                 if call.startswith(":") or call[:2].endswith("."):
                     namespace = self._engine.rpc
                 else:
