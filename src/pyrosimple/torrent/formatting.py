@@ -166,9 +166,14 @@ def expand_template(template_path: str, namespace: Dict) -> str:
     # Expand template
     return template.render(**variables)
 
-def format_item_str(template_str: str, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None):
+
+def format_item_str(
+    template_str: str, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
+):
+    """Simple helper function to format a string with an item"""
     template = env.from_string(template_str)
     return format_item(template, item, defaults)
+
 
 def format_item(
     template: Template, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
