@@ -81,10 +81,7 @@ class RtorrentItem(engine.TorrentProxy):
                 self._fields["hash"],
             )
             for call in calls:
-                if call.startswith(":") or call[:2].endswith("."):
-                    namespace = self._engine.rpc
-                else:
-                    namespace = self._engine.rpc.d
+                namespace = self._engine.rpc
                 result = getattr(namespace, call.lstrip(":"))(*args)
                 if observer is not None:
                     observer(result)
@@ -154,7 +151,7 @@ class RtorrentItem(engine.TorrentProxy):
             value = getter(*args, **kwargs)
             self._make_it_so(
                 f"caching {name}={value!r} for",
-                ["custom.set"],
+                ["d.custom.set"],
                 field[7:],
                 value,
             )
@@ -184,7 +181,7 @@ class RtorrentItem(engine.TorrentProxy):
             histo_str = " ".join(("%d%%_%s" % i).replace(" ", "_") for i in histo)
             self._make_it_so(
                 f"setting kind cache {histo_str!r} on",
-                ["custom.set"],
+                ["d.custom.set"],
                 "kind",
                 histo_str,
             )
@@ -270,21 +267,21 @@ class RtorrentItem(engine.TorrentProxy):
 
     def start(self):
         """(Re-)start downloading or seeding."""
-        self._make_it_so("starting", ["open", "start"])
+        self._make_it_so("starting", ["d.open", "d.start"])
 
     def stop(self):
         """Stop and close download."""
-        self._make_it_so("stopping", ["stop", "close"])
+        self._make_it_so("stopping", ["d.stop", "d.close"])
 
     def ignore(self, flag: int):
         """Set ignore status."""
-        self._make_it_so("setting ignore status for", ["ignore_commands.set"], flag)
+        self._make_it_so("setting ignore status for", ["d.ignore_commands.set"], flag)
         self._fields["is_ignored"] = flag
 
     def set_prio(self, prio: int):
         """Set priority (0-3)."""
         self._make_it_so(
-            "setting priority for", ["priority.set"], max(0, min(int(prio), 3))
+            "setting priority for", ["d.priority.set"], max(0, min(int(prio), 3))
         )
 
     def tag(self, tags: str):
@@ -306,7 +303,7 @@ class RtorrentItem(engine.TorrentProxy):
         if tagset != previous:
             tagset = " ".join(sorted(tagset))
             self._make_it_so(
-                f"setting tags {tagset!r} on", ["custom.set"], "tags", tagset
+                f"setting tags {tagset!r} on", ["d.custom.set"], "tags", tagset
             )
             self._fields["custom_tags"] = tagset
 
@@ -337,7 +334,7 @@ class RtorrentItem(engine.TorrentProxy):
                 "Torrent #%s stopped for throttling", self._fields["hash"]
             )
             self.stop()
-        self._make_it_so(f"setting throttle {name!r} on", ["throttle_name.set"], name)
+        self._make_it_so(f"setting throttle {name!r} on", ["d.throttle_name.set"], name)
         if active:
             self._engine.LOG.debug(
                 "Torrent #%s restarted after throttling",
@@ -362,13 +359,13 @@ class RtorrentItem(engine.TorrentProxy):
         if not key:
             raise error.UserError("Custom field name cannot be empty!")
         if len(key) == 1 and key in "12345":
-            method, args = "custom" + key + ".set", [value]
+            method, args = "d.custom" + key + ".set", [value]
         elif not (key[0].isalpha() and key.replace("_", "").isalnum()):
             raise error.UserError(
                 f"Bad custom field name {key!r} (must only contain a-z, A-Z, 0-9 and _)"
             )
         else:
-            method, args = "custom.set", [key, value]
+            method, args = "d.custom.set", [key, value]
 
         # Make the assignment
         self._make_it_so(f"setting custom_{key} = {value!r} on", [method], *args)
@@ -376,7 +373,7 @@ class RtorrentItem(engine.TorrentProxy):
 
     def hash_check(self):
         """Hash check a download."""
-        self._make_it_so("hash-checking", ["check_hash"])
+        self._make_it_so("hash-checking", ["d.check_hash"])
 
     def __print_result(self, data, method=None, args=None):
         "Helper to print RPC call results"
@@ -405,16 +402,14 @@ class RtorrentItem(engine.TorrentProxy):
             if method.startswith(">"):
                 observer = partial(self.__print_result, args=args, method=method)
             method = method.lstrip(">")
-            if not (method.startswith(":") or method[:2].endswith(".")):
-                method = "d." + method
             self._make_it_so("executing command on", [method], *args, observer=observer)
 
     def delete(self):
         """Remove torrent from client."""
         self.stop()
         if self.fetch("metafile"):
-            self._make_it_so("removing metafile of", ["delete_tied"])
-        self._make_it_so("erasing", ["erase"])
+            self._make_it_so("removing metafile of", ["d.delete_tied"])
+        self._make_it_so("erasing", ["d.erase"])
 
     # TODO: def set_files_priority(self, pattern, prio)
     # Set priority of selected files
@@ -549,7 +544,7 @@ class RtorrentItem(engine.TorrentProxy):
 
     def flush(self):
         """Write volatile data to disk."""
-        self._make_it_so("saving session data of", ["save_resume"])
+        self._make_it_so("saving session data of", ["d.save_resume"])
 
 
 class RtorrentEngine:
