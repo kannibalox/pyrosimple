@@ -18,11 +18,11 @@
 import time
 
 from pyrosimple import error
-from pyrosimple.torrent import formatting, rtorrent
-from pyrosimple.util import matching, pymagic, rpc
+from pyrosimple.util import matching, rpc
 from pyrosimple.job.base import MatchableJob
 
-
+# No need to override run_item() since we override run()
+# pylint: disable=abstract-method
 class QueueManager(MatchableJob):
     """rTorrent queue manager implementation."""
 
@@ -161,8 +161,7 @@ class QueueManager(MatchableJob):
             # Get items from 'main' view
             items = list(self.engine.view(self.config["view"]))
 
-            if self.sort_key:
-                items.sort(key=self.sort_key)
+            items.sort(key=self.sort_key)
 
             # Handle found items
             self._start(items)
