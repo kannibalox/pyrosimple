@@ -17,6 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import argparse
 import functools
 import json
 import re
@@ -28,11 +29,11 @@ import time
 from multiprocessing.pool import ThreadPool
 from typing import Callable, List, Union
 
-from pyrosimple import config, error
+from pyrosimple import config
 from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
-from pyrosimple.util.parts import Bunch, DefaultBunch
+from pyrosimple.util.parts import DefaultBunch
 
 
 def print_help_fields():
@@ -120,6 +121,38 @@ class FieldStatistics:
         return result
 
 
+class RtorrentAction(argparse.Action):
+    """This class is used by the argparse action parameter for adding rtcontrol actions to a master list in the namespace.
+
+    There is a rather unforunate name collision between argparse's actions and rtcontrol's actions.
+    'const' is used as the method name to call, with the arguments being pulled from the value"""
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is None:
+            nargs = 1
+        if "const" not in kwargs:
+            kwargs["const"] = option_strings[0].lstrip("-").replace("-", "_")
+        self.interactive = False
+        super().__init__(option_strings, dest, nargs, **kwargs)
+
+    def __call__(
+        self, parser, namespace, values, option_string=None, interactive=False
+    ):
+        print("%r %r %r" % (namespace, values, option_string))
+        actions = getattr(namespace, "actions", [])
+        actions.append(
+            {"method": self.const, "args": values, "interactive": interactive}
+        )
+        namespace.actions = actions
+
+
+class RtorrentInteractiveAction(RtorrentAction):
+    """Simple class to mark commands as interactive"""
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs, interactive=True)
+
+
 class RtorrentControl(ScriptBaseWithConfig):
     ### Keep things wrapped to fit under this comment... ##############################
     """
@@ -175,79 +208,11 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     # action options that perform some change on selected items
     ACTION_MODES = (
-        Bunch(name="start", options=("--start",), help="start torrent"),
-        Bunch(
-            name="close",
-            options=("--close", "--stop"),
-            help="stop torrent",
-            method="stop",
-        ),
-        Bunch(
-            name="hash_check",
-            label="HASH",
-            options=("-H", "--hash-check"),
-            help="hash-check torrent",
-            interactive=True,
-        ),
         # TODO: Bunch(name="announce", options=("--announce",), help="announce right now", interactive=True),
         # TODO: --pause, --resume?
         # TODO: implement --clean-partial
         # self.add_bool_option("--clean-partial",
         #    help="remove partially downloaded 'off'ed files (also stops downloads)")
-        Bunch(
-            name="delete",
-            options=("--delete",),
-            help="remove torrent from client",
-            interactive=True,
-        ),
-        Bunch(
-            name="purge",
-            options=("--purge", "--delete-partial"),
-            help="delete PARTIAL data files and remove torrent from client",
-            interactive=True,
-        ),
-        Bunch(
-            name="cull",
-            options=("--cull", "--exterminate", "--delete-all"),
-            help="delete ALL data files and remove torrent from client",
-            interactive=True,
-        ),
-        Bunch(
-            name="throttle",
-            options=(
-                "-T",
-                "--throttle",
-            ),
-            argshelp="NAME",
-            method="set_throttle",
-            help="assign to named throttle group (NULL=unlimited, NONE=global)",
-            interactive=True,
-        ),
-        Bunch(
-            name="tag",
-            options=("--tag",),
-            argshelp='"TAG +TAG -TAG..."',
-            help="add or remove tag(s)",
-            interactive=False,
-        ),
-        Bunch(
-            name="custom",
-            label="SET_CUSTOM",
-            options=("--custom",),
-            argshelp="KEY=VALUE",
-            method="set_custom",
-            help="set value of 'custom_KEY' field (KEY might also be 1..5)",
-            interactive=False,
-        ),
-        Bunch(
-            name="exec",
-            label="EXEC",
-            options=("--exec", "--xmlrpc", "--RPC"),
-            argshelp="CMD",
-            method="execute",
-            help="execute RPC command pattern",
-            interactive=True,
-        ),
         # TODO: --move / --link output_format / the formatted result is the target path
         #           if the target contains a '//' in place of a '/', directories
         #           after that are auto-created
@@ -381,67 +346,108 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.parser.add_argument(
             "-Q",
             "--fast-query",
-            metavar="LEVEL",
-            default="=",
             choices=("=", "0", "1", "2"),
+            default="=",
+            metavar="LEVEL",
             help="enable query optimization (=: use config; 0: off; 1: safe; 2: danger seeker)",
         )
-        action_group = self.parser.add_argument_group("actions")
+        action_group = self.parser.add_argument_group(
+            "actions", "Can be set more than once, and order matters."
+        )
         action_group.add_argument(
             "--call",
+            action=RtorrentInteractiveAction,
+            help="call an OS command pattern in the shell (implies -i)",
             metavar="CMD [--call]",
-            action="append",
-            default=[],
-            help="call an OS command pattern in the shell",
         )
         action_group.add_argument(
             "--spawn",
+            action=RtorrentInteractiveAction,
+            help="execute OS command pattern(s) directly (implies -i)",
             metavar="CMD [--spawn ...]",
-            action="append",
-            default=[],
-            help="execute OS command pattern(s) directly",
         )
         action_group.add_argument(
-            "-F",
             "--flush",
+            "-F",
+            nargs=0,
+            action=RtorrentAction,
             help="flush changes immediately (save session data)",
-            action="store_true",
         )
-
-        # torrent state change (actions)
-        for action in self.ACTION_MODES:
-            action.setdefault("label", action.name.upper())
-            action.setdefault("method", action.name)
-            action.setdefault("interactive", False)
-            action.setdefault("argshelp", "")
-            action.setdefault("args", ())
-            if action.argshelp:
-                action_group.add_argument(
-                    *action.options,
-                    **{
-                        "metavar": action.argshelp,
-                        "help": action.help
-                        + (" (implies -i)" if action.interactive else ""),
-                    },
-                )
-            else:
-                action_group.add_argument(
-                    *action.options,
-                    **{
-                        "action": "store_true",
-                        "help": action.help
-                        + (" (implies -i)" if action.interactive else ""),
-                    },
-                )
         action_group.add_argument(
             "--ignore",
+            action=RtorrentAction,
             choices=self.IGNORE_OPTIONS,
             help="set 'ignore commands' status on torrent",
         )
         action_group.add_argument(
+            "--start",
+            action=RtorrentAction,
+            nargs=0,
+            help="start torrent",
+        )
+        action_group.add_argument(
+            "--stop",
+            "--close",
+            action=RtorrentAction,
+            nargs=0,
+            help="stop torrent",
+        )
+        action_group.add_argument(
+            "--hash-check",
+            "-H",
+            action=RtorrentInteractiveAction,
+            nargs=0,
+            help="trigger a hash check (implies -i)",
+        )
+        action_group.add_argument(
             "--prio",
+            action=RtorrentAction,
             choices=self.PRIO_OPTIONS,
             help="set priority of torrent",
+        )
+        action_group.add_argument(
+            "--delete",
+            action=RtorrentInteractiveAction,
+            nargs=0,
+            help="remove torrent (but not the data) (implies -i)",
+        )
+        action_group.add_argument(
+            "--cull",
+            action=RtorrentInteractiveAction,
+            nargs=0,
+            help="remove torrent and ALL data files (implies -i)",
+        )
+        action_group.add_argument(
+            "--purge",
+            action=RtorrentInteractiveAction,
+            nargs=0,
+            help="remove torrent and partial data files (implies -i)",
+        )
+        action_group.add_argument(
+            "--throttle",
+            "-T",
+            action=RtorrentInteractiveAction,
+            help="assign to named throttle group (NULL=unlimited, NONE=global) (implies -i)",
+        )
+        action_group.add_argument(
+            "--tag",
+            action=RtorrentInteractiveAction,
+            metavar='"TAG +TAG -TAG..."',
+            help="add or remove tag",
+        )
+        action_group.add_argument(
+            "--custom",
+            action=RtorrentAction,
+            metavar="KEY=VALUE",
+            help="set value of 'custom_KEY' field (KEY might also be 1..5)",
+        )
+        action_group.add_argument(
+            "--exec",
+            "--rpc",
+            action=RtorrentInteractiveAction,
+            const="execute",
+            metavar="RPC_CMD",
+            help="execute RPC command pattern",
         )
 
     def help_completion_fields(self):
@@ -618,61 +624,10 @@ class RtorrentControl(ScriptBaseWithConfig):
         if not self.args:
             self.parser.error("No filter conditions given!")
 
+        print(self.options.actions)
         # Check special action options
-        actions = []
-        if self.options.ignore:
-            actions.append(
-                Bunch(
-                    name="ignore",
-                    method="ignore",
-                    label="IGNORE" if int(self.options.ignore) else "HEED",
-                    help="commands on torrent",
-                    interactive=False,
-                    args=(self.options.ignore,),
-                )
-            )
-        if self.options.prio:
-            actions.append(
-                Bunch(
-                    name="prio",
-                    method="set_prio",
-                    label="PRIO" + str(self.options.prio),
-                    help="for torrent",
-                    interactive=False,
-                    args=(self.options.prio,),
-                )
-            )
-
-        # Check standard action options
-        # TODO: Allow certain combinations of actions (like --tag foo --stop etc.)
-        #       How do we get a sensible order of execution?
-        for action_mode in self.ACTION_MODES:
-            if getattr(self.options, action_mode.name):
-                if actions:
-                    self.parser.error(
-                        "Options --%s and --%s are mutually exclusive"
-                        % (
-                            ", --".join(i.name.replace("_", "-") for i in actions),
-                            action_mode.name.replace("_", "-"),
-                        )
-                    )
-                if action_mode.argshelp:
-                    action_mode.args = (getattr(self.options, action_mode.name),)
-                actions.append(action_mode)
-        if not actions and self.options.flush:
-            actions.append(
-                Bunch(
-                    name="flush",
-                    method="flush",
-                    label="FLUSH",
-                    help="flush session data",
-                    interactive=False,
-                    args=(),
-                )
-            )
-            self.options.flush = False  # No need to flush twice
-        if any(i.interactive for i in actions):
-            self.options.interactive = True
+        actions = getattr(self.options, "actions", [])
+        print(self.options.actions)
 
         # Reduce results according to index range
         selection = None
@@ -776,46 +731,59 @@ class RtorrentControl(ScriptBaseWithConfig):
                         for item in matches:
                             summary.add(field, getattr(item, field))
 
-            # Execute action?
+            # Run actions?
             if actions:
-                action = actions[0]  # TODO: loop over it
                 self.LOG.info(
-                    "%s %s %d out of %d torrents.",
+                    "%s perform actions [%s] on %d out of %d torrents.",
                     "Would" if self.options.dry_run else "About to",
-                    action.label,
+                    ",".join([a["method"] for a in actions]),
                     len(matches),
                     view.size(),
                 )
-                defaults = {"action": action.label, "now": time.time}
-                defaults.update(self.FORMATTER_DEFAULTS)
+            for item in matches:
+                for action in actions:
+                    action_name = action["method"].replace("_", " ")
+                    defaults = {"action": action_name, "now": time.time}
+                    defaults.update(self.FORMATTER_DEFAULTS)
 
-                # Perform chosen action on matches
-                template_args = [("{##}" + i if "{{" in i else i) for i in action.args]
-                for item in matches:
-                    if not self.prompt.ask_bool(f"{action.label} item {item.name}"):
-                        continue
-                    if (
-                        self.options.output_format
-                        and not self.options.view_only
-                        and str(self.options.output_format) != "-"
-                    ):
-                        self.emit(item, defaults)
+                    args = action["args"]
+                    # Templatetize arguments for some commands
+                    if action_name in ["call", "spawn", "execute"]:
+                        template_args = [
+                            ("{##}" + i if "{{" in i else i) for i in action["args"]
+                        ]
+                        print(template_args)
+                        if not self.prompt.ask_bool(f"{action_name} item {item.name}"):
+                            continue
+                        if (
+                            self.options.output_format
+                            and not self.options.view_only
+                            and str(self.options.output_format) != "-"
+                        ):
+                            self.emit(item, defaults)
 
-                    args = tuple(
-                        formatting.format_item(
-                            formatting.env.from_string(i),
-                            item,
-                            defaults=dict(item=item),
+                        args = tuple(
+                            formatting.format_item(
+                                formatting.env.from_string(i),
+                                item,
+                                defaults=dict(item=item),
+                            )
+                            for i in template_args
                         )
-                        for i in template_args
-                    )
 
                     if self.options.dry_run:
-                        self.LOG.debug("Would call action %s%r", action.method, args)
+                        self.LOG.debug("Would call action %s%r", action["method"], args)
                     else:
-                        getattr(item, action.method)(*args)
-                        if self.options.flush:
-                            item.flush()
+                        if action_name == "call":
+                            self.LOG.debug("Calling '%s' with a shell", args[0])
+                            subprocess.run(args[0], check=True, shell=True)
+                            continue
+                        if action_name == "spawn":
+                            args = shlex.split(args[0])
+                            self.LOG.debug("Runing '%s'", args)
+                            subprocess.run(args, check=True, shell=False)
+                            continue
+                        getattr(item, action["method"])(*args)
                         if self.options.view_only:
                             show_in_client = functools.partial(
                                 lambda x, e: e.open().log(rpc.NOHASH, x), e=r_engine
@@ -823,55 +791,10 @@ class RtorrentControl(ScriptBaseWithConfig):
                             self.emit(item, defaults, to_log=show_in_client)
 
             # Show in ncurses UI?
-            elif not self.options.tee_view and (
+            if not self.options.tee_view and (
                 self.options.to_view or self.options.view_only
             ):
                 self.show_in_view(view, matches)
-
-            # Execute OS commands?
-            elif self.options.call or self.options.spawn:
-                if self.options.call and self.options.spawn:
-                    self.fatal("You cannot mix --call and --spawn")
-
-                template_cmds = []
-                if self.options.call:
-                    for cmd in self.options.call:
-                        template_cmds.append(["{##}" + cmd])
-                else:
-                    for cmd in self.options.spawn:
-                        template_cmds.append(
-                            [
-                                ("{##}" + i if "{{" in i else i)
-                                for i in shlex.split(str(cmd))
-                            ]
-                        )
-
-                for item in matches:
-                    cmds: List[str] = [
-                        [formatting.format_item(i, item) for i in k]
-                        for k in template_cmds
-                    ]
-
-                    if self.options.dry_run:
-                        self.LOG.info("Would call command(s) %r", cmds)
-                    else:
-                        for cmd in cmds:
-                            if self.options.call:
-                                logged_cmd = cmd[0]
-                            else:
-                                logged_cmd = '"{}"'.format('" "'.join(cmd))
-                            self.LOG.info("Calling: %s", logged_cmd)
-                            try:
-                                if self.options.call:
-                                    subprocess.check_call(cmd[0], shell=True)
-                                else:
-                                    subprocess.check_call(cmd)
-                            except subprocess.CalledProcessError as exc:
-                                raise error.UserError(f"Command failed: {exc}")
-                            except OSError as exc:
-                                raise error.UserError(
-                                    f"Command failed ({logged_cmd}): {exc}"
-                                )
 
             # Dump as JSON array?
             elif self.options.json:

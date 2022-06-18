@@ -18,8 +18,9 @@
 import time
 
 from pyrosimple import error
-from pyrosimple.util import matching, rpc
 from pyrosimple.job.base import MatchableJob
+from pyrosimple.util import matching, rpc
+
 
 # No need to override run_item() since we override run()
 # pylint: disable=abstract-method
