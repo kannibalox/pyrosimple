@@ -16,13 +16,13 @@ See the [documentation for usage](https://kannibalox.github.io/pyrosimple/). If 
 
 ## What's the point of this?
 
-The pyrocore tools are great, but being stuck on python 2, along with the complicated install procedure made integrating both the tools and the code into other processes very painfule.
+The pyrocore tools are great, but being stuck on python 2, along with the complicated install procedure made integrating both the tools and the code into other processes very painful.
 
 ## Significant differences from pyrocore
 
 The following lists are not exhaustive, and don't cover many of the internal improvements and refactoring.
 
-- Only supports python 3 and rtorrent 0.9.8 (0.9.6/0.9.7 should still work just fine, but aren't officially supported)
+- Only supports python 3 and rtorrent 0.9.8+ (0.9.6/0.9.7 should still work just fine, but aren't officially supported)
 - Simpler poetry-based build/install system
 - Everything in one package (no separate pyrobase)
   - Use external lib for bencode
