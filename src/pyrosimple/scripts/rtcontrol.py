@@ -138,7 +138,6 @@ class RtorrentAction(argparse.Action):
     def __call__(
         self, parser, namespace, values, option_string=None, interactive=False
     ):
-        print("%r %r %r" % (namespace, values, option_string))
         actions = getattr(namespace, "actions", [])
         actions.append(
             {"method": self.const, "args": values, "interactive": interactive}
@@ -624,10 +623,8 @@ class RtorrentControl(ScriptBaseWithConfig):
         if not self.args:
             self.parser.error("No filter conditions given!")
 
-        print(self.options.actions)
         # Check special action options
         actions = getattr(self.options, "actions", [])
-        print(self.options.actions)
 
         # Reduce results according to index range
         selection = None
@@ -752,7 +749,6 @@ class RtorrentControl(ScriptBaseWithConfig):
                         template_args = [
                             ("{##}" + i if "{{" in i else i) for i in action["args"]
                         ]
-                        print(template_args)
                         if not self.prompt.ask_bool(f"{action_name} item {item.name}"):
                             continue
                         if (
