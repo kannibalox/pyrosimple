@@ -117,6 +117,8 @@ def test_conditions_prefilter(cond, expected):
     ("matcher", "item"),
     [
         ("name=arch", Bunch(name="arch")),
+        ("name=/arch/i", Bunch(name="ARCH")),
+        ("name=/ar.*/i", Bunch(name="ARCH")),
         ("name=ARCH", Bunch(name="ARCH")),
         ("name=rtörrent", Bunch(name="rtörrent")),
         ("name=rtör*", Bunch(name="rtörrent")),

@@ -333,7 +333,7 @@ class FieldFilter(MatcherNode):
 
 
 class PatternFilter(FieldFilter):
-    """Case-insensitive pattern filter, either a glob or a /regex/ pattern."""
+    """Pattern filter, either a glob or a /regex/ pattern."""
 
     CLEAN_PRE_VAL_RE = re.compile(r"(?:\[.*?]\])|(?:\(.*?]\))|(?:{.*?]})|(?:\\)")
     SPLIT_PRE_VAL_RE = re.compile(r"[^a-zA-Z0-9/_]+")
@@ -345,23 +345,28 @@ class PatternFilter(FieldFilter):
         super().validate()
         self._value: str = self._value
         self._template = None
+        self._flags = 0
         self._matcher: Callable[Any, Any]
         if self._value == '""':
             self._matcher = lambda val, _: val == ""
-        elif self._value.startswith("/") and self._value.endswith("/"):
-            if self._value in ["//", "/.*/"]:
+        elif self._value.startswith("/") and (self._value.endswith("/") or self._value.endswith("/i")):
+            if self._value in ["//", "/.*/", "//i", "/.*/i"]:
                 self._matcher = lambda _, __: True
             else:
-                regex = re.compile(self._value[1:-1])
+                value = self._value
+                if self._value.endswith("/i"):
+                    self._flags = re.IGNORECASE
+                    value = self._value.rstrip('i')
+                regex = re.compile(value[1:-1], self._flags)
                 self._matcher = lambda val, _: regex.search(val)
         elif self._value.startswith("{{") or self._value.endswith("}}"):
 
             def _template_globber(val, item):
-                """Helper."""
+                """Helper method to allow templating a glob."""
                 pattern = torrent.formatting.format_item(
                     torrent.formatting.env.from_string(self._template), item
-                ).replace("[", "[[]")
-                return fnmatch.fnmatchcase(val, pattern.lower())
+                )
+                return fnmatch.fnmatchcase(val)
 
             self._template = self._value
             self._matcher = _template_globber
@@ -375,8 +380,11 @@ class PatternFilter(FieldFilter):
         if not self._value or self._value == '""':
             return f'"equal={self.PRE_FILTER_FIELDS[self._name]},cat="'
 
-        if self._value.startswith("/") and self._value.endswith("/"):
-            needle = self._value[1:-1]
+        if self._value.startswith("/") and (self._value.endswith("/") or self._value.endswith("/i")):
+            if self._value.endswith("/i"):
+                needle = self._value[1:-2]
+            else:
+                needle = self._value[1:-1]
             needle = self.CLEAN_PRE_VAL_RE.sub(" ", needle)
             split_needle = self.SPLIT_PRE_VAL_RE.split(needle)
         else:
@@ -401,16 +409,15 @@ class PatternFilter(FieldFilter):
         result = self._matcher(val, item)
         return result
 
-
 class FilesFilter(PatternFilter):
-    """Case-insensitive pattern filter on filenames in a torrent."""
+    """Pattern filter on filenames in a torrent."""
 
     def match(self, item) -> bool:
         """Return True if filter matches item."""
         val = getattr(item, self._name)
         if val is not None:
             for fileinfo in val:
-                if fnmatch.fnmatchcase(fileinfo.path.lower(), self._value):
+                if fnmatch.fnmatchcase(fileinfo.path, self._value):
                     return True
             return False
         return False
@@ -733,7 +740,7 @@ QueryGrammar = Grammar(
     unnamed_cond = filter
     filter      = (glob / regex / quoted / word)
     glob = ~r"[\S]+"
-    regex = ~"/[^/]*/"
+    regex = ~"/[^/]*/i?"
     quoted      = ~'"[^\"]*"'
     word        = ~r"[\w]+"
     conditional = (ne / ge / le / lt / gt / eq)
