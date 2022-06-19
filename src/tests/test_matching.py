@@ -121,6 +121,8 @@ def test_conditions_prefilter(cond, expected):
         ("name=/ar.*/i", Bunch(name="ARCH")),
         ("name=ARCH", Bunch(name="ARCH")),
         ("name=rtörrent", Bunch(name="rtörrent")),
+        ("name={{d.alias}}", Bunch(name="ubuntu",alias="ubuntu")),
+        ("name={{d.alias}}*", Bunch(name="ubuntu-server",alias="ubuntu")),
         ("name=rtör*", Bunch(name="rtörrent")),
         ("name=arch*", Bunch(name="arch-linux")),
         ("name=*arch", Bunch(name="base-arch")),

@@ -366,7 +366,7 @@ class PatternFilter(FieldFilter):
                 pattern = torrent.formatting.format_item(
                     torrent.formatting.env.from_string(self._template), item
                 )
-                return fnmatch.fnmatchcase(val)
+                return fnmatch.fnmatchcase(val, pattern)
 
             self._template = self._value
             self._matcher = _template_globber
