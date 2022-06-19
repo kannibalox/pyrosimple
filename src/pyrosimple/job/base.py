@@ -19,7 +19,7 @@ class BaseJob:
         self.engine = pyrosimple.connect()
         self.log = pymagic.get_class_logger(__name__)
         if "log_level" in self.config:
-            self.log.setLevel(config["log_level"])
+            self.log.setLevel(self.config["log_level"])
         self.log.debug("%s created with config %r", __name__, self.config)
 
     def run(self):

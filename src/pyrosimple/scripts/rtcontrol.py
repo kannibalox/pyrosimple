@@ -121,6 +121,11 @@ class FieldStatistics:
         return result
 
 
+def move_item(item: rtorrent.RtorrentItem, dest: str):
+    if item.datapath() == dest:
+        return
+
+
 class RtorrentAction(argparse.Action):
     """This class is used by the argparse action parameter for adding rtcontrol actions to a master list in the namespace.
 
@@ -128,6 +133,7 @@ class RtorrentAction(argparse.Action):
     'const' is used as the method name to call, with the arguments being pulled from the value"""
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        """Build the action, default to 1 narg since that's the most common"""
         if nargs is None:
             nargs = 1
         if "const" not in kwargs:
@@ -138,6 +144,7 @@ class RtorrentAction(argparse.Action):
     def __call__(
         self, parser, namespace, values, option_string=None, interactive=False
     ):
+        """Add any action to the namesapce in order"""
         actions = getattr(namespace, "actions", [])
         actions.append(
             {"method": self.const, "args": values, "interactive": interactive}
@@ -149,6 +156,7 @@ class RtorrentInteractiveAction(RtorrentAction):
     """Simple class to mark commands as interactive"""
 
     def __call__(self, *args, **kwargs):
+        """Call the parent, but with interactive=True"""
         super().__call__(*args, **kwargs, interactive=True)
 
 

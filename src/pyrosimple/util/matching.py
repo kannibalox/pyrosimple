@@ -349,14 +349,16 @@ class PatternFilter(FieldFilter):
         self._matcher: Callable[Any, Any]
         if self._value == '""':
             self._matcher = lambda val, _: val == ""
-        elif self._value.startswith("/") and (self._value.endswith("/") or self._value.endswith("/i")):
+        elif self._value.startswith("/") and (
+            self._value.endswith("/") or self._value.endswith("/i")
+        ):
             if self._value in ["//", "/.*/", "//i", "/.*/i"]:
                 self._matcher = lambda _, __: True
             else:
                 value = self._value
                 if self._value.endswith("/i"):
                     self._flags = re.IGNORECASE
-                    value = self._value.rstrip('i')
+                    value = self._value.rstrip("i")
                 regex = re.compile(value[1:-1], self._flags)
                 self._matcher = lambda val, _: regex.search(val)
         elif self._value.startswith("{{") or self._value.endswith("}}"):
@@ -380,7 +382,9 @@ class PatternFilter(FieldFilter):
         if not self._value or self._value == '""':
             return f'"equal={self.PRE_FILTER_FIELDS[self._name]},cat="'
 
-        if self._value.startswith("/") and (self._value.endswith("/") or self._value.endswith("/i")):
+        if self._value.startswith("/") and (
+            self._value.endswith("/") or self._value.endswith("/i")
+        ):
             if self._value.endswith("/i"):
                 needle = self._value[1:-2]
             else:
@@ -405,9 +409,10 @@ class PatternFilter(FieldFilter):
 
     def eq(self, item):
         """Return True if filter matches item."""
-        val = (getattr(item, self._name) or "")
+        val = getattr(item, self._name) or ""
         result = self._matcher(val, item)
         return result
+
 
 class FilesFilter(PatternFilter):
     """Pattern filter on filenames in a torrent."""
