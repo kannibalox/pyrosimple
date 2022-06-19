@@ -25,6 +25,7 @@ import time
 
 from collections import defaultdict
 from functools import partial
+from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Union
 from xmlrpc import client as xmlrpclib
 
@@ -240,15 +241,15 @@ class RtorrentItem(engine.TorrentProxy):
 
         return val
 
-    def datapath(self):
+    def datapath(self) -> Path:
         """Get an item's data path."""
         path = self.rpc_call("d.directory")
         if path and not self.rpc_call("d.is_multi_file"):
             path = os.path.join(path, self.rpc_call("d.name"))
         path = os.path.expanduser(path)
         if self.rpc_call("d.is_multi_file"):
-            return path + "/"
-        return path
+            return Path(path)
+        return Path(path)
 
     def announce_urls(self, default=[]):  # pylint: disable=dangerous-default-value
         """Get a list of all announce URLs.
