@@ -117,6 +117,9 @@ def test_conditions_prefilter(cond, expected):
     ("matcher", "item"),
     [
         ("name=arch", Bunch(name="arch")),
+        ("name=ARCH", Bunch(name="ARCH")),
+        ("name=rtörrent", Bunch(name="rtörrent")),
+        ("name=rtör*", Bunch(name="rtörrent")),
         ("name=arch*", Bunch(name="arch-linux")),
         ("name=*arch", Bunch(name="base-arch")),
         ("name=/arch/", Bunch(name="base-arch")),
@@ -147,6 +150,8 @@ def test_matcher(matcher, item):
 @pytest.mark.parametrize(
     ("matcher", "item"),
     [
+        ("name=arch", Bunch(name="ARCH")),
+        ("name=ARCH", Bunch(name="arch")),
         ("name=arch", Bunch(name="asdfsafad")),
         ("name!=arch*", Bunch(name="arch-linux")),
         ("name!=/arch$/", Bunch(name="base-arch")),

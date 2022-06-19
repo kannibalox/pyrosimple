@@ -343,7 +343,7 @@ class PatternFilter(FieldFilter):
         """Validate filter condition (template method)."""
 
         super().validate()
-        self._value: str = self._value.lower()
+        self._value: str = self._value
         self._template = None
         self._matcher: Callable[Any, Any]
         if self._value == '""':
@@ -397,7 +397,7 @@ class PatternFilter(FieldFilter):
 
     def eq(self, item):
         """Return True if filter matches item."""
-        val = (getattr(item, self._name) or "").lower()
+        val = (getattr(item, self._name) or "")
         result = self._matcher(val, item)
         return result
 
