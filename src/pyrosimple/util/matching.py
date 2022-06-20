@@ -765,9 +765,9 @@ QueryGrammar = Grammar(
     conditional = (ne / ge / le / lt / gt / eq)
     ne          = ("!=" / "<>")
     eq          = ("==" / "=")
-    gt          = ">"
-    lt          = "<"
-    ge          = (">=" / "=+")
+    gt          = (">" / "=+")
+    lt          = ("<")
+    ge          = (">=")
     le          = ("<=" / "=-")
     fws         = ~r"\s+"
     ws          = ~r"\s*"
