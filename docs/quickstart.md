@@ -17,14 +17,14 @@ Install pyrosimple:
 pip install pyrosimple
 ```
 
-With pyrosimple installed and rTorrent running, try a simple test
-command:
+With pyrosimple installed and rTorrent running, let's see if the configuration
+can be auto-detected:
 
 ```bash
-rtxmlrpc system.hostname
+pyroadmin config --check && echo "All good!"
 ```
 
-If this correctly returns the name of your computer, then pyrosimple has
+If the command doesn't show any errors, then pyrosimple has
 automatically figured out how to talk with rTorrent. Neat!
 
 If not, see [Configuration](configuration.md) for
@@ -120,7 +120,7 @@ lstor example.torrent
 
 It looks pretty good, but maybe there should be a comment added to it.
 
-```bash 
+```bash
 chtor --comment 'Hello world!' example.torrent
 # View the changed file
 lstor example.torrent

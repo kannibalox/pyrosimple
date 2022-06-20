@@ -6,6 +6,10 @@ title: Experimental Features
 
 ## Connecting to multiple clients
 
+!!! warning
+
+    This can cause strange behavior unless planned out. As an example, hashes are no longer enough to uniquely identify a torrent.
+
 `rtxmlrpc` and `rtcontrol` support talking to multiple clients, by specifying a TOML list
 in the `CONNECTIONS` section:
 ```toml
@@ -20,7 +24,9 @@ rtxmlrpc -U all system.hostname
 
 ## Connecting over SSH
 
-`socat` is required to be installed on the remote server for this functionality.
+!!! Requirements
+
+    `socat` is required to be installed on the remote server for this functionality.
 
 ```bash
 # Via port

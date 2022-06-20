@@ -143,3 +143,75 @@ See `rtcontrol --help` for a full list of actions. All action can be dry-run wit
   Show the total size of all torrents.
 * `rtcontrol -o filelist path=/mnt/tmp/\*`  
   List all files in rtorrent under a directory.
+
+### Filter examples
+
+* `*HDTV*`:
+    Anything with "HDTV" in its name
+
+* `/s\d+e\d+/`:
+    Anything with typical TV episode numbering in its name (regex match)
+
+* `ratio=+1`:
+    All downloads seeded to at least 1:1
+
+* `xfer=+0`:
+    All active torrents (transferring data)
+
+* `up=+0` or `up>0`:
+    All seeding torrents (uploading data)
+
+* `down=+0 down=-5k` or `down>0 down<=5k`:
+    Slow torrents (downloading, but with < 5 KiB/s)
+
+* `down=0 is_complete=no is_open=yes`:
+    Stuck torrents
+
+* `size=+4g`:
+    Big stuff (DVD size or larger)
+
+* `is_complete=no`:
+    Incomplete downloads
+
+* `is_open=y is_active=n`:
+    Paused items
+
+* `is_ghost=yes`:
+    Torrents that have no data (were never started or lost their data)
+
+* `alias=obt`:
+    Torrents tracked by `openbittorrent.com` (see [configuration](/configuration/#aliases) on how to add aliases for trackers)
+
+* `ratio=+1 realpath!=/mnt/*`:
+    1:1 seeds not on a mounted path (i.e. likely on localhost)
+
+* `completed=+2w`:
+    Completed more than 2 weeks ago
+
+* `tagged=""`:
+    Not tagged at all
+
+* `tagged=\!`:
+    Has at least one tag
+
+* `tagged=foo,bar`:
+    Tagged with "foo" or "bar" (*since v0.3.5*) — tags are white-space separated
+    lists of names in the field `custom_tags`
+
+* `tagged=:highlander`:
+    *Only* tagged with "highlander" and nothing else
+
+* `kind=flac,mp3`:
+    Music downloads
+
+* `files=sample/*`:
+    Items with a top-level `sample` folder
+
+* `ratio=+2.5 OR seedtime=+1w`:
+  Items seeded to 5:2 **or** for more than a week
+
+* `alias=foo [ ratio=+2.5 OR seedtime=+7d ]`:
+  The same as above, but for one tracker only
+
+* `traits=avi traits=tv,movies`:
+  TV or movies in AVI containers

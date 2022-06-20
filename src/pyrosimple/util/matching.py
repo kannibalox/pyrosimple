@@ -523,6 +523,7 @@ class FloatFilter(NumericFilterBase):
         ratio=1000,
     )
 
+    # pylint: disable=missing-function-docstring
     def pre_filter_eq(self):
         if self._name in self.PRE_FILTER_FIELDS:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
@@ -532,7 +533,9 @@ class FloatFilter(NumericFilterBase):
     def pre_filter_ge(self):
         if self._name in self.PRE_FILTER_FIELDS:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"greater=value=${self.PRE_FILTER_FIELDS[self._name]},value={val-1}"'
+            return (
+                f'"greater=value=${self.PRE_FILTER_FIELDS[self._name]},value={val-1}"'
+            )
         return ""
 
     def pre_filter_gt(self):
@@ -552,6 +555,8 @@ class FloatFilter(NumericFilterBase):
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return f'"less=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
         return ""
+
+    # pylint: enable=missing-function-docstring
 
     def validate(self):
         """Validate filter condition (template method)."""
