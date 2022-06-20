@@ -76,6 +76,7 @@ class FieldStatistics:
         self.min = DefaultBunch(int)
         self.max = DefaultBunch(int)
         self._basetime = time.time()
+        self.intermixed_args = True
 
     def __bool__(self):
         "Truth"

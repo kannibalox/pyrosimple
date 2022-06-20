@@ -65,6 +65,7 @@ class ScriptBase:
         self.options = None
         self.return_code = 0
         self.engine = None
+        self.intermixed_args = False
 
         # For python 3.7 compatibility
         try:
@@ -159,7 +160,10 @@ class ScriptBase:
         # Template method to add options of derived class
         self.add_options()
 
-        self.options = self.parser.parse_intermixed_args()
+        if self.intermixed_args:
+            self.options = self.parser.parse_intermixed_args()
+        else:
+            self.options = self.parser.parse_args()
         self.args = self.options.args
 
         if self.options.log_level:
