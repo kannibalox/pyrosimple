@@ -529,14 +529,28 @@ class FloatFilter(NumericFilterBase):
             return f'"equal=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
         return ""
 
-    def pre_filter_old(self):
-        """Return rTorrent condition to speed up data transfer."""
-        conditions = {"gt": "greater", "lt": "less", "eq": "equal"}
-        if self._name in self.PRE_FILTER_FIELDS and self._op.name in conditions:
+    def pre_filter_ge(self):
+        if self._name in self.PRE_FILTER_FIELDS:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return '"{}=value=${},value={}"'.format(
-                conditions[self._op.name], self.PRE_FILTER_FIELDS[self._name], val
-            )
+            return f'"greater=value=${self.PRE_FILTER_FIELDS[self._name]},value={val-1}"'
+        return ""
+
+    def pre_filter_gt(self):
+        if self._name in self.PRE_FILTER_FIELDS:
+            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
+            return f'"greater=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
+        return ""
+
+    def pre_filter_le(self):
+        if self._name in self.PRE_FILTER_FIELDS:
+            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
+            return f'"less=value=${self.PRE_FILTER_FIELDS[self._name]},value={val+1}"'
+        return ""
+
+    def pre_filter_lt(self):
+        if self._name in self.PRE_FILTER_FIELDS:
+            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
+            return f'"less=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
         return ""
 
     def validate(self):
