@@ -128,6 +128,8 @@ def test_conditions_prefilter(cond, expected):
         ("name=*arch", Bunch(name="base-arch")),
         ("name=/arch/", Bunch(name="base-arch")),
         ("name=/arch$/", Bunch(name="base-arch")),
+        (r"/S\d+E\d+/", Bunch(name="Test.S03E04.mkv")),
+        (r"/s\d+e\d+/i", Bunch(name="Test.S03E04.mkv")),
         ('message=""', Bunch(message="")),
         ('message!=""', Bunch(message="Oh no!")),
         ("is_complete=no", Bunch(is_complete=False)),
@@ -148,6 +150,9 @@ def test_conditions_prefilter(cond, expected):
 )
 def test_matcher(matcher, item):
     m = matching.create_matcher(matcher)
+    print(type(m))
+    if isinstance(m, matching.PatternFilter):
+        print(m._matcher)
     assert m.match(item)
 
 

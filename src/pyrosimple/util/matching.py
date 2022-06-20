@@ -311,7 +311,7 @@ class FieldFilter(MatcherNode):
         """Create a prefilter condition (if possible).
 
         By default this will defer to the operator functions in subclasses,
-        but that behaivor can be overridden."""
+        but that behavior can be overridden."""
         method_name = f"pre_filter_{self._op.name}"
         return str(getattr(self, method_name)())
 
