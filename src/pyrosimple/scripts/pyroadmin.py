@@ -16,6 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import pyrosimple
+from pyrosimple import config
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 
 
@@ -26,10 +28,29 @@ class AdminTool(ScriptBaseWithConfig):
     # TODO: backup session/config
 
     def add_options(self):
-        pass
+        super().add_options()
+        subparsers = self.parser.add_subparsers()
+        config_parser = subparsers.add_parser('config')
+        config_parser.set_defaults(func=self.config)
+        config_parser.add_argument('--check', help='Check config for any issues', action="store_true")
+
+    def config(self):
+        if self.args.check:
+            try:
+                config.autoload_scgi_url()
+            except Exception as e:
+                self.LOG.error("Error loading SCGI URL:")
+                raise
+            else:
+                self.LOG.debug("Loaded SCGI URL successfully")
+            try:
+                pyrosimple.connect().open()
+            except ConnectionRefusedError as e:
+                self.LOG.warning("SCGI URL '%s' found, but rTorrent may not be running!", config.autoload_scgi_url())
 
     def mainloop(self):
-        pass
+        self.args = self.parser.parse_args()
+        self.args.func()
 
 
 def run():  # pragma: no cover
