@@ -29,11 +29,6 @@ class SCGIException(Exception):
 ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 
 
-#
-# SCGI transports
-#
-
-
 class RTorrentTransport(xmlrpclib.Transport):
     """Base class for handle transports. Primarily exists to allow
     using the same transport with a different underlying RPC mechanism"""
@@ -125,7 +120,7 @@ TRANSPORTS = {
     "scgi+ssh": SSHTransport,
 }
 
-# Register our schemes to be parsed as having a netloc
+
 for t in TRANSPORTS:
     register_scheme(t)
 
@@ -147,12 +142,6 @@ def transport_from_url(url: str) -> Type[xmlrpclib.Transport]:
             return transport_from_url(f"scgi://{parsed_url.scheme}:{parsed_url.path}")
         raise URLError(f"Unsupported scheme in URL {parsed_url.geturl()}")
     return transport
-
-
-#
-# Helpers to handle SCGI data
-# See spec at http://python.ca/scgi/protocol.txt
-#
 
 
 def _encode_netstring(data: bytes) -> bytes:

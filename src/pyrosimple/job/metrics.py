@@ -42,7 +42,6 @@ class EngineStats:
             self.LOG.warning(str(exc))
 
 
-# Begin prometheus client code
 class ClientServer(threading.Thread):
     """Simple thread class to run the prometheus HTTP server
     in the background"""
@@ -246,7 +245,7 @@ class RtorrentExporter(BaseJob):
         for j in self.config.get("jobs", "system").split(","):
             j = j.strip()
             if j not in jobs:
-                self.log.error(f"Job {j} not found, skipping")
+                self.log.error("Job %s not found, skipping", j)
             else:
                 REGISTRY.register(jobs[j](self.proxy, self.config))
 

@@ -2,19 +2,7 @@
 
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 
 import errno
 import fnmatch
@@ -38,23 +26,21 @@ from pyrosimple.util import fmt, pymagic
 from pyrosimple.util.parts import Bunch
 
 
-# Allowed characters in a metafile filename or path
 ALLOWED_ROOT_NAME = re.compile(
     r"^[^/\\.~][^/\\]*$"
 )  # cannot be absolute or ~user, and cannot have path parts
 ALLOWED_PATH_NAME = re.compile(r"^(?:~\d+)?[^/\\~][^/\\]*$")
 
-# Character sequences considered secret (roughly, any path part or query parameter
-# that looks like an alphanumeric sequence or url-safe base64 string)
+
 PASSKEY_RE = re.compile(r"(?<=[/=])[-_0-9a-zA-Z]{5,64}={0,3}(?=[/&]|$)")
 
-# Non-secret exemptions
+
 PASSKEY_OK = (
     "announce",
     "TrackerServlet",
 )
 
-# List of all standard keys in a metafile
+
 METAFILE_STD_KEYS = [
     _i.split(".")
     for _i in (

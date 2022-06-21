@@ -2,19 +2,7 @@
 
     Copyright (c) 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 
 import functools
 import json
@@ -33,12 +21,7 @@ NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
 
-# Store these results in a LRU cache, primarily helps with code that
-# performs a method call in some sort of loop.
-# MUST be constant return values for all possible arguments
-# N.B. The inclusion of d.* methods means it's possible
-# for client code to get valid results for hashes that have
-# been removed.
+
 CACHE_METHOD = {
     "d.chunk_size",
     "d.is_private",
@@ -73,7 +56,6 @@ class HashNotFound(XmlRpcError):
         self.faultCode = -404
 
 
-# Currently, we don't have our own errors, so just copy it
 ERRORS = (XmlRpcError,) + scgi.ERRORS
 
 

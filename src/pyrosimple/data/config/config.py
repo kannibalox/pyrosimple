@@ -1,10 +1,3 @@
-# The default PyroScope configuration script
-#
-# For details, see https://pyrosimple.readthedocs.io/en/latest/setup.html
-# and https://pyrosimple.readthedocs.io/en/latest/custom.html#defining-custom-fields
-#
-
-
 def _custom_fields():
     """Yield custom field definitions."""
     # Import some commonly needed modules
@@ -40,5 +33,4 @@ def _custom_fields():
     globals().setdefault("diskspace_threshold_mb", "500")
 
 
-# Register our factory with the system
 custom_field_factories.append(_custom_fields)
