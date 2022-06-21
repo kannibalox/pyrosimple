@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=
 """ Traits tests.
 
@@ -25,12 +24,10 @@ import pytest
 
 from pyrosimple.util import traits
 
+
 @pytest.mark.parametrize(
-    ('name', "alias", "filetype", "result"),
-    [
-        ('Test', None, None, []),
-        ('Test.tgz', None, '.tgz', ['misc', 'tgz'])
-    ]
+    ("name", "alias", "filetype", "result"),
+    [("Test", None, None, []), ("Test.tgz", None, ".tgz", ["misc", "tgz"])],
 )
 def test_trait_detect(name, alias, filetype, result):
     assert traits.detect_traits(name, alias, filetype) == result

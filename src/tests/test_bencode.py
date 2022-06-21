@@ -96,12 +96,12 @@ def test_bencode_decode_values(val, expected):
     assert bencode.decode(val) == expected
 
 
-class DunderBencode(object):
+class DunderBencode:
     def __init__(self, num):
         self.num = num
 
     def __bencode__(self):
-        return "DunderBencode-{}".format(self.num)
+        return f"DunderBencode-{self.num}"
 
 
 @pytest.mark.parametrize(

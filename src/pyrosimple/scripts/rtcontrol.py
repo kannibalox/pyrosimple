@@ -122,11 +122,6 @@ class FieldStatistics:
         return result
 
 
-def move_item(item: rtorrent.RtorrentItem, dest: str):
-    if item.datapath() == dest:
-        return
-
-
 class RtorrentAction(argparse.Action):
     """This class is used by the argparse action parameter for adding rtcontrol actions to a master list in the namespace.
 

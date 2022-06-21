@@ -46,6 +46,7 @@ class EngineStats:
 class ClientServer(threading.Thread):
     """Simple thread class to run the prometheus HTTP server
     in the background"""
+
     def __init__(self, port):
         super().__init__()
         self.port = int(port)
@@ -56,6 +57,7 @@ class ClientServer(threading.Thread):
 
 class RtorrentCollector:
     """Base class for all the different collectors"""
+
     def __init__(self, proxy, config):
         self.proxy = proxy
         self.config = config
@@ -69,6 +71,7 @@ class RtorrentCollector:
 class RtorrentItemCollector(RtorrentCollector):
     """Collects per-item information
     This will most likely caush prometheus to burn except with smaller instances"""
+
     def __init__(self, proxy, config):
         super().__init__(proxy, config)
 
@@ -106,6 +109,7 @@ class RtorrentItemCollector(RtorrentCollector):
 
 class RtorrentTrackerCollector(RtorrentCollector):
     """Collects tracker-based summaries"""
+
     def collect(self):
         tracker_gauge = GaugeMetricFamily(
             self.prefix + "tracker_amount",
@@ -143,6 +147,7 @@ class RtorrentSystemCollector(RtorrentCollector):
     """Collects system information. This is both the most useful and least
     impactful collector, as it only takes a single system.multicall to collect
     all the information"""
+
     def __init__(self, proxy, config):
         super().__init__(proxy, config)
         stat_methods = [
@@ -241,7 +246,7 @@ class RtorrentExporter(BaseJob):
         for j in self.config.get("jobs", "system").split(","):
             j = j.strip()
             if j not in jobs:
-                self.log.error("Job {} not found, skipping".format(j))
+                self.log.error(f"Job {j} not found, skipping")
             else:
                 REGISTRY.register(jobs[j](self.proxy, self.config))
 
