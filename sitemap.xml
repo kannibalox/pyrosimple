@@ -2,62 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://example.com/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/advanced/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/configuration/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/experimental/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://example.com/migrate/</loc>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/pyrotorque-jobs/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/queue/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/quickstart/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/tips/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/usage-pyrotorque/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/usage-rtcontrol/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/usage-rtxmlrpc/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://example.com/usage-tor/</loc>
-         <lastmod>2022-06-13</lastmod>
+         <lastmod>2022-06-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
