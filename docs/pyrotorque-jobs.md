@@ -4,6 +4,30 @@ title: Pyrotorque Jobs
 
 # Pyrotorque Jobs
 
+## Action
+
+This is a simple job, intended to allow access to (almost)
+the same actions as `rtcontrol`.
+
+Example of stopping completed torrents after they reach a >5 ratio:
+
+```toml
+[TORQUE]
+[TORQUE.stop_well_seeded]
+handler       = "pyrosimple.job.action:Action"
+active        = true
+dry_run       = false
+schedule      = "hour=*"
+matcher       = "is_ignored=no ratio>5.0"
+view          = "complete"
+action        = "stop"
+```
+
+Arguments:
+* `action`: The action to perform. See `rtcontrol --help` for a list of actions.
+* `view`: The rtorrent view to query
+* `matcher`: The query to use when listing torrents
+
 ## Queue Manager
 
 ### Configuration

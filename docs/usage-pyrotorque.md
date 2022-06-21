@@ -59,7 +59,7 @@ Any other settings are job-specific. For more detail documentation for each job,
 Once you have a configuration file, the easiest way to test your configuration is to try running the process in the foreground:
 
 ```bash
-# Also enforce `dry_run = true` and output messages while we're testing things
+# Also enforce dry_run mode and output info messages while we're testing things
 pyrotorque --fg --dry-run -v
 ```
 
@@ -70,7 +70,7 @@ pyrotorque --run-once stats --dry-run --debug
 
 Once you're satisfied, you can launch the process into the background by simply running `pyrotorque`. You can check the status, restart, or stop the daemon with `--status`, `--restart` and `--stop` respectively. Alternatively, see your distro's documentation for writing service files. Here is a bare-bones example for a systemd-based distro:
 
-```ini
+```ini title="pyrotorque.service"
 [Unit]
 Description=Pyrotorque rtorrent daemon
 After=network-online.target rtorrent.service
