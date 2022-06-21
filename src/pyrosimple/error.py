@@ -40,3 +40,7 @@ class NetworkError(LoggableError):
 
 class UserError(LoggableError):
     """Yes, it was your fault!"""
+
+
+class ConfigurationError(LoggableError):
+    """Generic config error."""

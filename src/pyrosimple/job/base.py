@@ -4,7 +4,7 @@ from typing import Dict, Optional
 import pyrosimple
 
 from pyrosimple import error
-from pyrosimple.torrent import formatting, rtorrent
+from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
 
 
@@ -33,10 +33,16 @@ class MatchableJob(BaseJob):
     def __init__(self, config=None):
         super().__init__(config)
         self.config.setdefault("view", "main")
+        sort = self.config.get("sort", "name,hash")
+        query_tree = matching.QueryGrammar.parse(self.config["matcher"])
+        sort_keys = [s[1:] if s.startswith("-") else s for s in sort.split(",")]
+
         self.matcher = matching.create_matcher(self.config["matcher"])
-        self.sort_key = formatting.validate_sort_fields(
-            self.config.get("sort", "name,hash")
-        )
+        self.sort_key = formatting.validate_sort_fields(sort)
+        self.prefetch_fields = [
+            *matching.KeyNameVisitor().visit(query_tree),
+            *sort_keys,
+        ]
 
     def run_item(self, item: rtorrent.RtorrentItem):
         """Let all child classes determine what the action is."""
@@ -49,8 +55,14 @@ class MatchableJob(BaseJob):
         that still needs to happen in run_item()"""
         try:
             self.engine.open()
-            matches = self.engine.view(self.config["view"], self.matcher)
-            for i in list(matches).sort(key=self.sort_key):
+            prefetch = [
+                engine.FieldDefinition.FIELDS[f].requires for f in self.prefetch_fields
+            ]
+            prefetch = [item for sublist in prefetch for item in sublist]
+            view = self.engine.view(self.config["view"], self.matcher)
+            matches = list(self.engine.items(view=view, prefetch=prefetch))
+            matches.sort(key=self.sort_key)
+            for i in matches:
                 if self.matcher.match(i):
                     self.run_item(i)
         except (error.LoggableError, *rpc.ERRORS) as exc:

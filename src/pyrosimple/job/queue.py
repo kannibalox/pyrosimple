@@ -9,6 +9,7 @@ from pyrosimple import error
 from pyrosimple.job.base import MatchableJob
 from pyrosimple.util import matching, rpc
 
+
 # pylint: disable=abstract-method
 class QueueManager(MatchableJob):
     """rTorrent queue manager implementation."""

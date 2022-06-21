@@ -170,7 +170,6 @@ def format_item(
     """
     if defaults is None:
         defaults = {}
-    # otemplate = env.from_string(format_spec)
     return str(template.render(d=item, **defaults))
 
 
