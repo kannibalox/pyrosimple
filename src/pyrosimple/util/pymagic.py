@@ -54,7 +54,7 @@ def get_class_logger(obj):
 
 
 class JSONEncoder(json.JSONEncoder):
-    """Custon JSON encoder."""
+    """Custom JSON encoder."""
 
     def default(self, o):
         """Support more object types."""
