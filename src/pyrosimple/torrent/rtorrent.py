@@ -3,7 +3,7 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
-
+import base64
 import errno
 import fnmatch
 import operator
@@ -12,14 +12,16 @@ import shlex
 import time
 
 from collections import defaultdict
-from functools import partial
+from functools import partial, lru_cache
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Union
 from xmlrpc import client as xmlrpclib
 
+import bencode
+
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, matching, pymagic, rpc, traits
+from pyrosimple.util import fmt, matching, pymagic, rpc, traits, metafile
 from pyrosimple.util.cache import ExpiringCache
 from pyrosimple.util.parts import Bunch
 
@@ -393,6 +395,79 @@ class RtorrentItem(engine.TorrentProxy):
             method = method.lstrip(">")
             self._make_it_so("executing command on", [method], *args, observer=observer)
 
+    def custom_items(self) -> Dict:
+        """Try using rtorrent-ps commands to list custom keys, otherwise fall back to reading from a session file.
+
+        This does *not* include the custom1, custom2, etc. keys"""
+        proxy = self._engine.open()
+        if self._engine.has_method("d.custom.keys"):
+            custom_fields = {}
+            for key in proxy.d.custom.keys(self.hash):
+                custom_fields[key] = proxy.d.custom(self.hash, key)
+            return custom_fields
+        proxy.d.save_full_session(self.hash)
+        info_file = Path(proxy.session.path(), f"{self.hash}.torrent.rtorrent")
+        return dict(
+            bencode.decode(proxy.execute.capture(rpc.NOHASH, "cat", info_file))[
+                "custom"
+            ]
+        )
+
+    def move_to_host(self, remote_url: str, copy: bool = False):
+        remote_proxy = RtorrentEngine(remote_url).open()
+        proxy = self._engine.open()
+        self._engine.LOG.debug("Attempting to move %s to %s", self.hash, remote_url)
+        extra_cmds: List[str] = []
+        try:
+            remote_proxy.d.hash(self.hash)
+        except rpc.HashNotFound:
+            pass
+        else:
+            raise error.EngineError(
+                f"Hash {self.hash} already exists remotely on {remote_url}"
+            )
+        torrent_path = Path(proxy.session.path(), f"{self.hash}.torrent")
+        torrent = bencode.decode(
+            base64.b64decode(
+                proxy.execute.capture(
+                    rpc.NOHASH,
+                    "base64",
+                    torrent_path,
+                )
+            )
+        )
+        metafile.add_fast_resume(torrent, proxy.d.directory_base(self.hash))
+        base_dir = proxy.d.directory_base(self.hash).replace('"', r"\"")
+        extra_cmds.insert(0, f'd.directory_base.set="{base_dir}"')
+        rpc_metafile = xmlrpclib.Binary(bencode.bencode(torrent))
+        if not copy:
+            proxy.d.stop(self.hash)
+        self._engine.LOG.debug("Running extra commands on load: %s", extra_cmds)
+        remote_proxy.load.raw_verbose("", rpc_metafile, *extra_cmds)
+        for _ in range(0, 10):
+            try:
+                remote_proxy.d.hash(self.hash)
+            except rpc.HashNotFound:
+                time.sleep(0.5)
+        # After 5 seconds, let the exception happen
+        remote_proxy.d.hash(self.hash)
+
+        # Keep custom values
+        # Trying to load these in during the load.raw tends to cause either the load to fail
+        # or the values to get corrupted.
+
+        for k, v in self.custom_items().items():
+            remote_proxy.d.custom.set(self.hash, k, v)
+        for key in range(1, 5):
+            value = getattr(proxy.d, f"custom{key}")(self.hash)
+            if value:
+                getattr(remote_proxy.d, f"custom{key}.set")(self.hash, value)
+
+        remote_proxy.d.start(self.hash)
+        if not copy:
+            proxy.d.erase(self.hash)
+        return True
+
     def delete(self):
         """Remove torrent from client."""
         self.stop()
@@ -665,6 +740,13 @@ class RtorrentEngine:
                 result = r[0]
             results[list(methods.keys())[index]] = result
         return results
+
+    @lru_cache
+    def has_method(self, method_name: str):
+        """Cached check to see if method exists"""
+        if method_name in self.rpc.system.listMethods():
+            return True
+        return False
 
     def open(self):
         """Open connection."""

@@ -351,6 +351,12 @@ class RtorrentControl(ScriptBaseWithConfig):
             metavar="CMD [--call]",
         )
         action_group.add_argument(
+            "--move-to-host",
+            action=RtorrentInteractiveAction,
+            help="move item to another host (implies -i)",
+            metavar="URL",
+        )
+        action_group.add_argument(
             "--spawn",
             action=RtorrentInteractiveAction,
             help="execute OS command pattern(s) directly (implies -i)",
