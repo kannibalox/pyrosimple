@@ -90,7 +90,7 @@ class QueueManager(MatchableJob):
                 return
 
         # Start eligible items
-        for idx, item in enumerate(startable.sort(key=self.sort_key)):
+        for idx, item in enumerate(sorted(startable, key=self.sort_key)):
             # Check if we reached 'start_now' in this run
             if idx >= start_now:
                 self.log.debug(
