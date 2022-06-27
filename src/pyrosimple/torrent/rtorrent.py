@@ -741,7 +741,7 @@ class RtorrentEngine:
             results[list(methods.keys())[index]] = result
         return results
 
-    @lru_cache
+    @lru_cache(maxsize=32)
     def has_method(self, method_name: str):
         """Cached check to see if method exists"""
         if method_name in self.rpc.system.listMethods():
