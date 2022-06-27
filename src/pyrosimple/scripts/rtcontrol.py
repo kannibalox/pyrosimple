@@ -305,12 +305,12 @@ class RtorrentControl(ScriptBaseWithConfig):
             "NAME",
             help="show search result only in named ncurses view",
         )
-        self.script.add_bool_option(
+        self.add_bool_option(
             "-i",
             "--interactive",
             help="interactive mode (prompt before changing things)",
         )
-        self.script.add_bool_option(
+        self.add_bool_option(
             "--yes", help="positively answer all prompts (e.g. --delete --yes)"
         )
         self.add_value_option(
