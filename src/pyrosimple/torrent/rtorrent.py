@@ -94,7 +94,7 @@ class RtorrentItem(engine.TorrentProxy):
             f_multicall = self._engine.rpc.f.multicall
             f_params = [
                 self._fields["hash"],
-                0,
+                rpc.NOHASH,
                 "f.path=",
                 "f.size_bytes=",
                 "f.last_touched=",
@@ -432,7 +432,7 @@ class RtorrentItem(engine.TorrentProxy):
                 proxy.execute.capture(
                     rpc.NOHASH,
                     "base64",
-                    torrent_path,
+                    str(torrent_path),
                 )
             )
         )
