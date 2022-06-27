@@ -16,8 +16,10 @@ import time
 from multiprocessing.pool import ThreadPool
 from typing import Callable, List, Union
 
-from pyrosimple import config
-from pyrosimple.scripts.base import PromptDecorator, ScriptBase, ScriptBaseWithConfig
+from prompt_toolkit import prompt
+
+from pyrosimple import config, error
+from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import engine, formatting, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
 from pyrosimple.util.parts import DefaultBunch
@@ -218,7 +220,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         """Initialize rtcontrol."""
         super().__init__()
 
-        self.prompt = PromptDecorator(self)
         self.is_plain_output_format = False
         self.original_output_format = None
 
@@ -233,7 +234,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.add_bool_option(
             "-n", "--dry-run", help="don't commit changes, just tell what would happen"
         )
-        self.prompt.add_options()
 
         # output control
         output_group = self.parser.add_argument_group("output")
@@ -304,6 +304,14 @@ class RtorrentControl(ScriptBaseWithConfig):
             "--to",
             "NAME",
             help="show search result only in named ncurses view",
+        )
+        self.script.add_bool_option(
+            "-i",
+            "--interactive",
+            help="interactive mode (prompt before changing things)",
+        )
+        self.script.add_bool_option(
+            "--yes", help="positively answer all prompts (e.g. --delete --yes)"
         )
         self.add_value_option(
             "--alter-view",
@@ -681,6 +689,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         engines = {}
         for uri in self.multi_connection_lookup(config.settings["SCGI_URL"]):
             engines[uri] = rtorrent.RtorrentEngine(uri, auto_open=True)
+
         # Kick off the result fetcher in a thread pool
         pool = ThreadPool(processes=len(engines))
         futures = {}
@@ -754,15 +763,6 @@ class RtorrentControl(ScriptBaseWithConfig):
                         template_args = [
                             ("{##}" + i if "{{" in i else i) for i in action["args"]
                         ]
-                        if not self.prompt.ask_bool(f"{action_name} item {item.name}"):
-                            continue
-                        if (
-                            self.options.output_format
-                            and not self.options.view_only
-                            and str(self.options.output_format) != "-"
-                        ):
-                            self.emit(item, defaults)
-
                         args = tuple(
                             formatting.format_item(
                                 formatting.env.from_string(i),
@@ -771,6 +771,27 @@ class RtorrentControl(ScriptBaseWithConfig):
                             )
                             for i in template_args
                         )
+
+                    if (
+                        action["interactive"] or self.options.interactive
+                    ) and not self.options.yes:
+                        self.emit(item, defaults)
+                        answer = prompt(
+                            f"{action_name}? [Y)es, n)o, a)ll yes, q)uit]: "
+                        )
+                        if answer.lower() in ["n", "no"]:
+                            continue
+                        if answer.lower() in ["q", "quit"]:
+                            self.LOG.warn("Abort due to user choice!")
+                            sys.exit(error.EX_TEMPFAIL)
+                        if answer.lower() in ["a", "all"]:
+                            self.options.yes = True
+                    elif (
+                        self.options.output_format
+                        and not self.options.view_only
+                        and str(self.options.output_format) != "-"
+                    ):
+                        self.emit(item, defaults)
 
                     if self.options.dry_run:
                         self.LOG.debug("Would call action %s%r", action["method"], args)
@@ -784,6 +805,9 @@ class RtorrentControl(ScriptBaseWithConfig):
                             self.LOG.debug("Runing '%s'", args)
                             subprocess.run(args, check=True, shell=False)
                             continue
+                        # Look up aliases when moving to a host
+                        if action_name == "move to host":
+                            args[0] = self.lookup_connection_alias(args[0])
                         getattr(item, action["method"])(*args)
                         if self.options.view_only:
                             show_in_client = functools.partial(
@@ -833,7 +857,11 @@ class RtorrentControl(ScriptBaseWithConfig):
                 sys.stdout.flush()
 
             # Show on console?
-            elif self.options.output_format and str(self.options.output_format) != "-" and not actions:
+            elif (
+                self.options.output_format
+                and str(self.options.output_format) != "-"
+                and not actions
+            ):
                 if not self.options.summary:
                     for item in matches:
                         # Print matching item

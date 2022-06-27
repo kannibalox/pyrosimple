@@ -12,7 +12,7 @@ import shlex
 import time
 
 from collections import defaultdict
-from functools import partial, lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Union
 from xmlrpc import client as xmlrpclib
@@ -21,7 +21,7 @@ import bencode
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, matching, pymagic, rpc, traits, metafile
+from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
 from pyrosimple.util.cache import ExpiringCache
 from pyrosimple.util.parts import Bunch
 
