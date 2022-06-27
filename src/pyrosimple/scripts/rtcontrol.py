@@ -833,7 +833,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 sys.stdout.flush()
 
             # Show on console?
-            elif self.options.output_format and str(self.options.output_format) != "-":
+            elif self.options.output_format and str(self.options.output_format) != "-" and not actions:
                 if not self.options.summary:
                     for item in matches:
                         # Print matching item
