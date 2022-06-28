@@ -72,7 +72,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     def __init__(
         self,
-        uri,
+        url,
         transport=None,
         encoding=None,
         verbose=False,
@@ -100,9 +100,9 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 headers = [("CONTENT_TYPE", "application/json")]
             elif self.__rpc_codec == "xml":
                 codec = xmlrpclib
-            handler = scgi.transport_from_url(uri)
+            handler = scgi.transport_from_url(url)
             transport = handler(
-                uri=uri,
+                url=url,
                 use_datetime=use_datetime,
                 use_builtin_types=use_builtin_types,
                 codec=codec,
@@ -205,7 +205,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         raise ValueError(f"Invalid RPC protocol '{self.__rpc_codec}'")
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} via {self.__rpc_codec} for {self.__uri}>"
+        return f"<{self.__class__.__name__} via {self.__rpc_codec} for {self.__url}>"
 
     def __getattr__(self, name):
         # magic method dispatcher

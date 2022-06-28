@@ -15,12 +15,6 @@ from xmlrpc import client as xmlrpclib
 logger = logging.getLogger(__name__)
 
 
-def register_scheme(scheme: str):
-    """Helper method to register protocols with urllib"""
-    for method in filter(lambda s: s.startswith("uses_"), dir(urlparse)):
-        getattr(urlparse, method).append(scheme)
-
-
 class SCGIException(Exception):
     """SCGI protocol error"""
 
@@ -59,7 +53,7 @@ class SSHTransport(RTorrentTransport):
 
     def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
-        target = urlparse.urlparse(self.uri).path
+        target = urlparse.urlparse(self.url).path
         cmd = ["ssh", host, "socat", "STDIO", target[1:]]
         resp = subprocess.run(
             cmd,
@@ -79,7 +73,7 @@ class HTTPTransport(RTorrentTransport):
 
     def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
-        req = urllib.request.Request(self.uri)
+        req = urllib.request.Request(self.url)
         for key, val in self._headers:
             req.add_header(key, val)
         req.data = request_body
@@ -92,8 +86,9 @@ class TCPTransport(RTorrentTransport):
 
     def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
+        target = urlparse.urlparse(self.url)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            host, port = host.split(":")
+            host, port = target.netloc.split(":")
             sock.connect((host, int(port)))
             sock.sendall(_encode_payload(request_body, self._headers))
             with sock.makefile("rb") as handle:
@@ -124,6 +119,12 @@ TRANSPORTS = {
     "scgi+unix": UnixTransport,
     "scgi+ssh": SSHTransport,
 }
+
+
+def register_scheme(scheme: str):
+    """Helper method to register protocols with urllib"""
+    for method in filter(lambda s: s.startswith("uses_"), dir(urlparse)):
+        getattr(urlparse, method).append(scheme)
 
 
 for t in TRANSPORTS:
