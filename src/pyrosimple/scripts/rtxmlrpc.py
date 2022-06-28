@@ -113,8 +113,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     "You need to configure a RPC connection, read"
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
-            for uri in self.multi_connection_lookup(config.settings["SCGI_URL"]):
-                self.proxies.append(rpc.RTorrentProxy(uri))
+            for url in self.multi_connection_lookup(config.settings["SCGI_URL"]):
+                self.proxies.append(rpc.RTorrentProxy(url))
         return self.proxies
 
     def cooked(self, raw_args):

@@ -7,12 +7,12 @@
 from pyrosimple.torrent import rtorrent
 
 
-def connect(uri=None):
+def connect(url=None):
     """Initialize everything for interactive use.
 
     Returns a ready-to-use RtorrentEngine object.
     """
-    return rtorrent.RtorrentEngine(uri)
+    return rtorrent.RtorrentEngine(url)
 
 
 def view(

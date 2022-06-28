@@ -655,7 +655,7 @@ class RtorrentEngine:
         "d.up.total",
     }
 
-    def __init__(self, uri=None, auto_open=False):
+    def __init__(self, url=None, auto_open=False):
         """Initialize proxy."""
         self.LOG = pymagic.get_class_logger(self)
         self.engine_id = "N/A"  # ID of the instance we're connecting to
@@ -667,10 +667,10 @@ class RtorrentEngine:
         self.properties = {}
         self._item_cache = {}
         self.known_throttle_names = {"", "NULL"}
-        if uri is None:
+        if url is None:
             config.autoload_scgi_url()
         else:
-            config.settings.SCGI_URL = uri
+            config.settings.SCGI_URL = url
         if auto_open:
             self.open()
 

@@ -687,13 +687,13 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Find matching torrents
         engines = {}
-        for uri in self.multi_connection_lookup(config.settings["SCGI_URL"]):
-            engines[uri] = rtorrent.RtorrentEngine(uri, auto_open=True)
+        for url in self.multi_connection_lookup(config.settings["SCGI_URL"]):
+            engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
 
         # Kick off the result fetcher in a thread pool
         pool = ThreadPool(processes=len(engines))
         futures = {}
-        for uri, r_engine in engines.items():
+        for url, r_engine in engines.items():
 
             def fetch(e):
                 view = e.view(self.options.from_view, matcher)
@@ -711,12 +711,12 @@ class RtorrentControl(ScriptBaseWithConfig):
                 matches.sort(key=sort_key, reverse=self.options.reverse_sort)
                 return matches
 
-            futures[uri] = pool.apply_async(fetch, (r_engine,))
+            futures[url] = pool.apply_async(fetch, (r_engine,))
 
         # The rest of the process should still be done in sequence
-        for uri, r_engine in engines.items():
+        for url, r_engine in engines.items():
             view = r_engine.view(self.options.from_view, matcher)
-            matches = futures[uri].get()
+            matches = futures[url].get()
 
             if selection:
                 matches = matches[selection[0] - 1 : selection[1]]
