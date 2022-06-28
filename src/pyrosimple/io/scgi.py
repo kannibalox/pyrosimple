@@ -33,8 +33,12 @@ class RTorrentTransport(xmlrpclib.Transport):
     """Base class for handle transports. Primarily exists to allow
     using the same transport with a different underlying RPC mechanism"""
 
-    def __init__(self, *args, uri, codec=xmlrpclib, headers=(), **kwargs):
-        self.uri = uri
+    def __init__(self, *args, url, codec=xmlrpclib, headers=(), **kwargs):
+        if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
+            url = "scgi://" + url
+        if url.startswith("/") or url.startswith("~"):
+            url = "scgi+unix://" + url
+        self.url = url
         self.codec = codec
         self.verbose = False
         # We need to handle the headers differently based on the RPC protocols
@@ -101,10 +105,11 @@ class TCPTransport(RTorrentTransport):
 class UnixTransport(RTorrentTransport):
     """Transport via UNIX domain socket."""
 
-    def request(self, host, handler, request_body, verbose=False):
+    def request(self, _host, handler, request_body, verbose=False):
         self.verbose = verbose
-        with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as sock:
-            sock.connect(host)
+        target = urlparse.urlparse(self.url).path
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+            sock.connect(target)
             sock.sendall(_encode_payload(request_body))
             with sock.makefile("b") as handle:
                 return self.parse_response(
@@ -129,8 +134,8 @@ def transport_from_url(url: str) -> Type[xmlrpclib.Transport]:
     """Create a transport for the given URL."""
     if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
         url = "scgi://" + url
-    elif url.startswith("/") or url.startswith("~"):
-        url = "scgi+unix://"
+    if url.startswith("/") or url.startswith("~"):
+        url = "scgi+unix://" + url
     parsed_url = urlparse.urlsplit(url, scheme="scgi", allow_fragments=False)
 
     try:
@@ -139,7 +144,7 @@ def transport_from_url(url: str) -> Type[xmlrpclib.Transport]:
         # pylint: disable=raise-missing-from
         if not any((parsed_url.netloc, parsed_url.query)) and parsed_url.path.isdigit():
             # Support simplified "domain:port" URLs
-            return transport_from_url(f"scgi://{parsed_url.scheme}:{parsed_url.path}")
+            return transport_from_url(f"scgi://{parsed_url.netloc}:{parsed_url.path}")
         raise URLError(f"Unsupported scheme in URL {parsed_url.geturl()}")
     return transport
 

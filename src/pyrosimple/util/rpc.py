@@ -84,15 +84,11 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         context=None,
     ):
         # Get the url
-        parsed_url = urllib.parse.urlsplit(uri)
+        parsed_url = urllib.parse.urlsplit(url)
         queries = urllib.parse.parse_qs(parsed_url.query)
-        if parsed_url.scheme not in ("http", "https", "scgi", "scgi+ssh", "scgi+unix"):
-            raise OSError(
-                f"unsupported RPC scheme '{parsed_url.scheme}' in url '{uri}'"
-            )
         # Config the connection details
         self.__rpc_codec = queries.get("rpc", ["xml"])[0]
-        self.__uri = uri
+        self.__url = url
         self.__host = parsed_url.netloc
         self.__handler = urllib.parse.urlunsplit(["", "", *parsed_url[2:]])
         if not self.__handler and parsed_url.scheme in ("http", "https"):
