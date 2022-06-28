@@ -414,6 +414,10 @@ class RtorrentItem(engine.TorrentProxy):
         )
 
     def move_to_host(self, remote_url: str, copy: bool = False):
+        """Migrate an item to a remote host
+
+        TODO allow skipping fast resume (which requires local access to FS)
+        FIXME invalidate all self-cached items after sending"""
         remote_proxy = RtorrentEngine(remote_url).open()
         proxy = self._engine.open()
         self._engine.LOG.debug("Attempting to move %s to %s", self.hash, remote_url)
