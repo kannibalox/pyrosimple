@@ -130,6 +130,9 @@ rtcontrol has many ways to effect torrent, including but not limited to:
 
 See `rtcontrol --help` for a full list of actions. All action can be dry-run with the `-n`/`--dry-run` flag. Many of the more dangerous actions (e.g. `--cull`) will prompt before actually performing the action. However, if you wish to enable prompting for all action, the `-i`/`--interactive` will set that behavior for all commands. Alternatively, if you don't want any prompts at all (e.g. when running in a headless script), `--yes` will automatically confirm all prompts.
 
+When multiple actions are specified, rtcontrol will apply those actions to each item in sequence.
+
+### Executing commands
 
 ## Examples
 
@@ -143,6 +146,8 @@ See `rtcontrol --help` for a full list of actions. All action can be dry-run wit
   Show the total size of all torrents.
 * `rtcontrol -o filelist path=/mnt/tmp/\*`  
   List all files in rtorrent under a directory.
+* `rtcontrol --start is_complete=yes is_active=no is_open=no`  
+  Start all completed but inactive torrents.
 
 ### Filter examples
 

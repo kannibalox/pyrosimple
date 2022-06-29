@@ -45,7 +45,7 @@ aborted with an error.
 
 ### Copy Session Metafiles by Category
 
-Here\'s a practical example for using `--spawn`, it copies all your
+Here's a practical example for using `--spawn`, it copies all your
 loaded metafiles from the session directory into a folder structure
 categorized by the *ruTorrent* label. Unlabelled items go to the
 `_NOLABEL` folder.
@@ -59,7 +59,7 @@ rtcontrol // \
 ```
 
 The copied metafiles themselves are renamed to the contained name of the
-item\'s data, plus a small part of the infohash to make these names
+item's data, plus a small part of the infohash to make these names
 unique.
 
 Replace the `i.fetch(1)` by `i.‹fieldname›` to categorize by other
@@ -73,12 +73,12 @@ that. For global commands not referring to specific items, see the next
 section about the `rtxmlrpc` tool. Read through the following examples
 to understand how `--exec` works, features are explained as they are
 used there. Also make sure you understand basic things like
-`output-templates`{.interpreted-text role="ref"} beforehand, it\'s
+`output-templates`{.interpreted-text role="ref"} beforehand, it's
 assumed here that you do.
 
 ### Repairing Stuck Items
 
-Let\'s start with an easy example of using `--exec`, where no templating
+Let's start with an easy example of using `--exec`, where no templating
 is needed:
 
 ``` bash
@@ -108,7 +108,7 @@ The `:` prefix prevents `rtcontrol` from assuming this is a `d.` item
 command.
 
 Make sure that the registered handlers do not have adverse effects when
-called repeatedly, i.e. know what you\'re doing. The handlers for an
+called repeatedly, i.e. know what you're doing. The handlers for an
 event can be listed like so:
 
 ``` bash
@@ -125,7 +125,7 @@ rtcontrol --exec 'directory_base.set="/mnt/data/new/path"' directory=/mnt/data/o
 ```
 
 This replaces the location of items stored at `/mnt/data/old/path` with
-a new path. But to be really useful, we\'d want to shift *any* path
+a new path. But to be really useful, we'd want to shift *any* path
 under a given base directory to a new location -- the next command does
 this by using templating and calculating the new path based on the old
 one:
@@ -146,7 +146,7 @@ implied.
 
 The `move-data`{.interpreted-text role="ref"} section has more on how to
 also move the data on disk, in addition to changing the location in
-[rTorrent]{.title-ref}\'s session as shown here.
+rTorrent's session as shown here.
 
 ### Making Shared Data Paths Unique
 
@@ -158,7 +158,7 @@ rtcontrol --from stopped // --exec 'directory.set={{item.directory}}-{{item.hash
 
 That command ensures that items that would download into the same path
 get a unique name by appending the info hash, and assumes those items
-weren\'t started yet (i.e. added via `load.normal`).
+weren't started yet (i.e. added via `load.normal`).
 
 ### Changing Announce URLs in Bulk
 
@@ -426,7 +426,7 @@ job that does some background processing for rTorrent, including custom
 ones that you can add yourself.
 
 It runs in the background parallel to rTorrent and has its own scheduler
-to run automation jobs similar to rTorrent\'s `schedule` command --- one
+to run automation jobs similar to rTorrent's `schedule` command --- one
 of the jobs does start stopped items in a controlled fashion, that is
 the queue manager part.
 
@@ -455,7 +455,7 @@ install the *full* set of dependencies:
 ```
 
 Watch out for any errors, since this installs several Python extensions
-that *might* need some `*-dev` OS packages available that you don\'t
+that *might* need some `*-dev` OS packages available that you don't
 have on your machine.
 
 The `pyrotorque` queue manager daemon relies on certain additions to
@@ -532,7 +532,7 @@ Anything else will lead to confusing and inconsistent results.
 In the above example for the `queue` job, `downloading_max` counts
 started-but-incomplete items including those that ignore commands. Only
 if there are fewer of these items in the client than that number, a new
-item will be started. This is the queue\'s length and thus the most
+item will be started. This is the queue's length and thus the most
 important parameter.
 
 The queue *never* stops any items, i.e. `downloading_max` is not
@@ -541,7 +541,7 @@ That is also the reason items that should be under queue control must be
 loaded in 'normal' mode, i.e. stopped.
 
 Other queue parameters are the minimum number of items in
-\'downloading\' state named `downloading_min`, which trumps
+'downloading' state named `downloading_min`, which trumps
 `start_at_once`, the maximum number of items to start in one run of the
 job. Both default to `1`. Since the default schedule is `second=*/15`,
 that means at most one item would be started every 15 seconds.
@@ -572,9 +572,9 @@ job.queue.startable = is_ignored=0 message= prio>0
 ```
 
 This sample condition also adds the extra hurdle that audio downloads
-that don\'t stay below a 25% threshold regarding contained images are
+that don't stay below a 25% threshold regarding contained images are
 **not** started automatically. *Unless* you raise the priority to 3
-(`high`) using the `+` key, then they\'re fair game for the queue. Go do
+(`high`) using the `+` key, then they're fair game for the queue. Go do
 all that with a plain rTorrent watch dir, in one line of configuration.
 
 The parameter `sort_fields` is used to determinate in what order
@@ -594,7 +594,7 @@ job.queue.downloading = [ prio>1 [ down>3 OR started<2i ] ]
 In plain English, this example says we only count items that have a
 normal or high priority, and transfer data or were started in the last 2
 minutes. The priority check means you can 'hide' started items from the
-queue by setting them to `low`, e.g. because they\'re awfully slow and
+queue by setting them to `low`, e.g. because they're awfully slow and
 prevent your full bandwidth from being used.
 
 The second part automatically ignores stalled items unless just started.
@@ -639,7 +639,7 @@ Should you have both `start` and `load` in a path, then `start` wins.
 
 `path` determines the root of the folder tree to watch for new metafiles
 via registration with the `inotify` mechanism of Linux. That means they
-are loaded milliseconds after they\'re written to disk, without any
+are loaded milliseconds after they're written to disk, without any
 excessive polling.
 
 ``` ini
@@ -652,7 +652,7 @@ folders with `:`.
 The `cmd.«name»` settings can be used to provide additional load
 commands, executed during loading the new item, *before* it is started
 (in case it is started at all). This is equivalent to the commands you
-can append to a rTorrent `load.*` command. They\'re added in the
+can append to a rTorrent `load.*` command. They're added in the
 alphabetic order of their names.
 
 ``` ini
@@ -686,7 +686,7 @@ after you have restarted it to load them.
 
 ### Testing Your Configuration
 
-After having completed your configuration, you\'re ready to **test it,
+After having completed your configuration, you're ready to **test it,
 by following these steps**:
 
 1.  Execute `rm ~/.pyroscope/run/pyrotorque` to **prevent the watchdog
@@ -705,7 +705,7 @@ by following these steps**:
     should show that no daemon process is running.
 6.  Execute `touch ~/.pyroscope/run/pyrotorque` --- this does **create
     the guard file again**, which must always exist if you want
-    `pyrotorque` to run in the background (otherwise you\'ll just get an
+    `pyrotorque` to run in the background (otherwise you'll just get an
     error message on the console or in the log, if you try to launch
     it).
 7.  **Wait up to 300 seconds**, and if your *rTorrent* configuration has
@@ -783,7 +783,7 @@ section below, and just adapt one of the prepared use cases to your
 setup.
 
 So how does this work? When a `.torrent` file is notified for loading
-via `inotify`, it\'s parsed and contained data is put into variables
+via `inotify`, it's parsed and contained data is put into variables
 that can be used in the command templates. In order to get an idea what
 variables are available, you can dump the templating namespace for a
 metafile to the console, by calling the `watch` job directly.
@@ -823,13 +823,13 @@ Things to take note of:
     to the watch dir root.
 
 2.  all kinds of other information is made available, like the
-    torrent\'s info hash and the tracker alias; thus you can write
+    torrent's info hash and the tracker alias; thus you can write
     conditional templates based on tracker, or use the tracker name in a
     completion path.
 
 3.  for certain types of downloads, `traits` provides parsed information
     to build specific target paths, e.g. for the
-    `Pioneer.One.S01E06.720p.x264-VODO` TV episode, you\'ll get this:
+    `Pioneer.One.S01E06.720p.x264-VODO` TV episode, you'll get this:
 
     ``` ini
     label='tv/mkv'
@@ -861,7 +861,7 @@ the custom variable that is set, and moves the data based on its value.
 ### Tree Watch with Sorting
 
 This example adds a *second* job for a `sorted` tree that directly saves
-the data into a path based on the loaded metafile\'s location.
+the data into a path based on the loaded metafile's location.
 
 ``` ini
 # Tree watch with location
@@ -885,8 +885,8 @@ job.watch-sorted.cmd.setdir     = {{# set download path
 Change the values in the second block to suit your needs. As given, an
 item loaded from `…/sorted/watch/movies/*.torrent` would end up in the
 `…/sorted/movies` directory (with the filename coming from inside the
-metafile as usual), and it won\'t start by itself.
+metafile as usual), and it won't start by itself.
 
-Also, paths containing `music` use the metafile\'s basename as the data
+Also, paths containing `music` use the metafile's basename as the data
 directory, and metafiles recognized as TV content get separated into
 show directories.

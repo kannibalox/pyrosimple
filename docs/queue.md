@@ -7,7 +7,7 @@ job that does some background processing for rTorrent, including custom
 ones that you can add yourself.
 
 It runs in the background parallel to rTorrent and has its own scheduler
-to run automation jobs similar to rTorrent\'s `schedule` command --- one
+to run automation jobs similar to rTorrent's `schedule` command --- one
 of the jobs does start stopped items in a controlled fashion, that is
 the queue manager part.
 
@@ -36,7 +36,7 @@ install the *full* set of dependencies:
 ```
 
 Watch out for any errors, since this installs several Python extensions
-that *might* need some `*-dev` OS packages available that you don\'t
+that *might* need some `*-dev` OS packages available that you don't
 have on your machine.
 
 The `pyrotorque` queue manager daemon relies on certain additions to
@@ -113,7 +113,7 @@ Anything else will lead to confusing and inconsistent results.
 In the above example for the `queue` job, `downloading_max` counts
 started-but-incomplete items including those that ignore commands. Only
 if there are fewer of these items in the client than that number, a new
-item will be started. This is the queue\'s length and thus the most
+item will be started. This is the queue's length and thus the most
 important parameter.
 
 The queue *never* stops any items, i.e. `downloading_max` is not
@@ -122,7 +122,7 @@ That is also the reason items that should be under queue control must be
 loaded in 'normal' mode, i.e. stopped.
 
 Other queue parameters are the minimum number of items in
-\'downloading\' state named `downloading_min`, which trumps
+'downloading' state named `downloading_min`, which trumps
 `start_at_once`, the maximum number of items to start in one run of the
 job. Both default to `1`. Since the default schedule is `second=*/15`,
 that means at most one item would be started every 15 seconds.
@@ -153,9 +153,9 @@ job.queue.startable = is_ignored=0 message= prio>0
 ```
 
 This sample condition also adds the extra hurdle that audio downloads
-that don\'t stay below a 25% threshold regarding contained images are
+that don't stay below a 25% threshold regarding contained images are
 **not** started automatically. *Unless* you raise the priority to 3
-(`high`) using the `+` key, then they\'re fair game for the queue. Go do
+(`high`) using the `+` key, then they're fair game for the queue. Go do
 all that with a plain rTorrent watch dir, in one line of configuration.
 
 The parameter `sort_fields` is used to determinate in what order
@@ -175,7 +175,7 @@ job.queue.downloading = [ prio>1 [ down>3 OR started<2i ] ]
 In plain English, this example says we only count items that have a
 normal or high priority, and transfer data or were started in the last 2
 minutes. The priority check means you can 'hide' started items from the
-queue by setting them to `low`, e.g. because they\'re awfully slow and
+queue by setting them to `low`, e.g. because they're awfully slow and
 prevent your full bandwidth from being used.
 
 The second part automatically ignores stalled items unless just started.
@@ -220,7 +220,7 @@ Should you have both `start` and `load` in a path, then `start` wins.
 
 `path` determines the root of the folder tree to watch for new metafiles
 via registration with the `inotify` mechanism of Linux. That means they
-are loaded milliseconds after they\'re written to disk, without any
+are loaded milliseconds after they're written to disk, without any
 excessive polling.
 
 ``` ini
@@ -233,7 +233,7 @@ folders with `:`.
 The `cmd.«name»` settings can be used to provide additional load
 commands, executed during loading the new item, *before* it is started
 (in case it is started at all). This is equivalent to the commands you
-can append to a rTorrent `load.*` command. They\'re added in the
+can append to a rTorrent `load.*` command. They're added in the
 alphabetic order of their names.
 
 ``` ini
@@ -267,7 +267,7 @@ after you have restarted it to load them.
 
 ## Testing Your Configuration
 
-After having completed your configuration, you\'re ready to **test it,
+After having completed your configuration, you're ready to **test it,
 by following these steps**:
 
 1.  Execute `rm ~/.pyroscope/run/pyrotorque` to **prevent the watchdog
@@ -286,7 +286,7 @@ by following these steps**:
     should show that no daemon process is running.
 6.  Execute `touch ~/.pyroscope/run/pyrotorque` --- this does **create
     the guard file again**, which must always exist if you want
-    `pyrotorque` to run in the background (otherwise you\'ll just get an
+    `pyrotorque` to run in the background (otherwise you'll just get an
     error message on the console or in the log, if you try to launch
     it).
 7.  **Wait up to 300 seconds**, and if your *rTorrent* configuration has

@@ -18,7 +18,7 @@ See the [documentation for usage](https://kannibalox.github.io/pyrosimple/). If 
 
 The pyrocore tools are great, but being stuck on python 2, along with the complicated install procedure made integrating both the tools and the code into other processes very painful.
 
-## Significant differences from pyrocore
+## Differences from pyrocore
 
 The following lists are not exhaustive, and don't cover many of the internal improvements and refactoring.
 
@@ -27,16 +27,9 @@ The following lists are not exhaustive, and don't cover many of the internal imp
 - Everything in one package (no separate pyrobase)
   - Use external lib for bencode
 
-### Added
+### New features
 - Multi-instance support for rtcontrol/rtxmlrpc
 - Replaced Tempita with jinja2
 - Support for JSON-RPC (only implemented by https://github.com/jesec/rtorrent)
 - pyrotorque job to move torrents between hosts
 - pyrotorque job to move torrent paths
-
-### Removed
-- the `rtsweep`, `rtmv`, and `rtevent` commands
-- `pyrotorque`'s guard file, influxdb job and web server
-
-### Changed
-- `rtxmlrpc`'s `--raw` now outputs JSON

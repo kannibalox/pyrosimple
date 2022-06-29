@@ -24,6 +24,7 @@ action        = "stop"
 ```
 
 Arguments:
+
 * `action`: The action to perform. See `rtcontrol --help` for a list of actions.
 * `view`: The rtorrent view to query
 * `matcher`: The query to use when listing torrents

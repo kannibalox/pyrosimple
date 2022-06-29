@@ -4,7 +4,7 @@ title: rtxmlrpc Usage
 
 # rtxmlrpc
 
-Since rtxmlrpc is intended to interact directly with rtorrent, it is deliberately designed to be simple. However, there are a few usefil features to be aware of.
+Since rtxmlrpc is intended to interact directly with rtorrent, it is deliberately designed to be simple. However, there are a few useful features to be aware of.
 
 ## Typing
 
@@ -15,10 +15,11 @@ Use `[1,2,...` for arrays. Use `@` to indicate binary data, which can be
 followed by a file path (e.g. `@/path/to/file`), a URL (https, http, ftp,
 and file are supported), or `@-` to read from stdin.
 
-Note that using the `@` syntax to load data from URLs requires the `requests` library to be installed:
-```
-pip install requests
-```
+!!! Note
+    Using the `@` syntax to load data from URLs requires the `requests` library to be installed:
+    ```
+    pip install requests
+    ```
 
 Examples:
 ```bash

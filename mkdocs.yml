@@ -15,6 +15,7 @@ nav:
   - Advanced:
       - Experimental Features: experimental.md
       - Tips & Tricks: tips.md
+      - Migration: migrate.md
 theme:
   name: material
   font:
