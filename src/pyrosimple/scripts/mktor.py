@@ -149,9 +149,9 @@ class MetafileCreator(ScriptBaseWithConfig):
 
         def callback(meta):
             "Callback to set label and resume data."
-            meta["info"]["source"] = config.map_announce2alias(
-                meta["announce"] or meta["announce-list"][0]
-            )
+            url_target = meta.get("announce", None) or meta["announce-list"][0]
+            meta["info"]["source"] = config.map_announce2alias(url_target)
+            meta["info"]["x_cross_seed"] = hashlib.md5(url_target.encode()).hexdigest()
             # Set specific keys?
             metafile.assign_fields(meta, self.options.set)
 
