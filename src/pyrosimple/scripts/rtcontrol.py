@@ -16,6 +16,7 @@ import time
 from multiprocessing.pool import ThreadPool
 from typing import Callable, List, Union
 
+from daemon import DaemonContext
 from prompt_toolkit import prompt
 
 from pyrosimple import config, error
@@ -304,6 +305,10 @@ class RtorrentControl(ScriptBaseWithConfig):
             "--to",
             "NAME",
             help="show search result only in named ncurses view",
+        )
+        self.add_bool_option(
+            "--detach",
+            help="run command in background",
         )
         self.add_bool_option(
             "-i",
@@ -685,6 +690,16 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Holds summary information, will be populated later
         summary = FieldStatistics()
 
+        dcontext = DaemonContext(
+            detach_process=False,
+            stdin=sys.stdin,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+        )
+        if self.options.detach:
+            dcontext.detach_process = True
+        dcontext.open()
+
         # Find matching torrents
         engines = {}
         for url in self.multi_connection_lookup(config.settings["SCGI_URL"]):
@@ -896,7 +911,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
 
             self.LOG.debug("RPC stats: %s", r_engine.rpc)
-
+        dcontext.close()
 
 def run():  # pragma: no cover
     """The entry point."""

@@ -22,7 +22,6 @@ from pyrosimple.util import logutil, pymagic
 
 
 class RtorrentQueueManager(ScriptBaseWithConfig):
-    ### Keep things wrapped to fit under this comment... ##############################
     """
     rTorrent queue manager & daemon.
     """
@@ -215,7 +214,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.sched.start()
             try:
                 self.add_jobs()
-                # TODO: daemonize here, or before the scheduler starts?
                 self.run_forever()
             finally:
                 self.sched.shutdown()
