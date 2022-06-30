@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyrosimple"
-version = "2.0.0rc1"
+version = "2.0.0rc2"
 description = ""
 authors = ["kannibalox <kannibalox@gmail.com>"]
 repository = "https://github.com/kannibalox/pyrosimple"
