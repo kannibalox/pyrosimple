@@ -446,6 +446,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrate/" class="md-nav__link">
+        Migration
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -491,7 +505,7 @@ one at a time (thus the name <code>pyro-tor-que</code>), but it can now manage a
 job that does some background processing for rTorrent, including custom
 ones that you can add yourself.</p>
 <p>It runs in the background parallel to rTorrent and has its own scheduler
-to run automation jobs similar to rTorrent\'s <code>schedule</code> command --- one
+to run automation jobs similar to rTorrent's <code>schedule</code> command --- one
 of the jobs does start stopped items in a controlled fashion, that is
 the queue manager part.</p>
 <p>Besides the queue manager, the most important job type is <code>TreeWatch</code>.
@@ -513,7 +527,7 @@ install the <em>full</em> set of dependencies:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>~/.local/pyroscope/bin/pip install -r ~/.local/pyroscope/requirements-torque.txt
 </code></pre></div>
 <p>Watch out for any errors, since this installs several Python extensions
-that <em>might</em> need some <code>*-dev</code> OS packages available that you don\'t
+that <em>might</em> need some <code>*-dev</code> OS packages available that you don't
 have on your machine.</p>
 <p>The <code>pyrotorque</code> queue manager daemon relies on certain additions to
 <code>rtorrent.rc</code>, these are included in the standard <code>pyrocore</code> includes
@@ -576,14 +590,14 @@ out), <em>before</em> activating tree watch.</p>
 <p>In the above example for the <code>queue</code> job, <code>downloading_max</code> counts
 started-but-incomplete items including those that ignore commands. Only
 if there are fewer of these items in the client than that number, a new
-item will be started. This is the queue\'s length and thus the most
+item will be started. This is the queue's length and thus the most
 important parameter.</p>
 <p>The queue <em>never</em> stops any items, i.e. <code>downloading_max</code> is not
 enforced and you can manually start more items than that if you want to.
 That is also the reason items that should be under queue control must be
 loaded in 'normal' mode, i.e. stopped.</p>
 <p>Other queue parameters are the minimum number of items in
-\'downloading\' state named <code>downloading_min</code>, which trumps
+'downloading' state named <code>downloading_min</code>, which trumps
 <code>start_at_once</code>, the maximum number of items to start in one run of the
 job. Both default to <code>1</code>. Since the default schedule is <code>second=*/15</code>,
 that means at most one item would be started every 15 seconds.</p>
@@ -606,9 +620,9 @@ zero (a/k/a <code>off</code>).</p>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">        </span><span class="k">[ prio&gt;2 OR [ NOT [ traits=audio kind_25=jpg,png,tif,bmp ] ] ]</span><span class="w"></span>
 </code></pre></div>
 <p>This sample condition also adds the extra hurdle that audio downloads
-that don\'t stay below a 25% threshold regarding contained images are
+that don't stay below a 25% threshold regarding contained images are
 <strong>not</strong> started automatically. <em>Unless</em> you raise the priority to 3
-(<code>high</code>) using the <code>+</code> key, then they\'re fair game for the queue. Go do
+(<code>high</code>) using the <code>+</code> key, then they're fair game for the queue. Go do
 all that with a plain rTorrent watch dir, in one line of configuration.</p>
 <p>The parameter <code>sort_fields</code> is used to determinate in what order
 startable items are handled. By default, higher priority items are
@@ -623,7 +637,7 @@ requirement.</p>
 <p>In plain English, this example says we only count items that have a
 normal or high priority, and transfer data or were started in the last 2
 minutes. The priority check means you can 'hide' started items from the
-queue by setting them to <code>low</code>, e.g. because they\'re awfully slow and
+queue by setting them to <code>low</code>, e.g. because they're awfully slow and
 prevent your full bandwidth from being used.</p>
 <p>The second part automatically ignores stalled items unless just started.
 This prevents disk trashing when a big item is still creating its files
@@ -660,7 +674,7 @@ These examples should help with understanding how to use that:</p>
 <p>Should you have both <code>start</code> and <code>load</code> in a path, then <code>start</code> wins.</p>
 <p><code>path</code> determines the root of the folder tree to watch for new metafiles
 via registration with the <code>inotify</code> mechanism of Linux. That means they
-are loaded milliseconds after they\'re written to disk, without any
+are loaded milliseconds after they're written to disk, without any
 excessive polling.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="na">job.treewatch.path</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s">/var/torrent/watch</span><span class="w"></span>
 </code></pre></div>
@@ -669,7 +683,7 @@ folders with <code>:</code>.</p>
 <p>The <code>cmd.«name»</code> settings can be used to provide additional load
 commands, executed during loading the new item, <em>before</em> it is started
 (in case it is started at all). This is equivalent to the commands you
-can append to a rTorrent <code>load.*</code> command. They\'re added in the
+can append to a rTorrent <code>load.*</code> command. They're added in the
 alphabetic order of their names.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="na">job.treewatch.cmd.nfo</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s">f.multicall=*.nfo,f.priority.set=2</span><span class="w"></span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="na">job.treewatch.cmd.jpg</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s">f.multicall=*.jpg,f.priority.set=2</span><span class="w"></span>
@@ -694,7 +708,7 @@ as they are received.</p>
 after you have restarted it to load them.
 :::</p>
 <h2 id="testing-your-configuration">Testing Your Configuration</h2>
-<p>After having completed your configuration, you\'re ready to <strong>test it,
+<p>After having completed your configuration, you're ready to <strong>test it,
 by following these steps</strong>:</p>
 <ol>
 <li>Execute <code>rm ~/.pyroscope/run/pyrotorque</code> to <strong>prevent the watchdog
@@ -713,7 +727,7 @@ by following these steps</strong>:</p>
     should show that no daemon process is running.</li>
 <li>Execute <code>touch ~/.pyroscope/run/pyrotorque</code> --- this does <strong>create
     the guard file again</strong>, which must always exist if you want
-    <code>pyrotorque</code> to run in the background (otherwise you\'ll just get an
+    <code>pyrotorque</code> to run in the background (otherwise you'll just get an
     error message on the console or in the log, if you try to launch
     it).</li>
 <li><strong>Wait up to 300 seconds</strong>, and if your <em>rTorrent</em> configuration has

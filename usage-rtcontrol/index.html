@@ -353,6 +353,19 @@
     Actions
   </a>
   
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#executing-commands" class="md-nav__link">
+    Executing commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -536,6 +549,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrate/" class="md-nav__link">
+        Migration
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -599,6 +626,19 @@
   <a href="#actions" class="md-nav__link">
     Actions
   </a>
+  
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#executing-commands" class="md-nav__link">
+    Executing commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -735,6 +775,8 @@ set predefined templates, rather than putting the whole string in the CLI every 
 <li><code>-H</code>/<code>--hashcheck</code>: hash check torrents (equivalent to pressing ^K ^E ^R in the UI)</li>
 </ul>
 <p>See <code>rtcontrol --help</code> for a full list of actions. All action can be dry-run with the <code>-n</code>/<code>--dry-run</code> flag. Many of the more dangerous actions (e.g. <code>--cull</code>) will prompt before actually performing the action. However, if you wish to enable prompting for all action, the <code>-i</code>/<code>--interactive</code> will set that behavior for all commands. Alternatively, if you don't want any prompts at all (e.g. when running in a headless script), <code>--yes</code> will automatically confirm all prompts.</p>
+<p>When multiple actions are specified, rtcontrol will apply those actions to each item in sequence.</p>
+<h3 id="executing-commands">Executing commands</h3>
 <h2 id="examples">Examples</h2>
 <ul>
 <li><code>rtcontrol '*HDTV*'</code><br />
@@ -747,6 +789,8 @@ set predefined templates, rather than putting the whole string in the CLI every 
   Show the total size of all torrents.</li>
 <li><code>rtcontrol -o filelist path=/mnt/tmp/\*</code><br />
   List all files in rtorrent under a directory.</li>
+<li><code>rtcontrol --start is_complete=yes is_active=no is_open=no</code><br />
+  Start all completed but inactive torrents.</li>
 </ul>
 <h3 id="filter-examples">Filter examples</h3>
 <ul>

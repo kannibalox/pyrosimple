@@ -446,6 +446,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrate/" class="md-nav__link">
+        Migration
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -601,7 +615,7 @@ commands, <code>--spawn</code> can be passed several times for executing a seque
 of commands. If any called command fails, the <code>rtcontrol</code> call is
 aborted with an error.</p>
 <h3 id="copy-session-metafiles-by-category">Copy Session Metafiles by Category</h3>
-<p>Here\'s a practical example for using <code>--spawn</code>, it copies all your
+<p>Here's a practical example for using <code>--spawn</code>, it copies all your
 loaded metafiles from the session directory into a folder structure
 categorized by the <em>ruTorrent</em> label. Unlabelled items go to the
 <code>_NOLABEL</code> folder.</p>
@@ -612,7 +626,7 @@ categorized by the <em>ruTorrent</em> label. Unlabelled items go to the
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    --spawn <span class="s1">&#39;cp {{i.sessionfile}} &quot;&#39;</span><span class="s2">&quot;</span><span class="nv">$target</span><span class="s2">&quot;</span><span class="s1">&#39;/{{item.fetch(1) or \&quot;_NOLABEL\&quot;}}/{{item.name}}-{{item.hash[:7]}}.torrent&quot;&#39;</span>
 </code></pre></div>
 <p>The copied metafiles themselves are renamed to the contained name of the
-item\'s data, plus a small part of the infohash to make these names
+item's data, plus a small part of the infohash to make these names
 unique.</p>
 <p>Replace the <code>i.fetch(1)</code> by <code>i.‹fieldname›</code> to categorize by other
 values, e.g. <code>i.alias</code> for 'by tracker'.</p>
@@ -623,10 +637,10 @@ that. For global commands not referring to specific items, see the next
 section about the <code>rtxmlrpc</code> tool. Read through the following examples
 to understand how <code>--exec</code> works, features are explained as they are
 used there. Also make sure you understand basic things like
-<code>output-templates</code>{.interpreted-text role="ref"} beforehand, it\'s
+<code>output-templates</code>{.interpreted-text role="ref"} beforehand, it's
 assumed here that you do.</p>
 <h3 id="repairing-stuck-items">Repairing Stuck Items</h3>
-<p>Let\'s start with an easy example of using <code>--exec</code>, where no templating
+<p>Let's start with an easy example of using <code>--exec</code>, where no templating
 is needed:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>rtcontrol --exec <span class="s1">&#39;stop= ; close= ; f.multicall=,f.set_create_queued=0,f.set_resize_queued=0 ; check_hash=&#39;</span> <span class="se">\</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>          --from stopped // -/1
@@ -646,7 +660,7 @@ in the last 10 minutes:</p>
 <p>The <code>:</code> prefix prevents <code>rtcontrol</code> from assuming this is a <code>d.</code> item
 command.</p>
 <p>Make sure that the registered handlers do not have adverse effects when
-called repeatedly, i.e. know what you\'re doing. The handlers for an
+called repeatedly, i.e. know what you're doing. The handlers for an
 event can be listed like so:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>rtxmlrpc --repr method.get <span class="s1">&#39;&#39;</span> event.download.finished
 </code></pre></div>
@@ -656,7 +670,7 @@ fixed location for all selected items, as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rtcontrol --exec <span class="s1">&#39;directory_base.set=&quot;/mnt/data/new/path&quot;&#39;</span> <span class="nv">directory</span><span class="o">=</span>/mnt/data/old/path
 </code></pre></div>
 <p>This replaces the location of items stored at <code>/mnt/data/old/path</code> with
-a new path. But to be really useful, we\'d want to shift <em>any</em> path
+a new path. But to be really useful, we'd want to shift <em>any</em> path
 under a given base directory to a new location -- the next command does
 this by using templating and calculating the new path based on the old
 one:</p>
@@ -673,14 +687,14 @@ command. Also note that the <code>d.</code> prefix to download item commands is
 implied.</p>
 <p>The <code>move-data</code>{.interpreted-text role="ref"} section has more on how to
 also move the data on disk, in addition to changing the location in
-[rTorrent]{.title-ref}\'s session as shown here.</p>
+rTorrent's session as shown here.</p>
 <h3 id="making-shared-data-paths-unique">Making Shared Data Paths Unique</h3>
 <p>Another example regarding data paths is this:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>rtcontrol --from stopped // --exec <span class="s1">&#39;directory.set={{item.directory}}-{{item.hash}}&#39;</span>
 </code></pre></div>
 <p>That command ensures that items that would download into the same path
 get a unique name by appending the info hash, and assumes those items
-weren\'t started yet (i.e. added via <code>load.normal</code>).</p>
+weren't started yet (i.e. added via <code>load.normal</code>).</p>
 <h3 id="changing-announce-urls-in-bulk">Changing Announce URLs in Bulk</h3>
 <p>The next example replaces an active announce URL with a new one, which
 is necessary after a domain or passkey change. Compared to other methods
@@ -899,7 +913,7 @@ one at a time (thus the name <code>pyro-tor-que</code>), but it can now manage a
 job that does some background processing for rTorrent, including custom
 ones that you can add yourself.</p>
 <p>It runs in the background parallel to rTorrent and has its own scheduler
-to run automation jobs similar to rTorrent\'s <code>schedule</code> command --- one
+to run automation jobs similar to rTorrent's <code>schedule</code> command --- one
 of the jobs does start stopped items in a controlled fashion, that is
 the queue manager part.</p>
 <p>Besides the queue manager, the most important job type is <code>TreeWatch</code>.
@@ -921,7 +935,7 @@ install the <em>full</em> set of dependencies:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>~/.local/pyroscope/bin/pip install -r ~/.local/pyroscope/requirements-torque.txt
 </code></pre></div>
 <p>Watch out for any errors, since this installs several Python extensions
-that <em>might</em> need some <code>*-dev</code> OS packages available that you don\'t
+that <em>might</em> need some <code>*-dev</code> OS packages available that you don't
 have on your machine.</p>
 <p>The <code>pyrotorque</code> queue manager daemon relies on certain additions to
 <code>rtorrent.rc</code>, these are included in the standard <code>pyrocore</code> includes
@@ -984,14 +998,14 @@ out), <em>before</em> activating tree watch.</p>
 <p>In the above example for the <code>queue</code> job, <code>downloading_max</code> counts
 started-but-incomplete items including those that ignore commands. Only
 if there are fewer of these items in the client than that number, a new
-item will be started. This is the queue\'s length and thus the most
+item will be started. This is the queue's length and thus the most
 important parameter.</p>
 <p>The queue <em>never</em> stops any items, i.e. <code>downloading_max</code> is not
 enforced and you can manually start more items than that if you want to.
 That is also the reason items that should be under queue control must be
 loaded in 'normal' mode, i.e. stopped.</p>
 <p>Other queue parameters are the minimum number of items in
-\'downloading\' state named <code>downloading_min</code>, which trumps
+'downloading' state named <code>downloading_min</code>, which trumps
 <code>start_at_once</code>, the maximum number of items to start in one run of the
 job. Both default to <code>1</code>. Since the default schedule is <code>second=*/15</code>,
 that means at most one item would be started every 15 seconds.</p>
@@ -1014,9 +1028,9 @@ zero (a/k/a <code>off</code>).</p>
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">        </span><span class="k">[ prio&gt;2 OR [ NOT [ traits=audio kind_25=jpg,png,tif,bmp ] ] ]</span><span class="w"></span>
 </code></pre></div>
 <p>This sample condition also adds the extra hurdle that audio downloads
-that don\'t stay below a 25% threshold regarding contained images are
+that don't stay below a 25% threshold regarding contained images are
 <strong>not</strong> started automatically. <em>Unless</em> you raise the priority to 3
-(<code>high</code>) using the <code>+</code> key, then they\'re fair game for the queue. Go do
+(<code>high</code>) using the <code>+</code> key, then they're fair game for the queue. Go do
 all that with a plain rTorrent watch dir, in one line of configuration.</p>
 <p>The parameter <code>sort_fields</code> is used to determinate in what order
 startable items are handled. By default, higher priority items are
@@ -1031,7 +1045,7 @@ requirement.</p>
 <p>In plain English, this example says we only count items that have a
 normal or high priority, and transfer data or were started in the last 2
 minutes. The priority check means you can 'hide' started items from the
-queue by setting them to <code>low</code>, e.g. because they\'re awfully slow and
+queue by setting them to <code>low</code>, e.g. because they're awfully slow and
 prevent your full bandwidth from being used.</p>
 <p>The second part automatically ignores stalled items unless just started.
 This prevents disk trashing when a big item is still creating its files
@@ -1068,7 +1082,7 @@ These examples should help with understanding how to use that:</p>
 <p>Should you have both <code>start</code> and <code>load</code> in a path, then <code>start</code> wins.</p>
 <p><code>path</code> determines the root of the folder tree to watch for new metafiles
 via registration with the <code>inotify</code> mechanism of Linux. That means they
-are loaded milliseconds after they\'re written to disk, without any
+are loaded milliseconds after they're written to disk, without any
 excessive polling.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="na">job.treewatch.path</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s">/var/torrent/watch</span><span class="w"></span>
 </code></pre></div>
@@ -1077,7 +1091,7 @@ folders with <code>:</code>.</p>
 <p>The <code>cmd.«name»</code> settings can be used to provide additional load
 commands, executed during loading the new item, <em>before</em> it is started
 (in case it is started at all). This is equivalent to the commands you
-can append to a rTorrent <code>load.*</code> command. They\'re added in the
+can append to a rTorrent <code>load.*</code> command. They're added in the
 alphabetic order of their names.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="na">job.treewatch.cmd.nfo</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s">f.multicall=*.nfo,f.priority.set=2</span><span class="w"></span>
 <a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="na">job.treewatch.cmd.jpg</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s">f.multicall=*.jpg,f.priority.set=2</span><span class="w"></span>
@@ -1102,7 +1116,7 @@ as they are received.</p>
 after you have restarted it to load them.
 :::</p>
 <h3 id="testing-your-configuration">Testing Your Configuration</h3>
-<p>After having completed your configuration, you\'re ready to <strong>test it,
+<p>After having completed your configuration, you're ready to <strong>test it,
 by following these steps</strong>:</p>
 <ol>
 <li>Execute <code>rm ~/.pyroscope/run/pyrotorque</code> to <strong>prevent the watchdog
@@ -1121,7 +1135,7 @@ by following these steps</strong>:</p>
     should show that no daemon process is running.</li>
 <li>Execute <code>touch ~/.pyroscope/run/pyrotorque</code> --- this does <strong>create
     the guard file again</strong>, which must always exist if you want
-    <code>pyrotorque</code> to run in the background (otherwise you\'ll just get an
+    <code>pyrotorque</code> to run in the background (otherwise you'll just get an
     error message on the console or in the log, if you try to launch
     it).</li>
 <li><strong>Wait up to 300 seconds</strong>, and if your <em>rTorrent</em> configuration has
@@ -1182,7 +1196,7 @@ for you, skip to the <code>tree-watch-examples</code>{.interpreted-text role="re
 section below, and just adapt one of the prepared use cases to your
 setup.</p>
 <p>So how does this work? When a <code>.torrent</code> file is notified for loading
-via <code>inotify</code>, it\'s parsed and contained data is put into variables
+via <code>inotify</code>, it's parsed and contained data is put into variables
 that can be used in the command templates. In order to get an idea what
 variables are available, you can dump the templating namespace for a
 metafile to the console, by calling the <code>watch</code> job directly.</p>
@@ -1220,14 +1234,14 @@ metafile to the console, by calling the <code>watch</code> job directly.</p>
 </li>
 <li>
 <p>all kinds of other information is made available, like the
-    torrent\'s info hash and the tracker alias; thus you can write
+    torrent's info hash and the tracker alias; thus you can write
     conditional templates based on tracker, or use the tracker name in a
     completion path.</p>
 </li>
 <li>
 <p>for certain types of downloads, <code>traits</code> provides parsed information
     to build specific target paths, e.g. for the
-    <code>Pioneer.One.S01E06.720p.x264-VODO</code> TV episode, you\'ll get this:</p>
+    <code>Pioneer.One.S01E06.720p.x264-VODO</code> TV episode, you'll get this:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="na">label</span><span class="o">=</span><span class="s">&#39;tv/mkv&#39;</span><span class="w"></span>
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="na">traits</span><span class="o">=</span><span class="s">Bunch(aspect=None, codec=&#39;x264&#39;, episode=&#39;06&#39;, extension=None, format=&#39;720p&#39;,</span><span class="w"></span>
 <a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="na">group</span><span class="o">=</span><span class="s">&#39;VODO&#39;, kind=&#39;tv&#39;, pattern=&#39;Normal TV Episodes&#39;, release=None,</span><span class="w"></span>
@@ -1250,7 +1264,7 @@ can set the \"move on completion\" target using that value.</p>
 the custom variable that is set, and moves the data based on its value.</p>
 <h3 id="tree-watch-with-sorting">Tree Watch with Sorting</h3>
 <p>This example adds a <em>second</em> job for a <code>sorted</code> tree that directly saves
-the data into a path based on the loaded metafile\'s location.</p>
+the data into a path based on the loaded metafile's location.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Tree watch with location</span><span class="w"></span>
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="na">job.watch-sorted.handler</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s">pyrocore.torrent.watch:TreeWatch</span><span class="w"></span>
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="na">job.watch-sorted.schedule</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s">hour=*</span><span class="w"></span>
@@ -1271,8 +1285,8 @@ the data into a path based on the loaded metafile\'s location.</p>
 <p>Change the values in the second block to suit your needs. As given, an
 item loaded from <code>…/sorted/watch/movies/*.torrent</code> would end up in the
 <code>…/sorted/movies</code> directory (with the filename coming from inside the
-metafile as usual), and it won\'t start by itself.</p>
-<p>Also, paths containing <code>music</code> use the metafile\'s basename as the data
+metafile as usual), and it won't start by itself.</p>
+<p>Also, paths containing <code>music</code> use the metafile's basename as the data
 directory, and metafiles recognized as TV content get separated into
 show directories.</p>
 

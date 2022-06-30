@@ -489,6 +489,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrate/" class="md-nav__link">
+        Migration
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -543,7 +557,7 @@
 
 
 <h1 id="rtxmlrpc">rtxmlrpc</h1>
-<p>Since rtxmlrpc is intended to interact directly with rtorrent, it is deliberately designed to be simple. However, there are a few usefil features to be aware of.</p>
+<p>Since rtxmlrpc is intended to interact directly with rtorrent, it is deliberately designed to be simple. However, there are a few useful features to be aware of.</p>
 <h2 id="typing">Typing</h2>
 <p>Most of the time, strings are sufficient for dealing with rtorrent's commands, however sometimes you may need to coerce arguments
 to be a certain type.
@@ -551,9 +565,12 @@ Start arguments with <code>+</code> or <code>-</code> to indicate they're number
 Use <code>[1,2,...</code> for arrays. Use <code>@</code> to indicate binary data, which can be
 followed by a file path (e.g. <code>@/path/to/file</code>), a URL (https, http, ftp,
 and file are supported), or <code>@-</code> to read from stdin.</p>
-<p>Note that using the <code>@</code> syntax to load data from URLs requires the <code>requests</code> library to be installed:
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using the <code>@</code> syntax to load data from URLs requires the <code>requests</code> library to be installed:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip install requests
 </code></pre></div></p>
+</div>
 <p>Examples:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Force an integer</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>rtxmlrpc throttle.max_downloads.div.set <span class="s1">&#39;&#39;</span> +100

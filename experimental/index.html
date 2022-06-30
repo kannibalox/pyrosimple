@@ -460,6 +460,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#query-optimization" class="md-nav__link">
+    Query optimization
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#connecting-to-multiple-clients" class="md-nav__link">
     Connecting to multiple clients
   </a>
@@ -490,6 +497,20 @@
     <li class="md-nav__item">
       <a href="../tips/" class="md-nav__link">
         Tips & Tricks
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrate/" class="md-nav__link">
+        Migration
       </a>
     </li>
   
@@ -529,6 +550,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#query-optimization" class="md-nav__link">
+    Query optimization
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#connecting-to-multiple-clients" class="md-nav__link">
     Connecting to multiple clients
   </a>
@@ -557,6 +585,40 @@
 
 
 <h1 id="experimental-features">Experimental Features</h1>
+<h2 id="query-optimization">Query optimization</h2>
+<div class="admonition requirements">
+<p class="admonition-title">Requirements</p>
+<p><em>rTorrent</em> must support the <code>d.multicall.filtered</code> method, which requires vanilla version 0.9.8+,
+or rTorrent-PS 1.1+.</p>
+</div>
+<p>If your rTorent supports <code>d.multicall.filtered</code>, rtcontrol can take advantage of it to return results
+faster. The option is controlled by the <code>-Q</code> flag in rtcontorl, or <code>fast_query</code> in the configuration file.</p>
+<p>Level 1 is less aggressive and safe by definition (i.e. produces correct results in all cases, unless there's a bug),
+while <code>-Q2</code> is highly experimental and in some circumstances likely produces results that are too small or empty.</p>
+<p>Optimization works by giving a <em>pre-filter</em> condition to <em>rTorrent</em>, to reduce the overhead involved in
+sending items over XMLRPC and processing them, only to be then discarded in the <code>rtcontrol</code> filter
+machinery.</p>
+<p>This goal of reducing the number of items sent to <code>rtcontrol</code> is best achieved if you put
+a highly selective condition first in a series of conditions. For cron-type jobs,
+this can often be achieved by looking at recent items only – older items should already be processed
+by previous runs. Even a very lenient window like “last week” drastically reduces items
+that need to be processed.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$ rtcontrol <span class="nv">loaded</span><span class="o">=</span>-6w <span class="nv">is_ignored</span><span class="o">=</span><span class="m">0</span> -o- -v -Q0
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>DEBUG:pyrosimple.util.rpc:method <span class="s1">&#39;d.multicall2&#39;</span>, params <span class="o">(</span><span class="s1">&#39;&#39;</span>, <span class="s1">&#39;default&#39;</span>, <span class="s1">&#39;d.custom=tm_loaded&#39;</span>, <span class="s1">&#39;d.hash=&#39;</span>, <span class="s1">&#39;d.ignore_commands=&#39;</span>, <span class="s1">&#39;d.name=&#39;</span><span class="o">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DEBUG:pyrosimple.torrent.rtorrent.RtorrentEngine:Got <span class="m">23771</span> items with <span class="m">4</span> attributes from <span class="s1">&#39;localhost:415&#39;</span> <span class="o">[</span>&lt;xmlrpc.client._Method object at 0x7ff59c348d30&gt;<span class="o">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>DEBUG:pyrosimple.util.rpc:method <span class="s1">&#39;view.size&#39;</span>, params <span class="o">(</span><span class="s1">&#39;&#39;</span>, <span class="s1">&#39;default&#39;</span><span class="o">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>INFO:pyrosimple.scripts.rtcontrol.RtorrentControl:Filtered <span class="m">627</span> out of <span class="m">23771</span> torrents.
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>DEBUG:pyrosimple.scripts.rtcontrol.RtorrentControl:RPC stats: &lt;RTorrentProxy via json <span class="k">for</span> scgi://localhost:7000?rpc<span class="o">=</span>json&gt;
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>INFO:pyrosimple.scripts.rtcontrol.RtorrentControl:Total time: <span class="m">1</span>.404 seconds.
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>$ rtcontrol <span class="nv">loaded</span><span class="o">=</span>-6w <span class="nv">is_ignored</span><span class="o">=</span><span class="m">0</span> -o- -v -Q1
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>INFO:pyrosimple.torrent.rtorrent.RtorrentEngine:!!! pre-filter: <span class="nv">greater</span><span class="o">=</span><span class="nv">value</span><span class="o">=</span><span class="nv">$d</span>.custom<span class="o">=</span>tm_loaded,value<span class="o">=</span><span class="m">1652724506</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>DEBUG:pyrosimple.util.rpc:method <span class="s1">&#39;d.multicall.filtered&#39;</span>, params <span class="o">(</span><span class="s1">&#39;&#39;</span>, <span class="s1">&#39;default&#39;</span>, <span class="s1">&#39;greater=value=$d.custom=tm_loaded,value=1652724506&#39;</span>, <span class="s1">&#39;d.custom=tm_loaded&#39;</span>, <span class="s1">&#39;d.hash=&#39;</span>, <span class="s1">&#39;d.ignore_commands=&#39;</span>, <span class="s1">&#39;d.name=&#39;</span><span class="o">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>DEBUG:pyrosimple.torrent.rtorrent.RtorrentEngine:Got <span class="m">636</span> items with <span class="m">4</span> attributes from <span class="s1">&#39;localhost:415&#39;</span> <span class="o">[</span>&lt;xmlrpc.client._Method object at 0x7f7f03428dc0&gt;<span class="o">]</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>DEBUG:pyrosimple.util.rpc:method <span class="s1">&#39;view.size&#39;</span>, params <span class="o">(</span><span class="s1">&#39;&#39;</span>, <span class="s1">&#39;default&#39;</span><span class="o">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>INFO:pyrosimple.scripts.rtcontrol.RtorrentControl:Filtered <span class="m">627</span> out of <span class="m">23771</span> torrents.
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>DEBUG:pyrosimple.scripts.rtcontrol.RtorrentControl:RPC stats: &lt;RTorrentProxy via json <span class="k">for</span> scgi://localhost:7000?rpc<span class="o">=</span>json&gt;
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>INFO:pyrosimple.scripts.rtcontrol.RtorrentControl:Total time: <span class="m">0</span>.672 seconds.
+</code></pre></div>
 <h2 id="connecting-to-multiple-clients">Connecting to multiple clients</h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -564,30 +626,32 @@
 </div>
 <p><code>rtxmlrpc</code> and <code>rtcontrol</code> support talking to multiple clients, by specifying a TOML list
 in the <code>CONNECTIONS</code> section:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[CONNECTIONS]</span><span class="w"></span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">local</span><span class="o">=</span><span class="s">&quot;localhost:7000&quot;</span><span class="w"></span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">seedbox</span><span class="o">=</span><span class="s">&quot;seedbox.example.com:7000&quot;</span><span class="w"></span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">all</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;local&quot;</span><span class="p">,</span><span class="s">&quot;seedbox&quot;</span><span class="p">]</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">[CONNECTIONS]</span><span class="w"></span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">local</span><span class="o">=</span><span class="s">&quot;localhost:7000&quot;</span><span class="w"></span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">seedbox</span><span class="o">=</span><span class="s">&quot;seedbox.example.com:7000&quot;</span><span class="w"></span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">all</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;local&quot;</span><span class="p">,</span><span class="s">&quot;seedbox&quot;</span><span class="p">]</span><span class="w"></span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>rtxmlrpc -U all system.hostname
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>rtxmlrpc -U all system.hostname
 </code></pre></div></p>
 <h2 id="connecting-over-ssh">Connecting over SSH</h2>
 <div class="admonition requirements">
 <p class="admonition-title">Requirements</p>
-<p><code>socat</code> is required to be installed on the remote server for this functionality.</p>
+<p><code>socat</code> is required to be installed on the remote server for this functionality.
+SSH authentication must also happen without any prompts, (i.e. through <code>authorized_keys</code>
+or a SSH agent that holds your password)</p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Via port</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>rtxmlrpc -U scgi+ssh://example.com/TCP:0.0.0.0:7000 system.hostname
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Via domain socket</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>rtxmlrpc -U scgi+ssh://example.com/UNIX-CONNECT:/home/rtorrentr/scgi.sock system.hostname
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Via port</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>rtxmlrpc -U scgi+ssh://example.com/TCP:0.0.0.0:7000 system.hostname
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Via domain socket</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>rtxmlrpc -U scgi+ssh://example.com/UNIX-CONNECT:/home/rtorrentr/scgi.sock system.hostname
 </code></pre></div>
 <p>Since each command opens a new SSH connection, setting up the ControlPersist feature in
 <code>~/.ssh/config</code> is highly recommended.</p>
 <p>Examples:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Host *
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  ControlMaster auto
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  ControlPath ~/.ssh/sockets/%r@%h-%p
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  ControlPersist 600
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Host *
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  ControlMaster auto
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  ControlPath ~/.ssh/sockets/%r@%h-%p
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>  ControlPersist 600
 </code></pre></div></p>
 
               

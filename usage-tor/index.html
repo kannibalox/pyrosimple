@@ -350,16 +350,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mktor" class="md-nav__link">
-    mktor
+  <a href="#lstor" class="md-nav__link">
+    lstor
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#lstor" class="md-nav__link">
-    lstor
+  <a href="#mktor" class="md-nav__link">
+    mktor
   </a>
+  
+    <nav class="md-nav" aria-label="mktor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cross-seeding" class="md-nav__link">
+    Cross-seeding
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -503,6 +516,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrate/" class="md-nav__link">
+        Migration
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -536,16 +563,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mktor" class="md-nav__link">
-    mktor
+  <a href="#lstor" class="md-nav__link">
+    lstor
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#lstor" class="md-nav__link">
-    lstor
+  <a href="#mktor" class="md-nav__link">
+    mktor
   </a>
+  
+    <nav class="md-nav" aria-label="mktor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cross-seeding" class="md-nav__link">
+    Cross-seeding
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -571,14 +611,75 @@
 
 
 <h1 id="mktorlstorchtor">mktor/lstor/chtor</h1>
-<p>The following tools are grouped together due to their similiar functionality. They can create, view, and modify .torrent files
+<p>The following tools are grouped together due to their similar functionality. They can create, view, and modify .torrent files
 respectively.</p>
+<h2 id="lstor">lstor</h2>
+<p>lstor is used for display information about torrents. Without any flags, it shows a human-friendly summary of the torrent:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$ lstor ubuntu-22.04-desktop-amd64.iso.torrent 
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>NAME ubuntu-22.04-desktop-amd64.iso.torrent
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>SIZE 3.4 GiB (13942 * 256.0 KiB + 142.0 KiB)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>META 272.7 KiB (pieces 272.3 KiB 99.9%)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>HASH 2C6B6858D61DA9543D4231A71DB4B1C9264B0685
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>URL  https://torrent.ubuntu.com/announce
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>PRV  NO (DHT/PEX enabled)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>TIME 2022-04-21 10:22:56
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>BY   mktorrent 1.1
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>REM  Ubuntu CD releases.ubuntu.com
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>FILE LISTING
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>ubuntu-22.04-desktop-amd64.iso                                         3.4 GiB
+</code></pre></div>
+<p>However, you can also display the same information in JSON format with the <code>--raw</code> flag:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$ lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw 
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>{
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  &quot;announce&quot;: &quot;https://torrent.ubuntu.com/announce&quot;,
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  &quot;announce-list&quot;: [
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    [
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>      &quot;https://torrent.ubuntu.com/announce&quot;
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    ],
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    [
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>      &quot;https://ipv6.torrent.ubuntu.com/announce&quot;
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    ]
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>  ],
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>  &quot;comment&quot;: &quot;Ubuntu CD releases.ubuntu.com&quot;,
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  &quot;created by&quot;: &quot;mktorrent 1.1&quot;,
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>  &quot;creation date&quot;: 1650550976,
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  &quot;info&quot;: {
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    &quot;length&quot;: 3654957056,
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    &quot;name&quot;: &quot;ubuntu-22.04-desktop-amd64.iso&quot;,
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    &quot;piece length&quot;: 262144,
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    &quot;pieces&quot;: &quot;&lt;13943 piece hashes&gt;&quot;
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>  }
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>}
+</code></pre></div>
+<p>If you only need to extract a few fields, the <code>-o</code>/<code>--output</code> flag lets you specify 
+which fields to show:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>__size__</code> is a magic variable that tells <code>lstor</code> to sum the sizes of all files in the torrent. See <code>lstor --help</code>
+for all the supported magic variables.</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$ lstor -o info.name,__size__ ubuntu-22.04-desktop-amd64.iso.torrent
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>ubuntu-22.04-desktop-amd64.iso  3654957056
+</code></pre></div>
+<p>By default lstor will throw an error if the file isn't a valid .torrent file. However,
+if you wish to ignore those errors (to view an non-torrent bencode file, for instance),
+the <code>--raw</code> flag can be combined with <code>-V</code>/<code>--skip-validation</code>.</p>
 <h2 id="mktor">mktor</h2>
 <p>At it's simplest, creating a torrent file requires only a path and an announce URL</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>mktor /tmp/file.txt http://tracker.publicbt.com:80/announce
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">echo</span> date &gt; date.txt
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>mktor date.txt http://tracker.publicbt.com:80/announce
 </code></pre></div>
-<h2 id="lstor">lstor</h2>
-<p><strong>TODO</strong></p>
+<p>If you have <a href="/configuration#aliases">aliases</a> configured, you can use the alias in place of the URL.</p>
+<h3 id="cross-seeding">Cross-seeding</h3>
+<p>To avoid duplicating the same hash across private trackers,
+mktor has two mechanisms to add distinct data to the <code>info</code> dictionary:
+* <code>source</code> gets set to the tracker alias (if available), or the 2nd level domin if not available
+* <code>x_cross_seed</code> gets set to an MD5 hash of the URL</p>
+<p>If you don't want one or both of theses fields present, you can use the <code>-s</code>/<code>--set</code> flag
+to have them removed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mktor --set info.source --set info.x_cross_seed date.txt http://tracker.publicbt.com:80/announce
+</code></pre></div>
 <h2 id="chtor">chtor</h2>
 <p><strong>TODO</strong></p>
 
