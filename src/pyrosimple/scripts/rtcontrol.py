@@ -913,6 +913,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             self.LOG.debug("RPC stats: %s", r_engine.rpc)
         dcontext.close()
 
+
 def run():  # pragma: no cover
     """The entry point."""
     ScriptBase.setup()
