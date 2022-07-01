@@ -11,6 +11,8 @@ from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
 
+import requests
+
 
 logger = logging.getLogger(__name__)
 
@@ -72,13 +74,23 @@ class HTTPTransport(RTorrentTransport):
     """Transport via HTTP(s) call."""
 
     def request(self, host, handler, request_body, verbose=False):
-        self.verbose = verbose
-        req = urllib.request.Request(self.url)
-        for key, val in self._headers:
-            req.add_header(key, val)
-        req.data = request_body
-        with urllib.request.urlopen(req) as resp:
-            return self.parse_response(resp)
+        parts = urllib.parse.urlsplit(self.url)
+        target = urllib.parse.urlunsplit(
+            (parts.scheme, parts.hostname, parts.path, parts.query, parts.fragment)
+        )
+        auth = ()
+        if parts.username is not None and parts.password is not None:
+            auth = (parts.username, parts.password)
+        if parts.path.endswith("plugins/rpc/rpc.php"):
+            req = requests.post(
+                target, headers=self._headers, auth=auth, data=request_body
+            )
+        else:
+            req = requests.get(
+                target, headers=self._headers, auth=auth, data=request_body
+            )
+        req.raise_for_status()
+        return self.parse_response(io.BytesIO(req.content))
 
 
 class TCPTransport(RTorrentTransport):
