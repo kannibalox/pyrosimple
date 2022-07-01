@@ -17,12 +17,7 @@ from pyrosimple.util import matching, pymagic, rpc
 def move(i: rtorrent.RtorrentItem, target: str):
     """Move a torrent path"""
     i.stop()
-    for _ in range(0, 5):
-        if i.rpc_call("d.is_open", cache=False):
-            time.sleep(0.1)
-        else:
-            break
-    shutil.move(i.datapath(), target)
+    shutil.move(str(i.datapath()), target)
     i._engine.rpc.d.directory.set(i.hash, target)
     i.start()
 
