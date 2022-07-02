@@ -3,7 +3,6 @@ Primarily intended for move-on-completion, but is intended to be generic.
 """
 import concurrent.futures
 import shutil
-import time
 
 from pathlib import Path
 

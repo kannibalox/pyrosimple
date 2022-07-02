@@ -5,7 +5,6 @@
 
 import base64
 import errno
-import fnmatch
 import operator
 import os
 import shlex
@@ -430,6 +429,7 @@ class RtorrentItem(engine.TorrentProxy):
             raise error.EngineError(
                 f"Hash {self.hash} already exists remotely on {remote_url}"
             )
+        # This might be brittle for systems that have a low network.xmlrpc.size_limit but large torrents.
         torrent_path = Path(proxy.session.path(), f"{self.hash}.torrent")
         torrent = bencode.decode(
             base64.b64decode(
@@ -441,6 +441,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
         )
         metafile.add_fast_resume(torrent, proxy.d.directory_base(self.hash))
+        # Do some basic escaping, nothing else should be necessary.
         base_dir = proxy.d.directory_base(self.hash).replace('"', r"\"")
         extra_cmds.insert(0, f'd.directory_base.set="{base_dir}"')
         rpc_metafile = xmlrpclib.Binary(bencode.bencode(torrent))
@@ -458,8 +459,7 @@ class RtorrentItem(engine.TorrentProxy):
 
         # Keep custom values
         # Trying to load these in during the load.raw tends to cause either the load to fail
-        # or the values to get corrupted.
-
+        # or the values to get corrupted, even for simple values.
         for k, v in self.custom_items().items():
             remote_proxy.d.custom.set(self.hash, k, v)
         for key in range(1, 5):
@@ -498,113 +498,38 @@ class RtorrentItem(engine.TorrentProxy):
         @param file_filter: Optional callable for selecting a subset of all files.
             The callable gets a file item as described for RtorrentItem._get_files
             and must return True for items eligible for deletion.
-        @param attrs: Optional list of additional attributes to fetch for a filter.
+        @param attrs: Optional list of additional attributes to fetch (for
+            file_filter to use).
         """
-        dry_run = 0  # set to 1 for testing
-
-        def remove_with_links(path):
-            "Remove a path including any symlink chains leading to it."
-            rm_paths = []
-            while os.path.islink(path):
-                target = os.readlink(path)
-                rm_paths.append(path)
-                path = target
-
-            if os.path.exists(path):
-                rm_paths.append(path)
-            else:
-                self._engine.LOG.debug(
-                    "Real path '%s' doesn't exist,"
-                    " but %d symlink(s) leading to it will be deleted..."
-                    % (path, len(rm_paths))
-                )
-
-            # Remove the link chain, starting at the real path
-            # (this prevents losing the chain when there's permission problems)
-            for rm_path in reversed(rm_paths):
-                is_dir = os.path.isdir(rm_path) and not os.path.islink(rm_path)
-                self._engine.LOG.debug(
-                    "Deleting '%s%s'", rm_path, "/" if is_dir else ""
-                )
-                if not dry_run:
-                    try:
-                        (os.rmdir if is_dir else os.remove)(rm_path)
-                    except OSError as exc:
-                        if exc.errno == errno.ENOENT:
-                            # Seems this disappeared somehow inbetween (race condition)
-                            self._engine.LOG.info(
-                                "Path '%s%s' disappeared before it could be deleted",
-                                rm_path,
-                                "/" if is_dir else "",
-                            )
-                        else:
-                            raise
-
-            return rm_paths
-
-        # Assemble doomed files and directories
-        files, dirs = set(), set()
-        base_path = os.path.expanduser(self.fetch("directory"))
-        item_files = list(self._get_files(attrs=attrs))
-
-        if not self.fetch("directory"):
+        dry_run = False  # set to True for testing
+        path = Path(self.fetch("directory"))
+        if not path.is_absolute():
             raise error.EngineError(
-                "Directory for item #%s is empty,"
-                " you might want to add a filter 'directory=!'"
-                % (self._fields["hash"],)
+                "Directory '%s' for item %s is not absolute, which is a bad idea,"
+                " fix your .rtorrent.rc to use 'directory.default.set = /...'"
+                % (self.fetch("directory"), self._fields["hash"])
             )
-        if not os.path.isabs(base_path):
-            raise error.EngineError(
-                "Directory '%s' for item #%s is not absolute, which is a bad idea;"
-                " fix your .rtorrent.rc, and use 'directory.default.set = /...'"
-                % (
-                    self.fetch("directory"),
-                    self._fields["hash"],
-                )
-            )
-        if self.fetch("is_multi_file") and os.path.isdir(self.fetch("directory")):
-            dirs.add(self.fetch("directory"))
 
-        for item_file in item_files:
-            if file_filter and not file_filter(item_file):
+        if not path.exists():
+            return
+
+        dirs_to_clean_up = set([path])
+        for file_data in self._get_files(attrs=attrs):
+            if file_filter is not None and not file_filter(file_data):
                 continue
-            path = os.path.join(base_path, item_file.path)
-            files.add(path)
-            if "/" in item_file.path:
-                dirs.add(os.path.dirname(path))
-
-        # Delete selected files
-        if not dry_run:
-            self.stop()
-        for path in sorted(files):
-            remove_with_links(path)
-
-        # Prune empty directories (longer paths first)
-        doomed = files | dirs
-        for path in sorted(dirs, reverse=True):
-            residue = set(os.listdir(path) if os.path.exists(path) else [])
-            ignorable = set(fnmatch.filter(residue, config.settings.CULL_WAIFS))
-            if residue and residue != ignorable:
-                self._engine.LOG.info(
-                    "Keeping non-empty directory '%s' with %d %s%s!",
-                    path,
-                    len(residue),
-                    "entry" if len(residue) == 1 else "entries",
-                    f" ({len(ignorable)} ignorable)" if ignorable else "",
-                )
-            else:
-                for waif in ignorable:  # - doomed:
-                    waif = os.path.join(path, waif)
-                    self._engine.LOG.debug(f"Deleting waif '{waif}'")
-                    if not dry_run:
-                        try:
-                            os.remove(waif)
-                        except OSError as exc:
-                            self._engine.LOG.warning(
-                                f"Problem deleting waif '{waif}' ({exc})"
-                            )
-
-                doomed.update(remove_with_links(path))
+            fullpath = Path(path, file_data.path)
+            if fullpath.is_file() or fullpath.is_symlink():
+                self._engine.LOG.debug("Deleting '%s'", fullpath)
+                dirs_to_clean_up.add(fullpath.parent)
+                if not dry_run:
+                    fullpath.unlink()
+        for directory in dirs_to_clean_up:
+            try:
+                if not dry_run:
+                    directory.rmdir()
+            except OSError as e:
+                if e.errno != errno.ENOTEMPTY:
+                    raise
 
         # Delete item from engine
         if not dry_run:
