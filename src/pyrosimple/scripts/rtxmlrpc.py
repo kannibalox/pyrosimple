@@ -207,6 +207,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
     def do_command(self):
         """Call a single command with arguments."""
+        if not self.args:
+            self.parser.print_help()
+            print("No method name given! Try `rtxmlrpc system.listMethods` to see a list of available methods.")
+            sys.exit(error.EX_USAGE)
         method = self.args[0]
 
         raw_args = self.args[1:]
