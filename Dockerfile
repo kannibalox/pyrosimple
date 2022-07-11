@@ -20,7 +20,7 @@ WORKDIR /app
 
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install -n --no-ansi
+RUN poetry install -n --no-ansi -E torque
 
 COPY . ./
 
