@@ -440,6 +440,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#torque" class="md-nav__link">
+    TORQUE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#formats" class="md-nav__link">
     FORMATS
   </a>
@@ -564,6 +571,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-code/" class="md-nav__link">
+        Custom Code
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -639,6 +660,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#torque" class="md-nav__link">
+    TORQUE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#formats" class="md-nav__link">
     FORMATS
   </a>
@@ -693,8 +721,8 @@ but basically each section starts with a <code>[SECTION_NAME]</code> followed by
 <p>If you'd like to use a file other than the default, use the <code>PYRO_CONF</code> environment variable:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">PYRO_CONF</span><span class="o">=</span>/tmp/config.toml rtxmlrpc system.hostname
 </code></pre></div>
-Similar environment variables can be used to override other parts of the configuration file:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>PYRO_RTORRENT_RC=/etc/rtorrent/rtorrent.rc PYRO_FAST_QUERY=0 rtcontrol //
+Similar environment variables can be used to override individual parts of the configuration file:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">PYRO_RTORRENT_RC</span><span class="o">=</span>/etc/rtorrent/rtorrent.rc <span class="nv">PYRO_FAST_QUERY</span><span class="o">=</span><span class="m">0</span> rtcontrol //
 </code></pre></div></p>
 <h2 id="reference">Reference</h2>
 <h3 id="top-level-section">Top-level section</h3>
@@ -712,6 +740,8 @@ but will raise an error if it's unable to do so.</p>
 <h4 id="sort_fields"><code>sort_fields</code></h4>
 <p>Defaults to <code>name,hash</code>.</p>
 <p>Sets the default sort order for output in <code>rtcontrol</code>.</p>
+<h3 id="torque">TORQUE</h3>
+<p>This section is reserved for <code>pyrotorque</code>. See its <a href="/usage-pyrotorque/">user guide</a> for more information.</p>
 <h3 id="formats">FORMATS</h3>
 <p>Example:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Example</span><span class="w"></span>
@@ -744,6 +774,8 @@ are no conflicts.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Example</span><span class="w"></span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">[CONNECTIONS]</span><span class="w"></span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">local</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;scgi+unix://$HOME/rtorrent/.scgi_local&quot;</span><span class="w"></span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">remote_scgi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;scgi://example.com:9000&quot;</span><span class="w"></span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">remote_https</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://example.com/RPC2&quot;</span><span class="w"></span>
 </code></pre></div>
 <p>Most of the CLI tools accept a <code>-U</code>/<code>--url</code> flag to provide the <code>scgi_url</code> directly when working with remote machines:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>rtxmlrpc -U <span class="s2">&quot;scgi+unix://</span><span class="nv">$HOME</span><span class="s2">/rtorrent/.scgi_local&quot;</span> system.hostname

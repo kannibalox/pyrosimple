@@ -522,6 +522,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-code/" class="md-nav__link">
+        Custom Code
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -599,7 +613,7 @@
 <h1 id="quick-start">Quick Start</h1>
 <p>The main goal of this document is to get you comfortable with using pyrosimple to
 interact with rTorrent and torrent files. None of the commands here will
-make any changes to your system, and are intended to be a gentle
+make any changes to your system and are intended to be a gentle
 introduction to the many capabilities available.</p>
 <h2 id="setup">Setup</h2>
 <p>Install pyrosimple:</p>
@@ -626,7 +640,7 @@ they'll just return information.</p>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Get the name of all torrents in the &#39;main&#39; view</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>rtxmlrpc d.multicall2 <span class="s1">&#39;&#39;</span> main d.name<span class="o">=</span>
 </code></pre></div>
-<p>That's all very nice, but it'd be even nicer if there was command to
+<p>That's all very nice, but it'd be even nicer if there was a command to
 make dealing with all the torrents easier than running all these RPC
 commands. That's where <code>rtcontrol</code> comes into play. It allows for
 scripting and outputting against torrents without needing to learn
@@ -646,12 +660,13 @@ rTorrent's RPC API directly. Try out the following commands:</p>
 don't worry, it's just an easy way to get all torrents.</p>
 </div>
 <p><code>rtcontrol</code> lets us filter on different fields, and optionally pick
-which fields will be output. There are many different fields that can filtered or displayed.
+which fields will be output. The many different fields that are available can
+be shown with <code>rtcontrol --help-fields</code>.
 In addition to simply displaying torrents, we can also run commands that will make
 things change.</p>
 <p>For the sake of this tutorial, all of the commands below have
-<code>--dry-run</code> at the end to make sure nothing is actually changed. If
-you'd like to actually try running the commands, simply remove that
+<code>--dry-run</code> at the end to make sure nothing is changed. If
+you'd like to try running the commands for real, simply remove that
 flag.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Start all torrents</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>rtcontrol // --start --dry-run
@@ -669,7 +684,7 @@ exits:</p>
 </code></pre></div>
 <h2 id="working-with-torrents">Working with torrents</h2>
 <p>In addition to rTorrent, pyrosimple can also work with .torrent files
-directly. The commands <code>mktor</code>, <code>lstor</code> and <code>chtor</code> can make, list
+directly. The commands <code>mktor</code>, <code>lstor</code> and <code>chtor</code> can make, list,
 and modify files, respectively</p>
 <p>Let's try creating an example torrent from an example file
 with the (fake) tracker <code>http://example.com</code>.</p>
