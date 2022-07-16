@@ -4,7 +4,7 @@ title: Pyrotorque Jobs
 
 # Pyrotorque Jobs
 
-## Action
+## Action Job
 
 This is a simple job, intended to allow access to (almost)
 the same actions as `rtcontrol`.
@@ -12,7 +12,6 @@ the same actions as `rtcontrol`.
 Example of stopping completed torrents after they reach a >5 ratio:
 
 ```toml
-[TORQUE]
 [TORQUE.stop_well_seeded]
 handler       = "pyrosimple.job.action:Action"
 active        = true
@@ -38,7 +37,6 @@ example, only changing a few values from the defaults to demonstrate
 key features:
 
 ```toml
-[TORQUE]
 [TORQUE.queue]
 handler = "pyrocore.torrent.queue:QueueManager"
 schedule = "minute=*"
@@ -134,34 +132,70 @@ queue.
 
 ## Tree Watch
 
-As mentioned in `QueueManager`{.interpreted-text role="ref"}, commands
+This job is for loading torrents into rtorrent. While the native tools
+work well enough for simply loading torrents, this jobs allows 
+for additional features like conditional logic and invalid file
+handling.
+
+Note that this job uses inotify, which is much lighter-weight
+but has the potential to miss files. See the `check_unhandled` argument
+for a way to counter this issue.
+
+### Configuration
+
+```toml
+[TORQUE.watch]
+handler = "pyrocore.job.watch:TreeWatch"
+schedule = "second=*/5"
+active = true
+dry_run = false
+path = "/var/torrents/watch"
+started = false
+check_unhandled = true
+remove_already_added = true
+cmd_label = """
+{% if 'TV' in flags %}d.custom1.set=TV{% endif %}
+"""
+```
+
+Arguments:
+
+* `path`: The path to watch for new files. Multiple paths can be separate with `:`. Note that the watch is recursive.
+* `started`: Controls whether new items are automatically started after adding
+* `check_unhandled`: If true, the job will try to find and update any file it may have missed on each `schedule`. This will also catch any files that were added while pyrotorque wasn't running
+* `remove_already_added`: If true, pytorque will remove files if the hash already exists in the client. This is mainly useful to prevent errors and files from building up if files are accidentally added to the directory twice.
+* `cmd_*`: Any argument starting with this prefix is treated as a custom command that will be run when the torrent is loaded. As seen in the example, this can be a fully-templated string, with some fields being auto-created by the job itself.
+
+### Explanation
+
+As mentioned in `QueueManager`, commands
 configured to be executed during item loading can be templates. This can
 be used to support all sorts of tricks, the most common ones are
 explained here, including fully dynamic completion moving. If the
 following explanation of the inner workings is too technical and nerdy
-for you, skip to the `tree-watch-examples`{.interpreted-text role="ref"}
+for you, skip to the [tree watch examples](pyrotorque-jobs/#tree-watch-examples)
 section below, and just adapt one of the prepared use cases to your
 setup.
 
 So how does this work? When a `.torrent` file is notified for loading
 via `inotify`, it's parsed and contained data is put into variables
 that can be used in the command templates. In order to get an idea what
-variables are available, you can dump the templating namespace for a
-metafile to the console, by calling the `watch` job directly.
+variables are available, you can combine the dry-run and debug modes.
 
 Consider this example:
 
 ``` shell
+$ cd /var/torrent/watch
 $ date >example.dat
 $ mktor -q example.dat http://tracker.example.com/
-$ python -m pyrosimple.torrent.watch -v example.dat.torrent
+$ pyrotorque --dry-run --debug --run-once watch
 …
 DEBUG    Tree watcher created with config Bunch(active=False, …
     cmd.target='{{# set target path\n}}d.custom.set=targetdir,/var/torrent/done/{{label}}/{{relpath}}',
-    dry_run=True, handler='pyrocore.torrent.watch:TreeWatch', job_name='treewatch',
+    dry_run=True, handler='pyrosimple.job.watch:TreeWatch', job_name='treewatch',
     load_mode='start', path='/var/torrent', queued='True', quiet='False', schedule='hour=*')
 DEBUG    custom commands = {'target': <Template 2d01990 name=None>, 'nfo': f.multicall=*.nfo,f.set_priority=2, …}
-INFO     Templating values are:
+DEBUG   Templating values are:
     commands=[…, 'd.custom.set=targetdir,/var/torrent/done//pyrocore', …]
     filetype='.dat'
     …

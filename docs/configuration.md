@@ -22,11 +22,10 @@ If you'd like to use a file other than the default, use the `PYRO_CONF` environm
 ```bash
 PYRO_CONF=/tmp/config.toml rtxmlrpc system.hostname
 ```
-Similar environment variables can be used to override other parts of the configuration file:
-```
+Similar environment variables can be used to override individual parts of the configuration file:
+```bash
 PYRO_RTORRENT_RC=/etc/rtorrent/rtorrent.rc PYRO_FAST_QUERY=0 rtcontrol //
 ```
-
 
 ## Reference
 
@@ -54,6 +53,10 @@ but will raise an error if it's unable to do so.
 Defaults to `name,hash`.
 
 Sets the default sort order for output in `rtcontrol`.
+
+### TORQUE
+
+This section is reserved for `pyrotorque`. See its [user guide](/usage-pyrotorque/) for more information.
 
 ### FORMATS
 
@@ -101,6 +104,8 @@ This section allows for setting any number of tracker aliases for use with `rtco
 # Example
 [CONNECTIONS]
 local = "scgi+unix://$HOME/rtorrent/.scgi_local"
+remote_scgi = "scgi://example.com:9000"
+remote_https = "https://example.com/RPC2"
 ```
 
 Most of the CLI tools accept a `-U`/`--url` flag to provide the `scgi_url` directly when working with remote machines:
