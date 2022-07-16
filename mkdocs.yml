@@ -16,6 +16,7 @@ nav:
       - Experimental Features: experimental.md
       - Tips & Tricks: tips.md
       - Migration: migrate.md
+      - Custom Code: custom-code.md
 theme:
   name: material
   font:

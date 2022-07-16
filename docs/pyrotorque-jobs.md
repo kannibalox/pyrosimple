@@ -132,7 +132,7 @@ yet another item to be started and increasing disk I/O even more, so the
 manager sees those idle but young items as occupying a slot in the
 queue.
 
-## TreeWatch
+## Tree Watch
 
 As mentioned in `QueueManager`{.interpreted-text role="ref"}, commands
 configured to be executed during item loading can be templates. This can

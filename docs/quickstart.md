@@ -6,7 +6,7 @@ title: Quick Start
 
 The main goal of this document is to get you comfortable with using pyrosimple to
 interact with rTorrent and torrent files. None of the commands here will
-make any changes to your system, and are intended to be a gentle
+make any changes to your system and are intended to be a gentle
 introduction to the many capabilities available.
 
 ## Setup
@@ -47,7 +47,7 @@ rtxmlrpc throttle.global_down.rate
 rtxmlrpc d.multicall2 '' main d.name=
 ```
 
-That's all very nice, but it'd be even nicer if there was command to
+That's all very nice, but it'd be even nicer if there was a command to
 make dealing with all the torrents easier than running all these RPC
 commands. That's where `rtcontrol` comes into play. It allows for
 scripting and outputting against torrents without needing to learn
@@ -70,13 +70,14 @@ rtcontrol is_ignored=no xfer=+0 -o up.sz,down.sz,name
 
 
 `rtcontrol` lets us filter on different fields, and optionally pick
-which fields will be output. There are many different fields that can filtered or displayed.
+which fields will be output. The many different fields that are available can
+be shown with `rtcontrol --help-fields`.
 In addition to simply displaying torrents, we can also run commands that will make
 things change.
 
 For the sake of this tutorial, all of the commands below have
-`--dry-run` at the end to make sure nothing is actually changed. If
-you'd like to actually try running the commands, simply remove that
+`--dry-run` at the end to make sure nothing is changed. If
+you'd like to try running the commands for real, simply remove that
 flag.
 
 ```bash
@@ -101,7 +102,7 @@ pyrotorque --run-once stats --debug --dry-run
 ## Working with torrents
 
 In addition to rTorrent, pyrosimple can also work with .torrent files
-directly. The commands `mktor`, `lstor` and `chtor` can make, list
+directly. The commands `mktor`, `lstor` and `chtor` can make, list,
 and modify files, respectively
 
 Let's try creating an example torrent from an example file
