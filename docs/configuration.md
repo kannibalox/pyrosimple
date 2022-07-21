@@ -103,17 +103,21 @@ This section allows for setting any number of tracker aliases for use with `rtco
 ```toml
 # Example
 [CONNECTIONS]
-local = "scgi+unix://$HOME/rtorrent/.scgi_local"
+local = "~/rtorrent/.scgi_local"
 remote_scgi = "scgi://example.com:9000"
 remote_https = "https://example.com/RPC2"
 ```
 
+!!! Note
+    For HTTP connections, it's important to either explicitly provide the path (e.g. `https://example.com/RPC2`) or leave it off entirely
+    (e.g. `https://example.com`). `https://example.com/` will not work for most setups.
+
 Most of the CLI tools accept a `-U`/`--url` flag to provide the `scgi_url` directly when working with remote machines:
 ```bash
-rtxmlrpc -U "scgi+unix://$HOME/rtorrent/.scgi_local" system.hostname
+rtxmlrpc -U "~/rtorrent/.scgi_local" system.hostname
 ```
 
-Instead, we can use the connections defined in this section:
+Once defined, the short name can be used instead:
 ```bash
 rtxmlrpc -U local system.hostname
 ```

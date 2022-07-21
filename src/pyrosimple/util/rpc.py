@@ -64,7 +64,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     """Proxy to rTorrent's RPC interface.
 
     Method calls are built from attribute accesses, i.e. you can do
-    something like C{proxy.system.client_version()}.
+    something like `proxy.system.client_version()`.
 
     All methods from ServerProxy are being overridden due to the combination
     of self.__var name mangling and the __call__/__getattr__ magic.
@@ -150,7 +150,8 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 results.append([self.__request_json(i["methodName"], i["params"])])
             return results
 
-        # This random ID feels silly but there's not much need for anything better at the moment.
+        # This random ID feels silly but there's not much need for anything better at the moment
+        # since the RPC interface is synchronous.
         rpc_id = random.randint(0, 100)
         request = json.dumps(
             {

@@ -49,15 +49,16 @@ INFO:pyrosimple.scripts.rtcontrol.RtorrentControl:Total time: 0.672 seconds.
 
 !!! warning
 
-    This can cause strange behavior unless planned out. As an example, hashes are no longer enough to uniquely identify a torrent.
+    This can cause strange behavior unless planned out. For instance, hashes are no longer enough to uniquely identify a torrent.
 
 `rtxmlrpc` and `rtcontrol` support talking to multiple clients, by specifying a TOML list
 in the `CONNECTIONS` section:
 ```toml
 [CONNECTIONS]
 local="localhost:7000"
-seedbox="seedbox.example.com:7000"
-all=["local","seedbox"]
+remote="remote.example.com:7000"
+seedbox="https://username:password@seedbox.example.com"
+all=["local","seedbox","remote"]
 ```
 ```bash
 rtxmlrpc -U all system.hostname
