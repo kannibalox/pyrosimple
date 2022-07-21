@@ -76,7 +76,7 @@ rtxmlrpc -U all system.hostname
 # Via port
 rtxmlrpc -U scgi+ssh://example.com/TCP:0.0.0.0:7000 system.hostname
 # Via domain socket
-rtxmlrpc -U scgi+ssh://example.com/UNIX-CONNECT:/home/rtorrentr/scgi.sock system.hostname
+rtxmlrpc -U scgi+ssh://example.com/UNIX-CONNECT:/home/rtorrent/scgi.sock system.hostname
 ```
 
 Since each command opens a new SSH connection, setting up the ControlPersist feature in
