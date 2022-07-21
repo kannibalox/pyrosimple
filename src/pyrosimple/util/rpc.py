@@ -91,8 +91,11 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         self.__url = url
         self.__host = parsed_url.netloc
         self.__handler = urllib.parse.urlunsplit(["", "", *parsed_url[2:]])
+        # The /RPC2 convention just comes from the xmlrpc CLI tool, but is
+        # generally used during ruTorrent setups
         if not self.__handler and parsed_url.scheme in ("http", "https"):
             self.__handler = "/RPC2"
+            self.__url += "/RPC2"
 
         if transport is None:
             if self.__rpc_codec == "json":
@@ -102,7 +105,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 codec = xmlrpclib
             handler = scgi.transport_from_url(url)
             transport = handler(
-                url=url,
+                url=self.__url,
                 use_datetime=use_datetime,
                 use_builtin_types=use_builtin_types,
                 codec=codec,

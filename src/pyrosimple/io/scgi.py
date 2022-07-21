@@ -4,7 +4,6 @@ import logging
 import socket
 import subprocess
 import sys
-import urllib.request
 
 from typing import Dict, List, Tuple, Type
 from urllib import parse as urlparse
@@ -74,21 +73,7 @@ class HTTPTransport(RTorrentTransport):
     """Transport via HTTP(s) call."""
 
     def request(self, host, handler, request_body, verbose=False):
-        parts = urllib.parse.urlsplit(self.url)
-        target = urllib.parse.urlunsplit(
-            (parts.scheme, parts.netloc, parts.path, parts.query, parts.fragment)
-        )
-        auth = ()
-        if parts.username is not None and parts.password is not None:
-            auth = (parts.username, parts.password)
-        if parts.path.endswith("plugins/rpc/rpc.php"):
-            req = requests.post(
-                target, headers=self._headers, auth=auth, data=request_body
-            )
-        else:
-            req = requests.post(
-                target, headers=self._headers, auth=auth, data=request_body
-            )
+        req = requests.post(self.url, headers=self._headers, data=request_body)
         req.raise_for_status()
         return self.parse_response(io.BytesIO(req.content))
 
