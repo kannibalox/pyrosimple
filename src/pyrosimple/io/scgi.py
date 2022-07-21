@@ -76,7 +76,7 @@ class HTTPTransport(RTorrentTransport):
     def request(self, host, handler, request_body, verbose=False):
         parts = urllib.parse.urlsplit(self.url)
         target = urllib.parse.urlunsplit(
-            (parts.scheme, parts.hostname, parts.path, parts.query, parts.fragment)
+            (parts.scheme, parts.netloc, parts.path, parts.query, parts.fragment)
         )
         auth = ()
         if parts.username is not None and parts.password is not None:
@@ -86,7 +86,7 @@ class HTTPTransport(RTorrentTransport):
                 target, headers=self._headers, auth=auth, data=request_body
             )
         else:
-            req = requests.get(
+            req = requests.post(
                 target, headers=self._headers, auth=auth, data=request_body
             )
         req.raise_for_status()
