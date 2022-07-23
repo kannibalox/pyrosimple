@@ -440,7 +440,10 @@ class RtorrentItem(engine.TorrentProxy):
                 )
             )
         )
-        metafile.add_fast_resume(torrent, proxy.d.directory_base(self.hash))
+        try:
+            metafile.add_fast_resume(torrent, proxy.d.directory_base(self.hash))
+        except (FileNotFoundError, OSError) as e:
+            self._engine.LOG.error("Could not add fast resume data: %s", e)
         # Do some basic escaping, nothing else should be necessary.
         base_dir = proxy.d.directory_base(self.hash).replace('"', r"\"")
         extra_cmds.insert(0, f'd.directory_base.set="{base_dir}"')
