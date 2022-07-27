@@ -18,6 +18,7 @@ class AdminTool(ScriptBaseWithConfig):
 
     def add_options(self):
         super().add_options()
+        self.parser.set_defaults(func=None)
         subparsers = self.parser.add_subparsers()
         config_parser = subparsers.add_parser("config")
         config_parser.set_defaults(func=self.config)
@@ -38,16 +39,19 @@ class AdminTool(ScriptBaseWithConfig):
             try:
                 pyrosimple.connect().open()
             except ConnectionRefusedError:
-                self.LOG.warning(
+                self.LOG.error(
                     "SCGI URL '%s' found, but rTorrent may not be running!",
                     config.autoload_scgi_url(),
                 )
                 raise
             else:
-                self.LOG.debug("Connected to rTorrent successfully")
+                self.LOG.info("Connected to rTorrent successfully")
 
     def mainloop(self):
         self.args = self.parser.parse_args()
+        if self.args.func is None:
+            self.parser.print_help()
+            return
         self.args.func()
 
 
