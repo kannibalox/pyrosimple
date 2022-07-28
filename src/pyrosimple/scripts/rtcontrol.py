@@ -817,7 +817,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                             continue
                         if action_name == "spawn":
                             args = shlex.split(args[0])
-                            self.LOG.debug("Runing '%s'", args)
+                            self.LOG.debug("Spawning '%s'", args)
                             subprocess.run(args, check=True, shell=False)
                             continue
                         # Look up aliases when moving to a host
