@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'dockerpush-action'
-
 jobs:
   docker:
     runs-on: ubuntu-latest
