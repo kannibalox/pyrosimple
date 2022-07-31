@@ -35,28 +35,21 @@ CACHE_METHOD = {
 }
 
 
-class XmlRpcError(xmlrpclib.Fault):
+class RpcError(xmlrpclib.Fault):
     """Base class for XMLRPC protocol errors."""
 
-    def __init__(self, msg, *args):
-        super().__init__(self, msg, *args)
-        self.message = msg.format(*args)
-        self.faultString = self.message
-        self.faultCode = -500
-
-    def __str__(self):
-        return self.message
+    def __init__(self, faultString: str, faultCode: int = -500):
+        super().__init__(faultCode, faultString)
 
 
-class HashNotFound(XmlRpcError):
+class HashNotFound(RpcError):
     """Non-existing or disappeared hash."""
 
-    def __init__(self, msg, *args):
-        super().__init__(msg, *args)
-        self.faultCode = -404
+    def __init__(self, faultString: str, faultCode: int = -404):
+        super().__init__(faultString, faultCode)
 
 
-ERRORS = (XmlRpcError,) + scgi.ERRORS
+ERRORS = (RpcError,) + scgi.ERRORS
 
 
 class RTorrentProxy(xmlrpclib.ServerProxy):
@@ -176,7 +169,19 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 f"RPC IDs do not match: sent={rpc_id} received={response['id']}"
             )
         if "error" in response:
-            raise ValueError(f"Received error: {response['error']}")
+            if "message" in response["error"]:
+                if (
+                    response["error"]["message"]
+                    == "invalid parameters: info-hash not found"
+                ):
+                    raise HashNotFound(str(response["error"]))
+                if "code" in response["error"]:
+                    raise RpcError(
+                        response["error"]["message"], response["error"]["code"]
+                    )
+            raise RpcError(f"Received error: {response['error']}")
+        if "result" not in response:
+            raise ValueError(f"Result not found in response: {response}")
         return response["result"]
 
     def __request(self, methodname, params):

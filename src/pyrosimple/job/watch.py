@@ -68,7 +68,7 @@ class MetafileHandler:
             name = self.job.proxy.d.name(self.ns.info_hash)
         except rpc.HashNotFound:
             pass
-        except rpc.XmlRpcError as exc:
+        except rpc.RpcError as exc:
             if exc.faultString != "Could not find info-hash.":
                 self.job.LOG.error("While checking for #%s: %s", self.ns.info_hash, exc)
                 return False

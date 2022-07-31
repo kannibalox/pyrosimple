@@ -161,11 +161,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     print(
                         "No similar methods found, try `rtxmlrpc system.listMethods` to see a full list of available methods."
                     )
-            self.return_code = (
-                error.EX_NOINPUT
-                if "not find" in getattr(exc, "faultString", "")
-                else error.EX_DATAERR
-            )
+            if isinstance(exc, rpc.HashNotFound):
+                self.return_code = error.EX_NOINPUT
+            else:
+                self.return_code = error.EX_DATAERR
         else:
             if self.LOG.isEnabledFor(
                 logging.WARNING
