@@ -9,6 +9,7 @@ import operator
 import os
 import shlex
 import time
+import urllib.parse
 
 from collections import defaultdict
 from functools import lru_cache, partial
@@ -413,11 +414,26 @@ class RtorrentItem(engine.TorrentProxy):
         )
 
     def move_to_host(self, remote_url: str, copy: bool = False):
-        """Migrate an item to a remote host
+        """Migrate an item to a remote host"""
 
-        TODO allow skipping fast resume (which requires local access to FS)
-        FIXME invalidate all self-cached items after sending"""
-        remote_proxy = RtorrentEngine(remote_url).open()
+        # TODO allow skipping fast resume (which requires local access to FS)
+        # FIXME invalidate all self-cached items after sending
+
+        # TODO Generalize this overriding of query parameters
+        parsed_url = urllib.parse.urlsplit(remote_url)
+        queries = urllib.parse.parse_qs(parsed_url.query)
+        queries["rpc"] = ["xml"]
+        rebuilt_url = urllib.parse.urlunsplit(
+            (
+                parsed_url.scheme,
+                parsed_url.netloc,
+                parsed_url.path,
+                urllib.parse.urlencode(queries, doseq=True),
+                parsed_url.fragment,
+            )
+        )
+
+        remote_proxy = RtorrentEngine(rebuilt_url).open()
         proxy = self._engine.open()
         self._engine.LOG.debug("Attempting to move %s to %s", self.hash, remote_url)
         extra_cmds: List[str] = []
