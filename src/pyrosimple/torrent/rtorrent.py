@@ -471,6 +471,7 @@ class RtorrentItem(engine.TorrentProxy):
         for _ in range(0, 10):
             try:
                 remote_proxy.d.hash(self.hash)
+                break
             except rpc.HashNotFound:
                 time.sleep(0.5)
         # After 5 seconds, let the exception happen
