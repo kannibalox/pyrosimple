@@ -95,7 +95,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.jobs[name] = dict(params)
             if self.options.dry_run:
                 self.jobs[name]["dry_run"] = True
-            if params.get("active", False):
+            if params.get("active", True):
                 self.jobs[name]["handler"] = pymagic.import_name(params.handler)
             self.jobs[name]["schedule"] = self.parse_schedule(params.get("schedule"))
 
