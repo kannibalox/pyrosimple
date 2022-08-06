@@ -12,6 +12,7 @@ import bencode
 import pyrosimple
 
 from pyrosimple import config, error
+from pyrosimple.job import base
 from pyrosimple.util import matching, pymagic, rpc
 
 
@@ -38,47 +39,31 @@ def get_custom_fields(infohash, proxy):
     return custom_fields
 
 
-class Mover:
+class Mover(base.MatchableJob):
     """Move torrent to remote host(s)"""
 
     def __init__(self, job_config=None):
         """Initalize torrent mover job"""
-        self.config = job_config or {}
-        self.LOG = pymagic.get_class_logger(self)
-        self.LOG.debug("Statistics logger created with config %r", self.config)
-        self.config.setdefault("dry_run", False)
-        self.proxy = None
-        self.engine = None
+        super().__init__(job_config)
+        self.config["hosts"] = [
+            config.lookup_connection_alias(h) for h in self.config["hosts"]
+        ]
 
-    def run(self):
+    def run_item(self, item):
         """Statistics logger job callback."""
-        try:
-            self.engine = pyrosimple.connect()
-            self.proxy = self.engine.open()
-            matcher = matching.create_matcher(self.config["matcher"])
-            hosts = [config.lookup_connection_alias(h) for h in self.config["hosts"]]
-            if not isinstance(hosts, list):
-                hosts = [hosts]
-            for i in self.engine.view("default", matcher):
-                for host in nodes_by_hash_weight(i.hash + i.alias, hosts):
-                    rproxy = rpc.RTorrentProxy(host)
-                    metahash = i.hash
-                    try:
-                        rproxy.d.hash(i.hash)
-                    except rpc.HashNotFound:
-                        pass
-                    else:
-                        self.LOG.info(
-                            "Hash %s already exists at remote URL %s", i.hash, host
-                        )
-                        continue
-                    if self.config["dry_run"]:
-                        self.LOG.info(
-                            "Would move %s to %s", metahash, rproxy.system.hostname()
-                        )
-                        break
-                    i.move_to_host(host)
-                    self.LOG.info("Moved %s to %s", metahash, rproxy.system.hostname())
-                    break
-        except (error.LoggableError, *rpc.ERRORS) as exc:
-            self.LOG.warning(str(exc))
+        for host in nodes_by_hash_weight(i.hash + i.alias, self.config["hosts"]):
+            rproxy = rpc.RTorrentProxy(host)
+            metahash = i.hash
+            try:
+                rproxy.d.hash(i.hash)
+            except rpc.HashNotFound:
+                pass
+            else:
+                self.LOG.info("Hash %s already exists at remote URL %s", i.hash, host)
+                continue
+            if self.config["dry_run"]:
+                self.LOG.info("Would move %s to %s", metahash, rproxy.system.hostname())
+                break
+            i.move_to_host(host)
+            self.LOG.info("Moved %s to %s", metahash, rproxy.system.hostname())
+            break
