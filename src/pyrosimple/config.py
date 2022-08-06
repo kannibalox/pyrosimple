@@ -11,7 +11,7 @@ import logging
 import urllib
 
 from pathlib import Path
-from typing import Optional, Union
+from typing import Iterator, Optional, Union
 
 from dynaconf import Dynaconf, Validator
 
@@ -184,3 +184,23 @@ def load_custom_py():
             exec(handle.read())
     else:
         log.debug("Configuration file '%s' not found!", config_file)
+
+
+def lookup_connection_alias(url: str) -> str:  # pylint: disable=no-self-use
+    """Convert a connection alias to the actual URL (if set in the config"""
+    if url in settings["CONNECTIONS"]:
+        return str(settings["CONNECTIONS"][url])
+    return url
+
+
+def multi_connection_lookup(url: str) -> Iterator[str]:
+    """Return a list of urls.
+
+    This is separate from lookup_connection_alias due to scripts needing to be written specifically
+    to handle this"""
+    val = settings["CONNECTIONS"].get(url, [url])
+    if isinstance(val, list):
+        for v in val:
+            yield lookup_connection_alias(v)
+    else:
+        yield lookup_connection_alias(val)
