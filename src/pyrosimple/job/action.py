@@ -17,7 +17,9 @@ class Command(BaseJob):
 
     def run(self):
         if not self.config["dry_run"]:
-            proc = subprocess.run(self.args, **self.kwargs, capture_output=True, check=False)
+            proc = subprocess.run(
+                self.args, **self.kwargs, capture_output=True, check=False
+            )
             self.log.info("Command %s finished with RC=%s", proc.args, proc.returncode)
             self.log.debug("stdout: %s", proc.stdout)
             self.log.debug("stderr: %s", proc.stderr)
