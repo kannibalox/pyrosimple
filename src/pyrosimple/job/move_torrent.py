@@ -9,11 +9,9 @@ from typing import Dict, List
 
 import bencode
 
-import pyrosimple
-
-from pyrosimple import config, error
+from pyrosimple import config
 from pyrosimple.job import base
-from pyrosimple.util import matching, pymagic, rpc
+from pyrosimple.util import rpc
 
 
 def nodes_by_hash_weight(meta_id: str, nodes: List[str]) -> Dict[str, int]:
@@ -51,19 +49,21 @@ class Mover(base.MatchableJob):
 
     def run_item(self, item):
         """Statistics logger job callback."""
-        for host in nodes_by_hash_weight(i.hash + i.alias, self.config["hosts"]):
+        for host in nodes_by_hash_weight(item.hash + item.alias, self.config["hosts"]):
             rproxy = rpc.RTorrentProxy(host)
-            metahash = i.hash
+            metahash = item.hash
             try:
-                rproxy.d.hash(i.hash)
+                rproxy.d.hash(item.hash)
             except rpc.HashNotFound:
                 pass
             else:
-                self.LOG.info("Hash %s already exists at remote URL %s", i.hash, host)
+                self.log.info(
+                    "Hash %s already exists at remote URL %s", item.hash, host
+                )
                 continue
             if self.config["dry_run"]:
-                self.LOG.info("Would move %s to %s", metahash, rproxy.system.hostname())
+                self.log.info("Would move %s to %s", metahash, rproxy.system.hostname())
                 break
-            i.move_to_host(host)
-            self.LOG.info("Moved %s to %s", metahash, rproxy.system.hostname())
+            item.move_to_host(host)
+            self.log.info("Moved %s to %s", metahash, rproxy.system.hostname())
             break
