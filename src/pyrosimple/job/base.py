@@ -9,8 +9,11 @@ from pyrosimple.util import matching, pymagic, rpc
 
 
 class BaseJob:
-    """Set up a base job
-    Truthfully this is simple enough that it doesn't really need to be used, but it provides a concrete minimum example of what a custom job would need to look like.
+    """Set up a base job.
+
+    Truthfully this setup is simple enough that it doesn't really need
+    a base class, but it provides a concrete minimum example of what a
+    custom job would need to look like.
     """
 
     def __init__(self, config: Optional[Dict] = None):
@@ -28,7 +31,8 @@ class BaseJob:
 
 
 class MatchableJob(BaseJob):
-    """Set up a job that loops through torrents that match a query and performs an action on each"""
+    """Set up a job that loops through torrents that match a query and
+    performs an action on each"""
 
     def __init__(self, config=None):
         super().__init__(config)

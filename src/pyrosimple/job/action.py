@@ -1,8 +1,26 @@
 """A simple job to emulate rtcontrol's actions"""
 from pyrosimple import error
-from pyrosimple.job.base import MatchableJob
+from pyrosimple.job.base import MatchableJob, BaseJob
 from pyrosimple.torrent import formatting, rtorrent
 
+import subprocess
+
+class Command(BaseJob):
+    """Runs a single untemplated command."""
+    def __init__(self, config=None):
+        super().__init__(config)
+        self.args = self.config.get("args", [])
+        allowed_kwargs = ["shell", "cwd", "timeout", "check", "env"]
+        self.kwargs = {k: self.config[k] for k in allowed_kwargs if k in self.config}
+
+    def run(self):
+        if not self.config['dry_run']:
+            proc = subprocess.run(self.args, **self.kwargs, capture_output=True)
+            self.log.info("Command %s finished with RC=%s", proc.cmd, proc.returncode)
+            self.log.debug("stdout: %s", proc.stdout)
+            self.log.debug("stderr: %s", proc.stderr)
+        else:
+            self.log.info("Would run %s with parameters %s", self.args, self.kwargs)
 
 class Action(MatchableJob):
     """Run an action for each matched item"""
