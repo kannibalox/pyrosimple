@@ -46,7 +46,7 @@ class MetafileChanger(ScriptBaseWithConfig):
     ARGS_HELP = "<metafile>..."
 
     # Keys of rTorrent session data
-    RT_RESUMT_KEYS = ("libtorrent_resume", "log_callback", "err_callback", "rtorrent")
+    RT_RESUME_KEYS = ("libtorrent_resume", "log_callback", "err_callback", "rtorrent")
 
     def add_options(self):
         """Add program options."""
@@ -289,7 +289,7 @@ class MetafileChanger(ScriptBaseWithConfig):
 
                 # Clean rTorrent data?
                 if self.options.clean_rtorrent:
-                    for key in self.RT_RESUMT_KEYS:
+                    for key in self.RT_RESUME_KEYS:
                         if key in metainfo:
                             self.LOG.info("Removing key %r...", key)
                             del metainfo[key]
