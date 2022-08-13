@@ -14,11 +14,11 @@ from urllib.parse import parse_qs
 import bencode
 
 from pyrosimple import config
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBase
 from pyrosimple.util import metafile
 
 
-class MetafileCreator(ScriptBaseWithConfig):
+class MetafileCreator(ScriptBase):
     """
     Create a bittorrent metafile.
 

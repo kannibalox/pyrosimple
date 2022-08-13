@@ -14,7 +14,7 @@ import urllib.parse
 import bencode  # typing: ignore
 
 from pyrosimple import config, error
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBase
 from pyrosimple.util import metafile
 
 
@@ -39,7 +39,7 @@ def replace_fields(meta, patterns):
     return meta
 
 
-class MetafileChanger(ScriptBaseWithConfig):
+class MetafileChanger(ScriptBase):
     """Change attributes of a bittorrent metafile."""
 
     # argument description for the usage information
