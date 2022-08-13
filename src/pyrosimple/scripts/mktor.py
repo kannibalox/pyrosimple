@@ -128,6 +128,7 @@ class MetafileCreator(ScriptBase):
 
         if not self.args:
             self.parser.print_help()
+            self.parser.error("No arguments given, nothing to do!")
             self.parser.exit()
         elif len(self.args) < 2:
             self.parser.error(

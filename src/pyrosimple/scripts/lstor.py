@@ -49,6 +49,7 @@ class MetafileLister(ScriptBase):
         """The main loop."""
         if not self.args:
             self.parser.print_help()
+            self.parser.error("No metafiles given, nothing to do!")
             self.parser.exit()
 
         for idx, filename in enumerate(self.args):

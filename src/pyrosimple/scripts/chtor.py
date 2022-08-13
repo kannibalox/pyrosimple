@@ -145,7 +145,9 @@ class MetafileChanger(ScriptBase):
     def mainloop(self):
         """The main loop."""
         if not self.args:
+            self.parser.print_help()
             self.parser.error("No metafiles given, nothing to do!")
+            self.parser.exit()
 
         if 1 < sum(
             bool(i)
