@@ -75,18 +75,11 @@ class RtorrentItemCollector(RtorrentCollector):
         super().__init__(proxy, config)
 
         available_methods = set(self.proxy.system.listMethods())
-        if "item-stats" in self.config:
-            self.item_stat_methods = (
-                set(self.config["item-stats"].split(",")) & available_methods
-            )
-        else:
-            self.item_stat_methods = ("down.total", "up.total")
-        if "item-labels" in self.config:
-            self.item_labels = list(
-                set(self.config["item-labels"].split(",")) & available_methods
-            )
-        else:
-            self.item_labels = ["hash", "name"]
+        self.item_stat_methods = set(self.config.get("item-stats", ["d.down.total", "d.up.total"]))
+        self.item_labels = set(self.config.get("item-labels", ["d.hash", "d.name"]))
+        # Strip out unavailable methods
+        self.item_stat_methods &= available_methods
+        self.item_labels &= available_methods
 
     def collect(self):
         calls = [
