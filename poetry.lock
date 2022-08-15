@@ -80,6 +80,29 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "black"
+version = "22.6.0"
+description = "The uncompromising code formatter."
+category = "dev"
+optional = false
+python-versions = ">=3.6.2"
+
+[package.dependencies]
+click = ">=8.0.0"
+mypy-extensions = ">=0.4.3"
+pathspec = ">=0.9.0"
+platformdirs = ">=2"
+tomli = {version = ">=1.1.0", markers = "python_full_version < \"3.11.0a7\""}
+typed-ast = {version = ">=1.4.2", markers = "python_version < \"3.8\" and implementation_name == \"cpython\""}
+typing-extensions = {version = ">=3.10.0.0", markers = "python_version < \"3.10\""}
+
+[package.extras]
+uvloop = ["uvloop (>=0.15.2)"]
+jupyter = ["tokenize-rt (>=3.2.0)", "ipython (>=7.8.0)"]
+d = ["aiohttp (>=3.7.4)"]
+colorama = ["colorama (>=0.4.3)"]
+
+[[package]]
 name = "certifi"
 version = "2022.6.15"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -120,7 +143,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "coverage"
-version = "6.4.2"
+version = "6.4.3"
 description = "Code coverage measurement for Python"
 category = "dev"
 optional = false
@@ -338,7 +361,7 @@ i18n = ["babel (>=2.9.0)"]
 
 [[package]]
 name = "mkdocs-material"
-version = "8.3.9"
+version = "8.4.0"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
@@ -361,6 +384,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "mypy-extensions"
+version = "0.4.3"
+description = "Experimental type system extensions for programs checked with the mypy typechecker."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
@@ -381,6 +412,14 @@ python-versions = "*"
 
 [package.dependencies]
 regex = ">=2022.3.15"
+
+[[package]]
+name = "pathspec"
+version = "0.9.0"
+description = "Utility library for gitignore style pattern matching of file paths."
+category = "dev"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [[package]]
 name = "platformdirs"
@@ -548,7 +587,7 @@ six = ">=1.5"
 
 [[package]]
 name = "pytz"
-version = "2022.1"
+version = "2022.2.1"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = true
@@ -653,7 +692,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "tzdata"
-version = "2022.1"
+version = "2022.2"
 description = "Provider of IANA time zone data"
 category = "main"
 optional = true
@@ -734,7 +773,7 @@ torque = ["APScheduler", "pyinotify"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4"
-content-hash = "91a8d85fd0e1e70b50027838556276de82ed196e2a13e3a7047da9892824014a"
+content-hash = "347107445ef269a72c64b9da76080792d1cbff75d4a0fd0c9aa1d343d49ec471"
 
 [metadata.files]
 apscheduler = [
@@ -766,6 +805,7 @@ attrs = []
     {file = "bencode.py-4.0.0-py2.py3-none-any.whl", hash = "sha256:99c06a55764e85ffe81622fdf9ee78bd737bad3ea61d119784a54bb28860d962"},
     {file = "bencode.py-4.0.0.tar.gz", hash = "sha256:2a24ccda1725a51a650893d0b63260138359eaa299bb6e7a09961350a2a6e05c"},
 ]
+black = []
 certifi = [
     {file = "certifi-2022.6.15-py3-none-any.whl", hash = "sha256:fe86415d55e84719d75f8b69414f6438ac3547d2078ab91b67e779ef69378412"},
     {file = "certifi-2022.6.15.tar.gz", hash = "sha256:84c85a9078b11105f04f3036a9482ae10e4621616db313fe045dd24743a0820d"},
@@ -915,14 +955,12 @@ mergedeep = [
     {file = "mergedeep-1.3.4.tar.gz", hash = "sha256:0096d52e9dad9939c3d975a774666af186eda617e6ca84df4c94dec30004f2a8"},
 ]
 mkdocs = []
-mkdocs-material = [
-    {file = "mkdocs-material-8.3.9.tar.gz", hash = "sha256:dc82b667d2a83f0de581b46a6d0949732ab77e7638b87ea35b770b33bc02e75a"},
-    {file = "mkdocs_material-8.3.9-py2.py3-none-any.whl", hash = "sha256:263f2721f3abe533b61f7c8bed435a0462620912742c919821ac2d698b4bfe67"},
-]
+mkdocs-material = []
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.3.tar.gz", hash = "sha256:bfd24dfdef7b41c312ede42648f9eb83476ea168ec163b613f9abd12bbfddba2"},
     {file = "mkdocs_material_extensions-1.0.3-py3-none-any.whl", hash = "sha256:a82b70e533ce060b2a5d9eb2bc2e1be201cf61f901f93704b4acf6e3d5983a44"},
 ]
+mypy-extensions = []
 packaging = [
     {file = "packaging-21.3-py3-none-any.whl", hash = "sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522"},
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
@@ -930,6 +968,7 @@ packaging = [
 parsimonious = [
     {file = "parsimonious-0.9.0.tar.gz", hash = "sha256:b2ad1ae63a2f65bd78f5e0a8ac510a98f3607a43f1db2a8d46636a5d9e4a30c1"},
 ]
+pathspec = []
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
     {file = "platformdirs-2.5.2.tar.gz", hash = "sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"},
@@ -978,10 +1017,7 @@ python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
-pytz = [
-    {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},
-    {file = "pytz-2022.1.tar.gz", hash = "sha256:1e760e2fe6a8163bc0b3d9a19c4f84342afa0a2affebfaa84b01b978a02ecaa7"},
-]
+pytz = []
 pytz-deprecation-shim = [
     {file = "pytz_deprecation_shim-0.1.0.post0-py2.py3-none-any.whl", hash = "sha256:8314c9692a636c8eb3bda879b9f119e350e93223ae83e70e80c31675a0fdc1a6"},
     {file = "pytz_deprecation_shim-0.1.0.post0.tar.gz", hash = "sha256:af097bae1b616dde5c5744441e2ddc69e74dfdcb0c263129610d85b87445a59d"},
@@ -1072,10 +1108,7 @@ typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
     {file = "typing_extensions-4.3.0.tar.gz", hash = "sha256:e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6"},
 ]
-tzdata = [
-    {file = "tzdata-2022.1-py2.py3-none-any.whl", hash = "sha256:238e70234214138ed7b4e8a0fab0e5e13872edab3be586ab8198c407620e2ab9"},
-    {file = "tzdata-2022.1.tar.gz", hash = "sha256:8b536a8ec63dc0751342b3984193a3118f8fca2afe25752bb9b7fffd398552d3"},
-]
+tzdata = []
 tzlocal = [
     {file = "tzlocal-4.2-py3-none-any.whl", hash = "sha256:89885494684c929d9191c57aa27502afc87a579be5cdd3225c77c463ea043745"},
     {file = "tzlocal-4.2.tar.gz", hash = "sha256:ee5842fa3a795f023514ac2d801c4a81d1743bbe642e3940143326b3a00addd7"},
