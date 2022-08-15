@@ -25,7 +25,7 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 
 
 class RTorrentTransport(xmlrpclib.Transport):
-    """Base class for handle transports. Primarily exists to allow
+    """Base class for handling transports. Primarily exists to allow
     using the same transport with a different underlying RPC mechanism"""
 
     def __init__(self, *args, url, codec=xmlrpclib, headers=(), **kwargs):

@@ -17,7 +17,7 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import Callable, Dict, Generator, List, Optional, Union
+from typing import Callable, Dict, Generator, List, Optional, Set, Union
 
 import bencode  # typing: ignore
 
@@ -102,7 +102,7 @@ class MaskingPrettyPrinter(pprint.PrettyPrinter):
         return pprint.PrettyPrinter.format(self, obj, context, maxlevels, level)
 
 
-def check_info(info):
+def check_info(info: Dict):
     """Validate info dict.
 
     Raise ValueError if validation fails.
@@ -166,7 +166,7 @@ def check_info(info):
     return info
 
 
-def check_meta(meta):
+def check_meta(meta: Dict):
     """Validate meta dict.
 
     Raise ValueError if validation fails.
@@ -175,18 +175,20 @@ def check_meta(meta):
         raise ValueError("bad metadata - not a dictionary")
     if not isinstance(meta.get("announce"), str):
         raise ValueError("bad announce URL - not a string")
-    check_info(meta.get("info"))
+    if not isinstance(meta["info"], dict):
+        raise ValueError("bad info key - not a dictionary")
+    check_info(meta["info"])
 
     return meta
 
 
-def clean_meta(meta: Dict, including_info: bool = False, logger=None):
+def clean_meta(meta: Dict, including_info: bool = False, logger=None) -> Set[str]:
     """Clean meta dict. Optionally log changes using the given logger.
 
     @param logger: If given, a callable accepting a string message.
     @return: Set of keys removed from C{meta}.
     """
-    modified = set()
+    modified: Set[str] = set()
 
     for key in list(meta.keys()):
         if [key] not in METAFILE_STD_KEYS:
@@ -217,7 +219,7 @@ def clean_meta(meta: Dict, including_info: bool = False, logger=None):
     return modified
 
 
-def sanitize(meta, diagnostics=False):
+def sanitize(meta: Dict, diagnostics=False):
     """Try to fix common problems, especially transcode non-standard string encodings."""
     bad_encodings, bad_fields = set(), set()
 
@@ -253,7 +255,7 @@ def sanitize(meta, diagnostics=False):
     return (meta, bad_encodings, bad_fields) if diagnostics else meta
 
 
-def assign_fields(meta, assignments: List[str]):
+def assign_fields(meta: Dict, assignments: List[str]) -> Dict:
     """Takes a list of C{key=value} strings and assigns them to the
     given metafile. If you want to set nested keys (e.g. "info.source"),
     you have to use a dot as a separator. For exotic keys *containing*
@@ -293,7 +295,7 @@ def assign_fields(meta, assignments: List[str]):
     return meta
 
 
-def add_fast_resume(meta, datapath: str):
+def add_fast_resume(meta: Dict, datapath: str) -> Dict:
     """Add fast resume data to a metafile dict."""
     # Get list of files
     files = meta["info"].get("files", None)
@@ -348,12 +350,12 @@ def add_fast_resume(meta, datapath: str):
     return meta
 
 
-def info_hash(metadata) -> str:
+def info_hash(metadata: Dict) -> str:
     """Return info hash as a string."""
     return hashlib.sha1(bencode.encode(metadata["info"])).hexdigest().upper()
 
 
-def data_size(metadata) -> int:
+def data_size(metadata: Dict) -> int:
     """Calculate the size of a torrent based on parsed metadata."""
     info = metadata["info"]
 
@@ -364,7 +366,7 @@ def data_size(metadata) -> int:
     return sum(f["length"] for f in info["files"])
 
 
-def checked_open(filename: str, log: logging.Logger = None):
+def checked_open(filename: str, log: logging.Logger = None) -> Dict:
     """Open and validate the given metafile.
     Optionally provide diagnostics on the passed logger, for
     invalid metafiles, which then just cause a warning but no exception.
@@ -469,11 +471,11 @@ class Metafile:
         # Initialize progress state
         hashing_secs = time.time()
         totalsize = self._calc_size()
-        totalhashed = 0
+        totalhashed: int = 0
 
         # Start a new piece
         sha1sum = hashlib.sha1()
-        done = 0
+        done: int = 0
         filename = None
 
         # Hash all files

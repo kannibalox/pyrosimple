@@ -241,7 +241,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         return url
 
     def multi_connection_lookup(self, url: str) -> Iterator[str]:
-        """Return a list of urls.
+        """Return a list of host URLs.
 
         This is separate from lookup_connection_alias due to scripts needing to be written specifically
         to handle this"""

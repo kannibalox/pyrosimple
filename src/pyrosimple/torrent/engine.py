@@ -44,7 +44,9 @@ def _duration(start: Optional[float], end: Optional[float]) -> Optional[float]:
     return None
 
 
-def _interval_split(interval, only=None, event_re=re.compile("[A-Z][0-9]+")):
+def _interval_split(
+    interval: str, only: Optional[str] = None, event_re=re.compile("[A-Z][0-9]+")
+):
     """Split C{interval} into a series of event type and timestamp tuples.
     An exaple of the input is "R1283008245P1283008268".
     Returns events in reversed order (latest first).
@@ -57,9 +59,6 @@ def _interval_split(interval, only=None, event_re=re.compile("[A-Z][0-9]+")):
             return kind, float(val)
         except (TypeError, ValueError):
             return None, 0
-
-    if hasattr(interval, "fetch"):
-        interval = interval.fetch("custom_activations")
 
     return list(
         reversed(
@@ -123,7 +122,7 @@ def _fmt_tags(tagset: Set[str]) -> str:
     return " ".join(sorted(tagset))
 
 
-def _fmt_files(filelist):
+def _fmt_files(filelist) -> str:
     """Produce a file listing."""
     depth = max(i.path.count("/") for i in filelist)
     pad = ["\uFFFE"] * depth

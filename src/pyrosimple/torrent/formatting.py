@@ -10,7 +10,7 @@ import os
 import re
 
 from pathlib import Path
-from typing import Dict, Generator, Union
+from typing import Dict, Generator, Optional, Tuple, Union
 
 import jinja2
 
@@ -160,7 +160,9 @@ def format_item_str(
 
 
 def format_item(
-    template: Template, item: Union[Dict, str, rtorrent.RtorrentItem], defaults=None
+    template: Template,
+    item: Union[Dict, str, rtorrent.RtorrentItem],
+    defaults: Optional[Dict] = None,
 ) -> str:
     """Format an item according to the given output template.
 
@@ -211,13 +213,13 @@ def validate_field_list(
     return split_fields
 
 
-def validate_sort_fields(sort_fields):
+def validate_sort_fields(sort_fields: str):
     """Make sure the fields in the given list exist, and return sorting key.
 
     If field names are prefixed with '-', sort order is reversed for that field (descending).
     """
     # Create sort specification
-    sort_spec = tuple()
+    sort_spec: Tuple = tuple()
     for name in sort_fields.split(","):
         descending = False
         if name.startswith("-"):
@@ -259,7 +261,7 @@ def get_fields_from_template(
 ) -> Generator[str, None, None]:
     """Utility function to get field references from a template
 
-    E.g: 'Name: {{d.size}}' -> ['size']"""
+    E.g: 'Size: {{d.size}}' -> ['size']"""
     for node in env.parse(template).find_all(jinja2.nodes.Getattr):
         if isinstance(node.node, jinja2.nodes.Name) and node.node.name == item_name:
             yield node.attr
