@@ -169,7 +169,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
 
             # Set custom cache field with value formatted like "80%_flac 20%_jpg" (sorted by percentage)
-            histo_str = " ".join(("%d%%_%s" % i).replace(" ", "_") for i in histo)
+            histo_str = " ".join([f'{i[0]}%_{i[1].replace(" ", "_")}' for i in histo])
             self._make_it_so(
                 f"setting kind cache {histo_str!r} on",
                 ["d.custom.set"],
@@ -210,7 +210,7 @@ class RtorrentItem(engine.TorrentProxy):
             except KeyError:
                 pass
         if isinstance(name, int):
-            name = "custom_%d" % name
+            name = f"custom_{name}"
         if name.startswith("kind_") and name[5:].isdigit():
             val = self._get_kind(int(name[5:], 10))
         elif name.startswith("custom_"):
@@ -341,8 +341,7 @@ class RtorrentItem(engine.TorrentProxy):
                 key, value = key.split("=", 1)
             except (ValueError, TypeError) as exc:
                 raise error.UserError(
-                    "Bad custom field assignment %r, probably missing a '=' (%s)"
-                    % (key, exc)
+                    f"Bad custom field assignment {key!r}, probably missing a '=' ({exc})"
                 )
 
         # Check identifier rules
@@ -525,9 +524,8 @@ class RtorrentItem(engine.TorrentProxy):
         path = Path(self.fetch("directory"))
         if not path.is_absolute():
             raise error.EngineError(
-                "Directory '%s' for item %s is not absolute, which is a bad idea,"
+                f"Directory '{path}' for item {self.hash} is not absolute, which is a bad idea,"
                 " fix your .rtorrent.rc to use 'directory.default.set = /...'"
-                % (self.fetch("directory"), self._fields["hash"])
             )
 
         if not path.exists():

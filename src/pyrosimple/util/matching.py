@@ -24,7 +24,6 @@ TRUE = {
     "yes",
     "y",
     "1",
-    "+",
 }
 
 FALSE = {
@@ -33,7 +32,6 @@ FALSE = {
     "no",
     "n",
     "0",
-    "-",
 }
 
 
@@ -55,7 +53,7 @@ Operators = {
 }
 
 
-def truth(val, context=None) -> bool:
+def truth(val, context="statement") -> bool:
     """Convert truth value in "val" to a boolean."""
     # Try coercing it to an int then a bool
     try:
@@ -71,8 +69,7 @@ def truth(val, context=None) -> bool:
         return False
 
     raise FilterError(
-        "Bad boolean value %r in %r (expected one of '%s', or '%s')"
-        % (val, context, "' '".join(TRUE), "' '".join(FALSE))
+        f"Bad boolean value {val!r} in {context!r} (expected one of '{TRUE}', or '{FALSE}')"
     )
 
 
@@ -157,7 +154,7 @@ class AndNode(MatcherNode):
         if result:
             if int(config.settings.get("FAST_QUERY")) == 1 or len(result) == 1:
                 return result[0]  # using just one simple expression is safer
-            return "and={%s}" % ",".join(result)
+            return f'and={",".join(result)}'
         return ""
 
     def __repr__(self):
@@ -179,7 +176,7 @@ class OrNode(MatcherNode):
         result = [x.pre_filter() for x in self.children]
         result = [x for x in result if x]
         if result:
-            return "or={%s}" % ",".join(result)
+            return f'or={",".join(result)}'
         return ""
 
     def __repr__(self):
@@ -389,8 +386,9 @@ class PatternFilter(FieldFilter):
                 needle.encode("ascii")
             except UnicodeEncodeError:
                 return ""
+            needle = needle.replace('"', r"\\\"")
             return r'"string.contains_i=${},\"{}\""'.format(
-                self.PRE_FILTER_FIELDS[self._name], needle.replace('"', r"\\\"")
+                self.PRE_FILTER_FIELDS[self._name], needle
             )
 
         return ""
@@ -571,7 +569,7 @@ class TimeFilter(NumericFilterBase):
         s=lambda t, d: t - d,
     )
     TIMEDELTA_RE = re.compile(
-        "^%s$" % "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms")
+        "^" + "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms") + "$"
     )
 
     def pre_filter(self) -> str:
@@ -658,8 +656,7 @@ class TimeFilter(NumericFilterBase):
                     timestamp = time.mktime(tuple(time.strptime(val, dtfmt)))
                 except (ValueError) as exc:
                     raise FilterError(
-                        "Bad timestamp value %r in %r (%s)"
-                        % (self._value, self._condition, exc)
+                        f"Bad timestamp value {self._value!r} in {self._condition!r} ({exc})"
                     ) from exc
 
                 if duration:

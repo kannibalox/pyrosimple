@@ -156,15 +156,9 @@ def _fmt_files(filelist) -> str:
                 result.append(f"{base_indent}{' ' * indent}\\ {dirname}")
                 indent += 1
 
+        prio = {0: "off ", 1: "    ", 2: "high"}.get(fileinfo.prio, "????")
         result.append(
-            "  %s %s %s %s| %s"
-            % (
-                {0: "off ", 1: "    ", 2: "high"}.get(fileinfo.prio, "????"),
-                fmt.iso_datetime(fileinfo.mtime),
-                fmt.human_size(fileinfo.size),
-                " " * indent,
-                name,
-            )
+            f"  {prio} {fmt.iso_datetime(fileinfo.mtime)} {fmt.human_size(fileinfo.size)} {' ' * indent}| {name}"
         )
 
         prev_path = path
@@ -238,12 +232,7 @@ class FieldDefinition:
 
     def __repr__(self):
         """Return a representation of internal state."""
-        return "<{}({!r}, {!r}, {!r})>".format(
-            self.__class__.__name__,
-            self.valtype,
-            self.name,
-            self.__doc__,
-        )
+        return f"<{self.__class__.__name__}({self.valtype!r}, {self.name!r}, {self.__doc__!r})>"
 
     def __get__(self, obj, cls=None):
         if obj is None:
