@@ -28,28 +28,37 @@ class AdminTool(ScriptBaseWithConfig):
         config_parser.add_argument(
             "--check", help="Check config for any issues", action="store_true"
         )
-        backfill_parser = subparsers.add_parser("backfill", help="Backfill missing custom fields from available data")
+        backfill_parser = subparsers.add_parser(
+            "backfill", help="Backfill missing custom fields from available data"
+        )
         backfill_parser.set_defaults(func=self.backfill)
         backfill_parser.add_argument(
-            "--dry-run", help="Print changes instead of applying them", action="store_true"
+            "--dry-run",
+            help="Print changes instead of applying them",
+            action="store_true",
         )
 
     def backfill(self):
+        """Backfill missing any missing metadata from available sources.
+        Safe to run multiple times.
+        """
+        # pylint: disable=broad-except
         engine = pyrosimple.connect()
         engine.open()
-        matcher = matching.create_matcher('loaded=0 metafile=/.+/')
-        for i in engine.view('main', matching.create_matcher('loaded=0 metafile=/.+/')):
+        for i in engine.view("main", matching.create_matcher("loaded=0 metafile=/.+/")):
             try:
                 mtime = int(Path(i.metafile).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    print(f"Would set {i.hash} tm_loaded to {dt} from metafile {i.metafile}")
+                    print(
+                        f"Would set {i.hash} tm_loaded to {dt} from metafile {i.metafile}"
+                    )
                 else:
                     i.rpc_call("d.custom.set", ["tm_loaded", str(mtime)])
                     i.flush()
             except Exception as e:
                 print(f"Could not set tm_loaded for {i.hash}: {e}")
-        for i in engine.view('main', matching.create_matcher('loaded=0 path=/.+/')):
+        for i in engine.view("main", matching.create_matcher("loaded=0 path=/.+/")):
             try:
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
@@ -60,7 +69,9 @@ class AdminTool(ScriptBaseWithConfig):
                     i.flush()
             except Exception as e:
                 print(f"Could not set tm_loaded for {i.hash}: {e}")
-        for i in engine.view('main', matching.create_matcher('completed=0 is_complete=yes path=/.+/')):
+        for i in engine.view(
+            "main", matching.create_matcher("completed=0 is_complete=yes path=/.+/")
+        ):
             try:
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
