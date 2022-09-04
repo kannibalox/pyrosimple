@@ -1,10 +1,4 @@
-# [Unreleased]
-## Added
-- Support for rutorrent's rpc.php endpoint
-- Basic auth with HTTP endpoings
-- Untemplated 'Command' job for pyrotorque
-## Fixed
-- Show better message when rtxmlrpc gets no method name
-- Allow `mktor` and `chtor` to run without rtorrent.rc
-## Removed
-- Theming module
+# [2.0.0]
+
+This release marks the break between pyrocore-compatible code and new pyrosimple code/behavior.
+If you just want to use the pyrocore tools on python 3 without all the new features, you can use the `release-1.X` branch.
