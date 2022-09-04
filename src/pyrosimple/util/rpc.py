@@ -10,7 +10,7 @@ import logging
 import random
 import urllib
 
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Tuple, cast
 from xmlrpc import client as xmlrpclib
 
 from pyrosimple.io import scgi
