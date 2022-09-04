@@ -683,9 +683,7 @@ class RtorrentEngine:
         for method, params in methods.items():
             call.append({"methodName": method, "params": params})
         for index, r in enumerate(self.rpc.system.multicall(call)):
-            if len(r) == 1:
-                result = r[0]
-            results[list(methods.keys())[index]] = result
+            results[list(methods.keys())[index]] = r[0]
         return results
 
     @lru_cache(maxsize=32)

@@ -132,16 +132,37 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
         return response
 
+    def __batch_request_json(self, calls):
+        """Handle multicalls in place of XMLRPC's built-in
+        system.multilcall."""
+        batch_call = [
+            {
+                "jsonrpc": "2.0",
+                "method": call["methodName"],
+                "params": call["params"] or [""],
+                "id": index,
+            }
+            for index, call in enumerate(calls)
+        ]
+        request = json.dumps(batch_call).encode(self.__encoding, "xmlcharrefreplace")
+        response = self.__transport.request(
+            self.__host,
+            self.__handler,
+            request,
+            verbose=self.__verbose,
+        )
+        result = [[r["result"]] for r in sorted(response, key=lambda i: i["id"])]
+        return result
+
     def __request_json(self, methodname, params):
         if not params:
             params = [""]
 
-        # Gross hack, see about getting call implemented upstream
+        # system.multicall isn't defined by the app,
+        # but by the xmlrpc library, so we intercept it
+        # and turn it into a batch request
         if methodname == "system.multicall":
-            results = []
-            for i in params[0]:
-                results.append([self.__request_json(i["methodName"], i["params"])])
-            return results
+            return self.__batch_request_json(params[0])
 
         # This random ID feels silly but there's not much need for anything better at the moment
         # since the RPC interface is synchronous.
