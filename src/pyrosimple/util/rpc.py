@@ -10,6 +10,7 @@ import logging
 import random
 import urllib
 
+from typing import Any, Dict, List, Optional, Tuple, cast
 from xmlrpc import client as xmlrpclib
 
 from pyrosimple.io import scgi
@@ -112,7 +113,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     def __close(self):
         self.__transport.close()
 
-    def __request_xml(self, methodname, params):
+    def __request_xml(self, methodname: str, params: Tuple[Any]):
         # Verbatim from parent method
         request = xmlrpclib.dumps(
             params,
@@ -128,14 +129,13 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         )
 
         if len(response) == 1:
-            response = response[0]
-
+            return response[0]
         return response
 
-    def __batch_request_json(self, calls):
+    def __batch_request_json(self, calls: List) -> List:
         """Handle multicalls in place of XMLRPC's built-in
         system.multilcall."""
-        batch_call = [
+        batch_call: List[Dict] = [
             {
                 "jsonrpc": "2.0",
                 "method": call["methodName"],
@@ -144,14 +144,23 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             }
             for index, call in enumerate(calls)
         ]
-        request = json.dumps(batch_call).encode(self.__encoding, "xmlcharrefreplace")
-        response = self.__transport.request(
-            self.__host,
-            self.__handler,
-            request,
-            verbose=self.__verbose,
+        request: bytes = json.dumps(batch_call).encode(
+            self.__encoding, "xmlcharrefreplace"
         )
-        result = [[r["result"]] for r in sorted(response, key=lambda i: i["id"])]
+        response: Tuple[Dict] = cast(
+            Tuple[Dict],
+            self.__transport.request(
+                self.__host,
+                self.__handler,
+                request,
+                verbose=self.__verbose,
+            ),
+        )
+
+        def sort_key(i: Dict) -> int:
+            return int(i["id"])
+
+        result = [[r["result"]] for r in sorted(response, key=sort_key)]
         return result
 
     def __request_json(self, methodname, params):
@@ -178,7 +187,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if self.__verbose:
             print("req: ", request)
 
-        response = self.__transport.request(
+        response: Dict = self.__transport.request(
             self.__host,
             self.__handler,
             request,

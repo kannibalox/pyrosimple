@@ -9,8 +9,8 @@ from pathlib import Path
 import pyrosimple
 
 from pyrosimple import config
-from pyrosimple.util import matching
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.util import matching
 
 
 class AdminTool(ScriptBaseWithConfig):
