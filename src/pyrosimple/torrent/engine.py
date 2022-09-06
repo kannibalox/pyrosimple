@@ -722,21 +722,7 @@ class TorrentProxy:
             ", ".join(sorted("%s=%r" % mask(k, v) for k, v in self._fields.items())),
         )
 
-    # TODO: metafile data cache (sqlite, shelve or maybe .ini)
-    # cache data indexed by hash
-    # store ctime per cache entry
-    # scan metafiles of new hashes not yet in cache
-    # on cache read, for unknown hashes setdefault() a purge date, then remove entries after a while
-    # clear purge date for known hashes (unloaded and then reloaded torrents)
-    # store a version marker and other global metadata in cache under key = None, so it can be upgraded
-    # add option to pyroadmin to inspect the cache, mainly for debugging
-
-    # TODO: created (metafile creation date, i.e. the bencoded field; same as downloaded if missing; cached by hash)
-    # add .age formatter (age = " 1y 6m", " 2w 6d", "12h30m", etc.)
-
-
 TorrentProxy.add_core_fields()
-
 
 class TorrentView:
     """A view on a subset of torrent items."""

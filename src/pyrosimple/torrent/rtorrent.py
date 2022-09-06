@@ -21,8 +21,6 @@ from xmlrpc import client as xmlrpclib
 import bencode
 import jinja2
 
-from jinja2 import Environment, FileSystemLoader, Template
-
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
 from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
@@ -32,9 +30,10 @@ from pyrosimple.util.parts import Bunch
 
 log = logging.getLogger(__name__)
 
-env = Environment(
-    loader=FileSystemLoader([Path("~/.config/pyrosimple/templates/").expanduser()]),
+env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader([Path("~/.config/pyrosimple/templates/").expanduser()]),
 )
+# Load filter methods from fmt submodule
 env.filters.update(
     {
         name[4:]: method
@@ -934,7 +933,7 @@ def format_item_str(
 
 
 def format_item(
-    template: Template,
+    template: jinja2.Template,
     item: Union[Dict, str, RtorrentItem],
     defaults: Optional[Dict] = None,
 ) -> str:
