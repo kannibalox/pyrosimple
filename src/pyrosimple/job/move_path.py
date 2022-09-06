@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 
 from pyrosimple.job import base
-from pyrosimple.torrent import formatting, rtorrent
+from pyrosimple.torrent import rtorrent
 
 
 def move(i: rtorrent.RtorrentItem, target: str):
@@ -29,7 +29,7 @@ class PathMover(base.MatchableJob):
 
     def run_item(self, item: rtorrent.RtorrentItem):
         """Conditionally move data"""
-        target = formatting.format_item_str(self.config["target"], item)
+        target = rtorrent.format_item_str(self.config["target"], item)
         if not target:
             self.log.debug("Empty target for %s", item.hash)
             return

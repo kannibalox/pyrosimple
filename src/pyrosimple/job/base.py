@@ -4,7 +4,7 @@ from typing import Dict, Optional
 import pyrosimple
 
 from pyrosimple import error
-from pyrosimple.torrent import engine, formatting, rtorrent
+from pyrosimple.torrent import engine, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
 
 
@@ -42,7 +42,7 @@ class MatchableJob(BaseJob):
         sort_keys = [s[1:] if s.startswith("-") else s for s in sort.split(",")]
 
         self.matcher = matching.create_matcher(self.config["matcher"])
-        self.sort_key = formatting.validate_sort_fields(sort)
+        self.sort_key = rtorrent.validate_sort_fields(sort)
         self.prefetch_fields = [
             *matching.KeyNameVisitor().visit(query_tree),
             *sort_keys,

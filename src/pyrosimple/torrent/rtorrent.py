@@ -5,6 +5,7 @@
 
 import base64
 import errno
+import logging
 import operator
 import os
 import shlex
@@ -14,16 +15,33 @@ import urllib.parse
 from collections import defaultdict
 from functools import lru_cache, partial
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Set, Union
+from typing import Callable, Dict, Generator, List, Optional, Set, Tuple, Union
 from xmlrpc import client as xmlrpclib
 
 import bencode
+import jinja2
+
+from jinja2 import Environment, FileSystemLoader, Template
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
 from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
 from pyrosimple.util.cache import ExpiringCache
 from pyrosimple.util.parts import Bunch
+
+
+log = logging.getLogger(__name__)
+
+env = Environment(
+    loader=FileSystemLoader([Path("~/.config/pyrosimple/templates/").expanduser()]),
+)
+env.filters.update(
+    {
+        name[4:]: method
+        for name, method in fmt.__dict__.items()
+        if name.startswith("fmt_")
+    }
+)
 
 
 class CommaLexer(shlex.shlex):
@@ -885,3 +903,138 @@ class RtorrentEngine:
                 proxy.view.set_visible(item.hash, view_name)
 
         return view
+
+
+def expand_template(template_path: str, namespace: Dict) -> str:
+    """Expand the given (preparsed) template.
+    Currently, only jinja2 templates are supported.
+
+    @param template: The name of the template, to be loaded by the jinja2 loaders.
+    @param namespace: Custom namespace that is added to the predefined defaults
+        and takes precedence over those.
+    @return: The expanded template.
+    @raise LoggableError: In case of typical errors during template execution.
+    """
+    template = env.get_template(template_path)
+    # Default templating namespace
+    # variables = dict(c=config.custom_template_helpers)
+    variables = {}
+    # Provided namespace takes precedence
+    variables.update(namespace)
+    # Expand template
+    return template.render(**variables)
+
+
+def format_item_str(
+    template_str: str, item: Union[Dict, str, RtorrentItem], defaults=None
+):
+    """Simple helper function to format a string with an item"""
+    template = env.from_string(template_str)
+    return format_item(template, item, defaults)
+
+
+def format_item(
+    template: Template,
+    item: Union[Dict, str, RtorrentItem],
+    defaults: Optional[Dict] = None,
+) -> str:
+    """Format an item according to the given output template.
+
+    @param format_spec: The output template, preparsed by jinja2.
+    @param item: The object, which is automatically wrapped for interpolation.
+    @param defaults: Optional default values.
+    """
+    if defaults is None:
+        defaults = {}
+    return str(template.render(d=item, **defaults))
+
+
+def validate_field_list(
+    fields: str,
+    allow_fmt_specs=False,
+):
+    """Make sure the fields in the given list exist.
+
+    @param fields: List of fields (comma-/space-separated if a string).
+    @type fields: list or str
+    @return: validated field names.
+    @rtype: list
+    """
+    formats = [i[4:] for i in globals() if i.startswith("fmt_")]
+
+    try:
+        split_fields = [i.strip() for i in fields.split(",")]
+    except AttributeError:
+        # Not a string, expecting an iterable
+        pass
+
+    for name in split_fields:
+        if allow_fmt_specs and "." in name:
+            fullname = name
+            name, fmtspecs = name.split(".", 1)
+            for fmtspec in fmtspecs.split("."):
+                if fmtspec not in formats and fmtspec != "raw":
+                    raise error.UserError(
+                        f"Unknown format specification {fmtspec!r} in {fullname!r}"
+                    )
+
+        if (
+            name not in engine.FieldDefinition.FIELDS
+            and not engine.TorrentProxy.add_manifold_attribute(name)
+        ):
+            raise error.UserError(f"Unknown field name {name!r}")
+
+    return split_fields
+
+
+def validate_sort_fields(sort_fields: str):
+    """Make sure the fields in the given list exist, and return sorting key.
+
+    If field names are prefixed with '-', sort order is reversed for that field (descending).
+    """
+    # Create sort specification
+    sort_spec: Tuple = tuple()
+    for name in sort_fields.split(","):
+        descending = False
+        if name.startswith("-"):
+            name = name[1:]
+            descending = True
+        sort_spec += ((name, descending),)
+
+    # Validate field list
+    validate_field_list(",".join([name for name, _ in sort_spec]))
+    log.debug(
+        "Sorting order is: %s",
+        ", ".join([("-" if descending else "") + i for i, descending in sort_spec]),
+    )
+
+    # Need to provide complex key in order to allow for the minimum amount of attribute fetches,
+    # since they could mean a potentially expensive RPC call.
+    class Key:
+        "Complex sort order key"
+
+        def __init__(self, obj, *_):
+            "Remember object to be compared"
+            self.obj = obj
+
+        def __lt__(self, other):
+            "Compare to other key"
+            for field, descending in sort_spec:
+                lhs, rhs = getattr(self.obj, field), getattr(other.obj, field)
+                if lhs == rhs:
+                    continue
+                return rhs < lhs if descending else lhs < rhs
+            return False
+
+    return Key
+
+
+def get_fields_from_template(
+    template: str, item_name: str = "d"
+) -> Generator[str, None, None]:
+    """Utility function to get field references from a template
+
+    E.g: 'Size: {{d.size}}' -> ['size']"""
+    for node in env.parse(template).find_all(jinja2.nodes.Getattr):
+        if isinstance(node.node, jinja2.nodes.Name) and node.node.name == item_name:
+            yield node.attr

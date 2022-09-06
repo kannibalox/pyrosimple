@@ -14,7 +14,7 @@ from pathlib import Path
 from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.torrent import formatting
+from pyrosimple.torrent import rtorrent
 from pyrosimple.util import metafile, pymagic, rpc
 from pyrosimple.util.parts import Bunch
 
@@ -121,8 +121,8 @@ class MetafileHandler:
         self.ns.commands = []
         for key, cmd in sorted(self.job.custom_cmds.items()):
             try:
-                template = formatting.env.from_string(cmd)
-                for split_cmd in formatting.format_item(
+                template = rtorrent.env.from_string(cmd)
+                for split_cmd in rtorrent.format_item(
                     template, {}, defaults=self.ns
                 ).split():
                     self.ns.commands.append(split_cmd.strip())

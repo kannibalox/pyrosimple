@@ -8,11 +8,18 @@ Copyright (c) 2009, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 
 
 import datetime
+import json
 import logging
+import os
+import re
 import time
 
+from pathlib import Path
 from pprint import pformat
 from typing import Optional
+
+from pyrosimple import torrent
+from pyrosimple.util import pymagic
 
 
 log = logging.getLogger(__name__)
@@ -40,6 +47,108 @@ def human_size(size: float) -> str:
             return f"{rem:6.1f} {unit}".lstrip()
 
     return f"{rem:6.1f} PiB".lstrip()
+
+
+def fmt_sz(intval: int) -> str:
+    """Format a byte sized value."""
+    try:
+        return human_size(intval).rjust(10)
+    except (ValueError, TypeError):
+        return "N/A".rjust(10)
+
+
+def fmt_iso(timestamp: float) -> str:
+    """Format a UNIX timestamp to an ISO datetime string."""
+    try:
+        return iso_datetime(timestamp)
+    except (ValueError, TypeError):
+        return "N/A".rjust(len(iso_datetime(0)))
+
+
+def fmt_duration(duration: int) -> str:
+    """Format a duration value in seconds to a readable form."""
+    try:
+        return human_duration(float(duration), 0, 2, True)
+    except (ValueError, TypeError):
+        return "N/A".rjust(len(human_duration(0, 0, 2, True)))
+
+
+def fmt_delta(timestamp) -> str:
+    """Format a UNIX timestamp to a delta (relative to now)."""
+    try:
+        return human_duration(float(timestamp), precision=2, short=True)
+    except (ValueError, TypeError):
+        return "N/A".rjust(len(human_duration(0, precision=2, short=True)))
+
+
+def fmt_pc(floatval: float):
+    """Scale a ratio value to percent."""
+    return round(float(floatval) * 100.0, 2)
+
+
+def fmt_strip(val: str) -> str:
+    """Strip leading and trailing whitespace."""
+    return str(val).strip()
+
+
+def fmt_subst(val, regex, subst):
+    """Replace regex with string."""
+    return re.sub(regex, subst, val)
+
+
+def fmt_mtime(val: str) -> float:
+    """Modification time of a path."""
+    p = Path(str(val))
+    if p.exists():
+        return p.stat().st_mtime
+    return 0.0
+
+
+def fmt_pathbase(val: str) -> str:
+    """Base name of a path."""
+    return os.path.basename(val or "")
+
+
+def fmt_pathname(val: str) -> str:
+    """Base name of a path, without its extension."""
+    return os.path.splitext(os.path.basename(val or ""))[0]
+
+
+def fmt_raw(val):
+    """A little magic to allow showing the raw value of a field in rtcontrol"""
+    return val
+
+
+def fmt_fmt(val, field):
+    """Apply a field-specific formatter (if present)
+
+    If val is a RtorrentItem, fetch `field` from it before formatting. This
+    is to allow `d|fmt('is_private')` vs. the redundant `d.is_private|fmt('is_private')`.
+    Be aware that using the former in rtcontrol templates breaks the field auto-detection.
+    """
+    if field not in torrent.engine.FieldDefinition.FIELDS:
+        return val
+    if isinstance(val, torrent.rtorrent.RtorrentItem):
+        val = getattr(val, field)
+    formatter = torrent.engine.FieldDefinition.FIELDS[field].formatter
+    if formatter:
+        return formatter(val)
+    return val
+
+
+def fmt_pathext(val: str) -> str:
+    """Extension of a path (including the '.')."""
+    return os.path.splitext(val or "")[1]
+
+
+def fmt_pathdir(val: str):
+    """Directory containing the given path."""
+    return os.path.dirname(val or "")
+
+
+def fmt_json(val):
+    """JSON serialization."""
+    return json.dumps(val, cls=pymagic.JSONEncoder)
 
 
 def iso_datetime(timestamp: Optional[float] = None) -> str:

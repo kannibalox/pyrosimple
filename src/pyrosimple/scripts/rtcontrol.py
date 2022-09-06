@@ -21,7 +21,7 @@ from prompt_toolkit import prompt
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.torrent import engine, formatting, rtorrent
+from pyrosimple.torrent import engine, rtorrent
 from pyrosimple.util import matching, pymagic, rpc
 from pyrosimple.util.parts import DefaultBunch
 
@@ -489,7 +489,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         """Format an item."""
 
         try:
-            item_text: str = formatting.format_item(
+            item_text: str = rtorrent.format_item(
                 self.options.output_format_template, item, defaults
             )
         except (NameError, ValueError, TypeError) as exc:
@@ -557,7 +557,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         if re.match(r"^[,._0-9a-zA-Z]+$", output_format):
             self.is_plain_output_format = True
             outputs = []
-            for field in formatting.validate_field_list(
+            for field in rtorrent.validate_field_list(
                 output_format, allow_fmt_specs=True
             ):
                 field = field.replace(".", "|")
@@ -574,13 +574,13 @@ class RtorrentControl(ScriptBaseWithConfig):
             .replace(r"\ ", " ")  # to prevent stripping in config file
         )
         self.options.output_format = output_format
-        self.options.output_format_template = formatting.env.from_string(output_format)
+        self.options.output_format_template = rtorrent.env.from_string(output_format)
 
     # TODO: refactor to engine.FieldDefinition as a class method
     def get_output_fields(self) -> List[str]:
         """Get field names from output template."""
         result = []
-        for name in formatting.get_fields_from_template(self.options.output_format):
+        for name in rtorrent.get_fields_from_template(self.options.output_format):
             if name not in engine.FieldDefinition.FIELDS:
                 self.LOG.warning(
                     "Omitted unknown name '%s' from statistics and output format sorting",
@@ -598,7 +598,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         if self.options.sort_fields == "*":
             self.options.sort_fields = self.get_output_fields()
 
-        return formatting.validate_sort_fields(self.options.sort_fields)
+        return rtorrent.validate_sort_fields(self.options.sort_fields)
 
     def show_in_view(self, sourceview, matches, targetname=None):
         """Show search result in ncurses view."""
@@ -675,7 +675,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Handles the empty regex query "//"
         if not key_names:
             key_names = ["name"]
-        formatting.validate_sort_fields(",".join(key_names))
+        rtorrent.validate_sort_fields(",".join(key_names))
         matcher = matching.MatcherBuilder().visit(query_tree)
         self.LOG.debug("Matcher is: %s", matcher)
 
@@ -779,8 +779,8 @@ class RtorrentControl(ScriptBaseWithConfig):
                             ("{##}" + i if "{{" in i else i) for i in action["args"]
                         ]
                         args = tuple(
-                            formatting.format_item(
-                                formatting.env.from_string(i),
+                            rtorrent.format_item(
+                                rtorrent.env.from_string(i),
                                 item,
                                 defaults=dict(item=item),
                             )
@@ -868,7 +868,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
 
                 output_template = self.options.output_template
-                sys.stdout.write(formatting.expand_template(output_template, full_ns))
+                sys.stdout.write(rtorrent.expand_template(output_template, full_ns))
                 sys.stdout.flush()
 
             # Show on console?

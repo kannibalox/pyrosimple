@@ -5,7 +5,6 @@
 """
 import pytest
 
-from pyrosimple.torrent import formatting
 from pyrosimple.util import fmt
 
 
@@ -29,4 +28,4 @@ def test_fmt_human_size(size, expected):
     ],
 )
 def test_fmt_size(size, expected):
-    assert formatting.fmt_sz(size) == expected
+    assert fmt.fmt_sz(size) == expected

@@ -12,21 +12,6 @@ from xmlrpc import client as xmlrpclib
 
 import requests
 
-from prometheus_client import Counter, Summary
-
-
-request_counter = Counter(
-    "transport_request", "Number of requests made by the transport", ["transport"]
-)
-request_size_counter = Counter(
-    "transport_request_size", "Size of the request in bytes", ["transport"]
-)
-response_size_counter = Counter(
-    "transport_response_size", "Size of the response in bytes", ["transport"]
-)
-request_time = Summary(
-    "transport_request_time", "Time spent processing request", ["transport"]
-)
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +26,7 @@ ERRORS = (SCGIException, URLError, xmlrpclib.Fault, socket.error)
 
 class RTorrentTransport(xmlrpclib.Transport):
     """Base class for handling transports. Primarily exists to allow
-    using the different transports with different underlying RPC mechanisms"""
+    using the same transport with a different underlying RPC mechanism"""
 
     def __init__(self, *args, url, codec=xmlrpclib, headers=(), **kwargs):
         if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
@@ -67,11 +52,7 @@ class RTorrentTransport(xmlrpclib.Transport):
 class SSHTransport(RTorrentTransport):
     """Transport via SSH conneection."""
 
-    label = "ssh"
-
-    @request_time.labels(transport=label).time()
     def request(self, host, handler, request_body, verbose=False):
-        request_counter.labels(transport=self.label).inc()
         self.verbose = verbose
         target = urlparse.urlparse(self.url).path
         cmd = ["ssh", host, "socat", "STDIO", target[1:]]
@@ -91,9 +72,7 @@ class SSHTransport(RTorrentTransport):
 class HTTPTransport(RTorrentTransport):
     """Transport via HTTP(s) call."""
 
-    @request_time.labels(transport="http").time()
     def request(self, host, handler, request_body, verbose=False):
-        request_counter.labels(transport="http").inc()
         req = requests.post(self.url, headers=self._headers, data=request_body)
         req.raise_for_status()
         return self.parse_response(io.BytesIO(req.content))
@@ -102,12 +81,7 @@ class HTTPTransport(RTorrentTransport):
 class TCPTransport(RTorrentTransport):
     """Transport via TCP socket."""
 
-    label = "tcp"
-
-    @request_time.labels(transport=label).time()
     def request(self, host, handler, request_body, verbose=False):
-        request_counter.labels(transport=self.label).inc()
-        request_size_counter.labels(transport="tcp").inc(len(request_body))
         self.verbose = verbose
         target = urlparse.urlparse(self.url)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -115,17 +89,15 @@ class TCPTransport(RTorrentTransport):
             sock.connect((host, int(port)))
             sock.sendall(_encode_payload(request_body, self._headers))
             with sock.makefile("rb") as handle:
-                response = _parse_response(handle.read())[0]
-                response_size_counter.labels(transport="tcp").inc(len(response))
-                return self.parse_response(io.BytesIO(response))
+                return self.parse_response(
+                    io.BytesIO(_parse_response(handle.read())[0])
+                )
 
 
 class UnixTransport(RTorrentTransport):
     """Transport via UNIX domain socket."""
 
-    @request_time.labels(transport="unix").time()
     def request(self, _host, handler, request_body, verbose=False):
-        request_counter.labels(transport="unix").inc()
         self.verbose = verbose
         target = urlparse.urlparse(self.url).path
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:

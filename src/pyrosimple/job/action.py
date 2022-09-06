@@ -3,7 +3,7 @@ import subprocess
 
 from pyrosimple import error
 from pyrosimple.job.base import BaseJob, MatchableJob
-from pyrosimple.torrent import formatting, rtorrent
+from pyrosimple.torrent import rtorrent
 
 
 class Command(BaseJob):
@@ -35,12 +35,12 @@ class Action(MatchableJob):
         self.action = self.config["action"]
         if not hasattr(rtorrent.RtorrentItem, self.action):
             raise error.ConfigurationError(f"Action '{self.action}' not found!")
-        self.args = [formatting.env.from_string(a) for a in self.config.get("args", [])]
+        self.args = [rtorrent.env.from_string(a) for a in self.config.get("args", [])]
 
     def run_item(self, item):
         """For now, simply call the named methods on the item"""
         action = self.config["action"]
-        processed_args = [formatting.format_item(a, item) for a in self.args]
+        processed_args = [rtorrent.format_item(a, item) for a in self.args]
         if self.config["dry_run"]:
             self.log.info(
                 "Would %s(%s) %s",
