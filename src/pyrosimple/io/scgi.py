@@ -69,7 +69,6 @@ class SSHTransport(RTorrentTransport):
 
     label = "ssh"
 
-    @request_time.labels(transport=label).time()
     def request(self, host, handler, request_body, verbose=False):
         request_counter.labels(transport=self.label).inc()
         self.verbose = verbose
@@ -91,7 +90,6 @@ class SSHTransport(RTorrentTransport):
 class HTTPTransport(RTorrentTransport):
     """Transport via HTTP(s) call."""
 
-    @request_time.labels(transport="http").time()
     def request(self, host, handler, request_body, verbose=False):
         request_counter.labels(transport="http").inc()
         req = requests.post(self.url, headers=self._headers, data=request_body)
@@ -104,7 +102,6 @@ class TCPTransport(RTorrentTransport):
 
     label = "tcp"
 
-    @request_time.labels(transport=label).time()
     def request(self, host, handler, request_body, verbose=False):
         request_counter.labels(transport=self.label).inc()
         request_size_counter.labels(transport="tcp").inc(len(request_body))
@@ -123,7 +120,6 @@ class TCPTransport(RTorrentTransport):
 class UnixTransport(RTorrentTransport):
     """Transport via UNIX domain socket."""
 
-    @request_time.labels(transport="unix").time()
     def request(self, _host, handler, request_body, verbose=False):
         request_counter.labels(transport="unix").inc()
         self.verbose = verbose
