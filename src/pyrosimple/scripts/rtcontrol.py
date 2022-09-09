@@ -465,31 +465,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             help="execute RPC command pattern",
         )
 
-    def help_completion_fields(self):
-        """Return valid field names."""
-        for name, field in sorted(engine.FieldDefinition.FIELDS.items()):
-            if issubclass(field._matcher, matching.BoolFilter):
-                yield f"{name}=no"
-                yield f"{name}=yes"
-                continue
-            if issubclass(field._matcher, matching.PatternFilter):
-                yield f"{name}="
-                yield f"{name}=/"
-                yield f"{name}=?"
-                yield f"{name}=\"'*'\""
-                continue
-            if issubclass(field._matcher, matching.NumericFilterBase):
-                for i in range(10):
-                    yield "%s=%d" % (name, i)
-            else:
-                yield f"{name}="
-
-            yield rf"{name}=+"
-            yield rf"{name}=-"
-
-        yield "custom_"
-        yield "kind_"
-
     # TODO: refactor to engine.TorrentProxy as format() method
     def format_item(self, item: str, defaults=None, stencil=None) -> str:
         """Format an item."""
