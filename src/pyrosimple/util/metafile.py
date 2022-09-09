@@ -10,7 +10,6 @@ import hashlib
 import logging
 import math
 import os
-import pprint
 import re
 import sys
 import time
@@ -88,18 +87,6 @@ def mask_keys(announce_url: str) -> str:
         lambda m: m.group() if m.group() in PASSKEY_OK else "*" * len(m.group()),
         announce_url,
     )
-
-
-class MaskingPrettyPrinter(pprint.PrettyPrinter):
-    """A PrettyPrinter that masks strings in the object tree."""
-
-    def format(
-        self, obj, context, maxlevels, level
-    ):  # pylint: disable=arguments-renamed
-        """Mask obj if it looks like an URL, then pass it to the super class."""
-        if isinstance(obj, str) and "://" in obj:
-            obj = mask_keys(obj)
-        return pprint.PrettyPrinter.format(self, obj, context, maxlevels, level)
 
 
 def check_info(info: Dict):

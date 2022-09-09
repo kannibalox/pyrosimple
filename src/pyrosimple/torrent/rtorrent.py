@@ -12,7 +12,6 @@ import shlex
 import time
 import urllib.parse
 
-from collections import defaultdict
 from functools import lru_cache, partial
 from pathlib import Path
 from typing import Callable, Dict, Generator, List, Optional, Set, Tuple, Union
@@ -622,12 +621,10 @@ class RtorrentEngine:
         self.LOG = pymagic.get_class_logger(self)
         self.engine_id = "N/A"  # ID of the instance we're connecting to
         self.engine_software = "rTorrent"  # Name and version of software
-        self.versions = (None, None)
         self.version_info = (0,)
         self.startup = time.time()
         self.rpc = None
         self.properties = {}
-        self._item_cache = {}
         self.known_throttle_names = {"", "NULL"}
         if url is None:
             config.autoload_scgi_url()
@@ -639,28 +636,6 @@ class RtorrentEngine:
     def view(self, viewname="default", matcher=None):
         """Get list of download items."""
         return engine.TorrentView(self, viewname, matcher)
-
-    def group_by(self, fields, items=None):
-        """Returns a dict of lists of items, grouped by the given fields.
-
-        ``fields`` can be a string (one field) or an iterable of field names.
-        """
-        result = defaultdict(list)
-        if items is None:
-            items = self.items()
-
-        try:
-            key = operator.attrgetter(fields + "")
-        except TypeError:
-
-            def key(obj, names=tuple(fields)):
-                "Helper to return group key tuple"
-                return tuple(getattr(obj, x) for x in names)
-
-        for item in items:
-            result[key(item)].append(item)
-
-        return result
 
     def __repr__(self):
         """Return a representation of internal state."""
@@ -688,7 +663,6 @@ class RtorrentEngine:
         """Check for special view names and return existing rTorrent one."""
         if viewname == "-":
             try:
-                # Only works with rTorrent-PS at this time!
                 viewname = self.open().ui.current_view()
             except rpc.ERRORS as exc:
                 raise error.EngineError(f"Can't get name of current view: {exc}")
@@ -800,8 +774,6 @@ class RtorrentEngine:
             view = engine.TorrentView(self, "default")
         elif isinstance(view, str):
             view = engine.TorrentView(self, self._resolve_viewname(view))
-        else:
-            view.viewname = self._resolve_viewname(view.viewname)
 
         # Map pyroscope names to rTorrent ones
         if prefetch:

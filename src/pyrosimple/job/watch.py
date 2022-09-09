@@ -347,7 +347,6 @@ class TreeWatch:
 
 
 class TreeWatchCommand(ScriptBaseWithConfig):
-    ### Keep things wrapped to fit under this comment... ##############################
     """
     Use tree watcher directly from cmd line, call it like this:
         python -m pyrosimple.torrent.watch <DIR>
@@ -361,8 +360,6 @@ class TreeWatchCommand(ScriptBaseWithConfig):
 
     # argument description for the usage information
     ARGS_HELP = "<directory>"
-
-    OPTIONAL_CFG_FILES = ["torque.ini"]
 
     def mainloop(self):
         """The main loop."""

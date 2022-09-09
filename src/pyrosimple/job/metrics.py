@@ -231,7 +231,6 @@ class RtorrentExporter(BaseJob):
         super().__init__(config)
         self.prefix = self.config.get("prefix", "rtorrent_")
         self.proxy = self.engine.open()
-        self.system_stats_initialized = False
         jobs = {
             "item": RtorrentItemCollector,
             "tracker": RtorrentTrackerCollector,

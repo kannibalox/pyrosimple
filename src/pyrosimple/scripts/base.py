@@ -34,9 +34,6 @@ class ScriptBase:
     # Can be empty or None in derived classes
     COPYRIGHT = ""
 
-    # Can be made explicit in derived classes (for external tools)
-    VERSION = None
-
     @classmethod
     def setup(cls, _=None):
         """Set up the runtime environment."""
@@ -46,7 +43,6 @@ class ScriptBase:
         """Initialize CLI."""
         self.startup = time.time()
         self.LOG = pymagic.get_class_logger(self)
-        self.config_dir = ""
 
         self.args = None
         self.options = None
@@ -219,8 +215,6 @@ class ScriptBase:
 
 class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
     """CLI tool with configuration support."""
-
-    OPTIONAL_CFG_FILES: List[str] = []
 
     def add_options(self):
         super().add_options()

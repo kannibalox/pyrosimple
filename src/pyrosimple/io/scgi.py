@@ -12,7 +12,7 @@ from xmlrpc import client as xmlrpclib
 
 import requests
 
-from prometheus_client import Counter, Summary
+from prometheus_client import Counter
 
 
 request_counter = Counter(
@@ -23,9 +23,6 @@ request_size_counter = Counter(
 )
 response_size_counter = Counter(
     "transport_response_size", "Size of the response in bytes", ["transport"]
-)
-request_time = Summary(
-    "transport_request_time", "Time spent processing request", ["transport"]
 )
 
 logger = logging.getLogger(__name__)

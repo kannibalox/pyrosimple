@@ -29,8 +29,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
     # argument description for the usage information
     ARGS_HELP = ""
 
-    OPTIONAL_CFG_FILES = ["torque.ini"]
-
     POLL_TIMEOUT = 1.0
 
     RUNTIME_DIR = os.getenv("XDG_RUNTIME_DIR") or "~/.pyrosimple/run/"

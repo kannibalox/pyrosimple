@@ -34,10 +34,6 @@ class EngineError(LoggableError):
     """Connection or other backend error."""
 
 
-class NetworkError(LoggableError):
-    """External connection errors."""
-
-
 class UserError(LoggableError):
     """Yes, it was your fault!"""
 

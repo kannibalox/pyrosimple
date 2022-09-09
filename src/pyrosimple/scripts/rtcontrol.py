@@ -56,6 +56,7 @@ def print_help_fields():
 
 
 def print_help_filters():
+    """Print help about template filters."""
     print("")
     print("In addition to the filters below, jinja2 has some filters")
     print(
@@ -228,13 +229,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         #            help="move data to given target directory (implies -i, can be combined with --delete)")
         # TODO: --copy, and --move/--link across devices
     )
-
-    def __init__(self):
-        """Initialize rtcontrol."""
-        super().__init__()
-
-        self.is_plain_output_format = False
-        self.original_output_format = None
 
     def add_options(self):
         """Add program options."""
@@ -553,7 +547,6 @@ class RtorrentControl(ScriptBaseWithConfig):
     def validate_output_format(self, default_format):
         """Prepare output format for later use."""
         output_format = self.options.output_format
-        self.original_output_format = output_format
 
         # Use default format if none is given
         if output_format is None:
@@ -567,7 +560,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Expand plain field list to usable form
         # "name,size.sz" would become "{{d.name}}\t{{d.size|sz}}"
         if re.match(r"^[,._0-9a-zA-Z]+$", output_format):
-            self.is_plain_output_format = True
             outputs = []
             for field in rtorrent.validate_field_list(
                 output_format, allow_fmt_specs=True

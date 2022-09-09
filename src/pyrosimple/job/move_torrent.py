@@ -4,10 +4,7 @@ Currently uses consistent hashing to determine which remote host
 gets the torrent (if multiple are specified)."""
 import hashlib
 
-from pathlib import Path
 from typing import Dict, List
-
-import bencode
 
 from pyrosimple import config
 from pyrosimple.job import base
@@ -21,20 +18,6 @@ def nodes_by_hash_weight(meta_id: str, nodes: List[str]) -> Dict[str, int]:
         for n in nodes
     }
     return dict(sorted(result.items(), key=lambda item: item[1]))
-
-
-def get_custom_fields(infohash, proxy):
-    """Try using rtorrent-ps commands to list custom keys, otherwise fall back to reading from a session file."""
-    if "d.custom.keys" in proxy.system.listMethods():
-        custom_fields = {}
-        for key in proxy.d.custom.keys(infohash):
-            custom_fields[key] = proxy.d.custom(infohash, key)
-    else:
-        info_file = Path(proxy.session.path(), f"{infohash}.torrent.rtorrent")
-        proxy.d.save_full_session(infohash)
-        with open(info_file, "rb") as fh:
-            custom_fields = bencode.bread(fh)["custom"]
-    return custom_fields
 
 
 class Mover(base.MatchableJob):
