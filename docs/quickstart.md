@@ -60,12 +60,12 @@ rtcontrol //
 rtcontrol // -o hash
 # Get the size and name of completed torrents
 rtcontrol is_complete=yes -o size.sz,name
-# Get the upload, download and name of any un-ingnored active torrents
+# Get the upload, download and name of any not-ingnored active torrents
 rtcontrol is_ignored=no xfer=+0 -o up.sz,down.sz,name
 ```
 
 !!! note
-    The string `//` in the first command is an empty regex. If you don't know what that means,
+    The string `//` in the first two commands is an empty regex. If you don't know what that means,
     don't worry, it's just an easy way to get all torrents.
 
 

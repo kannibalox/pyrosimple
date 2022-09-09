@@ -1,22 +1,53 @@
-# Migrating from pyrocore
+---
+title: Migrating from pyroscope
+---
+# Migrating from pyroscope
 
 ## Configuration
 
-The entire configuration has been moved into a single TOML file (`~/.config/pyrosimple/config.yoml`). While most of the settings have the same name/values, there is currently no way
-to automatically migrate the configuration. See the [configuration reference](/configuration) for more information.
+* The configuration file is located in a new location by default (`~/.config/pyrosimple/config.toml`), and uses a new format. Although the settings name have remained mostly the same, it is recommended to manually copy settings over to the new format.
 
-Similarly, custom code in `config.py` is still supported but will require changes to work under pyrosimple. For the most part
-this will just mean changing the location of libraries and minor tweaks to how the custom fields are initialized.
+## Common CLI
 
-## CLI
+* Logging has been overhauled. `--cron` is now an alias for `--quiet`. All logging goes to stderr.
 
-### rtcontrol
+## `rtcontrol`
 
-Multiple action flags can now be specified and will run in order:
+* Multiple actions flags are allowed, and the order in which they are specified is the order in which they are executed. Previously, only some combinations were allowed, and order did not matter.
+* The `--anneal` flag has been removed. Use core Linux utilites (e.g. `sort` and `uniq`) instead.
+* Matching an empty string with a blank value (e.g. `message=`) will no longer work as expected. Use a an empty quotes instead: `message=\"\"`.
+* String matching is now case-sensitive by default. To use case-insensitive matching, use a regex with the `i` flag, e.g. `name=/UbUnTu.*/i`
 
-`rtcontrol --flush --exec "print={{d.name}}" --flush`
+### Templating
 
-Some of the query syntax has changed slightly:
+* Tempita has been replaced with [Jinja2](https://jinja.palletsprojects.com/en/3.0.x/templates/). The syntax is similar
+  but not equivalent.
+  ```
+  # Old
+  rtcontrol // -o '{{ if d.is_multi_file }}Multi-file path: {{ else }}Single file: {{ endif }}{{item.directory}}'
+  # New
+  rtcontrol // -o '{% if d.is_multi_file %}Multi-file path: {% else %}Single file: {% endif %}{{item.directory}}'
+  ```
+* The native python formatting style has been removed. Use the jinja2 template instead.
+  ```
+  # Old
+  rtcontrol // -o '%(size.sz)s %(name)s'
+  # New
+  rtcontrol // -o '{{item.size|sz}} {{item.name}}'
+  ```
 
-* `message=` to match an empty string no longer works. Use `message=""` (escaped to be `message=\"\"` in the shell) instead
-* String matching is now case-sensitive. To get the old case-insentivity, add the `i` flag to the end of regexes, e.g. `/UbUnTu/i`
+### `--exec`
+
+* All commands now use the full name. As such, the `:` signifier no longer has any effect.
+  ```
+  # Old
+  rtcontrol // --exec "directory.set={{item.directory}}/{{item.custom_target_folder}}"
+  rtcontrol --exec ":event.download.finished=" loaded=-10i done=100
+  # New
+  rtcontrol // --exec "d.directory.set={{item.directory}}/{{item.custom_target_folder}}"
+  rtcontrol --exec "event.download.finished=" loaded=-10i done=100
+  ```
+
+## `rtxmlrpc`
+
+* `-x, --xml, -r, --repr` have been removed. Use `-o <format>` to control the output format.
