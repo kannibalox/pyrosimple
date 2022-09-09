@@ -722,7 +722,9 @@ class TorrentProxy:
             ", ".join(sorted("%s=%r" % mask(k, v) for k, v in self._fields.items())),
         )
 
+
 TorrentProxy.add_core_fields()
+
 
 class TorrentView:
     """A view on a subset of torrent items."""

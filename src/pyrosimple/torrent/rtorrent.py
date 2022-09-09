@@ -31,7 +31,9 @@ from pyrosimple.util.parts import Bunch
 log = logging.getLogger(__name__)
 
 env = jinja2.Environment(
-    loader=jinja2.FileSystemLoader([Path("~/.config/pyrosimple/templates/").expanduser()]),
+    loader=jinja2.FileSystemLoader(
+        [Path("~/.config/pyrosimple/templates/").expanduser()]
+    ),
 )
 # Load filter methods from fmt submodule
 env.filters.update(

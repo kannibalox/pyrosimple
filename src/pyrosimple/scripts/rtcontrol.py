@@ -1,4 +1,4 @@
-# pylint: disable=no-self-use,too-many-nested-blocks
+# pylint: disable=no-self-use
 """ rTorrent Control.
 
     Copyright (c) 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
@@ -22,7 +22,7 @@ from prompt_toolkit import prompt
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.torrent import engine, rtorrent
-from pyrosimple.util import matching, pymagic, rpc
+from pyrosimple.util import fmt, matching, pymagic, rpc
 from pyrosimple.util.parts import DefaultBunch
 
 
@@ -53,6 +53,18 @@ def print_help_fields():
             ]
         )
     )
+
+
+def print_help_filters():
+    print("")
+    print("In addition to the filters below, jinja2 has some filters")
+    print(
+        "built-in: https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-builtin-filters"
+    )
+    print("pyrosimple-specific filters:")
+    for name, method in fmt.__dict__.items():
+        if name.startswith("fmt_"):
+            print("  %-21s %s" % (name[4:], method.__doc__))
 
 
 class FieldStatistics:
@@ -623,10 +635,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def mainloop(self):
         """The main loop."""
-        # Print field definitions?
         if self.options.help_fields:
-            self.parser.print_help()
             print_help_fields()
+            print_help_filters()
             sys.exit(1)
 
         # Print usage if no conditions are provided

@@ -120,12 +120,11 @@ def fmt_raw(val):
 
 
 def fmt_fmt(val, field):
-    """Apply a field-specific formatter (if present)
+    """Apply a field-specific formatter (if present)"""
 
-    If val is a RtorrentItem, fetch `field` from it before formatting. This
-    is to allow `d|fmt('is_private')` vs. the redundant `d.is_private|fmt('is_private')`.
-    Be aware that using the former in rtcontrol templates breaks the field auto-detection.
-    """
+    # If val is a RtorrentItem, fetch `field` from it before formatting. This
+    # is to allow `d|fmt('is_private')` vs. the redundant `d.is_private|fmt('is_private')`.
+    # Be aware that using the former in rtcontrol templates breaks the field auto-detection.
     if field not in torrent.engine.FieldDefinition.FIELDS:
         return val
     if isinstance(val, torrent.rtorrent.RtorrentItem):
