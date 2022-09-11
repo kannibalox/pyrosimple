@@ -61,6 +61,53 @@ METAFILE_STD_KEYS = [
 ]
 
 
+class PieceChecker:
+    """Holds some state to display nice error messages
+    if pieces fail to hash check"""
+
+    def __init__(self, meta, logger):
+        self.piece_index = 0
+        self.meta = meta
+        self.log = logger
+
+    def check_piece(self, filename, piece):
+        "Callback for new piece"
+        if (
+            piece
+            != self.meta["info"]["pieces"][
+                self.piece_index : self.piece_index + 20
+            ]
+        ):
+            self.log.warning(
+                "Piece #%d: Hashes differ in file %r",
+                self.piece_index // 20,
+                filename,
+            )
+        self.piece_index += 20
+
+class PieceCheckerQuickFail:
+    """Raises an OSError if any pieces don't match"""
+
+    def __init__(self, meta, logger):
+        self.piece_index = 0
+        self.meta = meta
+        self.log = logger
+
+    def check_piece(self, filename, piece):
+        "Callback for new piece"
+        if (
+            piece
+            != self.meta["info"]["pieces"][
+                self.piece_index : self.piece_index + 20
+            ]
+        ):
+            self.log.warning(
+                "Piece #%d: Hashes differ in file %r",
+                self.piece_index // 20,
+                filename,
+            )
+        self.piece_index += 20
+
 def console_progress():
     """Return a progress indicator for consoles if
     stdout is a tty.
@@ -576,44 +623,18 @@ class Metafile(dict):
             meta["creation date"] = int(time.time())
         return Metafile(meta)
 
-    def hash_check(self, datapath: Path, progress=None) -> bool:
+    def hash_check(self, datapath: Path, progress_callback=None, piece_callback=None) -> bool:
         """Check piece hashes of a metafile against the given datapath."""
-
-        class PieceChecker:
-            """Holds some state to display nice error messages
-            if pieces fail to hash check"""
-
-            def __init__(self, meta, logger):
-                self.piece_index = 0
-                self.meta = meta
-                self.log = logger
-
-            def check_piece(self, filename, piece):
-                "Callback for new piece"
-                if (
-                    piece
-                    != self.meta["info"]["pieces"][
-                        self.piece_index : self.piece_index + 20
-                    ]
-                ):
-                    self.log.warning(
-                        "Piece #%d: Hashes differ in file %r",
-                        self.piece_index // 20,
-                        filename,
-                    )
-                self.piece_index += 20
-
-        p = PieceChecker(dict(self), self.log)
 
         if "length" in self["info"]:
             files = [datapath]
         else:
-            files = [Path(datapath, i["path"]) for i in self["info"]["files"]]
+            files = [Path(datapath, *i["path"]) for i in self["info"]["files"]]
         datameta, _ = self._make_info(
             files,
             int(self["info"]["piece length"]),
-            progress_callback=progress,
-            piece_callback=p.check_piece,
+            progress_callback=progress_callback,
+            piece_callback=piece_callback,
         )
         return bool(datameta["pieces"] == self["info"]["pieces"])
 
