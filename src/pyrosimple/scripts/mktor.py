@@ -4,16 +4,20 @@
 """
 
 
+import fnmatch
 import hashlib
 import logging
 import os
 import re
+import time
 
+import urllib
 from urllib.parse import parse_qs
+from pathlib import Path
 
 import bencode
 
-from pyrosimple import config
+from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase
 from pyrosimple.util import metafile
 
@@ -136,54 +140,80 @@ class MetafileCreator(ScriptBase):
                 % (" ".join(self.args),)
             )
 
+        # Validate tracker list
+        tracker_urls: Dict[str, str] = {}
+        for tracker_url in self.args[1:]:
+            found_url = ""
+            try:
+                tracker_alias, found_urls = config.lookup_announce_url(tracker_url)
+                found_url = found_urls[0]
+            except KeyError:
+                tracker_alias = config.map_announce2alias(tracker_url)
+                found_url = tracker_url
+            if not found_url:
+                raise error.ConfigurationError(
+                    f"Announce '{tracker_url}' is not a valid URL or alias"
+                )
+            tracker_urls[tracker_alias] = found_url
+
         # Create and configure metafile factory
-        datapath = self.args[0].rstrip(os.sep)
-        metapath = datapath
+        datapath = Path(self.args[0])
+        metapath = Path(datapath)
         if self.options.output_filename:
-            metapath = self.options.output_filename
-            if os.path.isdir(metapath):
-                metapath = os.path.join(metapath, os.path.basename(datapath))
-        if not metapath.endswith(".torrent"):
-            metapath += ".torrent"
-        torrent = metafile.Metafile(metapath)
-        torrent.ignore.extend(self.options.exclude)
+            metapath = Path(self.options.output_filename)
+            if metapath.is_dir():
+                metapath = metapath.joinpath(os.path.basename(datapath))
+        if datapath.suffix != ".torrent":
+            metapath = datapath.with_suffix(".torrent")
 
-        def callback(meta):
-            "Callback to set label and resume data."
-            url_target = meta.get("announce", None) or meta["announce-list"][0]
-            meta["info"]["source"] = config.map_announce2alias(url_target)
-            meta["info"]["x_cross_seed"] = hashlib.md5(url_target.encode()).hexdigest()
-            # Set specific keys?
-            metafile.assign_fields(meta, self.options.set)
-
-        # Create and write the metafile(s)
-        # TODO: make it work better with multiple trackers (hash only once), also create fast-resume file for each tracker
-        meta = torrent.create(
+        # Create and metafile with the first announce as a placeholder
+        torrent = metafile.Metafile.from_path(
             datapath,
-            self.args[1:],
+            self.args[1],
             progress=metafile.console_progress()
             if logging.getLogger().isEnabledFor(logging.WARNING)
             else None,
             root_name=self.options.root_name,
             private=self.options.private,
-            no_date=self.options.no_date,
-            comment=self.options.comment,
             created_by="PyroSimple",
-            callback=callback,
+            ignore=[
+                re.compile(fnmatch.translate(glob)) for glob in self.options.exclude
+            ],
         )
+        torrent["created by"] = "PyroSimple"
+        if self.options.comment:
+            torrent["comment"] = self.options.comment
+        if not self.options.no_date:
+            torrent["creation date"] = int(time.time())
+
+        # If only one announce, just save to file
+        for alias, announce in tracker_urls.items():
+            torrent["announce"] = announce
+            torrent["info"]["source"] = alias
+            torrent["info"]["x_cross_seed"] = hashlib.md5(announce.encode()).hexdigest()
+            torrent.assign_fields(self.options.set)
+            if len(self.args) == 2:
+                self.LOG.info("Writing metafile %s...", metapath)
+                torrent.save(metapath)
+            else:
+                alias_metapath = Path(f"{alias}_{metapath}")
+                self.LOG.info("Writing metafile %s...", alias_metapath)
+                torrent.save(alias_metapath)
 
         # Create second metafile with fast-resume?
         if self.options.hashed:
             try:
-                metafile.add_fast_resume(meta, datapath)
+                torrent.add_fast_resume(datapath)
             except OSError as exc:
                 self.fatal(f"Error making fast-resume data ({exc})")
                 raise
 
-            hashed_path = re.sub(r"\.torrent$", "", metapath) + "-resume.torrent"
-            self.LOG.info("Writing fast-resume metafile %r...", hashed_path)
+            hashed_path = Path(
+                re.sub(r"\.torrent$", "", str(metapath)) + "-resume.torrent"
+            )
+            self.LOG.info("Writing fast-resume metafile %s...", hashed_path)
             try:
-                bencode.bwrite(hashed_path, meta)
+                torrent.save(hashed_path)
             except OSError as exc:
                 self.fatal(
                     f"Error writing fast-resume metafile {hashed_path!r} ({exc})"

@@ -10,6 +10,7 @@ import os
 import re
 import time
 import urllib.parse
+from pathlib import Path
 
 import bencode  # typing: ignore
 
@@ -212,8 +213,9 @@ class MetafileChanger(ScriptBase):
         for filename in self.args:
             try:
                 # Read and remember current content
-                metainfo = bencode.bread(filename)
-                old_metainfo = bencode.bencode(metainfo)
+                torrent = metafile.Metafile.from_file(Path(filename))
+                metainfo = dict(torrent)
+                old_metainfo = dict(torrent)
             except (OSError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.LOG.warning(
                     "Skipping bad metafile %r (%s: %s)",
@@ -225,7 +227,7 @@ class MetafileChanger(ScriptBase):
             else:
                 # Check metafile integrity
                 try:
-                    metafile.check_meta(metainfo)
+                    torrent.check_meta()
                 except ValueError as exc:
                     self.LOG.warning(
                         "Metafile %r failed integrity check: %s",
@@ -338,7 +340,7 @@ class MetafileChanger(ScriptBase):
                         raise
 
                 # Set specific keys?
-                metafile.assign_fields(metainfo, self.options.set)
+                torrent.assign_fields(self.options.set)
                 replace_fields(metainfo, self.options.regex)
 
                 # Write new metafile, if changed

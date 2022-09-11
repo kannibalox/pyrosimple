@@ -6,6 +6,7 @@
 
 import hashlib
 import json
+from pathlib import Path
 
 import bencode
 
@@ -53,7 +54,6 @@ class MetafileLister(ScriptBase):
             self.parser.exit()
 
         for idx, filename in enumerate(self.args):
-            torrent = metafile.Metafile(filename)
             if idx and not self.options.output and not self.options.raw:
                 print()
                 print("~" * 79)
@@ -61,10 +61,9 @@ class MetafileLister(ScriptBase):
             try:
                 # Read and check metafile
                 try:
-                    data = metafile.checked_open(
-                        filename,
-                        log=self.LOG if self.options.skip_validation else None,
-                    )
+                    filename = Path(filename)
+                    torrent = metafile.Metafile.from_file(filename)
+                    torrent.check_meta()
                 except OSError as exc:
                     self.fatal(
                         "Can't read '%s' (%s)"
@@ -78,10 +77,11 @@ class MetafileLister(ScriptBase):
                 listing = None
 
                 if self.options.raw:
-                    if not self.options.reveal and "info" in data:
+                    if not self.options.reveal and "info" in torrent:
                         # Shorten useless binary piece hashes
-                        data["info"]["pieces"] = "<%d piece hashes>" % (
-                            len(data["info"]["pieces"]) / len(hashlib.sha1().digest())
+                        torrent["info"]["pieces"] = "<%d piece hashes>" % (
+                            len(torrent["info"]["pieces"])
+                            / len(hashlib.sha1().digest())
                         )
 
                     class BencodeJSONEncoder(json.JSONEncoder):
@@ -92,7 +92,7 @@ class MetafileLister(ScriptBase):
                                 return o.hex().upper()
                             return super().default(o)
 
-                    listing = BencodeJSONEncoder(indent=2).encode(data)
+                    listing = BencodeJSONEncoder(indent=2).encode(torrent)
                 elif self.options.output:
 
                     def splitter(fields):
@@ -103,8 +103,8 @@ class MetafileLister(ScriptBase):
 
                     data["__file__"] = filename
                     if "info" in data:
-                        data["__hash__"] = metafile.info_hash(data)
-                        data["__size__"] = metafile.data_size(data)
+                        data["__hash__"] = torrent.info_hash()
+                        data["__size__"] = torrent.data_size()
                     values = []
                     for field in splitter(self.options.output):
                         try:

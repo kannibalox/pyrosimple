@@ -56,9 +56,8 @@ class MaskTest(unittest.TestCase):
 
 
 @pytest.fixture
-def good_metainfo():
-    with Path(Path(__file__).parent, "multi.torrent").open("rb") as fh:
-        return bencode.decode(fh.read())
+def good_metafile():
+    return Metafile.from_file(Path(Path(__file__).parent, "multi.torrent"))
 
 
 @pytest.mark.parametrize(

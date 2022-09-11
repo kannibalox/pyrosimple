@@ -16,7 +16,17 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import Callable, Dict, Generator, List, Optional, Set, Union
+from typing import (
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Set,
+    Union,
+    Tuple,
+    Iterable,
+)
 
 import bencode  # typing: ignore
 
@@ -89,295 +99,8 @@ def mask_keys(announce_url: str) -> str:
     )
 
 
-def check_info(info: Dict):
-    """Validate info dict.
-
-    Raise ValueError if validation fails.
-    """
-    if not isinstance(info, dict):
-        raise ValueError("bad metainfo - not a dictionary")
-
-    pieces = info.get("pieces")
-    if not isinstance(pieces, bytes) or len(pieces) % 20 != 0:
-        raise ValueError("bad metainfo - bad pieces key")
-
-    piece_size = info.get("piece length")
-    if not isinstance(piece_size, int) or piece_size <= 0:
-        raise ValueError("bad metainfo - illegal piece length")
-
-    name = info.get("name")
-    if not isinstance(name, str):
-        raise ValueError(f"bad metainfo - bad name (type is {type(name).__name__!r})")
-    if not ALLOWED_ROOT_NAME.match(name):
-        raise ValueError(f"name {name} disallowed for security reasons")
-
-    if ("files" in info) == ("length" in info):
-        raise ValueError("single/multiple file mix")
-
-    if "length" in info:
-        length = info.get("length")
-        if not isinstance(length, int) or length < 0:
-            raise ValueError("bad metainfo - bad length")
-    else:
-        files = info.get("files")
-        if not isinstance(files, (list, tuple)):
-            raise ValueError("bad metainfo - bad file list")
-
-        for item in files:
-            if not isinstance(item, dict):
-                raise ValueError("bad metainfo - bad file value")
-
-            length = item.get("length")
-            if not isinstance(length, int) or length < 0:
-                raise ValueError("bad metainfo - bad length")
-
-            path = item.get("path")
-            if not isinstance(path, (list, tuple)) or not path:
-                raise ValueError("bad metainfo - bad path")
-
-            for part in path:
-                if not isinstance(part, str):
-                    raise ValueError("bad metainfo - bad path dir")
-                if part == "..":
-                    raise ValueError(
-                        "relative path in %s disallowed for security reasons"
-                        % "/".join(path)
-                    )
-                if part and not ALLOWED_PATH_NAME.match(part):
-                    raise ValueError(f"path {part} disallowed for security reasons")
-
-        file_paths = [os.sep.join(item["path"]) for item in files]
-        if len(set(file_paths)) != len(file_paths):
-            raise ValueError("bad metainfo - duplicate path")
-
-    return info
-
-
-def check_meta(meta: Dict):
-    """Validate meta dict.
-
-    Raise ValueError if validation fails.
-    """
-    if not isinstance(meta, dict):
-        raise ValueError("bad metadata - not a dictionary")
-    if not isinstance(meta.get("announce"), str):
-        raise ValueError("bad announce URL - not a string")
-    if not isinstance(meta["info"], dict):
-        raise ValueError("bad info key - not a dictionary")
-    check_info(meta["info"])
-
-    return meta
-
-
-def clean_meta(meta: Dict, including_info: bool = False, logger=None) -> Set[str]:
-    """Clean meta dict. Optionally log changes using the given logger.
-
-    @param logger: If given, a callable accepting a string message.
-    @return: Set of keys removed from C{meta}.
-    """
-    modified: Set[str] = set()
-
-    for key in list(meta.keys()):
-        if [key] not in METAFILE_STD_KEYS:
-            if logger:
-                logger(f"Removing key {key!r}...")
-            del meta[key]
-            modified.add(key)
-
-    if including_info:
-        for key in list(meta["info"].keys()):
-            if ["info", key] not in METAFILE_STD_KEYS:
-                if logger:
-                    logger(f"Removing key {'info.' + key!r}...")
-                del meta["info"][key]
-                modified.add("info." + key)
-
-        for idx, entry in enumerate(meta["info"].get("files", [])):
-            for key in list(entry.keys()):
-                if ["info", "files", key] not in METAFILE_STD_KEYS:
-                    if logger:
-                        logger("Removing key %r from file #%d..." % (key, idx + 1))
-                    del entry[key]
-                    modified.add("info.files." + key)
-
-            # Remove crap that certain PHP software puts in paths
-            entry["path"] = [i for i in entry["path"] if i]
-
-    return modified
-
-
-def sanitize(meta: Dict, diagnostics=False):
-    """Try to fix common problems, especially transcode non-standard string encodings."""
-    bad_encodings, bad_fields = set(), set()
-
-    def sane_encoding(field, text):
-        "Transcoding helper."
-        if isinstance(text, str):
-            return text.encode("utf-8")
-        for encoding in ("utf-8", meta.get("encoding", None), "cp1252"):
-            if encoding:
-                try:
-                    u8_text = text.decode(encoding).encode("utf-8")
-                    if encoding != "utf-8":
-                        bad_encodings.add(encoding)
-                        bad_fields.add(field)
-                    return u8_text
-                except UnicodeError:
-                    continue
-        # Broken beyond anything reasonable
-        bad_encodings.add("UNKNOWN/EXOTIC")
-        bad_fields.add(field)
-        return str(text, "utf-8", "replace").replace("\ufffd", "_").encode("utf-8")
-
-    # Go through all string fields and check them
-    for field in ("comment", "created by"):
-        if field in meta:
-            meta[field] = sane_encoding(field, meta[field])
-
-    meta["info"]["name"] = sane_encoding("info name", meta["info"]["name"])
-
-    for entry in meta["info"].get("files", []):
-        entry["path"] = [sane_encoding("file path", i) for i in entry["path"]]
-
-    return (meta, bad_encodings, bad_fields) if diagnostics else meta
-
-
-def assign_fields(meta: Dict, assignments: List[str]) -> Dict:
-    """Takes a list of C{key=value} strings and assigns them to the
-    given metafile. If you want to set nested keys (e.g. "info.source"),
-    you have to use a dot as a separator. For exotic keys *containing*
-    a dot, double that dot ("dotted..key").
-
-    Numeric values starting with "+" or "-" are converted to integers.
-
-    If just a key name is given (no '='), the field is removed.
-    """
-    for assignment in assignments:
-        try:
-            val: Optional[Union[str, int]]
-            if "=" in assignment:
-                field, val = assignment.split("=", 1)
-            else:
-                field, val = assignment, None
-
-            if val is not None and val[0] in "+-" and val[1:].isdigit():
-                val = int(val, 10)
-
-            # TODO: Allow numerical indices, and "+" for append
-            namespace = meta
-            keypath = [
-                i.replace("\0", ".") for i in field.replace("..", "\0").split(".")
-            ]
-            for key in keypath[:-1]:
-                # Create missing dicts as we go...
-                namespace = namespace.setdefault(key, {})
-        except (KeyError, IndexError, TypeError, ValueError) as exc:
-            raise error.UserError(f"Bad assignment {assignment!r} ({exc})!") from exc
-        else:
-            if val is None:
-                del namespace[keypath[-1]]
-            else:
-                namespace[keypath[-1]] = val
-
-    return meta
-
-
-def add_fast_resume(meta: Dict, datapath: str) -> Dict:
-    """Add fast resume data to a metafile dict."""
-    # Get list of files
-    files = meta["info"].get("files", None)
-    single = files is None
-    if single:
-        if os.path.isdir(datapath):
-            datapath = os.path.join(datapath, meta["info"]["name"])
-        files = [
-            Bunch(
-                path=[os.path.abspath(datapath)],
-                length=meta["info"]["length"],
-            )
-        ]
-
-    # Prepare resume data
-    resume = meta.setdefault("libtorrent_resume", {})
-    resume["bitfield"] = len(meta["info"]["pieces"]) // 20
-    resume["files"] = []
-    piece_length = meta["info"]["piece length"]
-    offset = 0
-
-    for fileinfo in files:
-        # Get the path into the filesystem
-        filepath = Path(*fileinfo["path"])
-        if not single:
-            filepath = Path(datapath, filepath)
-
-        # Check file size
-        if os.path.getsize(filepath) != fileinfo["length"]:
-            raise OSError(
-                errno.EINVAL,
-                "File size mismatch for %r [is %d, expected %d]"
-                % (
-                    filepath,
-                    os.path.getsize(filepath),
-                    fileinfo["length"],
-                ),
-            )
-
-        # Add resume data for this file
-        resume["files"].append(
-            dict(
-                priority=1,
-                mtime=int(os.path.getmtime(filepath)),
-                completed=(offset + fileinfo["length"] + piece_length - 1)
-                // piece_length
-                - offset // piece_length,
-            )
-        )
-        offset += fileinfo["length"]
-
-    return meta
-
-
-def info_hash(metadata: Dict) -> str:
-    """Return info hash as a string."""
-    return hashlib.sha1(bencode.encode(metadata["info"])).hexdigest().upper()
-
-
-def data_size(metadata: Dict) -> int:
-    """Calculate the size of a torrent based on parsed metadata."""
-    info = metadata["info"]
-
-    if "length" in info:
-        # Single file
-        return int(info["length"])
-    # Directory structure
-    return sum(f["length"] for f in info["files"])
-
-
-def checked_open(filename: str, log: logging.Logger = None) -> Dict:
-    """Open and validate the given metafile.
-    Optionally provide diagnostics on the passed logger, for
-    invalid metafiles, which then just cause a warning but no exception.
-    "quiet" can supress that warning.
-    """
-    with open(filename, "rb") as handle:
-        raw_data = handle.read()
-    data: Dict = bencode.decode(raw_data)
-
-    try:
-        check_meta(data)
-        if raw_data != bencode.encode(data):
-            raise ValueError("Bad bencoded data - dict keys out of order?")
-    except ValueError as exc:
-        if log:
-            log.warning(f"{filename}: {exc}")
-        else:
-            raise
-
-    return data
-
-
-class Metafile:
-    """A torrent metafile."""
+class Metafile(dict):
+    """A torrent metafile, representing structure and operations for a .torrent file."""
 
     # Patterns of names to ignore
     IGNORE_GLOB = [
@@ -393,95 +116,172 @@ class Metafile:
         "ehthumbs_vista.db",
     ]
 
-    def __init__(self, filename, datapath=None):
-        """Initialize metafile."""
-        self.filename = filename
-        self.progress = None
-        self.datapath = datapath
-        self._datapath = None
-        self.ignore = self.IGNORE_GLOB[:]
-        self.LOG = pymagic.get_class_logger(self)
+    @staticmethod
+    def from_file(filename: Path):
+        with filename.open("rb") as handle:
+            raw_data = handle.read()
+        return Metafile(bencode.decode(raw_data))
 
-    def _get_datapath(self):
-        """Get a valid datapath, else raise an exception."""
-        if self._datapath is None:
-            raise OSError(
-                errno.ENOENT, f"You didn't provide any datapath for {self.filename!r}"
+    def save(self, filename: Path):
+        with filename.open("wb") as handle:
+            handle.write(bencode.encode(dict(self)))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.log = pymagic.get_class_logger(self)
+        self.ignore = [
+            re.compile(fnmatch.translate(glob)) for glob in Metafile.IGNORE_GLOB
+        ]
+
+    def check_info(self) -> None:
+        """Validate info dict.
+
+        Raise ValueError if validation fails.
+        """
+        info = self.get("info")
+        if not isinstance(info, dict):
+            raise ValueError("bad metainfo - not a dict")
+        pieces = info.get("pieces")
+        if not isinstance(pieces, bytes) or len(pieces) % 20 != 0:
+            raise ValueError("bad metainfo - bad pieces key")
+
+        piece_size = info.get("piece length")
+        if not isinstance(piece_size, int) or piece_size <= 0:
+            raise ValueError("bad metainfo - illegal piece length")
+
+        name = info.get("name")
+        if not isinstance(name, str):
+            raise ValueError(
+                f"bad metainfo - bad name (type is {type(name).__name__!r})"
             )
+        if not ALLOWED_ROOT_NAME.match(name):
+            raise ValueError(f"name {name} disallowed for security reasons")
 
-        return self._datapath
+        if ("files" in info) == ("length" in info):
+            raise ValueError("single/multiple file mix")
 
-    def _set_datapath(self, datapath: str):
-        """Set a datapath."""
-        if datapath:
-            self._datapath = datapath.rstrip(os.sep)
+        if "length" in info:
+            length = info.get("length")
+            if not isinstance(length, int) or length < 0:
+                raise ValueError("bad metainfo - bad length")
         else:
-            self._datapath = None
+            files = info.get("files")
+            if not isinstance(files, (list, tuple)):
+                raise ValueError("bad metainfo - bad file list")
 
-    datapath = property(_get_datapath, _set_datapath)
+            for item in files:
+                if not isinstance(item, dict):
+                    raise ValueError("bad metainfo - bad file value")
 
-    def walk(self) -> Generator[Path, None, None]:
-        """Generate paths in "self.datapath"."""
-        # Directory?
-        if os.path.isdir(self.datapath):
+                length = item.get("length")
+                if not isinstance(length, int) or length < 0:
+                    raise ValueError("bad metainfo - bad length")
+
+                path = item.get("path")
+                if not isinstance(path, (list, tuple)) or not path:
+                    raise ValueError("bad metainfo - bad path")
+
+                for part in path:
+                    if not isinstance(part, str):
+                        raise ValueError("bad metainfo - bad path dir")
+                    if part == "..":
+                        raise ValueError(
+                            "relative path in %s disallowed for security reasons"
+                            % "/".join(path)
+                        )
+                    if part and not ALLOWED_PATH_NAME.match(part):
+                        raise ValueError(f"path {part} disallowed for security reasons")
+
+            file_paths = [os.sep.join(item["path"]) for item in files]
+            if len(set(file_paths)) != len(file_paths):
+                raise ValueError("bad metainfo - duplicate path")
+
+    def check_meta(self) -> None:
+        """Validate meta dict.
+
+        Raise ValueError if validation fails.
+        """
+        if not isinstance(self, dict):
+            raise ValueError("bad metadata - not a dictionary")
+        if not isinstance(self.get("announce"), str):
+            raise ValueError("bad announce URL - not a string")
+        if not isinstance(self["info"], dict):
+            raise ValueError("bad info key - not a dictionary")
+        self.check_info()
+
+    def info_hash(self) -> str:
+        """Return info hash as a string."""
+        return hashlib.sha1(bencode.encode(self["info"])).hexdigest().upper()
+
+    def walk(
+        self, datapath: Path, ignore: Optional[List] = None
+    ) -> Generator[Path, None, None]:
+        """Generate paths in "self.datapath", ignoring files/dirs as necesarry"""
+        if datapath.is_dir():
             # Walk the directory tree
             for dirpath, dirnames, filenames in os.walk(
-                self.datapath
+                datapath
             ):  # , followlinks=True):
                 # Don't scan blacklisted directories
                 for bad in dirnames[:]:
-                    if any(fnmatch.fnmatch(bad, pattern) for pattern in self.ignore):
+                    if any(pattern.match(bad) for pattern in self.ignore):
                         dirnames.remove(bad)
 
                 # Yield all filenames that aren't blacklisted
                 for filename in filenames:
-                    if not any(
-                        fnmatch.fnmatch(filename, pattern) for pattern in self.ignore
-                    ):
+                    if not any(pattern.match(filename) for pattern in self.ignore):
                         yield Path(dirpath, filename)
-
         # Single file
         else:
             # Yield the filename
-            yield Path(self.datapath)
+            yield Path(datapath)
 
-    def _calc_size(self) -> int:
+    def _calc_size(self, datapath) -> int:
         """Get total size of "self.datapath"."""
-        return sum(os.path.getsize(filename) for filename in self.walk())
+        return sum(os.path.getsize(filename) for filename in self.walk(datapath))
 
-    def _make_info(self, piece_size: int, progress, walker, piece_callback=None):
-        """Create info dict."""
+    def _make_info(
+        self,
+        files: List[os.PathLike],
+        piece_size: int,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
+        piece_callback: Optional[Callable] = None,
+        datapath: Optional[Path] = None,
+    ):
+        """Create info dict from a list of files."""
         # These collect the file descriptions and piece hashes
         file_list = []
         pieces = []
 
         # Initialize progress state
         hashing_secs = time.time()
-        totalsize = self._calc_size()
+        totalsize: int = sum([Path(filename).stat().st_size for filename in files])
         totalhashed: int = 0
 
         # Start a new piece
         sha1sum = hashlib.sha1()
         done: int = 0
         filename = None
+        if datapath is None:
+            datapath = os.path.commonpath(files)
 
         # Hash all files
-        for filename in walker:
+        for filename in files:
             # Assemble file info
             filepath = Path(filename)
             filesize = filepath.stat().st_size
-            filepath = filepath.relative_to(self.datapath)
+            rel_filepath = filepath.relative_to(datapath)
             file_list.append(
                 {
                     "length": filesize,
-                    "path": PurePath(filepath).parts,
+                    "path": PurePath(rel_filepath).parts,
                 }
             )
-            self.LOG.debug("Hashing '%s', size %d...", filename, filesize)
+            self.log.debug("Hashing '%s', size %d...", filepath, filesize)
 
             # Open file and hash it
             fileoffset = 0
-            with open(filename, "rb") as handle:
+            with filepath.open("rb") as handle:
                 while fileoffset < filesize:
                     # Read rest of piece or file, whatever is smaller
                     chunk = handle.read(min(filesize - fileoffset, piece_size - done))
@@ -501,30 +301,30 @@ class Metafile:
                         done = 0
 
                     # Report progress
-                    if progress:
-                        progress(totalhashed, totalsize)
+                    if progress_callback:
+                        progress_callback(totalhashed, totalsize)
 
         # Add hash of partial last piece
         if done > 0:
             pieces.append(sha1sum.digest())
             if piece_callback:
-                piece_callback(filename, pieces[-1])
+                piece_callback(filepath, pieces[-1])
 
         # Build the meta dict
         metainfo = {
             "pieces": b"".join(pieces),
             "piece length": piece_size,
-            "name": os.path.basename(self.datapath),
+            "name": os.path.basename(datapath),
         }
 
         # Handle directory/FIFO vs. single file
-        if os.path.isdir(self.datapath):
+        if os.path.isdir(datapath):
             metainfo["files"] = file_list
         else:
             metainfo["length"] = totalhashed
 
         hashing_secs = time.time() - hashing_secs
-        self.LOG.info(
+        self.log.debug(
             "Hashing of %s took %.1f secs (%s/s)",
             fmt.human_size(totalhashed).strip(),
             hashing_secs,
@@ -532,19 +332,158 @@ class Metafile:
         )
 
         # Return validated info dict
-        return check_info(metainfo), totalhashed
+        return metainfo, totalhashed
+
+    def sanitize(self) -> Tuple[Set, Set]:
+        """Try to fix common problems, especially transcode non-standard string encodings."""
+        bad_encodings, bad_fields = set(), set()
+
+        def sane_encoding(field, text):
+            "Transcoding helper."
+            if isinstance(text, str):
+                return text.encode("utf-8")
+            for encoding in ("utf-8", meta.get("encoding", None), "cp1252"):
+                if encoding:
+                    try:
+                        u8_text = text.decode(encoding).encode("utf-8")
+                        if encoding != "utf-8":
+                            bad_encodings.add(encoding)
+                            bad_fields.add(field)
+                        return u8_text
+                    except UnicodeError:
+                        continue
+            # Broken beyond anything reasonable
+            bad_encodings.add("UNKNOWN/EXOTIC")
+            bad_fields.add(field)
+            return str(text, "utf-8", "replace").replace("\ufffd", "_").encode("utf-8")
+
+        # Go through all string fields and check them
+        for field in ("comment", "created by"):
+            if field in self.keys():
+                self[field] = sane_encoding(field, self[field])
+
+        self["info"]["name"] = sane_encoding("info name", self["info"]["name"])
+
+        for entry in self["info"].get("files", []):
+            entry["path"] = [sane_encoding("file path", i) for i in entry["path"]]
+
+        return bad_encodings, bad_fields
+
+    def assign_fields(meta: Dict, assignments: List[str]) -> Dict:
+        """Takes a list of C{key=value} strings and assigns them to the
+        given metafile. If you want to set nested keys (e.g. "info.source"),
+        you have to use a dot as a separator. For exotic keys *containing*
+        a dot, double that dot ("dotted..key").
+
+        Numeric values starting with "+" or "-" are converted to integers.
+
+        If just a key name is given (no '='), the field is removed.
+        """
+        for assignment in assignments:
+            try:
+                val: Optional[Union[str, int]]
+                if "=" in assignment:
+                    field, val = assignment.split("=", 1)
+                else:
+                    field, val = assignment, None
+
+                if val is not None and val[0] in "+-" and val[1:].isdigit():
+                    val = int(val, 10)
+
+                # TODO: Allow numerical indices, and "+" for append
+                namespace = meta
+                keypath = [
+                    i.replace("\0", ".") for i in field.replace("..", "\0").split(".")
+                ]
+                for key in keypath[:-1]:
+                    # Create missing dicts as we go...
+                    namespace = namespace.setdefault(key, {})
+            except (KeyError, IndexError, TypeError, ValueError) as exc:
+                raise error.UserError(
+                    f"Bad assignment {assignment!r} ({exc})!"
+                ) from exc
+            else:
+                if val is None:
+                    del namespace[keypath[-1]]
+                else:
+                    namespace[keypath[-1]] = val
+
+        return meta
+
+    def add_fast_resume(self, datapath: Path) -> None:
+        """Add fast resume data to a metafile dict."""
+        # Get list of files
+        files = self["info"].get("files", None)
+        single = files is None
+        if single:
+            if datapath.is_dir():
+                datapath = datapath.joinpath(self["info"]["name"])
+            files = [
+                Bunch(
+                    path=[os.path.abspath(datapath)],
+                    length=self["info"]["length"],
+                )
+            ]
+
+        # Prepare resume data
+        resume = self.setdefault("libtorrent_resume", {})
+        resume["bitfield"] = len(self["info"]["pieces"]) // 20
+        resume["files"] = []
+        piece_length = self["info"]["piece length"]
+        offset = 0
+
+        for fileinfo in files:
+            # Get the path into the filesystem
+            filepath = Path(*fileinfo["path"])
+            if not single:
+                filepath = Path(datapath, filepath)
+
+            # Check file size
+            if os.path.getsize(filepath) != fileinfo["length"]:
+                raise OSError(
+                    errno.EINVAL,
+                    "File size mismatch for %r [is %d, expected %d]"
+                    % (
+                        filepath,
+                        os.path.getsize(filepath),
+                        fileinfo["length"],
+                    ),
+                )
+
+            # Add resume data for this file
+            resume["files"].append(
+                dict(
+                    priority=1,
+                    mtime=int(os.path.getmtime(filepath)),
+                    completed=(offset + fileinfo["length"] + piece_length - 1)
+                    // piece_length
+                    - offset // piece_length,
+                )
+            )
+            offset += fileinfo["length"]
+
+    def data_size(self) -> int:
+        """Calculate the size of a torrent based on parsed metadata."""
+        info = self["info"]
+
+        if "length" in info:
+            # Single file
+            return int(info["length"])
+        # Directory structure
+        return sum(f["length"] for f in info["files"])
 
     def _make_meta(
         self,
+        datapath: Path,
         tracker_url: str,
         root_name: str,
         private: bool,
-        progress: Optional[Callable] = None,
+        progress: Optional[Callable[[int, int], None]] = None,
         piece_size: int = 0,
     ):
         """Create torrent dict."""
         if piece_size <= 0:
-            total_size = self._calc_size()
+            total_size = self._calc_size(datapath)
             if total_size:
                 piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
             else:
@@ -554,7 +493,9 @@ class Metafile:
             piece_size = 2**piece_size_exp
 
         # Build info hash
-        info, totalhashed = self._make_info(piece_size, progress, sorted(self.walk()))
+        info, totalhashed = self._make_info(
+            sorted(self.walk(datapath)), piece_size, progress_callback=progress
+        )
 
         # Set private flag
         if private:
@@ -565,98 +506,91 @@ class Metafile:
             info["name"] = root_name
 
         # Torrent metadata
-        meta = {
-            "info": info,
-            "announce": tracker_url.strip(),
-        }
+        self["info"] = info
+        self["announce"] = tracker_url.strip()
 
         # Return validated meta dict
-        return check_meta(meta), totalhashed
+        self.check_meta()
+        return self, totalhashed
 
-    def create(
-        self,
+    def clean_meta(self, including_info: bool = False) -> Set[str]:
+        """Clean meta dict.
+
+        @param logger: If given, a callable accepting a string message.
+        @return: Set of keys removed from C{meta}.
+        """
+        modified: Set[str] = set()
+
+        for key in list(self.keys()):
+            if [key] not in METAFILE_STD_KEYS:
+                del self[key]
+                modified.add(key)
+
+        if including_info:
+            for key in list(self["info"].keys()):
+                if ["info", key] not in METAFILE_STD_KEYS:
+                    del self["info"][key]
+                    modified.add("info." + key)
+
+            for idx, entry in enumerate(self["info"].get("files", [])):
+                for key in list(entry.keys()):
+                    if ["info", "files", key] not in METAFILE_STD_KEYS:
+                        del entry[key]
+                        modified.add("info.files." + key)
+
+                # Remove crap that certain PHP software puts in paths
+                entry["path"] = [i for i in entry["path"] if i]
+
+        return modified
+
+    @staticmethod
+    def from_path(
         datapath,
-        tracker_urls,
+        tracker_url,
         comment=None,
         root_name=None,
         created_by=None,
         private: bool = False,
         no_date: bool = False,
         progress=None,
-        callback=None,
+        ignore=None,
     ):
         """Create a metafile with the path given on object creation.
         Returns the last metafile dict that was written (as an object, not bencoded).
         """
-        if datapath:
-            self.datapath = datapath
-
+        # Lookup announce URLs from config file
+        torrent = Metafile()
+        if ignore:
+            torrent.ignore = ignore
         try:
-            tracker_urls = ["" + tracker_urls]
-        except TypeError:
-            tracker_urls = list(tracker_urls)
-        multi_mode = len(tracker_urls) > 1
+            if urllib.parse.urlparse(tracker_url).scheme:
+                tracker_alias = (
+                    urllib.parse.urlparse(tracker_url).netloc.split(":")[0].split(".")
+                )
+                tracker_alias = tracker_alias[-2 if len(tracker_alias) > 1 else 0]
+            else:
+                tracker_alias, tracker_url = config.lookup_announce_url(tracker_url)
+                tracker_url = tracker_url[0]
+        except (KeyError, IndexError) as exc:
+            raise error.UserError(
+                f"Bad tracker URL {tracker_url!r}, or unknown alias!"
+            ) from exc
 
-        # TODO add optimization so the hashing happens only once for multiple URLs!
-        for tracker_url in tracker_urls:
-            # Lookup announce URLs from config file
-            try:
-                if urllib.parse.urlparse(tracker_url).scheme:
-                    tracker_alias = (
-                        urllib.parse.urlparse(tracker_url)
-                        .netloc.split(":")[0]
-                        .split(".")
-                    )
-                    tracker_alias = tracker_alias[-2 if len(tracker_alias) > 1 else 0]
-                else:
-                    tracker_alias, tracker_url = config.lookup_announce_url(tracker_url)
-                    tracker_url = tracker_url[0]
-            except (KeyError, IndexError) as exc:
-                raise error.UserError(
-                    f"Bad tracker URL {tracker_url!r}, or unknown alias!"
-                ) from exc
+        meta, _ = torrent._make_meta(
+            datapath, tracker_url, root_name, private, progress
+        )
 
-            # Determine metafile name
-            output_name = self.filename
-            if multi_mode:
-                # Add 2nd level of announce URL domain to metafile name
-                output_name = list(os.path.splitext(output_name))
-                try:
-                    output_name[1:1] = "-" + tracker_alias
-                except (IndexError,):
-                    self.LOG.error("Malformed announce URL %r, skipping!", tracker_url)
-                    continue
-                output_name = "".join(output_name)
+        # Add optional fields
+        if comment:
+            meta["comment"] = comment
+        if created_by:
+            meta["created by"] = created_by
+        if not no_date:
+            meta["creation date"] = int(time.time())
+        return Metafile(meta)
 
-            # Hash the data
-            self.LOG.info(
-                "Creating %r from %r...",
-                output_name,
-                self.datapath,
-            )
-            meta, _ = self._make_meta(tracker_url, root_name, private, progress)
-
-            # Add optional fields
-            if comment:
-                meta["comment"] = comment
-            if created_by:
-                meta["created by"] = created_by
-            if not no_date:
-                meta["creation date"] = int(time.time())
-            if callback:
-                callback(meta)
-
-            # Write metafile to disk
-            self.LOG.debug("Writing %r...", output_name)
-            with open(output_name, "wb") as fh:
-                fh.write(bencode.encode(meta))
-
-        return meta
-
-    def check(self, metainfo, datapath, progress=None):
+    def hash_check(self, datapath: Path, progress=None) -> bool:
         """Check piece hashes of a metafile against the given datapath."""
-        if datapath:
-            self.datapath = datapath
 
         def check_piece(filename, piece):
             "Callback for new piece"
@@ -689,23 +623,21 @@ class Metafile:
         return datameta["pieces"] == metainfo["info"]["pieces"]
 
     def listing(self, masked=True):
-        """List torrent info & contents. Returns a list of formatted lines."""
+        """List torrent info & contents in human-readable format. Returns a list of formatted lines."""
         # Assemble data
-        with open(self.filename, "rb") as fh:
-            metainfo = bencode.decode(fh.read())
         bad_encodings = []
         bad_fields = []
-        announce = metainfo["announce"]
-        info = metainfo["info"]
-        infohash = hashlib.sha1(bencode.encode(info))
+        announce = self["announce"]
+        info = self["info"]
+        infohash = self.info_hash()
 
-        total_size = data_size(metainfo)
+        total_size = self.data_size()
         piece_length = info["piece length"]
         piece_number, last_piece_length = divmod(total_size, piece_length)
 
         # Build result
         result: List[str] = [
-            f"NAME {Path(self.filename).name}",
+            f"NAME {self['info']['name']}",
             "SIZE %s (%i * %s + %s)"
             % (
                 fmt.human_size(total_size).strip(),
@@ -715,11 +647,11 @@ class Metafile:
             ),
             "META %s (pieces %s %.1f%%)"
             % (
-                fmt.human_size(os.path.getsize(self.filename)).strip(),
+                fmt.human_size(self.data_size()).strip(),
                 fmt.human_size(len(info["pieces"])).strip(),
-                100.0 * len(info["pieces"]) / os.path.getsize(self.filename),
+                100.0 * len(info["pieces"]) / self.data_size(),
             ),
-            f"HASH {infohash.hexdigest().upper()}",
+            f"HASH {infohash.upper()}",
             f"URL  {(mask_keys if masked else str)(announce)}",
             "PRV  %s"
             % (
@@ -730,16 +662,16 @@ class Metafile:
             "TIME %s"
             % (
                 "N/A"
-                if "creation date" not in metainfo
+                if "creation date" not in self
                 else time.strftime(
-                    "%Y-%m-%d %H:%M:%S", time.localtime(metainfo["creation date"])
+                    "%Y-%m-%d %H:%M:%S", time.localtime(self["creation date"])
                 )
             ),
         ]
 
         for label, key in (("BY  ", "created by"), ("REM ", "comment")):
-            if key in metainfo:
-                result.append(f"{label} {metainfo.get(key, 'N/A')}")
+            if key in self:
+                result.append(f"{label} {self.get(key, 'N/A')}")
 
         result.extend(
             [
