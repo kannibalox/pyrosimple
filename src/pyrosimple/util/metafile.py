@@ -268,9 +268,7 @@ class Metafile(dict):
         """Generate paths in "self.datapath", ignoring files/dirs as necesarry"""
         if datapath.is_dir():
             # Walk the directory tree
-            for dirpath, dirnames, filenames in os.walk(
-                datapath
-            ):  # , followlinks=True):
+            for dirpath, dirnames, filenames in os.walk(datapath):
                 # Don't scan blacklisted directories
                 for bad in dirnames[:]:
                     if any(pattern.match(bad) for pattern in self.ignore):
@@ -280,9 +278,7 @@ class Metafile(dict):
                 for filename in filenames:
                     if not any(pattern.match(filename) for pattern in self.ignore):
                         yield Path(dirpath, filename)
-        # Single file
         else:
-            # Yield the filename
             yield Path(datapath)
 
     def _calc_size(self, datapath) -> int:

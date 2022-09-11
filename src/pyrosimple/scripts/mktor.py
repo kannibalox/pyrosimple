@@ -193,32 +193,31 @@ class MetafileCreator(ScriptBase):
             torrent["info"]["x_cross_seed"] = hashlib.md5(announce.encode()).hexdigest()
             torrent.assign_fields(self.options.set)
             if len(self.args) == 2:
-                self.LOG.info("Writing metafile %s...", metapath)
-                torrent.save(metapath)
+                save_metapath = metapath
             else:
-                alias_metapath = Path(f"{alias}_{metapath}")
-                self.LOG.info("Writing metafile %s...", alias_metapath)
-                torrent.save(alias_metapath)
+                save_metapath = Path(f"{alias}_{metapath}")
+            self.LOG.info("Writing metafile %s...", save_metapath)
+            torrent.save(save_metapath)
 
-        # Create second metafile with fast-resume?
-        if self.options.hashed:
-            try:
-                torrent.add_fast_resume(datapath)
-            except OSError as exc:
-                self.fatal(f"Error making fast-resume data ({exc})")
-                raise
+            # Create second metafile with fast-resume?
+            if self.options.hashed:
+                try:
+                    torrent.add_fast_resume(datapath)
+                except OSError as exc:
+                    self.fatal(f"Error making fast-resume data ({exc})")
+                    raise
 
-            hashed_path = Path(
-                re.sub(r"\.torrent$", "", str(metapath)) + "-resume.torrent"
-            )
-            self.LOG.info("Writing fast-resume metafile %s...", hashed_path)
-            try:
-                torrent.save(hashed_path)
-            except OSError as exc:
-                self.fatal(
-                    f"Error writing fast-resume metafile {hashed_path!r} ({exc})"
+                hashed_path = Path(
+                    re.sub(r"\.torrent$", "", str(save_metapath)) + "-resume.torrent"
                 )
-                raise
+                self.LOG.info("Writing fast-resume metafile %s...", hashed_path)
+                try:
+                    torrent.save(hashed_path)
+                except OSError as exc:
+                    self.fatal(
+                        f"Error writing fast-resume metafile {hashed_path!r} ({exc})"
+                    )
+                    raise
 
 
 def run():  # pragma: no cover
