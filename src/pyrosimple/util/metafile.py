@@ -20,12 +20,12 @@ from typing import (
     Callable,
     Dict,
     Generator,
+    Iterable,
     List,
     Optional,
     Set,
-    Union,
     Tuple,
-    Iterable,
+    Union,
 )
 
 import bencode  # typing: ignore

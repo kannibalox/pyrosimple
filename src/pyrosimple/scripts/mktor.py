@@ -10,10 +10,10 @@ import logging
 import os
 import re
 import time
-
 import urllib
-from urllib.parse import parse_qs
+
 from pathlib import Path
+from urllib.parse import parse_qs
 
 import bencode
 
