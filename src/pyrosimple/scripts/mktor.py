@@ -17,11 +17,9 @@ from urllib.parse import parse_qs
 
 import bencode
 
-from prompt_toolkit.shortcuts import ProgressBar
-
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import metafile
+from pyrosimple.util import fmt, metafile
 
 
 class MetafileCreator(ScriptBase):
@@ -169,7 +167,7 @@ class MetafileCreator(ScriptBase):
             metapath = datapath.with_suffix(".torrent")
 
         # Build progress bar
-        with ProgressBar() as pb:
+        with fmt.HashProgressBar() as pb:
             if (
                 logging.getLogger().isEnabledFor(logging.WARNING)
                 and sys.stdout.isatty()

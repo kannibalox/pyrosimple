@@ -3,16 +3,17 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
-
 import hashlib
 import json
+import logging
+import sys
 
 from pathlib import Path
 
 import bencode
 
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import metafile
+from pyrosimple.util import fmt, metafile
 
 
 class MetafileLister(ScriptBase):
@@ -23,9 +24,12 @@ class MetafileLister(ScriptBase):
 
     def add_options(self):
         """Add program options."""
-        self.add_bool_option("--reveal", help="show full announce URL including keys")
         self.add_bool_option(
-            "--raw", help="print the metafile's raw content in all detail"
+            "--reveal",
+            help="show full announce URL including keys, as well as full piece information",
+        )
+        self.add_bool_option(
+            "--raw", help="print the metafile's raw content in JSON format"
         )
         self.add_bool_option(
             "-V",
@@ -43,9 +47,12 @@ class MetafileLister(ScriptBase):
             " __hash__ is the info hash,"
             " and __size__ is the data size in bytes",
         )
-        # TODO: implement this
-        # self.add_value_option("-c", "--check-data", "PATH",
-        #    help="check the hash against the data in the given path")
+        self.add_value_option(
+            "-c",
+            "--check-data",
+            "PATH",
+            help="check the hash against the data in the given path",
+        )
 
     def mainloop(self):
         """The main loop."""
@@ -64,7 +71,8 @@ class MetafileLister(ScriptBase):
                 try:
                     filename = Path(filename)
                     torrent = metafile.Metafile.from_file(filename)
-                    torrent.check_meta()
+                    if not self.options.skip_validation:
+                        torrent.check_meta()
                 except OSError as exc:
                     self.fatal(
                         "Can't read '%s' (%s)"
@@ -75,6 +83,21 @@ class MetafileLister(ScriptBase):
                     )
                     raise
 
+                if self.options.check_data:
+                    with fmt.HashProgressBar() as pb:
+                        if (
+                            logging.getLogger().isEnabledFor(logging.WARNING)
+                            and sys.stdout.isatty()
+                        ):
+                            c = pb()
+                            progress_callback = c.progress_callback
+                        else:
+                            progress_callback = None
+
+                        torrent.hash_check(
+                            Path(self.options.check_data),
+                            progress_callback=progress_callback,
+                        )
                 listing = None
 
                 if self.options.raw:
