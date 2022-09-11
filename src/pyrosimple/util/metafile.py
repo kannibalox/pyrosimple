@@ -4,6 +4,7 @@
 """
 
 
+import copy
 import errno
 import fnmatch
 import hashlib
@@ -15,7 +16,17 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import Callable, Generator, List, Optional, Sequence, Set, Tuple, Union
+from typing import (
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+)
 
 import bencode  # typing: ignore
 
@@ -61,7 +72,7 @@ METAFILE_STD_KEYS = [
 ]
 
 
-class PieceChecker:
+class PieceLogger:
     """Holds some state to display nice error messages
     if pieces fail to hash check"""
 
@@ -74,9 +85,7 @@ class PieceChecker:
         "Callback for new piece"
         if (
             piece
-            != self.meta["info"]["pieces"][
-                self.piece_index : self.piece_index + 20
-            ]
+            != self.meta["info"]["pieces"][self.piece_index : self.piece_index + 20]
         ):
             self.log.warning(
                 "Piece #%d: Hashes differ in file %r",
@@ -85,7 +94,8 @@ class PieceChecker:
             )
         self.piece_index += 20
 
-class PieceCheckerQuickFail:
+
+class PieceFailer:
     """Raises an OSError if any pieces don't match"""
 
     def __init__(self, meta, logger):
@@ -97,9 +107,7 @@ class PieceCheckerQuickFail:
         "Callback for new piece"
         if (
             piece
-            != self.meta["info"]["pieces"][
-                self.piece_index : self.piece_index + 20
-            ]
+            != self.meta["info"]["pieces"][self.piece_index : self.piece_index + 20]
         ):
             self.log.warning(
                 "Piece #%d: Hashes differ in file %r",
@@ -107,6 +115,7 @@ class PieceCheckerQuickFail:
                 filename,
             )
         self.piece_index += 20
+
 
 def console_progress():
     """Return a progress indicator for consoles if
@@ -159,7 +168,11 @@ class Metafile(dict):
             raw_data = handle.read()
         return Metafile(bencode.decode(raw_data))
 
-    def save(self, filename: Path):
+    def dict_copy(self) -> Dict:
+        """Provide a copy of the metafile as a pure dict"""
+        return copy.deepcopy(dict(self))
+
+    def save(self, filename: Path) -> None:
         """Save the metafile to an actual file."""
         with filename.open("wb") as handle:
             handle.write(bencode.encode(dict(self)))
@@ -426,8 +439,8 @@ class Metafile(dict):
                 if val is not None and val[0] in "+-" and val[1:].isdigit():
                     val = int(val, 10)
 
+                namespace = self
                 # TODO: Allow numerical indices, and "+" for append
-                namespace = dict(self)
                 keypath = [
                     i.replace("\0", ".") for i in field.replace("..", "\0").split(".")
                 ]
@@ -528,7 +541,10 @@ class Metafile(dict):
 
         # Build info hash
         info, totalhashed = self._make_info(
-            sorted(self.walk(datapath)), piece_size, progress_callback=progress
+            sorted(self.walk(datapath)),
+            piece_size,
+            progress_callback=progress,
+            datapath=datapath,
         )
 
         # Set private flag
@@ -623,13 +639,16 @@ class Metafile(dict):
             meta["creation date"] = int(time.time())
         return Metafile(meta)
 
-    def hash_check(self, datapath: Path, progress_callback=None, piece_callback=None) -> bool:
+    def hash_check(
+        self, datapath: Path, progress_callback=None, piece_callback=None
+    ) -> bool:
         """Check piece hashes of a metafile against the given datapath."""
 
         if "length" in self["info"]:
             files = [datapath]
         else:
             files = [Path(datapath, *i["path"]) for i in self["info"]["files"]]
+            print(files)
         datameta, _ = self._make_info(
             files,
             int(self["info"]["piece length"]),

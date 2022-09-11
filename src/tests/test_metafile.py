@@ -26,38 +26,34 @@ def set_in_dict(data_dict, map_list, value):
     get_from_dict(data_dict, map_list[:-1])[map_list[-1]] = value
 
 
-class MaskTest(unittest.TestCase):
-    def test_urls(self):
-        testcases = (
-            "http://example.com:1234/user/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
-            "http://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
-            "http://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ&someparam=0",
-            "http://example.com/DDDDD/ZZZZZZZZZZZZZZZZ/announce",
-            "http://example.com/tracker.php/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
-            "https://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
-            "http://tracker1.example.com/TrackerServlet/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/DDDDDDD/announce",
-            "http://example.com:12345/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
-            "http://example.com/announce.php?pid=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
-            "http://example.com:1234/a/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
-            "http://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ&uid=DDDDD",
-        )
-        mapping = {
-            "D": lambda: random.choice("0123456789"),
-            "Z": lambda: random.choice(
-                "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnopqrstuvwxyz"
-            ),
-        }
+@pytest.mark.parametrize(
+    "announce_url",
+    [
+        "http://example.com:1234/user/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
+        "http://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+        "http://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ&someparam=0",
+        "http://example.com/DDDDD/ZZZZZZZZZZZZZZZZ/announce",
+        "http://example.com/tracker.php/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
+        "https://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+        "http://tracker1.example.com/TrackerServlet/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/DDDDDDD/announce",
+        "http://example.com:12345/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
+        "http://example.com/announce.php?pid=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+        "http://example.com:1234/a/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/announce",
+        "http://example.com/announce.php?passkey=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ&uid=DDDDD",
+    ],
+)
+def test_urls(announce_url):
+    mapping = {
+        "D": lambda: random.choice("0123456789"),
+        "Z": lambda: random.choice(
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnopqrstuvwxyz"
+        ),
+    }
 
-        for testcase in testcases:
-            expected = testcase.replace("D", "*").replace("Z", "*")
-            randomized = "".join(mapping.get(i, lambda: i)() for i in testcase)
-            assert expected != randomized
-            assert expected == mask_keys(randomized)
-
-
-@pytest.fixture
-def good_metafile():
-    return Metafile.from_file(Path(Path(__file__).parent, "multi.torrent"))
+    expected = announce_url.replace("D", "*").replace("Z", "*")
+    randomized = "".join(mapping.get(i, lambda: i)() for i in announce_url)
+    assert expected != randomized
+    assert expected == mask_keys(randomized)
 
 
 @pytest.mark.parametrize(
@@ -65,12 +61,24 @@ def good_metafile():
     [
         ["a"],
         {"agsdg": "asdga"},
-        {"announce", 3},
+        {"announce": 3},
     ],
 )
 def test_bad_dicts(data):
     with pytest.raises(ValueError):
-        check_meta(data)
+        Metafile(data).check_meta()
+
+
+@pytest.fixture
+def good_metafile():
+    return Metafile.from_file(Path(Path(__file__).parent, "multi.torrent"))
+
+
+@pytest.fixture
+def good_metafile_from_path():
+    return Metafile.from_path(
+        Path(Path(__file__).parent, "data/"), "http://example.com"
+    )
 
 
 @pytest.mark.parametrize(
@@ -100,16 +108,69 @@ def test_bad_dicts(data):
         ),
     ],
 )
-def test_bad_metadicts(good_metainfo, key, data):
-    meta = copy.deepcopy(good_metainfo)
+def test_bad_metadicts(good_metafile, key, data):
+    meta = copy.deepcopy(good_metafile)
     set_in_dict(meta, ["info"] + key, data)
     with pytest.raises(ValueError):
-        check_meta(meta)
+        meta.check_meta()
 
 
-def test_metafile_listing(good_metainfo):
-    meta = Metafile(Path(Path(__file__).parent, "multi.torrent"))
-    meta.listing()
+@pytest.mark.parametrize(
+    ("key", "data"),
+    [
+        (["test"], ["a"]),
+        (["encoding_std"], "ascii"),
+        (["info", "padding"], 5),
+    ],
+)
+def test_clean_bad_metadicts(good_metafile, key, data):
+    meta = copy.deepcopy(good_metafile)
+    set_in_dict(meta, key, data)
+    meta.clean_meta(including_info=True)
+    meta.check_meta()
+    with pytest.raises(KeyError):
+        get_from_dict(meta, key)
+
+
+# Test various functions holistically
+
+
+def test_metafile_listing(good_metafile):
+    good_metafile.listing()
+
+
+def test_metafile_size(good_metafile):
+    good_metafile.data_size()
+
+
+@pytest.mark.parametrize(
+    ("key", "data"),
+    [
+        (["test"], "a"),
+        (["encoding_std"], "ascii"),
+        (["info", "padding"], "5"),
+    ],
+)
+def test_metafile_assign(good_metafile, key, data):
+    meta = copy.deepcopy(good_metafile)
+    meta.assign_fields([".".join(key) + "=" + str(data)])
+    assert get_from_dict(meta, key) == data
+
+
+def test_metafile_from_path(good_metafile_from_path):
+    meta = copy.deepcopy(good_metafile_from_path)
+    meta.check_meta()
+    assert len(meta.clean_meta(including_info=True)) == 0
+    meta.hash_check(Path(Path(__file__).parent, "data"))
+    meta.add_fast_resume(Path(Path(__file__).parent, "data"))
+
+
+def test_metafile_from_filepath():
+    filepath = Path(Path(__file__).parent, "data", "file.txt")
+    meta = Metafile.from_path(filepath, "http://example.com")
+    assert len(meta.clean_meta(including_info=True)) == 0
+    meta.hash_check(filepath)
+    meta.add_fast_resume(filepath)
 
 
 if __name__ == "__main__":
