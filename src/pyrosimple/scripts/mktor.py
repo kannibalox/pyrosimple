@@ -3,12 +3,12 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
-
 import fnmatch
 import hashlib
 import logging
 import os
 import re
+import sys
 import time
 
 from pathlib import Path
@@ -16,6 +16,8 @@ from typing import Dict
 from urllib.parse import parse_qs
 
 import bencode
+
+from prompt_toolkit.shortcuts import ProgressBar
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase
@@ -166,21 +168,35 @@ class MetafileCreator(ScriptBase):
         if datapath.suffix != ".torrent":
             metapath = datapath.with_suffix(".torrent")
 
-        # Create and metafile with the first announce as a placeholder
-        torrent = metafile.Metafile.from_path(
-            datapath,
-            self.args[1],
-            progress=metafile.console_progress()
-            if logging.getLogger().isEnabledFor(logging.WARNING)
-            else None,
-            root_name=self.options.root_name,
-            private=self.options.private,
-            created_by="PyroSimple",
-            ignore=[
-                re.compile(fnmatch.translate(glob))
-                for glob in self.options.exclude + config.settings.MKTOR_IGNORE
-            ],
-        )
+        # Build progress bar
+        with ProgressBar() as pb:
+            if (
+                logging.getLogger().isEnabledFor(logging.WARNING)
+                and sys.stdout.isatty()
+            ):
+                c = pb()
+
+                def pb_tracker(totalhashed, totalsize):
+                    c.total = totalsize
+                    c.items_completed = totalhashed
+                    c.progress_bar.invalidate()
+
+                progress = pb_tracker
+            else:
+                progress = None
+            # Create and metafile with the first announce as a placeholder
+            torrent = metafile.Metafile.from_path(
+                datapath,
+                self.args[1],
+                progress=progress,
+                root_name=self.options.root_name,
+                private=self.options.private,
+                created_by="PyroSimple",
+                ignore=[
+                    re.compile(fnmatch.translate(glob))
+                    for glob in self.options.exclude + config.settings.MKTOR_IGNORE
+                ],
+            )
         torrent["created by"] = "PyroSimple"
         if self.options.comment:
             torrent["comment"] = self.options.comment

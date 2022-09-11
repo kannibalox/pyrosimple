@@ -117,25 +117,6 @@ class PieceFailer:
         self.piece_index += 20
 
 
-def console_progress():
-    """Return a progress indicator for consoles if
-    stdout is a tty.
-    """
-
-    def progress(totalhashed, totalsize):
-        "Helper"
-        msg = " " * 30
-        if totalhashed < totalsize:
-            msg = f"{totalhashed * 100.0 / totalsize:5.1f}% complete"
-        sys.stdout.write(msg + " \r")
-        sys.stdout.flush()
-
-    try:
-        return progress if sys.stdout.isatty() else None
-    except AttributeError:
-        return None
-
-
 def mask_keys(announce_url: str) -> str:
     """Mask any passkeys (hex sequences) in an announce URL."""
     return PASSKEY_RE.sub(
