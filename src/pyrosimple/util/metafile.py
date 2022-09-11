@@ -607,7 +607,6 @@ class Metafile(dict):
             files = [datapath]
         else:
             files = [Path(datapath, *i["path"]) for i in self["info"]["files"]]
-            print(files)
         datameta, _ = self._make_info(
             files,
             int(self["info"]["piece length"]),
