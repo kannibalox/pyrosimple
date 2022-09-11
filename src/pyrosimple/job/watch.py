@@ -45,7 +45,9 @@ class MetafileHandler:
                 # Ignore 0-byte dummy files (Firefox creates these while downloading)
                 self.job.LOG.warning("Ignoring 0-byte metafile '%s'", self.ns.pathname)
                 return False
-            self.metadata = metafile.checked_open(self.ns.pathname)
+
+            self.metadata = metafile.Metafile.from_file(self.ns.pathname)
+            self.metadata.check_meta()
         except OSError as exc:
             self.job.LOG.error(
                 "Can't read metafile '%s' (%s)",
@@ -57,7 +59,7 @@ class MetafileHandler:
             self.job.LOG.error("Invalid metafile '%s': %s", self.ns.pathname, exc)
             return False
 
-        self.ns.info_hash = metafile.info_hash(self.metadata)
+        self.ns.info_hash = self.metadata.info_hash()
         self.ns.info_name = self.metadata["info"]["name"]
         self.job.LOG.info(
             "Loaded '%s' from metafile '%s'", self.ns.info_name, self.ns.pathname

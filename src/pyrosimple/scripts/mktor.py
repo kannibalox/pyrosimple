@@ -10,9 +10,9 @@ import logging
 import os
 import re
 import time
-import urllib
 
 from pathlib import Path
+from typing import Dict
 from urllib.parse import parse_qs
 
 import bencode

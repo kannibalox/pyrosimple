@@ -7,7 +7,6 @@
 import errno
 import fnmatch
 import hashlib
-import logging
 import math
 import os
 import re
@@ -16,17 +15,7 @@ import time
 import urllib
 
 from pathlib import Path, PurePath
-from typing import (
-    Callable,
-    Dict,
-    Generator,
-    Iterable,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import Callable, Generator, List, Optional, Sequence, Set, Tuple, Union
 
 import bencode  # typing: ignore
 
@@ -118,11 +107,13 @@ class Metafile(dict):
 
     @staticmethod
     def from_file(filename: Path):
+        """Load a metafile directly from a file."""
         with filename.open("rb") as handle:
             raw_data = handle.read()
         return Metafile(bencode.decode(raw_data))
 
     def save(self, filename: Path):
+        """Save the metafile to an actual file."""
         with filename.open("wb") as handle:
             handle.write(bencode.encode(dict(self)))
 
@@ -213,9 +204,7 @@ class Metafile(dict):
         """Return info hash as a string."""
         return hashlib.sha1(bencode.encode(self["info"])).hexdigest().upper()
 
-    def walk(
-        self, datapath: Path, ignore: Optional[List] = None
-    ) -> Generator[Path, None, None]:
+    def walk(self, datapath: Path) -> Generator[Path, None, None]:
         """Generate paths in "self.datapath", ignoring files/dirs as necesarry"""
         if datapath.is_dir():
             # Walk the directory tree
@@ -242,7 +231,7 @@ class Metafile(dict):
 
     def _make_info(
         self,
-        files: List[os.PathLike],
+        files: Sequence[os.PathLike],
         piece_size: int,
         progress_callback: Optional[Callable[[int, int], None]] = None,
         piece_callback: Optional[Callable] = None,
@@ -342,7 +331,7 @@ class Metafile(dict):
             "Transcoding helper."
             if isinstance(text, str):
                 return text.encode("utf-8")
-            for encoding in ("utf-8", meta.get("encoding", None), "cp1252"):
+            for encoding in ("utf-8", self.get("encoding", None), "cp1252"):
                 if encoding:
                     try:
                         u8_text = text.decode(encoding).encode("utf-8")
@@ -369,7 +358,7 @@ class Metafile(dict):
 
         return bad_encodings, bad_fields
 
-    def assign_fields(meta: Dict, assignments: List[str]) -> Dict:
+    def assign_fields(self, assignments: List[str]) -> None:
         """Takes a list of C{key=value} strings and assigns them to the
         given metafile. If you want to set nested keys (e.g. "info.source"),
         you have to use a dot as a separator. For exotic keys *containing*
@@ -391,7 +380,7 @@ class Metafile(dict):
                     val = int(val, 10)
 
                 # TODO: Allow numerical indices, and "+" for append
-                namespace = meta
+                namespace = dict(self)
                 keypath = [
                     i.replace("\0", ".") for i in field.replace("..", "\0").split(".")
                 ]
@@ -407,8 +396,6 @@ class Metafile(dict):
                     del namespace[keypath[-1]]
                 else:
                     namespace[keypath[-1]] = val
-
-        return meta
 
     def add_fast_resume(self, datapath: Path) -> None:
         """Add fast resume data to a metafile dict."""
@@ -532,7 +519,7 @@ class Metafile(dict):
                     del self["info"][key]
                     modified.add("info." + key)
 
-            for idx, entry in enumerate(self["info"].get("files", [])):
+            for entry in list(self["info"].get("files", [])):
                 for key in list(entry.keys()):
                     if ["info", "files", key] not in METAFILE_STD_KEYS:
                         del entry[key]
@@ -592,35 +579,43 @@ class Metafile(dict):
     def hash_check(self, datapath: Path, progress=None) -> bool:
         """Check piece hashes of a metafile against the given datapath."""
 
-        def check_piece(filename, piece):
-            "Callback for new piece"
-            if (
-                piece
-                != metainfo["info"]["pieces"][
-                    check_piece.piece_index : check_piece.piece_index + 20
-                ]
-            ):
-                self.LOG.warning(
-                    "Piece #%d: Hashes differ in file %r",
-                    check_piece.piece_index // 20,
-                    filename,
-                )
-            check_piece.piece_index += 20
+        class PieceChecker:
+            """Holds some state to display nice error messages
+            if pieces fail to hash check"""
 
-        check_piece.piece_index = 0
+            def __init__(self, meta, logger):
+                self.piece_index = 0
+                self.meta = meta
+                self.log = logger
 
+            def check_piece(self, filename, piece):
+                "Callback for new piece"
+                if (
+                    piece
+                    != self.meta["info"]["pieces"][
+                        self.piece_index : self.piece_index + 20
+                    ]
+                ):
+                    self.log.warning(
+                        "Piece #%d: Hashes differ in file %r",
+                        self.piece_index // 20,
+                        filename,
+                    )
+                self.piece_index += 20
+
+        p = PieceChecker(dict(self), self.log)
+
+        if "length" in self["info"]:
+            files = [datapath]
+        else:
+            files = [Path(datapath, i["path"]) for i in self["info"]["files"]]
         datameta, _ = self._make_info(
-            int(metainfo["info"]["piece length"]),
-            progress,
-            [datapath]
-            if "length" in metainfo["info"]
-            else (
-                os.path.join(*([datapath] + i["path"]))
-                for i in metainfo["info"]["files"]
-            ),
-            piece_callback=check_piece,
+            files,
+            int(self["info"]["piece length"]),
+            progress_callback=progress,
+            piece_callback=p.check_piece,
         )
-        return datameta["pieces"] == metainfo["info"]["pieces"]
+        return bool(datameta["pieces"] == self["info"]["pieces"])
 
     def listing(self, masked=True):
         """List torrent info & contents in human-readable format. Returns a list of formatted lines."""

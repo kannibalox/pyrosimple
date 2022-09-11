@@ -102,20 +102,22 @@ class MetafileLister(ScriptBase):
                             for field in flist.split(","):
                                 yield field.strip()
 
+                    data = {}
                     data["__file__"] = filename
-                    if "info" in data:
+                    if "info" in torrent:
                         data["__hash__"] = torrent.info_hash()
                         data["__size__"] = torrent.data_size()
                     values = []
                     for field in splitter(self.options.output):
                         try:
-                            val = data
-                            for key in field.split("."):
-                                val = val[key]
-                        except KeyError as exc:
-                            self.LOG.error(
-                                "%s: Field %r not found (%s)", filename, field, exc
-                            )
+                            if field in data:
+                                val = data[field]
+                            else:
+                                val = dict(torrent)
+                                for key in field.split("."):
+                                    val = val[key]
+                        except KeyError:
+                            self.LOG.error("%s: Field %r not found", filename, field)
                             break
                         else:
                             values.append(str(val))

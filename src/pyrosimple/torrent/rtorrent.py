@@ -22,7 +22,7 @@ import jinja2
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
+from pyrosimple.util import fmt, matching, pymagic, rpc, traits
 from pyrosimple.util.cache import ExpiringCache
 from pyrosimple.util.parts import Bunch
 
@@ -474,7 +474,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
         )
         try:
-            metafile.add_fast_resume(torrent, proxy.d.directory_base(self.hash))
+            torrent.add_fast_resume(proxy.d.directory_base(self.hash))
         except (FileNotFoundError, OSError) as e:
             self._engine.LOG.error("Could not add fast resume data: %s", e)
         # Do some basic escaping, nothing else should be necessary.
