@@ -28,6 +28,21 @@ settings = Dynaconf(
         Validator("CONFIG_PY", default="~/.config/pyrosimple/config.py"),
         Validator("SORT_FIELDS", default="name,hash"),
         Validator("FAST_QUERY", gte=0, lte=2, default=0),
+        Validator(
+            "MKTOR_IGNORE",
+            default=[
+                "core",
+                "CVS",
+                ".*",
+                "*~",
+                "*.swp",
+                "*.tmp",
+                "*.bak",
+                "[Tt]humbs.db",
+                "[Dd]esktop.ini",
+                "ehthumbs_vista.db",
+            ],
+        ),
         Validator("SCGI_URL", default=""),
         # TOML sections
         Validator("ALIASES", default={}),

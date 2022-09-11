@@ -147,20 +147,6 @@ def mask_keys(announce_url: str) -> str:
 class Metafile(dict):
     """A torrent metafile, representing structure and operations for a .torrent file."""
 
-    # Patterns of names to ignore
-    IGNORE_GLOB = [
-        "core",
-        "CVS",
-        ".*",
-        "*~",
-        "*.swp",
-        "*.tmp",
-        "*.bak",
-        "[Tt]humbs.db",
-        "[Dd]esktop.ini",
-        "ehthumbs_vista.db",
-    ]
-
     @staticmethod
     def from_file(filename: Path):
         """Load a metafile directly from a file."""
@@ -180,9 +166,7 @@ class Metafile(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log = pymagic.get_class_logger(self)
-        self.ignore = [
-            re.compile(fnmatch.translate(glob)) for glob in Metafile.IGNORE_GLOB
-        ]
+        self.ignore = []
 
     def check_info(self) -> None:
         """Validate info dict.

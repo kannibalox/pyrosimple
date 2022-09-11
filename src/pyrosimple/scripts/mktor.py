@@ -177,7 +177,8 @@ class MetafileCreator(ScriptBase):
             private=self.options.private,
             created_by="PyroSimple",
             ignore=[
-                re.compile(fnmatch.translate(glob)) for glob in self.options.exclude
+                re.compile(fnmatch.translate(glob))
+                for glob in self.options.exclude + config.settings.MKTOR_IGNORE
             ],
         )
         torrent["created by"] = "PyroSimple"
