@@ -214,8 +214,6 @@ class MetafileChanger(ScriptBase):
             try:
                 # Read and remember current content
                 torrent = metafile.Metafile.from_file(Path(filename))
-                metainfo = dict(torrent)
-                old_metainfo = dict(torrent)
             except (OSError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.LOG.warning(
                     "Skipping bad metafile %r (%s: %s)",
@@ -238,7 +236,7 @@ class MetafileChanger(ScriptBase):
                         continue
 
                 # Skip any metafiles that don't meet the pre-conditions
-                if filter_url_prefix and not metainfo["announce"].startswith(
+                if filter_url_prefix and not torrent["announce"].startswith(
                     filter_url_prefix
                 ):
                     self.LOG.warning(
@@ -250,25 +248,25 @@ class MetafileChanger(ScriptBase):
 
                 # Keep resume info safe
                 libtorrent_resume = {}
-                if "libtorrent_resume" in metainfo:
+                if "libtorrent_resume" in torrent:
                     try:
-                        libtorrent_resume["bitfield"] = metainfo["libtorrent_resume"][
+                        libtorrent_resume["bitfield"] = torrent["libtorrent_resume"][
                             "bitfield"
                         ]
                     except KeyError:
                         pass  # nothing to remember
 
                     libtorrent_resume["files"] = copy.deepcopy(
-                        metainfo["libtorrent_resume"]["files"]
+                        torrent["libtorrent_resume"]["files"]
                     )
 
                 # Change private flag?
-                if self.options.make_private and not metainfo["info"].get("private", 0):
+                if self.options.make_private and not torrent["info"].get("private", 0):
                     self.LOG.info("Setting private flag...")
-                    metainfo["info"]["private"] = 1
-                if self.options.make_public and metainfo["info"].get("private", 0):
+                    torrent["info"]["private"] = 1
+                if self.options.make_public and torrent["info"].get("private", 0):
                     self.LOG.info("Clearing private flag...")
-                    del metainfo["info"]["private"]
+                    del torrent["info"]["private"]
 
                 # Remove non-standard keys?
                 if (
@@ -276,43 +274,41 @@ class MetafileChanger(ScriptBase):
                     or self.options.clean_all
                     or self.options.clean_xseed
                 ):
-                    metafile.clean_meta(
-                        metainfo,
+                    torrent.clean_meta(
                         including_info=not self.options.clean,
-                        logger=self.LOG.info,
                     )
 
                 # Restore resume info?
                 if self.options.clean_xseed:
                     if libtorrent_resume:
                         self.LOG.info("Restoring key 'libtorrent_resume'...")
-                        metainfo.setdefault("libtorrent_resume", {})
-                        metainfo["libtorrent_resume"].update(libtorrent_resume)
+                        torrent.setdefault("libtorrent_resume", {})
+                        torrent["libtorrent_resume"].update(libtorrent_resume)
                     else:
                         self.LOG.warning("No resume information found!")
 
                 # Clean rTorrent data?
                 if self.options.clean_rtorrent:
                     for key in self.RT_RESUME_KEYS:
-                        if key in metainfo:
+                        if key in torrent:
                             self.LOG.info("Removing key %r...", key)
-                            del metainfo[key]
+                            del torrent[key]
 
                 # Change announce URL?
                 if self.options.reannounce:
-                    metainfo["announce"] = self.options.reannounce
-                    if "announce-list" in metainfo:
-                        del metainfo["announce-list"]
+                    torrent["announce"] = self.options.reannounce
+                    if "announce-list" in torrent:
+                        del torrent["announce-list"]
 
                     if not self.options.no_cross_seed:
                         # Enforce unique hash per tracker
-                        metainfo["info"]["x_cross_seed"] = hashlib.md5(
+                        torrent["info"]["x_cross_seed"] = hashlib.md5(
                             self.options.reannounce
                         ).hexdigest()
                 if self.options.no_ssl:
                     # We're assuming here the same (default) port is used
-                    metainfo["announce"] = (
-                        metainfo["announce"]
+                    torrent["announce"] = (
+                        torrent["announce"]
                         .replace("https://", "http://")
                         .replace(":443/", ":80/")
                     )
@@ -320,76 +316,71 @@ class MetafileChanger(ScriptBase):
                 # Change comment or creation date?
                 if self.options.comment is not None:
                     if self.options.comment:
-                        metainfo["comment"] = self.options.comment
-                    elif "comment" in metainfo:
-                        del metainfo["comment"]
+                        torrent["comment"] = self.options.comment
+                    elif "comment" in torrent:
+                        del torrent["comment"]
                 if self.options.bump_date:
-                    metainfo["creation date"] = int(time.time())
-                if self.options.no_date and "creation date" in metainfo:
-                    del metainfo["creation date"]
+                    torrent["creation date"] = int(time.time())
+                if self.options.no_date and "creation date" in torrent:
+                    del torrent["creation date"]
 
                 # Add fast-resume data?
                 if self.options.hashed:
                     datadir = self.options.hashed
                     if "{}" in datadir and not os.path.exists(datadir):
-                        datadir = datadir.replace("{}", metainfo["info"]["name"])
+                        datadir = datadir.replace("{}", torrent["info"]["name"])
                     try:
-                        metafile.add_fast_resume(metainfo, datadir)
+                        torrent.add_fast_resume(datadir)
                     except OSError as exc:
                         self.fatal("Error making fast-resume data (%s)", exc)
                         raise
 
                 # Set specific keys?
                 torrent.assign_fields(self.options.set)
-                replace_fields(metainfo, self.options.regex)
+                replace_fields(torrent, self.options.regex)
 
                 # Write new metafile, if changed
-                new_metainfo = bencode.bencode(metainfo)
-                if new_metainfo != old_metainfo:
-                    if self.options.output_directory:
-                        filename = os.path.join(
-                            self.options.output_directory, os.path.basename(filename)
-                        )
-                        self.LOG.info("Will write %r...", filename)
 
-                        if not self.options.dry_run:
-                            with open(filename, "wb") as fh:
-                                fh.write(bencode.bencode(metainfo))
-                            if "libtorrent_resume" in metainfo:
-                                # Also write clean version
-                                filename = filename.replace(
-                                    ".torrent", "-no-resume.torrent"
-                                )
-                                del metainfo["libtorrent_resume"]
-                                self.LOG.info("Writing %r...", filename)
-                                bencode.bwrite(metainfo, filename)
-                    else:
-                        self.LOG.info("Changing %r...", filename)
+                if self.options.output_directory:
+                    filename = os.path.join(
+                        self.options.output_directory, os.path.basename(filename)
+                    )
+                    self.LOG.info("Will write %r...", filename)
 
-                        if not self.options.dry_run:
-                            # Write to temporary file
-                            tempname = os.path.join(
-                                os.path.dirname(filename),
-                                "." + os.path.basename(filename),
+                    if not self.options.dry_run:
+                        with open(filename, "wb") as fh:
+                            fh.write(bencode.bencode(torrent))
+                        if "libtorrent_resume" in torrent:
+                            # Also write clean version
+                            filename = filename.replace(
+                                ".torrent", "-no-resume.torrent"
                             )
-                            self.LOG.debug("Writing %r...", tempname)
-                            bencode.bwrite(metainfo, tempname)
+                            del torrent["libtorrent_resume"]
+                            self.LOG.info("Writing '%s'...", filename)
+                            bencode.bwrite(torrent, filename)
+                else:
+                    self.LOG.info("Changing %r...", filename)
 
-                            # Replace existing file
-                            if os.name != "posix":
-                                # cannot rename to existing target on WIN32
-                                os.remove(filename)
+                    if not self.options.dry_run:
+                        # Write to temporary file
+                        tempname = os.path.join(
+                            os.path.dirname(filename),
+                            "." + os.path.basename(filename),
+                        )
+                        self.LOG.debug("Writing temporary file '%s'...", tempname)
+                        torrent.save(Path(tempname))
 
-                            try:
-                                os.rename(tempname, filename)
-                            except OSError as exc:
-                                # TODO: Try to write directly, keeping a backup!
-                                raise error.LoggableError(
-                                    "Can't rename tempfile %r to %r (%s)"
-                                    % (tempname, filename, exc)
-                                )
+                        try:
+                            self.LOG.debug("Replacing file '%s'...", filename)
+                            os.replace(tempname, filename)
+                        except OSError as exc:
+                            # TODO: Try to write directly, keeping a backup!
+                            raise error.LoggableError(
+                                "Can't rename tempfile %r to %r (%s)"
+                                % (tempname, filename, exc)
+                            )
 
-                    changed += 1
+                changed += 1
 
         # Print summary
         if changed:
