@@ -51,7 +51,7 @@ BYTE_FORMATTER = [
     formatters.Text(" "),
     ByteProgress(),
     formatters.Text(" "),
-    formatters.Text("eta [", style="class:time-left"),
+    formatters.Text("ETA [", style="class:time-left"),
     formatters.TimeLeft(),
     formatters.Text("]", style="class:time-left"),
     formatters.Text(" "),
