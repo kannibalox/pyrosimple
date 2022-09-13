@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyrosimple"
-version = "2.0.0rc4"
+version = "2.0.0"
 description = ""
 authors = ["kannibalox <kannibalox@gmail.com>"]
 repository = "https://github.com/kannibalox/pyrosimple"
@@ -8,7 +8,7 @@ documentation = "https://kannibalox.github.io/pyrosimple/"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 classifiers = [
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Natural Language :: English",
