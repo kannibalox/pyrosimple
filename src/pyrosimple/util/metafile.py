@@ -465,6 +465,7 @@ class Metafile(dict):
                 )
             )
             offset += fileinfo["length"]
+        self["libtorrent_resume"] = resume
 
     def data_size(self) -> int:
         """Calculate the size of a torrent based on parsed metadata."""
