@@ -933,8 +933,6 @@ def validate_field_list(
     @return: validated field names.
     @rtype: list
     """
-    formats = [i[4:] for i in globals() if i.startswith("fmt_")]
-
     try:
         split_fields = [i.strip() for i in fields.split(",")]
     except AttributeError:
@@ -946,7 +944,7 @@ def validate_field_list(
             fullname = name
             name, fmtspecs = name.split(".", 1)
             for fmtspec in fmtspecs.split("."):
-                if fmtspec not in formats and fmtspec != "raw":
+                if fmtspec not in env.filters.keys() and fmtspec != "raw":
                     raise error.UserError(
                         f"Unknown format specification {fmtspec!r} in {fullname!r}"
                     )
