@@ -2,7 +2,7 @@
 
 ## [2.0.2] - 2022-09-14
 
-## Fixed
+### Fixed
 
 - Validate simple output formatters against all jinja2 filters
 
