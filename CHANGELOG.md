@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.2] - 2022-09-14
+
+## Fixed
+
+- Validate simple output formatters against all jinja2 filters
+
 ## [2.0.0] - 2022-09-13
 
 This release marks the break between pyrocore-compatible code and new pyrosimple code/behavior. The changes are too numerous
