@@ -12,17 +12,16 @@ from xmlrpc import client as xmlrpclib
 
 import requests
 
-from prometheus_client import Counter
+from prometheus_client import Counter, Summary
 
 
 request_counter = Counter(
-    "transport_request", "Number of requests made by the transport", ["transport"]
+    "transport_request", "Number of requests made by the transport"
 )
-request_size_counter = Counter(
-    "transport_request_size", "Size of the request in bytes", ["transport"]
-)
+request_size_counter = Counter("transport_request_size", "Size of the request in bytes")
+response_time_summary = Summary("response_time", "Time spent watiing for a response")
 response_size_counter = Counter(
-    "transport_response_size", "Size of the response in bytes", ["transport"]
+    "transport_response_size", "Size of the response in bytes"
 )
 
 logger = logging.getLogger(__name__)
@@ -67,29 +66,37 @@ class SSHTransport(RTorrentTransport):
     label = "ssh"
 
     def request(self, host, handler, request_body, verbose=False):
-        request_counter.labels(transport=self.label).inc()
+        request_counter.inc()
+        request_size_counter.inc(len(request_body))
         self.verbose = verbose
         target = urlparse.urlparse(self.url).path
         cmd = ["ssh", host, "socat", "STDIO", target[1:]]
-        resp = subprocess.run(
-            cmd,
-            input=_encode_payload(request_body, self._headers),
-            capture_output=True,
-            check=False,
-        )
+        with response_time_summary.time():
+            resp = subprocess.run(
+                cmd,
+                input=_encode_payload(request_body, self._headers),
+                capture_output=True,
+                check=False,
+            )
         if resp.returncode > 0:
             print("SSH command returned non-zero exit code")
             print("stderr:", resp.stderr)
             print("stdout:", resp.stdout)
+        response_size_counter.inc(len(resp.stdout))
         return self.parse_response(io.BytesIO(_parse_response(resp.stdout)[0]))
 
 
 class HTTPTransport(RTorrentTransport):
     """Transport via HTTP(s) call."""
 
+    # Notably the request here is *not* encoded into SCGI
+    # since the web proxy handles that itself.
     def request(self, host, handler, request_body, verbose=False):
-        request_counter.labels(transport="http").inc()
-        req = requests.post(self.url, headers=self._headers, data=request_body)
+        request_counter.inc()
+        request_size_counter.inc(len(request_body))
+        with response_time_summary.time():
+            req = requests.post(self.url, headers=self._headers, data=request_body)
+        response_size_counter.inc(len(req.content))
         req.raise_for_status()
         return self.parse_response(io.BytesIO(req.content))
 
@@ -97,37 +104,40 @@ class HTTPTransport(RTorrentTransport):
 class TCPTransport(RTorrentTransport):
     """Transport via TCP socket."""
 
-    label = "tcp"
+    name = "tcp"
 
     def request(self, host, handler, request_body, verbose=False):
-        request_counter.labels(transport=self.label).inc()
-        request_size_counter.labels(transport="tcp").inc(len(request_body))
+        request_counter.inc()
+        request_size_counter.inc(len(request_body))
         self.verbose = verbose
         target = urlparse.urlparse(self.url)
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            host, port = target.netloc.split(":")
-            sock.connect((host, int(port)))
-            sock.sendall(_encode_payload(request_body, self._headers))
-            with sock.makefile("rb") as handle:
-                response = _parse_response(handle.read())[0]
-                response_size_counter.labels(transport="tcp").inc(len(response))
-                return self.parse_response(io.BytesIO(response))
+        with response_time_summary.time():
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                host, port = target.netloc.split(":")
+                sock.connect((host, int(port)))
+                sock.sendall(_encode_payload(request_body, self._headers))
+                with sock.makefile("rb") as handle:
+                    response = _parse_response(handle.read())[0]
+        response_size_counter.inc(len(response))
+        return self.parse_response(io.BytesIO(response))
 
 
 class UnixTransport(RTorrentTransport):
     """Transport via UNIX domain socket."""
 
     def request(self, _host, handler, request_body, verbose=False):
-        request_counter.labels(transport="unix").inc()
+        request_counter.inc()
+        request_size_counter.inc(len(request_body))
         self.verbose = verbose
         target = urlparse.urlparse(self.url).path
-        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
-            sock.connect(target)
-            sock.sendall(_encode_payload(request_body))
-            with sock.makefile("b") as handle:
-                return self.parse_response(
-                    io.BytesIO(_parse_response(handle.read())[0])
-                )
+        with response_time_summary.time():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.connect(target)
+                sock.sendall(_encode_payload(request_body))
+                with sock.makefile("b") as handle:
+                    response = _parse_response(handle.read())[0]
+        response_size_counter.inc(len(response))
+        return self.parse_response(io.BytesIO(response))
 
 
 TRANSPORTS = {

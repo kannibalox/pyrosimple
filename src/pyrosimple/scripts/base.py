@@ -14,9 +14,9 @@ import traceback
 from argparse import ArgumentParser
 from typing import Iterator, List
 
-from pyrosimple import config, error
+from pyrosimple import config, error, io
 from pyrosimple.torrent import rtorrent
-from pyrosimple.util import pymagic
+from pyrosimple.util import fmt, pymagic
 
 
 class ScriptBase:
@@ -211,6 +211,17 @@ class ScriptBase:
     def mainloop(self):
         """The main loop."""
         raise NotImplementedError()
+
+    # pylint: disable=no-self-use
+    def rpc_stats(self) -> str:
+        """Return a string with RPC statistics"""
+        req_num = int(io.scgi.request_counter._value.get())
+        req_sz = fmt.human_size(io.scgi.request_size_counter._value.get())
+        req_time = round(
+            list(io.scgi.response_time_summary._child_samples())[1].value, 3
+        )
+        resp_sz = fmt.human_size(io.scgi.response_size_counter._value.get())
+        return f"{req_num} requests ({req_sz}) in {req_time}s (repsonse {resp_sz})"
 
 
 class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method

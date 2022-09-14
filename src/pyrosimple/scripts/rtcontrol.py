@@ -888,7 +888,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     view.size(),
                 )
 
-            self.LOG.debug("RPC stats: %s", r_engine.rpc)
+            self.LOG.debug("RPC stats: %s", self.rpc_stats())
         dcontext.close()
 
 

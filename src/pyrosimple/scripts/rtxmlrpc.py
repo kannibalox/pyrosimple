@@ -235,7 +235,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             self.do_command()
 
         # RPC stats
-        self.LOG.debug("RPC stats: %s", self.open())
+        self.LOG.debug("RPC stats: %s", self.rpc_stats())
 
 
 def run():  # pragma: no cover
