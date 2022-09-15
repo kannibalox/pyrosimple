@@ -58,9 +58,9 @@ def print_help_fields():
 def print_help_filters():
     """Print help about template filters."""
     print("")
-    print("In addition to the filters below, jinja2 has some filters")
+    print("In addition to the filters below, jinja2 has some filters built-in:")
     print(
-        "built-in: https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-builtin-filters"
+        "  https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-builtin-filters"
     )
     print("pyrosimple-specific filters:")
     for name, method in fmt.__dict__.items():
