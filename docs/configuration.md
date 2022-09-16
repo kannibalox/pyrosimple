@@ -54,6 +54,18 @@ Defaults to `name,hash`.
 
 Sets the default sort order for output in `rtcontrol`.
 
+#### `mktor_ignore`
+
+Defaults to `["core", "CVS", ".*", "*~", "*.swp", "*.tmp", "*.bak", "[Tt]humbs.db", "[Dd]esktop.ini", "ehthumbs_vista.db"]`
+
+This allows overriding the list of temporary/hidden files `mktor` will ignore when creating torrents.
+
+#### `fast_query`
+
+Defaults to `0` (disabled).
+
+See [query optimization](experimental.md#query-optimization) for more information.
+
 ### TORQUE
 
 This section is reserved for `pyrotorque`. See its [user guide](/usage-pyrotorque/) for more information.
