@@ -178,7 +178,7 @@ class MetafileHandler:
                 f"Loading {self.pathname} with commands {self.ns['commands']}"
             )
 
-            load_cmd(rpc.NOHASH, self.pathname, *tuple(self.ns["commands"]))
+            load_cmd(rpc.NOHASH, str(self.pathname), *tuple(self.ns["commands"]))
             time.sleep(0.05)  # let things settle
 
             # Announce new item
