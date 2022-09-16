@@ -10,6 +10,7 @@ import os
 import time
 
 from pathlib import Path
+from typing import Any, Dict
 
 from pyrosimple import config as configuration
 from pyrosimple import error
@@ -28,112 +29,115 @@ except ImportError:
 class MetafileHandler:
     """Handler for loading metafiles into rTorrent."""
 
-    def __init__(self, job, pathname):
+    def __init__(self, job, pathname: str):
         """Create a metafile handler."""
+        self.metadata: metafile.Metafile
         self.job = job
-        self.metadata = None
-        self.ns = Bunch(
-            pathname=os.path.abspath(pathname),
-            info_hash=None,
-            tracker_alias=None,
-        )
+        self.pathname = Path(pathname).resolve()
+        self.ns: Dict[str, Any] = {
+            "pathname": os.path.abspath(pathname),
+            "info_hash": None,
+            "tracker_alias": None,
+        }
 
     def parse(self) -> bool:
         """Parse metafile and check pre-conditions."""
         try:
-            if not os.path.getsize(self.ns.pathname):
+            if not os.path.getsize(self.pathname):
                 # Ignore 0-byte dummy files (Firefox creates these while downloading)
-                self.job.LOG.warning("Ignoring 0-byte metafile '%s'", self.ns.pathname)
+                self.job.LOG.warning("Ignoring 0-byte metafile '%s'", self.pathname)
                 return False
 
-            self.metadata = metafile.Metafile.from_file(self.ns.pathname)
+            self.metadata = metafile.Metafile.from_file(self.pathname)
             self.metadata.check_meta()
         except OSError as exc:
             self.job.LOG.error(
                 "Can't read metafile '%s' (%s)",
-                self.ns.pathname,
-                str(exc).replace(f": '{self.ns.pathname}'", ""),
+                self.pathname,
+                str(exc).replace(f": '{self.pathname}'", ""),
             )
             return False
         except ValueError as exc:
-            self.job.LOG.error("Invalid metafile '%s': %s", self.ns.pathname, exc)
+            self.job.LOG.error("Invalid metafile '%s': %s", self.pathname, exc)
             return False
 
-        self.ns.info_hash = self.metadata.info_hash()
-        self.ns.info_name = self.metadata["info"]["name"]
+        self.ns["info_hash"] = self.metadata.info_hash()
+        self.ns["info_name"] = self.metadata["info"]["name"]
         self.job.LOG.info(
-            "Loaded '%s' from metafile '%s'", self.ns.info_name, self.ns.pathname
+            "Loaded '%s' from metafile '%s'", self.metadata.info_hash(), self.pathname
         )
 
         # Check whether item is already loaded
         try:
-            name = self.job.proxy.d.name(self.ns.info_hash)
+            name = self.job.proxy.d.name(self.metadata.info_hash())
         except rpc.HashNotFound:
             pass
         except rpc.RpcError as exc:
             if exc.faultString != "Could not find info-hash.":
-                self.job.LOG.error("While checking for #%s: %s", self.ns.info_hash, exc)
+                self.job.LOG.error(
+                    "While checking for #%s: %s", self.metadata.info_hash(), exc
+                )
                 return False
         else:
             self.job.LOG.warn(
-                "Item #%s '%s' already added to client", self.ns.info_hash, name
+                "Item #%s '%s' already added to client", self.metadata.info_hash(), name
             )
             if (
                 self.job.config.get("remove_already_added", False)
                 and not self.job.config["dry_run"]
             ):
-                Path(self.ns.pathname).unlink()
+                Path(self.pathname).unlink()
             return False
 
         return True
 
-    def addinfo(self):
+    def addinfo(self) -> None:
         """Add known facts to templating namespace."""
         # Basic values
-        self.ns.watch_path = self.job.config["path"]
-        self.ns.relpath = None
+        self.ns["watch_path"] = self.job.config["path"]
+        self.ns["relpath"] = None
         for watch in self.job.config["path"]:
-            path = Path(self.ns.pathname)
+            path = Path(self.pathname)
             try:
-                self.ns.relpath = path.relative_to(watch)
+                self.ns["relpath"] = path.relative_to(watch)
                 break
             except ValueError:
                 pass
 
         # Build indicator flags for target state from filename
-        flags = self.ns.pathname.split(os.sep)
+        flags = str(self.pathname).split(os.sep)
         flags.extend(flags[-1].split("."))
-        self.ns.flags = {i for i in flags if i}
+        self.ns["flags"] = {i for i in flags if i}
 
         # Metafile stuff
         announce = self.metadata.get("announce", None)
         if announce:
-            self.ns.tracker_alias = configuration.map_announce2alias(announce)
+            self.ns["tracker_alias"] = configuration.map_announce2alias(announce)
 
-        main_file = self.ns.info_name
+        main_file = self.ns["info_name"]
         if "files" in self.metadata["info"]:
             main_file = list(
                 sorted(
                     (i["length"], i["path"][-1]) for i in self.metadata["info"]["files"]
                 )
             )[-1][1]
-        self.ns.filetype = os.path.splitext(main_file)[1]
+        self.ns["filetype"] = os.path.splitext(main_file)[1]
 
         # Finally, expand commands from templates
-        self.ns.commands = []
+        self.ns["commands"] = []
         for key, cmd in sorted(self.job.custom_cmds.items()):
             try:
                 template = rtorrent.env.from_string(cmd)
                 for split_cmd in rtorrent.format_item(
                     template, {}, defaults=self.ns
                 ).split():
-                    self.ns.commands.append(split_cmd.strip())
+                    self.ns["commands"].append(split_cmd.strip())
             except error.LoggableError as exc:
                 self.job.LOG.error(f"While expanding '{key}' custom command: {exc}")
 
-    def load(self):
+    def load(self) -> None:
         """Load metafile into client."""
-        if not self.ns.info_hash and not self.parse():
+        if not self.metadata.info_hash() and not self.parse():
             return
 
         self.addinfo()
@@ -147,9 +151,9 @@ class MetafileHandler:
                 "started",
             )
 
-            if "start" in self.ns.flags:
+            if "start" in self.ns["flags"]:
                 start_it = True
-            elif "load" in self.ns.flags:
+            elif "load" in self.ns["flags"]:
                 start_it = False
 
             # Load metafile into client
@@ -166,27 +170,27 @@ class MetafileHandler:
 
             if self.job.config["dry_run"]:
                 self.job.LOG.info(
-                    f"Would load: {self.ns.pathname} with commands {self.ns.commands}"
+                    f"Would load: {self.pathname} with commands {self.ns['commands']}"
                 )
                 return
 
             self.job.LOG.debug(
-                f"Loading {self.ns.pathname} with commands {self.ns.commands}"
+                f"Loading {self.pathname} with commands {self.ns['commands']}"
             )
 
-            load_cmd(rpc.NOHASH, self.ns.pathname, *tuple(self.ns.commands))
+            load_cmd(rpc.NOHASH, self.pathname, *tuple(self.ns["commands"]))
             time.sleep(0.05)  # let things settle
 
             # Announce new item
             if self.job.config["print_to_client"]:
                 try:
-                    name = self.job.proxy.d.name(self.ns.info_hash)
+                    name = self.job.proxy.d.name(self.metadata.info_hash())
                 except rpc.HashNotFound:
                     name = "NOHASH"
                 msg = "{}: Loaded '{}' from '{}/' {}".format(
                     self.job.__class__.__name__,
                     name,
-                    os.path.dirname(self.ns.pathname).rstrip(os.sep),
+                    os.path.dirname(self.pathname).rstrip(os.sep),
                     "[started]" if start_it else "[normal]",
                 )
                 self.job.proxy.log(rpc.NOHASH, msg)
@@ -200,7 +204,7 @@ class MetafileHandler:
             #   and add traits to the flags, too, in that case
 
         except rpc.ERRORS as exc:
-            self.job.LOG.error("While loading #%s: %s", self.ns.info_hash, exc)
+            self.job.LOG.error("While loading #%s: %s", self.metadata.info_hash(), exc)
 
     def handle(self):
         """Handle metafile."""
