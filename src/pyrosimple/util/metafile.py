@@ -69,9 +69,11 @@ METAFILE_STD_KEYS = [
     )
 ]
 
-
+# PieceLogger and PieceFailer are both utility classes for passing into
+# Metafile.make_info()'s piece_callback.
+# Example usage:
 class PieceLogger:
-    """Holds some state to display nice error messages
+    """Holds some state to display useful error messages
     if pieces fail to hash check"""
 
     def __init__(self, meta, logger):
@@ -93,14 +95,8 @@ class PieceLogger:
         self.piece_index += 20
 
 
-class PieceFailer:
+class PieceFailer(PieceLogger):
     """Raises an OSError if any pieces don't match"""
-
-    def __init__(self, meta, logger):
-        self.piece_index = 0
-        self.meta = meta
-        self.log = logger
-
     def check_piece(self, filename, piece):
         "Callback for new piece"
         if (

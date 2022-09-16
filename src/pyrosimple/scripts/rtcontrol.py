@@ -160,7 +160,6 @@ class RtorrentInteractiveAction(RtorrentAction):
 
 
 class RtorrentControl(ScriptBaseWithConfig):
-    ### Keep things wrapped to fit under this comment... ##############################
     """
     Control and inspect rTorrent from the command line.
 
@@ -214,7 +213,6 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     # action options that perform some change on selected items
     ACTION_MODES = (
-        # TODO: Bunch(name="announce", options=("--announce",), help="announce right now", interactive=True),
         # TODO: --pause, --resume?
         # TODO: implement --clean-partial
         # self.add_bool_option("--clean-partial",

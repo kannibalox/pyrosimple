@@ -22,7 +22,7 @@ import jinja2
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, matching, pymagic, rpc, traits
+from pyrosimple.util import fmt, matching, pymagic, rpc, traits, metafile
 from pyrosimple.util.cache import ExpiringCache
 from pyrosimple.util.parts import Bunch
 
@@ -464,12 +464,14 @@ class RtorrentItem(engine.TorrentProxy):
             )
         # This might be brittle for systems that have a low network.xmlrpc.size_limit but large torrents.
         torrent_path = Path(proxy.session.path(), f"{self.hash}.torrent")
-        torrent = bencode.decode(
-            base64.b64decode(
-                proxy.execute.capture(
-                    rpc.NOHASH,
-                    "base64",
-                    str(torrent_path),
+        torrent = metafile.Metafile(
+            bencode.decode(
+                base64.b64decode(
+                    proxy.execute.capture(
+                        rpc.NOHASH,
+                        "base64",
+                        str(torrent_path),
+                    )
                 )
             )
         )
@@ -480,7 +482,7 @@ class RtorrentItem(engine.TorrentProxy):
         # Do some basic escaping, nothing else should be necessary.
         base_dir = proxy.d.directory_base(self.hash).replace('"', r"\"")
         extra_cmds.insert(0, f'd.directory_base.set="{base_dir}"')
-        rpc_metafile = xmlrpclib.Binary(bencode.bencode(torrent))
+        rpc_metafile = xmlrpclib.Binary(bencode.bencode(dict(torrent)))
         if not copy:
             proxy.d.stop(self.hash)
         self._engine.LOG.debug("Running extra commands on load: %s", extra_cmds)
