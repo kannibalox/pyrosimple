@@ -11,8 +11,8 @@ title: Experimental Features
     *rTorrent* must support the `d.multicall.filtered` method, which requires vanilla version 0.9.8+,
     or rTorrent-PS 1.1+.
 
-If your rTorent supports `d.multicall.filtered`, rtcontrol can take advantage of it to return results
-faster. The option is controlled by the `-Q` flag in rtcontorl, or `fast_query` in the configuration file.
+If your rTorrent supports `d.multicall.filtered`, rtcontrol can take advantage of it to return results
+faster. The option is controlled by the `-Q` flag in rtcontrol, or `fast_query` in the configuration file.
 
 Level 1 is less aggressive and safe by definition (i.e. produces correct results in all cases, unless there's a bug),
 while ``-Q2`` is highly experimental and in some circumstances likely produces results that are too small or empty.
@@ -82,7 +82,7 @@ rtxmlrpc -U scgi+ssh://example.com/UNIX-CONNECT:/home/rtorrent/scgi.sock system.
 Since each command opens a new SSH connection, setting up the ControlPersist feature in
 `~/.ssh/config` is highly recommended.
 
-Examples:
+Example:
 ```
 Host *
   ControlMaster auto

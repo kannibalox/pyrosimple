@@ -7,7 +7,7 @@ title: rtcontrol Usage
 `rtcontrol` is one of the most flexible tools in the pyrosimple arsenal,
 which also means it can become very complex very quickly.
 
-`rtcontrol` maps rtorrent attributres to fields, which are a python-oriented
+`rtcontrol` maps rTorrent attributres to fields, which are a python-oriented
 way to represent the attributes. You can see the list of supported fields
 by running `rtcontrol --help-fields`.
 
@@ -50,13 +50,13 @@ name=arch-* OR [ alias=Ubuntu loaded>1w ]
     actually used on the command line.
     
     ```
-    rtcontrol \! [ 'size>700m' 'size<=1400m' ]
+    rtcontrol 'size>700m' 'size<=1400m'
     ```
     
     Entire queries can also be quoted without any problems:
     
     ```
-    rtcontrol '! [ size>700m size<=1400m ]'
+    rtcontrol 'size>700m size<=1400m'
     ```
     
 
@@ -111,12 +111,12 @@ it's capable of .
 
 
 ```bash
-rtcontrol // -o '{{d.alias}}\t{{d.size|filesizeformat(binary=True)}}\t{{d.path|truncate(20)}}'
+rtcontrol // -o '{{d.alias}}\t{{d.size|filesizeformat(binary=True)}}\t{{d.path|truncate(40)}}'
 ```
 
 As your output templates get more complex, you can use the `TEMPLATES` section in the configuration to
 set predefined templates, rather than putting the whole string in the CLI every time. This is how the
-`default` and `action_default` templates are defined. See the [configuration file docs](configuration.md) for more info.
+`default` and `action_default` templates are defined. See the [configuration file](configuration.md) for more info.
 
 ## Actions
 
@@ -145,7 +145,7 @@ When multiple actions are specified, rtcontrol will apply those actions to each 
 * `rtcontrol -o size.sz // --summary`  
   Show the total size of all torrents.
 * `rtcontrol -o filelist path=/mnt/tmp/\*`  
-  List all files in rtorrent under a directory.
+  List all files in rTorrent under a directory.
 * `rtcontrol --start is_complete=yes is_active=no is_open=no`  
   Start all completed but inactive torrents.
 

@@ -8,7 +8,7 @@ The configuration file for pyrosimple is lives in `$HOME/.config/pyrosimple/conf
 never used TOML files before, it's worth taking a quick look at the [documentation](https://toml.io/),
 but basically each section starts with a `[SECTION_NAME]` followed by keys and values.
 
-Here is a basical example of what your file could look like:
+Here is a basic example of what your file could look like:
 ```toml
 rtorrent_rc = "~/.rtorrent.rc"
 fast_query = 0
@@ -121,10 +121,10 @@ remote_https = "https://example.com/RPC2"
 ```
 
 !!! Note
-    For HTTP connections, it's important to either explicitly provide the path (e.g. `https://example.com/RPC2`) or leave it off entirely
+    For HTTP(S) connections, it's important to either explicitly provide the path (e.g. `https://example.com/RPC2`) or leave it off entirely
     (e.g. `https://example.com`). `https://example.com/` will not work for most setups.
 
-Most of the CLI tools accept a `-U`/`--url` flag to provide the `scgi_url` directly when working with remote machines:
+`rtmlxrpc`, `rtcontrol` and `pyrotorque` accept a `-U`/`--url` flag to provide the `scgi_url` directly when working with remote machines:
 ```bash
 rtxmlrpc -U "~/rtorrent/.scgi_local" system.hostname
 ```

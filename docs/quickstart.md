@@ -33,13 +33,13 @@ command succeeds.
 
 ## Interacting with rTorrent
 
-As seen in the previous test, `rtxmlrpc` is a command for interacting
+Let's start with something simple: `rtxmlrpc` is a command for interacting
 with rTorrent's low-level API. Let's run some more commands to get an
 idea of what it can do. None of these commands will change anything,
 they'll just return information.
 
 ``` bash
-# Get rtorrent's version
+# Get rTorrent's version
 rtxmlrpc system.client_version
 # Get the current download rate (in bytes/sec)
 rtxmlrpc throttle.global_down.rate
@@ -87,16 +87,6 @@ rtcontrol // --start --dry-run
 rtcontrol xfer=+0 --custom test=hello --dry-run
 # Hash check all un-ignored completed torrents
 rtcontrol is_ignored=no is_complete=yes --hash-check --dry-run
-```
-
-Sometimes, though, we'd like to have something that runs continuously
-and changes rtorrents as it runs. The pyrosimple tool for that is
-`pyrotorque`. We won't be covering the full capabilities here, we'll
-just be running an example job that generates some statistics and then
-exits:
-
-```bash
-pyrotorque --run-once stats --debug --dry-run
 ```
 
 ## Working with torrents

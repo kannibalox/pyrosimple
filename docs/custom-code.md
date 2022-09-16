@@ -22,6 +22,7 @@ below examples). They're also listed when you call
 Here's an example of adding a simple custom field:
 
 ```python
+from pyrosimple.torrent import engine
 def _custom_fields():
     from pyrosimple.torrent import engine
     from pyrosimple.util import fmt, matching
@@ -30,21 +31,24 @@ def _custom_fields():
     # and accessed by performing a single RPC call.
     yield engine.ConstantField(
         int,
-        "piece_size",
-        "Piece size for the item",
-        matcher=matching.FloatFilter,
-        accessor=lambda o: o.rpc_call("d.size_chunks"),
+        "piece_size", # name of the field
+        "Piece size for the item", # The description for --help
+        matcher=matching.FloatFilter, # The type to use when matching the field
+        accessor=lambda o: o.rpc_call("d.size_chunks"), # How to actually access the method
+        requires=["d.size_chunks"], # Optional but speeds up the process
     )
-    
+
     # Insert any other custom fields here
 
 # Register our custom fields to the proxy
 for field in _custom_fields():
     engine.TorrentProxy.add_field(field)
 ```
+```bash
+rtcontrol // -o piece_size
+```
 
-You can see how the existing fields are defined in `torrent/engine.py` if
-you wish to see more complex examples of how to defined fields.
+You can see how the built-in fields are defined in [torrent/engine.py](https://github.com/kannibalox/pyrosimple/blob/main/src/pyrosimple/torrent/engine.py) if you want to see more complete examples.
 
 ### Examples
 
@@ -112,7 +116,7 @@ you wish to see more complex examples of how to defined fields.
 ## As a library
 
 The main interface has been designed to be deliberately simple if you wish to connect to rtorrent
-from with another Ptyhong program:
+from within another Python program:
 
 ```python
 import pyrosimple
@@ -120,7 +124,7 @@ engine = pyrosimple.connect()
 proxy = engine.open()
 ```
 
-With this simple setup, `engine` can provide the same kind of high-level views and abstractions
+With this setup, `engine` can provide the same kind of high-level views and abstractions
 seen in `rtcontrol`:
 
 ```python
@@ -135,7 +139,7 @@ print(proxy.system.hostname())
 print(proxy.d.multicall2('', 'main', 'd.hash='))
 ```
 
-If you want to ignore the auto-detection of the URL, simply pass in your own to `connect()`:
+If you want to skip the auto-detection of rtorrent's URL, simply pass in your own to `connect()`:
 
 ```python
 engine = pyrosimple.connect("scgi://localhost:9000")
