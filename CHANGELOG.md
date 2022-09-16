@@ -6,6 +6,10 @@
 
 - Report actual RPC stats in debug output
 
+### Changed
+
+- Unify `util.metafile` to perform most operations in a dict-like class
+
 ## [2.0.2] - 2022-09-14
 
 ### Fixed
