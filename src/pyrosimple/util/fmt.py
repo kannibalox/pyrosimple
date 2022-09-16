@@ -317,5 +317,7 @@ def rpc_result_to_string(result) -> str:
     if isinstance(result, bytes):
         return result.decode()
     if hasattr(result, "__iter__"):
-        return "\n".join(i if isinstance(i, str) else pformat(i) for i in result)
+        return "\n".join(
+            i if isinstance(i, str) else pformat(i, width=240) for i in result
+        )
     return repr(result)
