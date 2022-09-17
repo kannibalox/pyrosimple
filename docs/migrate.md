@@ -7,9 +7,17 @@ title: Migrating from pyroscope
 
 * The configuration file is located in a new location by default (`~/.config/pyrosimple/config.toml`), and uses a new format. Although the names have remained mostly the same, it is recommended to manually copy settings over to the new format.
 
-## Common CLI
+## Common CLI options
 
 * Logging has been overhauled. `--cron` is now an alias for `--quiet`. All logging goes to stderr.
+* `--config-dir` and `--config-file` have been removed. Set the `PYRO_CONF` environment variable use a non-default config file.
+* `-D` has been removed. Use an environment variable to override specific parts of the configuration instead.
+  ```
+  # Old
+  rtcontrol -D rtorrent_rc=/etc/rtorrent/rtorrent.rc //
+  # New
+  PYRO_RTORRENT_RC=/etc/rtorrent/rtorrent.rc rtcontrol //
+  ```
 
 ## `rtcontrol`
 

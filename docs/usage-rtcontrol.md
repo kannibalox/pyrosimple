@@ -7,7 +7,7 @@ title: rtcontrol Usage
 `rtcontrol` is one of the most flexible tools in the pyrosimple arsenal,
 which also means it can become very complex very quickly.
 
-`rtcontrol` maps rTorrent attributres to fields, which are a python-oriented
+`rtcontrol` maps rTorrent attributes to fields, which are a python-oriented
 way to represent the attributes. You can see the list of supported fields
 by running `rtcontrol --help-fields`.
 
@@ -81,7 +81,7 @@ Many fields allow for special parsing of the value to support more complicated f
     * An absolute timestamp in [epoch time](https://en.wikipedia.org/wiki/Unix_time) format.  
       Example: `1652289156`
 * tags (e.g. `tagged`, `views`)
-    * Tags are work similiarly to strings, but they do not support regexes, and use whitespace as delimiters. For example, if a torrent has the tags `active archive new`, the values `n*` and `archive` would both match.
+    * Tags are work similarly to strings, but they do not support regexes, and use whitespace as delimiters. For example, if a torrent has the tags `active archive new`, the values `n*` and `archive` would both match.
 
 ## Output
 
@@ -105,7 +105,7 @@ rtcontrol // -o alias,size.sz,path.pathbase
 #### Jinja2
 
 For more complex output, the [Jinja2](https://palletsprojects.com/p/jinja/) library can be used.
-It has support for much more complex formatting and logic than the simple CSV ouput. See the 
+It has support for much more complex formatting and logic than the simple CSV output. See the 
 [official Jinja2 documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/) for everything
 it's capable of .
 

@@ -12,7 +12,7 @@ will manage rTorrent according to user-defined rules.
 
 ```bash
 pip install pyrosimple
-# pip install --user 'pyrosimple[torque]' # Optional dependencies, for advanced features
+# pip install 'pyrosimple[torque]' # Optional dependencies, for advanced features
 ```
 
 ## Getting started

@@ -13,9 +13,10 @@ nav:
       - Configuration: configuration.md
       - Torque Jobs: pyrotorque-jobs.md
   - Advanced:
+      - rTorrent Setup: rtorrent-config.md
       - Experimental Features: experimental.md
       - Tips & Tricks: tips.md
-      - Migration: migrate.md
+      - Migrating from pyrocore: migrate.md
       - Custom Code: custom-code.md
 theme:
   name: material

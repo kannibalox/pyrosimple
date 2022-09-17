@@ -38,15 +38,17 @@ contain the most basic configuration settings for pyrosimple.
 
 Defaults to `~/.rtorrent.rc`.
 
-This tells pyrosimple where to look for the rtorrent config file. It's mainly
+This tells pyrosimple where to look for the rTorrent config file. It's mainly
 needed in order to automatically figure out where the SCGI port/file is listening,
 but may have other uses in the future.
 
 ####  `scgi_url`
 
-If you'd prefer to manually set the SCGI URL, you can use this value to do so. If it's
-unset, pyrosimple will use the `rtorrent_rc` settings to automatically figure it out,
-but will raise an error if it's unable to do so.
+Defaults to being unset.
+
+If you'd prefer to manually set the SCGI URL, you can use this value to do so. When unset,
+pyrosimple will use the `rtorrent_rc` settings to automatically figure it out,
+but will raise an error if it's unable to find any hints.
 
 #### `sort_fields`
 

@@ -8,7 +8,7 @@ respectively.
 
 ## lstor
 
-lstor is used for display information about torrents. Without any flags, it shows a human-friendly summary of the torrent:
+lstor is used for displaying information about torrents. Without any flags, it shows a human-friendly summary of the torrent:
 
 ```
 $ lstor ubuntu-22.04-desktop-amd64.iso.torrent 
@@ -55,23 +55,23 @@ $ lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw
 If you only need to extract a few fields, the `-o`/`--output` flag lets you specify 
 which fields to show:
 
-!!! note
-    `__size__` is a magic variable that tells `lstor` to sum the sizes of all files in the torrent. See `lstor --help`
-    for all the supported magic variables.
-
-
 ```
 $ lstor -o info.name,__size__ ubuntu-22.04-desktop-amd64.iso.torrent
 ubuntu-22.04-desktop-amd64.iso	3654957056
 ```
 
+!!! note
+    `__size__` is a magic variable that tells `lstor` to sum the sizes of all files in the torrent. See `lstor --help`
+    for all the supported magic variables.
+
+
 By default lstor will throw an error if the file isn't a valid .torrent file. However,
-if you wish to ignore those errors (to view an non-torrent bencode file, for instance),
+if you wish to ignore those errors (to view a rTorrent session file, for instance),
 the `--raw` flag can be combined with `-V`/`--skip-validation`.
 
 ## mktor
 
-At it's simplest, creating a torrent file requires only a path and an announce URL
+At its simplest, creating a torrent file requires only a path and an announce URL
 
 ```bash
 echo date > date.txt
@@ -84,10 +84,11 @@ If you have [aliases](/configuration#aliases) configured, you can use the alias 
 
 To avoid duplicating the same hash across private trackers,
 mktor has two mechanisms to add distinct data to the `info` dictionary:
-* `source` gets set to the tracker alias (if available), or the 2nd level domin if not available
+
+* `source` gets set to the tracker alias (if available), or the 2nd level domain if not available
 * `x_cross_seed` gets set to an MD5 hash of the URL
 
-If you don't want one or both of theses fields present, you can use the `-s`/`--set` flag
+If you don't want one or both of these fields present, you can use the `-s`/`--set` flag
 to have them removed:
 
 ```
