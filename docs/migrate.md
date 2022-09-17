@@ -18,7 +18,7 @@ title: Migrating from pyroscope
   `PYRO_CONF` environment variable use a non-default config file.
 * `-D` has been removed. Use an environment variable to override
   specific parts of the configuration instead.
-  ```
+  ```bash
   # Old
   rtcontrol -D rtorrent_rc=/etc/rtorrent/rtorrent.rc //
   # New

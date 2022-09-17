@@ -2,13 +2,15 @@
 title: rTorrent configuration
 ---
 
+# rTorrent configuration
+
 While no rTorrent configuration is strictly required, some fields will
 only work correctly with configuration, and commands can be assigned
 for easy access.
 
-# Fields
+## Fields
 
-## Timestamps
+### Timestamps
 These events record timestamps for `loaded`, `started`, and `completed`.
 ```toml
 method.insert = pyro._tm_started.now, simple|private,\
@@ -33,9 +35,9 @@ pyroadmin backfill --dry-run
 ```
 This is safe to run multiple times if needed.
 
-# UI
+## UI
 
-## Searching
+### Searching
 
 The following snippet allows for quick searching directly in the
 UI. The examples below can be modified to suit any searches you find

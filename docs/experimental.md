@@ -15,12 +15,12 @@ If your rTorrent supports `d.multicall.filtered`, rtcontrol can take
 advantage of it to return results faster. The option is controlled by
 the `-Q` flag in rtcontrol, or `fast_query` in the configuration file.
 
-Level 1 is less aggressive and safe by definition (i.e. produces
+Level `1` is less aggressive and safe by definition (i.e. produces
 correct results in all cases, unless there's a bug), while ``-Q2`` is
 highly experimental and in some circumstances likely produces results
 that are too small or empty.
 
-Optimization works by giving a *pre-filter* condition to *rTorrent*,
+Optimization works by giving a pre-filter condition to rTorrent,
 to reduce the overhead involved in sending items over XMLRPC and
 processing them, only to be then discarded in the ``rtcontrol`` filter
 machinery.
