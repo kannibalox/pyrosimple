@@ -4,9 +4,12 @@ title: Configuration
 
 # Configuration
 
-The configuration file for pyrosimple is lives in `$HOME/.config/pyrosimple/config.toml`. If you've
-never used TOML files before, it's worth taking a quick look at the [documentation](https://toml.io/),
-but basically each section starts with a `[SECTION_NAME]` followed by keys and values.
+The configuration file for pyrosimple is lives in
+`$HOME/.config/pyrosimple/config.toml`. If you've
+never used TOML files before, it's worth taking a quick look at the
+[documentation](https://toml.io/),
+but basically each section starts with a `[SECTION_NAME]` followed by
+keys and values.
 
 Here is a basic example of what your file could look like:
 ```toml
@@ -18,11 +21,13 @@ action = '{{now|iso}} {{action}}\t {{d.name}} {{d.alias}}'
 Ubuntu = ["ubuntu.com"]
 ```
 
-If you'd like to use a file other than the default, use the `PYRO_CONF` environment variable:
+If you'd like to use a file other than the default, use the
+`PYRO_CONF` environment variable:
 ```bash
 PYRO_CONF=/tmp/config.toml rtxmlrpc system.hostname
 ```
-Similar environment variables can be used to override individual parts of the configuration file:
+Similar environment variables can be used to override individual parts
+of the configuration file:
 ```bash
 PYRO_RTORRENT_RC=/etc/rtorrent/rtorrent.rc PYRO_FAST_QUERY=0 rtcontrol //
 ```
@@ -38,17 +43,18 @@ contain the most basic configuration settings for pyrosimple.
 
 Defaults to `~/.rtorrent.rc`.
 
-This tells pyrosimple where to look for the rTorrent config file. It's mainly
-needed in order to automatically figure out where the SCGI port/file is listening,
-but may have other uses in the future.
+This tells pyrosimple where to look for the rTorrent config file. It's
+mainly needed in order to automatically figure out where the SCGI
+port/file is listening, but may have other uses in the future.
 
 ####  `scgi_url`
 
 Defaults to being unset.
 
-If you'd prefer to manually set the SCGI URL, you can use this value to do so. When unset,
-pyrosimple will use the `rtorrent_rc` settings to automatically figure it out,
-but will raise an error if it's unable to find any hints.
+If you'd prefer to manually set the SCGI URL, you can use this value
+to do so. When unset, pyrosimple will use the `rtorrent_rc` settings
+to automatically figure it out, but will raise an error if it's unable
+to find any hints.
 
 #### `sort_fields`
 
@@ -60,7 +66,8 @@ Sets the default sort order for output in `rtcontrol`.
 
 Defaults to `["core", "CVS", ".*", "*~", "*.swp", "*.tmp", "*.bak", "[Tt]humbs.db", "[Dd]esktop.ini", "ehthumbs_vista.db"]`
 
-This allows overriding the list of temporary/hidden files `mktor` will ignore when creating torrents.
+This allows overriding the list of temporary/hidden files `mktor` will
+ignore when creating torrents.
 
 #### `fast_query`
 
@@ -70,7 +77,7 @@ See [query optimization](experimental.md#query-optimization) for more informatio
 
 ### TORQUE
 
-This section is reserved for `pyrotorque`. See its [user guide](/usage-pyrotorque/) for more information.
+This section is reserved for `pyrotorque`. See its [user guide](/usage-pyrotorque/) for more information. 
 
 ### FORMATS
 

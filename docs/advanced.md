@@ -3,9 +3,9 @@ title: Advanced Features
 ---
 
 !!! note
-    Using these features requires some knowledge in the area Linux, Bash,
-    and Python beyond a novice level, but they enable you to customize your
-    setup even further and handle very specific use-cases.
+    Using these features requires some knowledge in the area of Linux,
+    Bash, and Python, but they enable you to customize your setup even
+    further and handle very specific use-cases.
 
 # Advanced 'rtcontrol'
 
@@ -101,7 +101,7 @@ them manually by calling them on selected items. This calls
 in the last 10 minutes:
 
 ``` bash
-rtcontrol --exec ":event.download.finished=" 'loaded<10m' is_complete=y
+rtcontrol --exec "event.download.finished=" 'loaded<10m' is_complete=y
 ```
 
 The `:` prefix prevents `rtcontrol` from assuming this is a `d.` item

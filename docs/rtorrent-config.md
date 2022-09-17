@@ -2,7 +2,9 @@
 title: rTorrent configuration
 ---
 
-While no rTorrent configuration is strictly required, some fields will only work correctly with configuration, and commands can be assigned for easy access.
+While no rTorrent configuration is strictly required, some fields will
+only work correctly with configuration, and commands can be assigned
+for easy access.
 
 # Fields
 
@@ -35,7 +37,9 @@ This is safe to run multiple times if needed.
 
 ## Searching
 
-The following snippet allows for quick searching directly in the UI. The examples below can be modified to suit any searches you find yourself using often.
+The following snippet allows for quick searching directly in the
+UI. The examples below can be modified to suit any searches you find
+yourself using often.
 
 ```toml
 # VIEW: Use rtcontrol filter (^X s=KEYWORD, ^X t=TRACKER, ^X f="FILTER")

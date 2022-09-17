@@ -11,21 +11,26 @@ title: Experimental Features
     *rTorrent* must support the `d.multicall.filtered` method, which requires vanilla version 0.9.8+,
     or rTorrent-PS 1.1+.
 
-If your rTorrent supports `d.multicall.filtered`, rtcontrol can take advantage of it to return results
-faster. The option is controlled by the `-Q` flag in rtcontrol, or `fast_query` in the configuration file.
+If your rTorrent supports `d.multicall.filtered`, rtcontrol can take
+advantage of it to return results faster. The option is controlled by
+the `-Q` flag in rtcontrol, or `fast_query` in the configuration file.
 
-Level 1 is less aggressive and safe by definition (i.e. produces correct results in all cases, unless there's a bug),
-while ``-Q2`` is highly experimental and in some circumstances likely produces results that are too small or empty.
+Level 1 is less aggressive and safe by definition (i.e. produces
+correct results in all cases, unless there's a bug), while ``-Q2`` is
+highly experimental and in some circumstances likely produces results
+that are too small or empty.
 
-Optimization works by giving a *pre-filter* condition to *rTorrent*, to reduce the overhead involved in
-sending items over XMLRPC and processing them, only to be then discarded in the ``rtcontrol`` filter
+Optimization works by giving a *pre-filter* condition to *rTorrent*,
+to reduce the overhead involved in sending items over XMLRPC and
+processing them, only to be then discarded in the ``rtcontrol`` filter
 machinery.
 
-This goal of reducing the number of items sent to ``rtcontrol`` is best achieved if you put
-a highly selective condition first in a series of conditions. For cron-type jobs,
-this can often be achieved by looking at recent items only – older items should already be processed
-by previous runs. Even a very lenient window like “last week” drastically reduces items
-that need to be processed.
+This goal of reducing the number of items sent to ``rtcontrol`` is
+best achieved if you put a highly selective condition first in a
+series of conditions. For cron-type jobs, this can often be achieved
+by looking at recent items only – older items should already be
+processed by previous runs. Even a very lenient window like “last
+week” drastically reduces items that need to be processed.
 
 ```bash
 $ rtcontrol loaded=-6w is_ignored=0 -o- -v -Q0
@@ -79,8 +84,8 @@ rtxmlrpc -U scgi+ssh://example.com/TCP:0.0.0.0:7000 system.hostname
 rtxmlrpc -U scgi+ssh://example.com/UNIX-CONNECT:/home/rtorrent/scgi.sock system.hostname
 ```
 
-Since each command opens a new SSH connection, setting up the ControlPersist feature in
-`~/.ssh/config` is highly recommended.
+Since each command opens a new SSH connection, setting up the
+ControlPersist feature in `~/.ssh/config` is highly recommended.
 
 Example:
 ```

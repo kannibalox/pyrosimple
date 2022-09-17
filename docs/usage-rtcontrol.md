@@ -13,9 +13,11 @@ by running `rtcontrol --help-fields`.
 
 ## Filter Conditions
 
-In order for `rtcontrol` to do anything, it first needs a filter condition that will tell
-it which torrents it should perform work against. Filters take the form of a field, operator and value,
-which will look familiar if you've dealt with any kind of programming or scripting.
+In order for `rtcontrol` to do anything, it first needs a filter
+condition that will tell it which torrents it should perform work
+against. Filters take the form of a field, operator and value, which
+will look familiar if you've dealt with any kind of programming or
+scripting.
 
 ```none
 size>8G
@@ -23,15 +25,18 @@ loaded<2d5h
 name=ubuntu-server-amd64-22.04.iso
 ```
 
-If the field and operator are omitted, they are assumed to be `name` and `=` respectively. This means the following filters
-are exactly the same:
+If the field and operator are omitted, they are assumed to be `name`
+and `=` respectively. This means the following filters are exactly the
+same:
 
 ```none
 ubuntu-server-amd64-22.04.iso
 name=ubuntu-server-amd64-22.04.iso
 ```
 
-If multiple filters are specified, torrents must match against all of them. The special keyword `OR` can be used to override that behavior, and change it so that only one of the filters have to match:
+If multiple filters are specified, torrents must match against all of
+them. The special keyword `OR` can be used to override that behavior,
+and change it so that only one of the filters have to match:
 
 ```none
 size<=4G name!=ubuntu-server-amd64-22.04.iso
@@ -46,7 +51,8 @@ name=arch-* OR [ alias=Ubuntu loaded>1w ]
 ```
 
 !!! note
-    Since many characters like `!` or `<` have special meanings in the shell, they will most likely need to be quoted or escaped when
+    Since many characters like `!` or `<` have special meanings in the
+    shell, they will most likely need to be quoted or escaped when
     actually used on the command line.
     
     ```
@@ -66,29 +72,42 @@ Many fields allow for special parsing of the value to support more complicated f
     * By default, strings are matched using [shell-style wildcards](https://docs.python.org/3/library/fnmatch.html). This means
       that to search for a substring instead of an exact match, you should use an expression like `*ubuntu*`.  
       Example: `arch-linux-*`
-    * If the value starts and ends with `/`, the value is treated as a [regex](https://docs.python.org/3/library/re.html?highlight=re#regular-expression-syntax), which allows for more complex expressions than just wildcards. Note that the whole string does not need to match; use `^` and `$` to enforce that behavior.  
+    * If the value starts and ends with `/`, the value is treated as a
+      [regex](https://docs.python.org/3/library/re.html?highlight=re#regular-expression-syntax),
+      which allows for more complex expressions than just
+      wildcards. Note that the whole string does not need to match;
+      use `^` and `$` to enforce that behavior.  
       Examples: `/.*/`, `/^ubuntu-.+-server-.*/`
 * numbers (e.g. `size`, `xfer`)
     * Byte number fields like `size` allow for suffixes to denote the size.  
       Example: `5g`, `64m`
 * time (e.g. `loaded`, `completed`)
   Similar to bytes, time fields accept multiple shorthands for comparing time:
-    * Time deltas in the form of `<num><unit>[<num><unit>...]`, where `unit` is a single letter to denote `y`ear, `M`onth,
-    `w`eek, `d`day, `h`our, `m`inute or `s`second.  
+    * Time deltas in the form of `<num><unit>[<num><unit>...]`, where
+    `unit` is a single letter to denote `y`ear, `M`onth, `w`eek,
+    `d`day, `h`our, `m`inute or `s`second.  
       Examples: `3w22h`, `1y6M`
-    * An exact date/time in a human-readable formate. Acceptable formats for the date are `YYYY-MM-DD`, `MM/DD/YYYY`, `DD.MM.YYYY`. To also include a `HH:MM` time, separate it from the date with a space or a `T`.  
+    * An exact date/time in a human-readable formate. Acceptable
+      formats for the date are `YYYY-MM-DD`, `MM/DD/YYYY`,
+      `DD.MM.YYYY`. To also include a `HH:MM` time, separate it from
+      the date with a space or a `T`.  
       Examples: `04/15/2021`, `2022-03-15T14:50`
     * An absolute timestamp in [epoch time](https://en.wikipedia.org/wiki/Unix_time) format.  
       Example: `1652289156`
 * tags (e.g. `tagged`, `views`)
-    * Tags are work similarly to strings, but they do not support regexes, and use whitespace as delimiters. For example, if a torrent has the tags `active archive new`, the values `n*` and `archive` would both match.
+    * Tags are work similarly to strings, but they do not support
+      regexes, and use whitespace as delimiters. For example, if a
+      torrent has the tags `active archive new`, the values `n*` and
+      `archive` would both match.
 
 ## Output
 
-By default, rtcontrol will use a predefined output template that displays most relevant information,
-but allows for selecting specific fields with the `-o`/`--output-format` flag.
+By default, rtcontrol will use a predefined output template that
+displays most relevant information, but allows for selecting specific
+fields with the `-o`/`--output-format` flag.
 
-The simplest way to use it is to simply specific a comma-separated list of fields:
+The simplest way to use it is to simply specific a comma-separated
+list of fields:
 
 ```bash
 rtcontrol // -o alias,size,path
@@ -104,19 +123,24 @@ rtcontrol // -o alias,size.sz,path.pathbase
 
 #### Jinja2
 
-For more complex output, the [Jinja2](https://palletsprojects.com/p/jinja/) library can be used.
-It has support for much more complex formatting and logic than the simple CSV output. See the 
-[official Jinja2 documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/) for everything
-it's capable of .
+For more complex output, the
+[Jinja2](https://palletsprojects.com/p/jinja/) library can be used.
+It has support for much more complex formatting and logic than the
+simple CSV output. See the
+[official Jinja2 documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
+for everything it's capable of .
 
 
 ```bash
 rtcontrol // -o '{{d.alias}}\t{{d.size|filesizeformat(binary=True)}}\t{{d.path|truncate(40)}}'
 ```
 
-As your output templates get more complex, you can use the `TEMPLATES` section in the configuration to
-set predefined templates, rather than putting the whole string in the CLI every time. This is how the
-`default` and `action` templates are defined. See the [configuration file](configuration.md) for more info.
+As your output templates get more complex, you can use the `TEMPLATES`
+section in the configuration to set predefined templates, rather than
+putting the whole string in the CLI every time. This is how the
+`default` and `action` templates are defined. See the
+[configuration file](configuration.md)
+for more info.
 
 ## Actions
 
@@ -128,9 +152,17 @@ rtcontrol has many ways to effect torrent, including but not limited to:
 * `--call`/`--spawn`: call a OS command/shell
 * `-H`/`--hashcheck`: hash check torrents (equivalent to pressing ^K ^E ^R in the UI)
 
-See `rtcontrol --help` for a full list of actions. All action can be dry-run with the `-n`/`--dry-run` flag. Many of the more dangerous actions (e.g. `--cull`) will prompt before actually performing the action. However, if you wish to enable prompting for all action, the `-i`/`--interactive` will set that behavior for all commands. Alternatively, if you don't want any prompts at all (e.g. when running in a headless script), `--yes` will automatically confirm all prompts.
+See `rtcontrol --help` for a full list of actions. All action can be
+dry-run with the `-n`/`--dry-run` flag. Many of the more dangerous
+actions (e.g. `--cull`) will prompt before actually performing the
+action. However, if you wish to enable prompting for all action, the
+`-i`/`--interactive` will set that behavior for all
+commands. Alternatively, if you don't want any prompts at all
+(e.g. when running in a headless script), `--yes` will automatically
+confirm all prompts.
 
-When multiple actions are specified, rtcontrol will apply those actions to each item in sequence.
+When multiple actions are specified, rtcontrol will apply those
+actions to each item in sequence.
 
 ### Executing commands
 
@@ -185,7 +217,9 @@ When multiple actions are specified, rtcontrol will apply those actions to each 
     Torrents that have no data (were never started or lost their data)
 
 * `alias=obt`:
-    Torrents tracked by `openbittorrent.com` (see [configuration](/configuration/#aliases) on how to add aliases for trackers)
+    Torrents tracked by `openbittorrent.com` (see
+    [configuration](/configuration/#aliases) on how to add aliases for
+    trackers)
 
 * `ratio=+1 realpath!=/mnt/*`:
     1:1 seeds not on a mounted path (i.e. likely on localhost)
@@ -200,8 +234,8 @@ When multiple actions are specified, rtcontrol will apply those actions to each 
     Has at least one tag
 
 * `tagged=foo,bar`:
-    Tagged with "foo" or "bar" (*since v0.3.5*) — tags are white-space separated
-    lists of names in the field `custom_tags`
+    Tagged with "foo" or "bar" (*since v0.3.5*) — tags are white-space
+    separated lists of names in the field `custom_tags`
 
 * `tagged=:highlander`:
     *Only* tagged with "highlander" and nothing else

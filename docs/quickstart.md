@@ -4,10 +4,10 @@ title: Quick Start
 
 # Quick Start
 
-The main goal of this document is to get you comfortable with using pyrosimple to
-interact with rTorrent and torrent files. None of the commands here will
-make any changes to your system and are intended to be a gentle
-introduction to the many capabilities available.
+The main goal of this document is to get you comfortable with using
+pyrosimple to interact with rTorrent and torrent files. None of the
+commands here will make any changes to your system and are intended to
+be a gentle introduction to the many capabilities available.
 
 ## Setup
 
@@ -27,16 +27,15 @@ pyroadmin config --check && echo "All good!"
 If the command doesn't show any errors, then pyrosimple has
 automatically figured out how to talk with rTorrent. Neat!
 
-If not, see [Configuration](configuration.md) for
-instructions on how to set up your config file, and come back once the
-command succeeds.
+If not, see [Configuration](configuration.md) for instructions on how
+to set up your config file, and come back once the command succeeds.
 
 ## Interacting with rTorrent
 
-Let's start with something simple: `rtxmlrpc` is a command for interacting
-with rTorrent's low-level API. Let's run some more commands to get an
-idea of what it can do. None of these commands will change anything,
-they'll just return information.
+Let's start with something simple: `rtxmlrpc` is a command for
+interacting with rTorrent's low-level API. Let's run some more
+commands to get an idea of what it can do. None of these commands will
+change anything, they'll just return information.
 
 ``` bash
 # Get rTorrent's version
@@ -70,15 +69,14 @@ rtcontrol is_ignored=no xfer=+0 -o up.sz,down.sz,name
 
 
 `rtcontrol` lets us filter on different fields, and optionally pick
-which fields will be output. The many different fields that are available can
-be shown with `rtcontrol --help-fields`.
-In addition to simply displaying torrents, we can also run commands that will make
+which fields will be output. The many different fields that are
+available can be shown with `rtcontrol --help-fields`.  In addition to
+simply displaying torrents, we can also run commands that will make
 things change.
 
 For the sake of this tutorial, all of the commands below have
-`--dry-run` at the end to make sure nothing is changed. If
-you'd like to try running the commands for real, simply remove that
-flag.
+`--dry-run` at the end to make sure nothing is changed. If you'd like
+to try running the commands for real, simply remove that flag.
 
 ```bash
 # Start all torrents
@@ -93,7 +91,7 @@ rtcontrol is_ignored=no is_complete=yes --hash-check --dry-run
 
 In addition to rTorrent, pyrosimple can also work with .torrent files
 directly. The commands `mktor`, `lstor` and `chtor` can make, list,
-and modify files, respectively
+and modify files, respectively.
 
 Let's try creating an example torrent from an example file
 with the (fake) tracker `http://example.com`.
