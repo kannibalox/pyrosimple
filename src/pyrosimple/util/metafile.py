@@ -97,6 +97,7 @@ class PieceLogger:
 
 class PieceFailer(PieceLogger):
     """Raises an OSError if any pieces don't match"""
+
     def check_piece(self, filename, piece):
         "Callback for new piece"
         if (

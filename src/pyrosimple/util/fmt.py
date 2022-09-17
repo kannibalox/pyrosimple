@@ -12,8 +12,8 @@ import json
 import logging
 import os
 import re
-import time
 import shlex
+import time
 
 from pathlib import Path
 from pprint import pformat
@@ -116,8 +116,11 @@ def human_size(size: float) -> str:
 
     return f"{rem:6.1f} PiB".lstrip()
 
+
 def fmt_shell(string: str) -> str:
+    """Quote a string for use in shell scripts."""
     return shlex.quote(string)
+
 
 def fmt_sz(intval: int) -> str:
     """Format a byte sized value."""

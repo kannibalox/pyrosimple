@@ -22,7 +22,7 @@ import jinja2
 
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
-from pyrosimple.util import fmt, matching, pymagic, rpc, traits, metafile
+from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
 from pyrosimple.util.cache import ExpiringCache
 from pyrosimple.util.parts import Bunch
 
