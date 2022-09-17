@@ -116,7 +116,7 @@ rtcontrol // -o '{{d.alias}}\t{{d.size|filesizeformat(binary=True)}}\t{{d.path|t
 
 As your output templates get more complex, you can use the `TEMPLATES` section in the configuration to
 set predefined templates, rather than putting the whole string in the CLI every time. This is how the
-`default` and `action_default` templates are defined. See the [configuration file](configuration.md) for more info.
+`default` and `action` templates are defined. See the [configuration file](configuration.md) for more info.
 
 ## Actions
 

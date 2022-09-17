@@ -12,7 +12,7 @@ ones that you can add yourself.
 
 There are two primary jobs that can be run from pyrotorque:
 
-* A tree watcher that reacts via `inotify` to load new files into rtorrent as needed.
+* A tree watcher that reacts via `inotify` to load new files into rTorrent as needed.
   It functions very similarly to `directory.watch.added`, but allows for more complex 
   loading rules, as well as recursive watching.
 * A queue manager that handles starting torrents in a controlled manner. This ensures
@@ -48,7 +48,7 @@ dry_run = true
 As seen in the `stats` job, there are four main settings for a job:
 
 - `handler` defines what class will run. You shouldn't need to understand what this means unless you're writing custom jobs, see the handler reference below instead.
-- `schedule` tells pyrotorque when to trigger jobs. If you're familiar with cron syntax, this is very similiar, e.g. `minute=*` means run once a minute. The underlying library, APScheduler, extends the syntax with features like per-second resolution, check out the [documentation](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#introduction) for details.
+- `schedule` tells pyrotorque when to trigger jobs. If you're familiar with cron syntax, this is very similar, e.g. `minute=*` means run once a minute. The underlying library, APScheduler, extends the syntax with features like per-second resolution, check out the [documentation](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#introduction) for details.
 - `active` provides an easy way to enable or disable jobs.
 - `dry_run` tells the job to not make any actual changes if it's `true`.
 
