@@ -121,7 +121,7 @@ The most simple variant of changing the download path is setting a new
 fixed location for all selected items, as follows:
 
 ``` bash
-rtcontrol --exec 'directory_base.set="/mnt/data/new/path"' directory=/mnt/data/old/path
+rtcontrol --exec 'd.directory_base.set="/mnt/data/new/path"' directory=/mnt/data/old/path
 ```
 
 This replaces the location of items stored at `/mnt/data/old/path` with
@@ -132,17 +132,16 @@ one:
 
 ``` bash
 rtcontrol \
-    --exec 'directory_base.set="{{item.directory|subst("^/mnt/data/","/var/data/")}}" ; >directory=' \
-    directory=/mnt/data/\*
+    --exec 'd.directory_base.set="{{item.directory|subst("^/mnt/data/","/var/data/")}}" ; >d.directory=' \
+    d.directory=/mnt/data/\*
 ```
 
 This selects any item stored under `/mnt/data` and relocates it to the
 new base directory `/var/data`. Fields of an item can be used via a
-`item.‹field-name›` reference. Adding `>directory=` prints the new
+`item.‹field-name›` reference. Adding `>d.directory=` prints the new
 location to the console -- a semicolon with spaces on both sides
 delimits several commands, and the `>` prints the result of a XMLRPC
-command. Also note that the `d.` prefix to download item commands is
-implied.
+command.
 
 The `move-data`{.interpreted-text role="ref"} section has more on how to
 also move the data on disk, in addition to changing the location in
@@ -171,7 +170,7 @@ URLs in group 0 using a `t.multicall`, and then adds a new one:
 
 ``` bash
 rtcontrol \
-    --exec 't.multicall=0,t.disable= ; tracker.insert=0,"http://new.example.com/announce" ; save_full_session=' \
+    --exec 't.multicall=0,t.disable= ; d.tracker.insert=0,"http://new.example.com/announce" ; d.save_full_session=' \
     "tracker=http://old.example.com/announce"
 ```
 
