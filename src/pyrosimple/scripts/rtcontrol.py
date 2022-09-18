@@ -451,6 +451,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         action_group.add_argument(
             "--custom",
             action=RtorrentAction,
+            const="set_custom",
             metavar="KEY=VALUE",
             help="set value of 'custom_KEY' field (KEY might also be 1..5)",
         )
