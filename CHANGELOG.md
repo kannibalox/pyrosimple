@@ -5,6 +5,7 @@
 ### Fixed
 
 - Report actual RPC stats in debug output
+- Handle custom1, custom2, etc correctly
 
 ### Changed
 
