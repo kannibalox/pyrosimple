@@ -742,7 +742,7 @@ class RtorrentEngine:
         self.LOG.debug("%s", repr(self))
         return self.rpc
 
-    def multicall(self, viewname: str, fields: List[str]) -> Bunch:
+    def multicall(self, viewname: str, fields: List[str]) -> List[Bunch]:
         """Query the given fields of items in the given view.
 
         The result list contains named tuples,
@@ -750,7 +750,10 @@ class RtorrentEngine:
         """
         commands = tuple(f"d.{x}=" for x in fields)
         items = self.open().d.multicall2("", viewname, *commands)
-        return Bunch(dict(zip([x.replace(".", "_") for x in fields], items)))
+        return [
+            Bunch(dict(zip([x.replace(".", "_") for x in fields], item)))
+            for item in items
+        ]
 
     def log(self, msg: str):
         """Log a message in the torrent client."""
