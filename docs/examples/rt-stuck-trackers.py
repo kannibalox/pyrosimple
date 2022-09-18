@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Simple script to find trackers that haven't announced with the expected period."""
 import time
 
