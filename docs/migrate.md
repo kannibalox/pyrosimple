@@ -44,7 +44,7 @@ title: Migrating from pyroscope
 * Tempita has been replaced with
   [Jinja2](https://jinja.palletsprojects.com/en/3.0.x/templates/). The
   syntax is similar but not equivalent.
-  ```
+  ```bash
   # Old
   rtcontrol // -o '{{ if d.is_multi_file }}Multi-file path: {{ else }}Single file: {{ endif }}{{item.directory}}'
   # New
@@ -52,7 +52,7 @@ title: Migrating from pyroscope
   ```
 * The string interpolation format style has been removed. Use the
   Jinja2 template instead.
-  ```
+  ```bash
   # Old
   rtcontrol // -o '%(size.sz)s %(name)s'
   # New
@@ -63,7 +63,7 @@ title: Migrating from pyroscope
 
 * All commands now use the full name. As such, the `:` signifier no
   longer has any effect.
-  ```
+  ```bash
   # Old
   rtcontrol // --exec "directory.set={{item.directory}}/{{item.custom_target_folder}}"
   rtcontrol --exec ":event.download.finished=" loaded=-10i done=100

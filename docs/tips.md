@@ -4,39 +4,48 @@ title: Tips & Tricks
 
 # Tip & Tricks
 
+## Working with ruTorrent
+
+pyrosimple and ruTorrent can be used at the same time with no
+issue. To view/filter on ruTorrent's labels, use the `custom_1` field:
+
+```bash
+rtcontrol custom_1=TV -o alias,name
+```
+
 ## Repairing Stuck Items
 
-Sometimes items will get stuck in a state where they are unable to start correctly, even after a hash check. Check that rTorrent has the correct access to the file first, and if so this command will reset all the file states and force another hash check. This is the same as pressing `^K^E^R` in the UI.
+Sometimes items will get stuck in a state where they are unable to
+start correctly, even after a hash check. Check that rTorrent has the
+correct access to the file first, and if so this command will reset
+all the file states and force another hash check. This is the same as
+pressing `^K^E^R` in the UI.
 
 ```bash
 rtcontrol --exec 'd.stop= ; d.close= ; f.multicall=,f.set_create_queued=0,f.set_resize_queued=0 ; d.check_hash=' \
   --from stopped // -/1 --yes
 ```
 
-The above example only effect 1 torrent from the stopped view. After the hash check is complete and the torrent is working again, use `--start` to start it again.
-
-## Working with ruTorrent
-
-pyrosimple and ruTorrent can be used at the same time with no issue. To view/filter on ruTorrent's labels, use the `custom_1` field:
-
-```bash
-rtcontrol custom_1=TV -o alias,name
-```
+The above example only effect 1 torrent from the stopped view. After
+the hash check is complete and the torrent is working again, use
+`--start` to start it again.
 
 ## Move data for selected items
 
-This sequence will put all torrents for a specific tracker into a dedicated view,
-then will stop them, move the data, set the directory, and restart them. The last
-command then clears the view.
+This sequence will put all torrents for a specific tracker into a
+dedicated view, then will stop them, move the data, set the directory,
+and restart them. The last command then clears the view.
 
-Note that if the items are not moved to the `d.directory.set` path, rTorrent
-may start trying to download them again.
+Note that if the items are not moved to the `d.directory.set` path,
+rTorrent may start trying to download them again.
 
 ```bash
 mkdir -p ~/rtorrent/data/TRK
 rtcontrol --to-view=to-move alias=TRK realpath=$HOME/rtorrent/data
 rtcontrol --from-view=to-move // --stop
-rtcontrol --from-view=to-move // --spawn "mv {{item.path|shell}} $HOME/rtorrent/data/TRK" --exec "d.directory.set=$HOME/rtorrent/data/TRK" --flush
+rtcontrol --from-view=to-move // \
+  --spawn "mv {{item.path|shell}} $HOME/rtorrent/data/TRK" \
+  --exec "d.directory.set=$HOME/rtorrent/data/TRK" --flush
 rtcontrol --from-view=to-move // --start
 rtcontrol -M=to-move --alter=remove //
 ```
@@ -87,7 +96,12 @@ print(f"of {proxy.convert.xb('', str(proxy.throttle.global_up.max_rate()))}/s")
 
 ## Find orphaned files
 
-Since Jinja2 is more sandboxes than the original Tempita templating system, the `orphans.txt` template file from pyrocore no longer works. However, we can replicate the functionality with a little fancy scripting. The following command will list the orphan files along with their sizes:
+Since Jinja2 is more sandboxed than the original Tempita templating
+system, the `orphans.txt` template file from pyrocore no longer
+works. However, we can replicate the functionality with a little fancy
+scripting. The following command will list the orphan files along with
+their sizes:
+
 ```bash
 target_dir=/mnt/test
 comm -13 \
@@ -96,7 +110,9 @@ comm -13 \
   | tr '\n' '\0' | xargs -0 du -hsc
 ```
 
-To clean up the files (after ensuring the list is accurate!), we can just change the final command from `du` to `rm`. Note that this example uses `echo rm` to ensure nothing is deleted accidentally:
+To clean up the files (after ensuring the list is accurate!), we can
+just change the final command from `du` to `rm`. Note that this
+example uses `echo rm` to ensure nothing is deleted accidentally:
 
 ```bash
 comm -13 \
