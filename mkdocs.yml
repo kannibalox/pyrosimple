@@ -21,7 +21,7 @@ nav:
 theme:
   name: material
   font:
-    code: Share Tech Mono
+    code: Inconsolata
     text: Lato
   icon:
     logo: fontawesome/regular/sun
