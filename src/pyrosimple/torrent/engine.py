@@ -51,15 +51,18 @@ def _interval_split(
     An exaple of the input is "R1283008245P1283008268".
     Returns events in reversed order (latest first).
     """
-
+   
+            
     def split_event(event):
         "Helper to parse events."
         kind, val = event[:1], event[1:]
+        print
         try:
             return kind, float(val)
         except (TypeError, ValueError):
             return None, 0
-
+    if hasattr(interval, "fetch"):
+        interval = interval.fetch("custom_activations")   
     return list(
         reversed(
             [
