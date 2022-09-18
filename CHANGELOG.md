@@ -10,6 +10,10 @@
 
 - Unify `util.metafile` to perform most operations in a dict-like class
 
+### Added
+
+- New `shell` template filter
+
 ## [2.0.2] - 2022-09-14
 
 ### Fixed
