@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.3] - 2022-09-28
+
 ### Fixed
 
 - Report actual RPC stats in debug output
