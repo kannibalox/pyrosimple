@@ -56,7 +56,6 @@ def _interval_split(
     def split_event(event):
         "Helper to parse events."
         kind, val = event[:1], event[1:]
-        print
         try:
             return kind, float(val)
         except (TypeError, ValueError):
