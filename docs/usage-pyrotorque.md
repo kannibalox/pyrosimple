@@ -12,16 +12,21 @@ ones that you can add yourself.
 
 There are two primary jobs that can be run from pyrotorque:
 
-* A tree watcher that reacts via `inotify` to load new files into rTorrent as needed.
-  It functions very similarly to `directory.watch.added`, but allows for more complex 
-  loading rules, as well as recursive watching.
-* A queue manager that handles starting torrents in a controlled manner. This ensures
-  that a system is not overloaded by starting too many torrents at once. The job is compatible
-  with torrents from both the tree watcher and files loaded by `directory.watch.added` or a `load` schedule.
+* A tree watcher that reacts via `inotify` to load new files into
+  rTorrent as needed.  It functions very similarly to
+  `directory.watch.added`, but allows for more complex loading rules,
+  as well as recursive watching.
+* A queue manager that handles starting torrents in a controlled
+  manner. This ensures that a system is not overloaded by starting too
+  many torrents at once. The job is compatible with torrents from both
+  the tree watcher and files loaded by `directory.watch.added` or a
+  `load` schedule.
 
 ## Configuration
 
-The configuration lives in the same `config.toml` with everything else, in the `[TORQUE]` section. Under the section, there are settings for pyrotorque itself, and then sub-sections for the individual jobs.
+The configuration lives in the same `config.toml` with everything
+else, in the `[TORQUE]` section. Under the section, there are settings
+for pyrotorque itself, and then sub-sections for the individual jobs.
 
 Example:
 ```toml
@@ -47,16 +52,25 @@ dry_run = true
 
 As seen in the `stats` job, there are four main settings for a job:
 
-- `handler` defines what class will run. You shouldn't need to understand what this means unless you're writing custom jobs, see the handler reference below instead.
-- `schedule` tells pyrotorque when to trigger jobs. If you're familiar with cron syntax, this is very similar, e.g. `minute=*` means run once a minute. The underlying library, APScheduler, extends the syntax with features like per-second resolution, check out the [documentation](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#introduction) for details.
+- `handler` defines what class will run. You shouldn't need to
+  understand what this means unless you're writing custom jobs, see
+  the handler reference below instead.
+- `schedule` tells pyrotorque when to trigger jobs. If you're familiar
+  with cron syntax, this is very similar, e.g. `minute=*` means run
+  once a minute. The underlying library, APScheduler, extends the
+  syntax with features like per-second resolution, check out the
+  [documentation](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#introduction)
+  for details.
 - `active` provides an easy way to enable or disable jobs.
 - `dry_run` tells the job to not make any actual changes if it's `true`.
 
-Any other settings are job-specific. For more detail documentation for each job, see the [pyrotorque reference](/pyrotorque-jobs/)
+Any other settings are job-specific. For detailed documentation on
+each job, see the [pyrotorque reference](/pyrotorque-jobs/).
 
 ## Usage
 
-Once you have a configuration file, the easiest way to test your configuration is to try running the process in the foreground:
+Once you have a configuration file, the easiest way to test your
+configuration is to try running the process in the foreground:
 
 ```bash
 # Also enforce dry_run mode and output info messages while we're testing things
@@ -68,7 +82,12 @@ Alternatively, you can also test the individual jobs one run at a time:
 pyrotorque --run-once stats --dry-run --debug
 ```
 
-Once you're satisfied, you can launch the process into the background by simply running `pyrotorque`. You can check the status, restart, or stop the daemon with `--status`, `--restart` and `--stop` respectively. Alternatively, see your distro's documentation for writing service files. Here is a bare-bones example for a systemd-based distro:
+Once you're satisfied, you can launch the process into the background
+by simply running `pyrotorque`. You can check the status, restart, or
+stop the daemon with `--status`, `--restart` and `--stop`
+respectively. Alternatively, see your distro's documentation for
+writing service files. Here is a bare-bones example for a
+systemd-based distro:
 
 ```ini title="pyrotorque.service"
 [Unit]

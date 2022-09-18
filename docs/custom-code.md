@@ -4,7 +4,8 @@ title: Custom Code
 
 # Custom Code
 
-`pyrosimple` offers a couple ways to extend it's functionality if you know a little Python.
+`pyrosimple` offers a couple ways to extend its functionality if you
+know a little Python.
 
 ## Custom fields
 
@@ -48,7 +49,9 @@ for field in _custom_fields():
 rtcontrol // -o piece_size
 ```
 
-You can see how the built-in fields are defined in [torrent/engine.py](https://github.com/kannibalox/pyrosimple/blob/main/src/pyrosimple/torrent/engine.py) if you want to see more complete examples.
+You can see how the built-in fields are defined in
+[torrent/engine.py](https://github.com/kannibalox/pyrosimple/blob/main/src/pyrosimple/torrent/engine.py)
+if you want to see more complete examples.
 
 ### Examples
 
@@ -115,8 +118,8 @@ You can see how the built-in fields are defined in [torrent/engine.py](https://g
 
 ## As a library
 
-The main interface has been designed to be deliberately simple if you wish to connect to rtorrent
-from within another Python program:
+The main interface has been designed to be deliberately simple if you
+wish to connect to rtorrent from within another Python program:
 
 ```python
 import pyrosimple
@@ -124,15 +127,16 @@ engine = pyrosimple.connect()
 proxy = engine.open()
 ```
 
-With this setup, `engine` can provide the same kind of high-level views and abstractions
-seen in `rtcontrol`:
+With this setup, `engine` can provide the same kind of high-level
+views and abstractions seen in `rtcontrol`:
 
 ```python
 engine.log("Hello world!") # Prints to console of rtorrent
 print(list(engine.view("incomplete")))
 ```
 
-While `proxy` allows for low-level direct RPC calls, just like `rtxmlrpc`:
+While `proxy` allows for low-level direct RPC calls, just like
+`rtxmlrpc`:
 
 ```python
 print(proxy.system.hostname())

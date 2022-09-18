@@ -17,8 +17,8 @@ Install pyrosimple:
 pip install pyrosimple
 ```
 
-With pyrosimple installed and rTorrent running, let's see if the configuration
-can be auto-detected:
+With pyrosimple installed and rTorrent running, let's see if the
+configuration can be auto-detected:
 
 ```bash
 pyroadmin config --check && echo "All good!"
@@ -64,8 +64,9 @@ rtcontrol is_ignored=no xfer=+0 -o up.sz,down.sz,name
 ```
 
 !!! note
-    The string `//` in the first two commands is an empty regex. If you don't know what that means,
-    don't worry, it's just an easy way to get all torrents.
+    The string `//` in the first two commands is an empty regex. If
+    you don't know what that means, don't worry, it's just an easy way
+    to get all torrents.
 
 
 `rtcontrol` lets us filter on different fields, and optionally pick

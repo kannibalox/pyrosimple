@@ -73,11 +73,13 @@ ignore when creating torrents.
 
 Defaults to `0` (disabled).
 
-See [query optimization](experimental.md#query-optimization) for more information.
+See [query optimization](experimental.md#query-optimization) for more
+information.
 
 ### TORQUE
 
-This section is reserved for `pyrotorque`. See its [user guide](/usage-pyrotorque/) for more information. 
+This section is reserved for `pyrotorque`. See its
+[user guide](/usage-pyrotorque/) for more information.
 
 ### FORMATS
 
@@ -96,8 +98,8 @@ Allows defining Jinja2 templates for use with `rtcontrol`.
 rtcontrol is_completed=yes -o filelist
 ```
 
-Note that any names defined here will override field names in the `-o` simple format, so make sure there
-are no conflicts.
+Note that any names defined here will override field names in the `-o`
+simple format, so make sure there are no conflicts.
 
 ### ALIASES
 
@@ -115,8 +117,9 @@ Debian  = ["http://bttracker.debian.org:6969/announce"]
 Linux   = ["http://linuxtracker.org:2710/"]
 ```
 
-This section allows for setting any number of tracker aliases for use with `rtcontrol`'s
-"alias" field, and when creating torrents with `mktor`.
+This section allows for setting any number of tracker aliases for use
+with `rtcontrol`'s "alias" field, and when creating torrents with
+`mktor`.
 
 
 ### CONNECTIONS
@@ -130,10 +133,13 @@ remote_https = "https://example.com/RPC2"
 ```
 
 !!! Note
-    For HTTP(S) connections, it's important to either explicitly provide the path (e.g. `https://example.com/RPC2`) or leave it off entirely
-    (e.g. `https://example.com`). `https://example.com/` will not work for most setups.
+    For HTTP(S) connections, it's important to either explicitly
+    provide the path (e.g. `https://example.com/RPC2`) or leave it off
+    entirely (e.g. `https://example.com`). `https://example.com/` will
+    not work for most setups.
 
-`rtmlxrpc`, `rtcontrol` and `pyrotorque` accept a `-U`/`--url` flag to provide the `scgi_url` directly when working with remote machines:
+`rtmlxrpc`, `rtcontrol` and `pyrotorque` accept a `-U`/`--url` flag to
+provide the `scgi_url` directly when working with remote machines:
 ```bash
 rtxmlrpc -U "~/rtorrent/.scgi_local" system.hostname
 ```
