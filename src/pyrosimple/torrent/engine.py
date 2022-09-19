@@ -542,8 +542,14 @@ def core_fields():
         accessor=lambda o: o.fetch("up") + o.fetch("down"),
         requires=["d.up.rate", "d.down.rate"],
     )
-    # last_xfer = DynamicField(int, "last_xfer", "last time data was transferred", matcher=matching.TimeFilter,
-    #     accessor=lambda o: int(o.fetch("timestamp.last_xfer") or 0), formatter=fmt.iso_datetime_optional)
+    yield DynamicField(
+        int,
+        "last_xfer",
+        "last time data was transferred",
+        matcher=matching.TimeFilter,
+        accessor=lambda o: int(o.rpc_call("d.timestamp.last_xfer") or 0),
+        formatter=fmt.iso_datetime_optional,
+    )
     yield DynamicField(
         int,
         "down",
@@ -633,8 +639,15 @@ def core_fields():
         formatter=_fmt_duration,
         requires=["d.custom=tm_completed", "d.complete", "d.custom=activations"],
     )
-    # active = DynamicField(int, "active", "last time a peer was connected", matcher=matching.TimeFilter,
-    #    accessor=lambda o: int(o.fetch("timestamp.last_active") or 0), formatter=fmt.iso_datetime_optional)
+    yield DynamicField(
+        int,
+        "active",
+        "last time a peer was connected",
+        matcher=matching.TimeFilter,
+        accessor=lambda o: int(o.rpc_call("d.timestamp.last_active") or 0),
+        formatter=fmt.iso_datetime_optional,
+        requires=["d.timestamp.last_active"]
+    )
     yield DynamicField(
         int,
         "stopped",
