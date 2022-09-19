@@ -201,7 +201,7 @@ class RtorrentItem(engine.TorrentProxy):
 
     def as_dict(self):
         """Return known fields."""
-        return self._fields.copy()
+        return dict(self._fields)
 
     def rpc_call(self, method: str, args: Optional[List] = None, cache: bool = True):
         """Directly call rpc for item-specific information"""
