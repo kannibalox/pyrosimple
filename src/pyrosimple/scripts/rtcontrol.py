@@ -7,6 +7,7 @@
 import argparse
 import functools
 import json
+import logging
 import re
 import shlex
 import subprocess
@@ -473,12 +474,13 @@ class RtorrentControl(ScriptBaseWithConfig):
                 self.options.output_format_template, item, defaults
             )
         except (NameError, ValueError, TypeError) as exc:
+            if self.LOG.isEnabledFor(logging.DEBUG):
+                raise
             self.fatal(
                 "Trouble with formatting item %r\n\n  FORMAT = %r\n\n  REASON ="
                 % (item, self.options.output_format),
                 exc,
             )
-            raise  # in --debug mode
 
         if self.options.shell:
             item_text = "\t".join(shlex.quote(i) for i in item_text.split("\t"))
