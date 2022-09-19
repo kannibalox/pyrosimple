@@ -589,15 +589,27 @@ def core_fields():
         formatter=fmt.iso_datetime_optional,
         requires=["d.custom=tm_started"],
     )
+
+    def _leechtime_accessor(o):
+        leechtime = _interval_sum(
+            o.rpc_call("d.custom", ["activations"]), end=o.completed
+        )
+        if not leechtime:
+            leechtime = _duration(o.started, o.completed)
+        return leechtime
+
     yield DynamicField(
         untyped,
         "leechtime",
         "time taken from start to completion",
         matcher=matching.DurationFilter,
-        accessor=lambda o: _interval_sum(o, end=o.completed)
-        or _duration(o.started, o.completed),
+        accessor=_leechtime_accessor,
         formatter=_fmt_duration,
-        requires=["d.custom=tm_completed", "d.custom=tm_started"],
+        requires=[
+            "d.custom=tm_completed",
+            "d.custom=tm_started",
+            "d.custom=activations",
+        ],
     )
     yield DynamicField(
         int,
@@ -613,11 +625,13 @@ def core_fields():
         "seedtime",
         "total seeding time after completion",
         matcher=matching.DurationFilter,
-        accessor=lambda o: _interval_sum(o, start=o.completed)
+        accessor=lambda o: _interval_sum(
+            o.rpc_call("d.custom", ["activations"]), start=o.completed
+        )
         if o.rpc_call("d.complete")
         else None,
         formatter=_fmt_duration,
-        requires=["d.custom=tm_completed", "d.complete"],
+        requires=["d.custom=tm_completed", "d.complete", "d.custom=activations"],
     )
     # active = DynamicField(int, "active", "last time a peer was connected", matcher=matching.TimeFilter,
     #    accessor=lambda o: int(o.fetch("timestamp.last_active") or 0), formatter=fmt.iso_datetime_optional)
@@ -626,8 +640,12 @@ def core_fields():
         "stopped",
         "time download was last stopped or paused",
         matcher=matching.TimeFilterNotNull,
-        accessor=lambda o: (_interval_split(o, only="P") + [(0, 0)])[0][1],
+        accessor=lambda o: (
+            _interval_split(o.rpc_call("d.custom", ["activations"]), only="P")
+            + [(0, 0)]
+        )[0][1],
         formatter=fmt.iso_datetime_optional,
+        requires=["d.custom=activations"],
     )
 
 
