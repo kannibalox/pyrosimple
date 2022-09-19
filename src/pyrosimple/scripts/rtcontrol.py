@@ -440,6 +440,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         action_group.add_argument(
             "--throttle",
             "-T",
+            const="set_throttle",
             action=RtorrentInteractiveAction,
             help="assign to named throttle group (NULL=unlimited, NONE=global) (implies -i)",
         )
