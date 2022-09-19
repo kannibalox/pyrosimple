@@ -316,7 +316,7 @@ def core_fields():
         "views this item is attached to",
         matcher=matching.TaggedAsFilter,
         formatter=_fmt_tags,
-        requires=["d.custom=tags"],
+        requires=["d.views"],
     )
     yield DynamicField(
         set,
