@@ -57,12 +57,12 @@ class CommaLexer(shlex.shlex):
 class RtorrentItem(engine.TorrentProxy):
     """A single download item."""
 
-    def __init__(self, engine_, fields, rpc_fields: Optional[Dict] = None):
+    def __init__(self, engine_, fields, rpc_fields: Optional[Dict] = None, cache_expires = 5.0):
         """Initialize download item."""
         super().__init__()
         self._engine = engine_
         self._fields = ExpiringCache(
-            static_keys=engine.FieldDefinition.CONSTANT_FIELDS
+            static_keys=engine.FieldDefinition.CONSTANT_FIELDS, expires=cache_expires
         )  # Acts a cache for the item
         self._fields.update(dict(fields))
         self._rpc_cache = ExpiringCache(
