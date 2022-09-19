@@ -29,4 +29,5 @@ method.insert = pyro._last_xfer_check_min_rate, simple|private,\
     "greater=argument.0=,pyro.last_xfer.min_rate="
 method.insert = pyro._last_xfer_update, simple|private,\
     "d.custom.set=last_xfer,$cat=$system.time= ; branch=argument.0=,d.save_resume="
-
+schedule2 = pyro_update_last_xfer, 33, 17,\
+    "d.multicall2=active,\"branch=$d.last_xfer.is_active=,pyro._last_xfer_update=\""
