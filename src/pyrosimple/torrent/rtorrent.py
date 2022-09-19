@@ -297,14 +297,14 @@ class RtorrentItem(engine.TorrentProxy):
         """Add or remove tags."""
         # Get tag list and add/remove given tags
         tags = tags.lower()
-        previous = self.fetch("tagged")
+        previous = self.rpc_call("d.custom", ["tags"])
         tagset = previous.copy()
         for tag in tags.replace(",", " ").split():
             if tag.startswith("-"):
                 tagset.discard(tag[1:])
             elif tag.startswith("+"):
                 tagset.add(tag[1:])
-            else:
+            elif tag:
                 tagset.add(tag)
 
         # Write back new tagset, if changed
@@ -329,15 +329,15 @@ class RtorrentItem(engine.TorrentProxy):
                     raise error.UserError(f"Unknown throttle name '{name}'")
             self._engine.known_throttle_names.add(name)
 
-        if (name or "NONE") == self.fetch("throttle"):
+        if (name or "NONE") == self.rpc_call("d.throttle_name"):
             self._engine.LOG.debug(
                 "Keeping throttle %r on torrent #%s",
-                self.fetch("throttle"),
+                self.rpc_call("d.throttle_name"),
                 self._fields["hash"],
             )
             return
 
-        active = self.fetch("is_active")
+        active = self.rpc_call("d.is_active")
         if active:
             self._engine.LOG.debug(
                 "Torrent #%s stopped for throttling", self._fields["hash"]
