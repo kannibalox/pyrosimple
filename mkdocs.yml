@@ -51,6 +51,7 @@ theme:
         name: Switch to system preference
 plugins:
   - search
+  - include-markdown
 markdown_extensions:
   - admonition
   - pymdownx.highlight:
