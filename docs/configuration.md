@@ -76,6 +76,15 @@ Defaults to `0` (disabled).
 See [query optimization](experimental.md#query-optimization) for more
 information.
 
+#### `item_cache_expiration`
+
+Defaults to `5.0`.
+
+The number of seconds to keep cached information for each item. The
+default aims to strike reasonable balance between reducing RPC calls
+while avoiding stale data.  `0` makes the process cache all
+information forever, while `-1` disables the cache entirely.
+
 ### TORQUE
 
 This section is reserved for `pyrotorque`. See its
