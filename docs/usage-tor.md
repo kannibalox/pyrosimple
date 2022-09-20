@@ -73,7 +73,7 @@ the `--raw` flag can be combined with `-V`/`--skip-validation`.
 
 ## mktor
 
-At its simplest, creating a torrent file requires only a path and an announce URL
+At its simplest, creating a torrent file requires only a path and an announce URL:
 
 ```bash
 echo date > date.txt
@@ -81,6 +81,14 @@ mktor date.txt http://tracker.publicbt.com:80/announce
 ```
 
 If you have [aliases](configuration.md#aliases) configured, you can use the alias in place of the URL.
+
+```toml title="config.toml"
+[ALIASES]
+PUB_BT = ["http://tracker.publicbt.com:80/announce"]
+```
+```bash
+mktor date.txt PUB_BT
+```
 
 ### Cross-seeding
 
