@@ -15,6 +15,7 @@ Install pyrosimple:
 
 ```bash
 pip install pyrosimple
+# pip install 'pyrosimple[torque]' # Optional dependencies for using pyrotorque
 ```
 
 With pyrosimple installed and rTorrent running, let's see if the

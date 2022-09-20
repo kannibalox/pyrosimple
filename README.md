@@ -12,6 +12,7 @@ for working with the
 
 ```bash
 pip install pyrosimple
+# pip install 'pyrosimple[torque]' # Optional dependencies for using pyrotorque
 ```
 
 See the [documentation for usage](https://kannibalox.github.io/pyrosimple/).

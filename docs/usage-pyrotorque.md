@@ -4,11 +4,17 @@ title: Usage
 
 # pyrotorque
 
+!!! note
+    pyrotorque requires additional dependencies. To install them, run
+    ```bash
+    pip install 'pyrosimple[torque]'
+    ```
+
 The `pyrotorque` command is a daemon that handles background jobs. At
 first, it was just a flexible torrent queue manager for starting items
-one at a time (thus the name `pyro-tor-que`), but it can now manage any
-job that does some background processing for rTorrent, including custom
-ones that you can add yourself.
+one at a time (thus the name `pyro-tor-que`), but it can now manage
+any job that does some background processing for rTorrent, including
+custom ones that you can add yourself.
 
 There are two primary jobs that can be run from pyrotorque:
 
