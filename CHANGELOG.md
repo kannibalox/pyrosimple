@@ -1,25 +1,29 @@
 # Changelog
 
-## [Unreleased]
+## [2.1.0] - 2022-09-20
 
 ### Added
 
 - Re-enabled `last_xfer` and `active` fields
-- Configuration option `item_cache_expiration` for more explicit control of the cache
+  - Added safety check for `last_xfer` if required method is not
+    available
+- Configuration option `item_cache_expiration` for more explicit
+  control of the cache
 
 ### Fixed
 
 - rtcontrol
   - `--json` will now display all known fields by default
   - `--throttle` works as intended
-  - send string to interval calculations instead of object (effected `seedtime`, `leechtime`, `stopped`)
+  - send string to interval calculations instead of object (effected
+    `seedtime`, `leechtime`, `stopped`)
   - Fix pre-fetching for `views`
 
 ### Changed
 
 - Show full stack traces for templating errors while using `--debug`
 
-## [2.0.3] - 2022-09-28
+## [2.0.3] - 2022-09-18
 
 ### Fixed
 
@@ -28,7 +32,8 @@
 
 ### Changed
 
-- Unify `util.metafile` to perform most operations in a dict-like class
+- Unify `util.metafile` to perform most operations in a dict-like
+  class
 
 ### Added
 
