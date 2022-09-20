@@ -827,7 +827,10 @@ class RtorrentControl(ScriptBaseWithConfig):
                     ]
                 else:
                     json_data = [
-                        {name: getattr(i, name) for name in engine.FieldDefinition.FIELDS}
+                        {
+                            name: getattr(i, name)
+                            for name in engine.FieldDefinition.FIELDS
+                        }
                         for i in matches
                     ]
                 json.dump(

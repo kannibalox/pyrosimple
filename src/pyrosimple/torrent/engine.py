@@ -646,7 +646,7 @@ def core_fields():
         matcher=matching.TimeFilter,
         accessor=lambda o: int(o.rpc_call("d.timestamp.last_active") or 0),
         formatter=fmt.iso_datetime_optional,
-        requires=["d.timestamp.last_active"]
+        requires=["d.timestamp.last_active"],
     )
     yield DynamicField(
         int,
