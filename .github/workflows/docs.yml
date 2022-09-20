@@ -7,6 +7,9 @@ on:
     branches:
       - 'main'
 
+env:
+  PYTHON_KEYRING_BACKEND: keyring.backends.null.Keyring
+
 jobs:
   build:
     name: Deploy docs
