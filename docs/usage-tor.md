@@ -3,12 +3,14 @@ title: mktor/lstor/chtor Usage
 ---
 # mktor/lstor/chtor
 
-The following tools are grouped together due to their similar functionality. They can create, view, and modify .torrent files
+The following tools are grouped together due to their similar
+functionality. They can create, view, and modify .torrent files
 respectively.
 
 ## lstor
 
-lstor is used for displaying information about torrents. Without any flags, it shows a human-friendly summary of the torrent:
+lstor is used for displaying information about torrents. Without any
+flags, it shows a human-friendly summary of the torrent:
 
 ```
 $ lstor ubuntu-22.04-desktop-amd64.iso.torrent 
@@ -26,7 +28,8 @@ FILE LISTING
 ubuntu-22.04-desktop-amd64.iso                                         3.4 GiB
 ```
 
-However, you can also display the same information in JSON format with the `--raw` flag:
+However, you can also display the same information in JSON format with
+the `--raw` flag:
 
 ```
 $ lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw 
@@ -52,8 +55,8 @@ $ lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw
 }
 ```
 
-If you only need to extract a few fields, the `-o`/`--output` flag lets you specify 
-which fields to show:
+If you only need to extract a few fields, the `-o`/`--output` flag
+lets you specify which fields to show:
 
 ```
 $ lstor -o info.name,__size__ ubuntu-22.04-desktop-amd64.iso.torrent
@@ -61,13 +64,15 @@ ubuntu-22.04-desktop-amd64.iso	3654957056
 ```
 
 !!! note
-    `__size__` is a magic variable that tells `lstor` to sum the sizes of all files in the torrent. See `lstor --help`
-    for all the supported magic variables.
+    `__size__` is a magic variable that tells `lstor` to sum the
+    sizes of all files in the torrent. See `lstor --help` for all the
+    supported magic variables.
 
 
-By default lstor will throw an error if the file isn't a valid .torrent file. However,
-if you wish to ignore those errors (to view a rTorrent session file, for instance),
-the `--raw` flag can be combined with `-V`/`--skip-validation`.
+By default lstor will throw an error if the file isn't a valid
+.torrent file. However, if you wish to ignore those errors (to view a
+rTorrent session file, for instance), the `--raw` flag can be combined
+with `-V`/`--skip-validation`.
 
 `lstor` can also hash check the torrent against real data by using the `-H <path>` flag.
 
@@ -80,7 +85,8 @@ echo date > date.txt
 mktor date.txt http://tracker.publicbt.com:80/announce
 ```
 
-If you have [aliases](configuration.md#aliases) configured, you can use the alias in place of the URL.
+If you have [aliases](configuration.md#aliases) configured, you can
+use the alias in place of the URL.
 
 ```toml title="config.toml"
 [ALIASES]
@@ -92,14 +98,15 @@ mktor date.txt PUB_BT
 
 ### Cross-seeding
 
-To avoid duplicating the same hash across private trackers,
-mktor has two mechanisms to add distinct data to the `info` dictionary:
+To avoid duplicating the same hash across private trackers, mktor has
+two mechanisms to add distinct data to the `info` dictionary:
 
-* `source` gets set to the tracker alias (if available), or the 2nd level domain if not available
+* `source` gets set to the tracker alias (if available), or the 2nd
+  level domain if not available
 * `x_cross_seed` gets set to an MD5 hash of the URL
 
-If you don't want one or both of these fields present, you can use the `-s`/`--set` flag
-to have them removed:
+If you don't want one or both of these fields present, you can use the
+`-s`/`--set` flag to have them removed:
 
 ```
 mktor --set info.source --set info.x_cross_seed date.txt http://tracker.publicbt.com:80/announce
