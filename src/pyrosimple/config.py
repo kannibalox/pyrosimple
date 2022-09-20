@@ -29,6 +29,7 @@ settings = Dynaconf(
         Validator("SORT_FIELDS", default="name,hash"),
         Validator("FAST_QUERY", gte=0, lte=2, default=0),
         Validator("ITEM_CACHE_EXPIRATION", default=5.0),
+        Validator("SAFETY_CHECKS_ENABLED", default=True),
         Validator(
             "MKTOR_IGNORE",
             default=[

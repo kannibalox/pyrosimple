@@ -76,6 +76,16 @@ Defaults to `0` (disabled).
 See [query optimization](experimental.md#query-optimization) for more
 information.
 
+#### `safety_checks_enabled`
+
+Default to `True`.
+
+Several safety checks exist to provide more useful error message in
+cases such as missing methods/fields. In most cases this should have
+no impact other than an extra call to rtorrent's `system.listMethods`,
+but disabling these checks may be useful if you'd like to speed up
+command runs.
+
 #### `item_cache_expiration`
 
 Defaults to `5.0`.

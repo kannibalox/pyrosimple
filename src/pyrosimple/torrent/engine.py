@@ -3,10 +3,10 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
-
 import os
 import re
 import time
+import warnings
 
 from typing import Any, Callable, Dict, Optional, Set
 
@@ -542,12 +542,26 @@ def core_fields():
         accessor=lambda o: o.fetch("up") + o.fetch("down"),
         requires=["d.up.rate", "d.down.rate"],
     )
+
+    def _last_xfer_accessor(o):
+        engine = o._engine
+        if config.settings.SAFETY_CHECKS_ENABLED and not engine.has_method(
+            "d.timestamp.last_xfer"
+        ):
+            warnings.warn(
+                "Method 'd.timestamp.last_xfer' does not exist! See https://kannibalox.github.io/pyrosimple/rtorrent-config/ for information on setting up rtorrent.rc.",
+                stacklevel=2,
+            )
+            return 0
+        else:
+            return int(o.rpc_call("d.timestamp.last_xfer") or 0)
+
     yield DynamicField(
         int,
         "last_xfer",
         "last time data was transferred",
         matcher=matching.TimeFilter,
-        accessor=lambda o: int(o.rpc_call("d.timestamp.last_xfer") or 0),
+        accessor=_last_xfer_accessor,
         formatter=fmt.iso_datetime_optional,
     )
     yield DynamicField(
