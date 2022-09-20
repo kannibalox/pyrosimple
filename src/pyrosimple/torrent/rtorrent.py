@@ -636,10 +636,12 @@ class RtorrentEngine:
         self.rpc = None
         self.properties = {}
         self.known_throttle_names = {"", "NULL"}
+        self.url: str
         if url is None:
             config.autoload_scgi_url()
+            self.url = config.settings.SCGI_URL
         else:
-            config.settings.SCGI_URL = url
+            self.url = url
         if auto_open:
             self.open()
 
@@ -656,12 +658,12 @@ class RtorrentEngine:
                 self.engine_id,
                 self.engine_software,
                 fmt.human_duration(self.uptime, 0, 2, True).strip(),
-                config.settings.SCGI_URL,
+                self.url,
             )
         # Unconnected state
         return "{} connectable via {!r}".format(
             self.__class__.__name__,
-            config.settings.SCGI_URL,
+            self.url,
         )
 
     @property
@@ -703,14 +705,14 @@ class RtorrentEngine:
             return self.rpc
 
         # Reading abilities are on the downfall, so...
-        if not config.settings.SCGI_URL:
+        if not self.url:
             raise error.UserError(
                 "You need to configure a RPC connection, read"
-                " https://pyrosimple.readthedocs.io/en/latest/setup.html"
+                " https://kannibalox.github.io/pyrosimple/configuration/#top-level-section"
             )
 
         # Connect and get instance ID (also ensures we're connectable)
-        self.rpc = rpc.RTorrentProxy(config.settings.SCGI_URL)
+        self.rpc = rpc.RTorrentProxy(self.url)
         self.properties = self.system_multicall(
             {
                 "system.client_version": [],
@@ -727,7 +729,7 @@ class RtorrentEngine:
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
             self.LOG.warning(
-                "Your xmlrpc-c is broken (64 bit integer support missing,"
+                "Unsupported xmlrpc-c version (64 bit integer support missing,"
                 " %r returned instead)",
                 type(time_usec),
             )
@@ -735,7 +737,7 @@ class RtorrentEngine:
         # Get other manifest values
         self.engine_software = f"rTorrent {self.properties['system.library_version']}/{self.properties['system.client_version']}"
 
-        if "+ssh:" in config.settings.SCGI_URL:
+        if "+ssh:" in self.url:
             self.startup = int(self.rpc.startup_time() or time.time())
         else:
             lockfile = os.path.join(self.properties["session.path"], "rtorrent.lock")
