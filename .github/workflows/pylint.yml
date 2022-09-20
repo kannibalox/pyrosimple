@@ -1,6 +1,9 @@
 name: Pylint
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   build:
@@ -19,7 +22,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install -v -E torque
-        poetry run pip install jinja2
     - name: Run unittests
       run: |
         poetry run pytest
