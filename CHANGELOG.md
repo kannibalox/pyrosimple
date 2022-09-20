@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+### Added
+
+- Re-enabled `last_xfer` and `active` fields
+- Configuration option `item_cache_expiration` for more explicit control of the cache
+
+### Fixed
+
+- rtcontrol
+  - `--json` will now display all known fields by default
+  - `--throttle` works as intended
+  - send string to interval calculations instead of object (effected `seedtime`, `leechtime`, `stopped`)
+  - Fix pre-fetching for `views`
+
+### Changed
+
+- Show full stack traces for templating errors while using `--debug`
+
 ## [2.0.3] - 2022-09-28
 
 ### Fixed
@@ -21,15 +38,19 @@
 
 ### Fixed
 
-- Validate simple output formatters against all jinja2 filters
+- Validate simple output formatters against all Jinja2 filters
 
 ## [2.0.0] - 2022-09-13
 
-This release marks the break between pyrocore-compatible code and new pyrosimple code/behavior. The changes are too numerous
-to list individually, but the following are some of the backwards-incompatible changes:
+This release marks the break between pyrocore-compatible code and new
+pyrosimple code/behavior. The changes are too numerous to list
+individually, but the following are some of the backwards-incompatible
+changes:
 
 - Overhauled `rtcontrol`'s query parsing engine
 - Python 2 support dropped
 - New TOML configuration file
 
-If you just want to use the pyrocore tools on python 3 without all the new features, you can use the `release-1.X` branch or the 1.X releases.
+If you just want to use the pyrocore tools on python 3 without all the
+new features, you can use the `release-1.X` branch or the 1.X
+releases.
