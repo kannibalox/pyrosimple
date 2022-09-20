@@ -828,11 +828,9 @@ class RtorrentEngine:
                 raw_items = multi_call(*tuple(multi_args))
 
             self.LOG.debug(
-                "Got %d items with %d attributes from %r [%s]",
+                "Got %d items with %d attributes",
                 len(raw_items),
                 len(prefetch),
-                self.engine_id,
-                multi_call,
             )
 
             for item in raw_items:
