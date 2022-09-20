@@ -38,6 +38,7 @@ title: Migrating from pyroscope
 * String matching is now case-sensitive by default. To use
   case-insensitive matching, use a regex with the `i` flag,
   e.g. `name=/UbUnTu.*/i`
+* Relative times (e.g. `2d3m`) are now case-sensitive.
 
 ### Templating
 
