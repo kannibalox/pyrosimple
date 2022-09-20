@@ -58,14 +58,14 @@ As seen in the `stats` job, there are four main settings for a job:
 - `schedule` tells pyrotorque when to trigger jobs. If you're familiar
   with cron syntax, this is very similar, e.g. `minute=*` means run
   once a minute. The underlying library, APScheduler, extends the
-  syntax with features like per-second resolution, check out the
+  syntax with features like per-second resolution. Check out the
   [documentation](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html#introduction)
   for details.
 - `active` provides an easy way to enable or disable jobs.
 - `dry_run` tells the job to not make any actual changes if it's `true`.
 
 Any other settings are job-specific. For detailed documentation on
-each job, see the [pyrotorque reference](/pyrotorque-jobs/).
+each job, see the [pyrotorque reference](pyrotorque-jobs.md).
 
 ## Usage
 

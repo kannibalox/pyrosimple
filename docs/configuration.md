@@ -88,7 +88,7 @@ information forever, while `-1` disables the cache entirely.
 ### TORQUE
 
 This section is reserved for `pyrotorque`. See its
-[user guide](/usage-pyrotorque/) for more information.
+[user guide](usage-pyrotorque.md) for more information.
 
 ### FORMATS
 

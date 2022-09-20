@@ -173,7 +173,7 @@ configured to be executed during item loading can be templates. This can
 be used to support all sorts of tricks, the most common ones are
 explained here, including fully dynamic completion moving. If the
 following explanation of the inner workings is too technical and nerdy
-for you, skip to the [tree watch examples](pyrotorque-jobs/#tree-watch-examples)
+for you, skip to the [tree watch examples](pyrotorque-jobs.md#tree-watch-examples)
 section below, and just adapt one of the prepared use cases to your
 setup.
 

@@ -78,7 +78,7 @@ echo date > date.txt
 mktor date.txt http://tracker.publicbt.com:80/announce
 ```
 
-If you have [aliases](/configuration#aliases) configured, you can use the alias in place of the URL.
+If you have [aliases](configuration.md#aliases) configured, you can use the alias in place of the URL.
 
 ### Cross-seeding
 
