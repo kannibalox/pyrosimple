@@ -69,6 +69,8 @@ By default lstor will throw an error if the file isn't a valid .torrent file. Ho
 if you wish to ignore those errors (to view a rTorrent session file, for instance),
 the `--raw` flag can be combined with `-V`/`--skip-validation`.
 
+`lstor` can also hash check the torrent against real data by using the `-H <path>` flag.
+
 ## mktor
 
 At its simplest, creating a torrent file requires only a path and an announce URL
