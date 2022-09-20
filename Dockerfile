@@ -10,7 +10,7 @@ FROM base as builder
 ENV PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.1.12
+  POETRY_VERSION=1.2.1
 
 RUN pip install "poetry==$POETRY_VERSION"
 RUN python -m venv /venv
@@ -20,7 +20,7 @@ WORKDIR /app
 
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install -n --no-ansi --no-dev -E torque
+RUN poetry install -n --no-ansi -E torque
 
 COPY . ./
 
