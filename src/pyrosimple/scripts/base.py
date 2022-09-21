@@ -54,17 +54,17 @@ class ScriptBase:
         try:
             import importlib.metadata  # pylint: disable=import-outside-toplevel
 
-            self.__version__ = importlib.metadata.version(  # pylint: disable=no-member
+            version = importlib.metadata.version(  # pylint: disable=no-member
                 "pyrosimple"
             )
         except ImportError:
-            self.__version__ = "unknown"
-        self.version_info = f"{self.__version__} on Python {sys.version.split()[0]}"
+            version = "unknown"
+        version_info = f"{version} on Python {sys.version.split()[0]}"
 
         self.parser = ArgumentParser(
             usage="%(prog)s [options] " + self.ARGS_HELP + "\n\n"
             "%(prog)s "
-            + self.version_info
+            + version_info
             + ("\n" + self.COPYRIGHT if self.COPYRIGHT else "")
             + "\n\n"
             + textwrap.dedent(self.__doc__.rstrip()).lstrip("\n")
@@ -74,7 +74,7 @@ class ScriptBase:
         )
 
         self.parser.add_argument(
-            "--version", action="version", version="%(prog)s " + self.version_info
+            "--version", action="version", version=f"%(prog)s {version_info}"
         )
         self.parser.add_argument("args", nargs="*")
 

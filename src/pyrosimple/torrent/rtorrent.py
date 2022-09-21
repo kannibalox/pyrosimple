@@ -631,7 +631,6 @@ class RtorrentEngine:
         self.LOG = pymagic.get_class_logger(self)
         self.engine_id = "N/A"  # ID of the instance we're connecting to
         self.engine_software = "rTorrent"  # Name and version of software
-        self.version_info = (0,)
         self.startup = time.time()
         self.rpc = None
         self.properties = {}
