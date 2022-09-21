@@ -174,7 +174,7 @@ class RtorrentControl(ScriptBaseWithConfig):
     Multiple values separated by a comma indicate several possible choices (OR).
     "!" in front of a filter value negates it (NOT).
 
-    See https://pyrosimple.readthedocs.io/en/latest/usage.html#rtcontrol for more.
+    See https://kannibalox.github.io/pyrosimple/usage-rtcontrol/#examples for more.
 
     Examples:
       - All 1:1 seeds         ratio=+1
