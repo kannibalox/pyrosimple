@@ -9,16 +9,15 @@ know a little Python.
 
 ## Custom fields
 
-The ``config.py`` script can be used to add
-custom logic to your setup. The most common use for this file is adding
-custom fields.
+The ``config.py`` script can be used to add custom logic to your
+setup. The most common use for this file is adding custom fields.
 
 To add user-defined fields you can put code describing them into your
-``~/.config/pyrosimple/config.py`` file. You can then use your custom field just
-like any built-in one, e.g. issue a command like
+``~/.config/pyrosimple/config.py`` file. You can then use your custom
+field just like any built-in one, e.g. issue a command like
 ``rtcontrol --from-view incomplete \* -qco partial_done,name`` (see
-below examples). They're also listed when you call
-``rtcontrol --help-fields``.
+below examples). They're also listed when you call ``rtcontrol
+--help-fields``.
 
 Here's an example of adding a simple custom field:
 
@@ -143,8 +142,13 @@ print(proxy.system.hostname())
 print(proxy.d.multicall2('', 'main', 'd.hash='))
 ```
 
-If you want to skip the auto-detection of rtorrent's URL, simply pass in your own to `connect()`:
+If you want to skip the auto-detection of rtorrent's URL, simply pass
+in your own to `connect()`:
 
 ```python
 engine = pyrosimple.connect("scgi://localhost:9000")
 ```
+
+See the
+[`examples`](https://github.com/kannibalox/pyrosimple/tree/main/docs/examples)
+directory for some useful python scripts.
