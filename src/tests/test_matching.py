@@ -168,3 +168,19 @@ def test_matcher(matcher, item):
 def test_matcher_fail(matcher, item):
     m = matching.create_matcher(matcher)
     assert not m.match(item)
+
+
+@pytest.mark.parametrize(
+    ("matcher", "item"),
+    [
+        ("name=arch", 'string.contains_i=$d.name=,"arch"'),
+        ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
+        ("size<1G", "less=d.size_bytes=,value=1073741824"),
+        ("is_complete=no", "equal=d.complete=,value=0"),
+    ],
+)
+def test_matcher_prefilter(matcher, item):
+    assert (
+        matching.unquote_pre_filter(matching.create_matcher(matcher).pre_filter())
+        == item
+    )
