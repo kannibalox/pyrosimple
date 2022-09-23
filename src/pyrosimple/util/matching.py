@@ -189,52 +189,6 @@ class FieldFilter(MatcherNode):
     Subclasses of FieldFilter act as the leaves of the tree, providing
     matching and pre-filtering functionality."""
 
-    PRE_FILTER_FIELDS = dict(
-        # alias="",
-        hash="d.hash=",
-        name="d.name=",
-        message="d.message=",
-        metafile="d.tied_to_file=",
-        path="d.base_path=",
-        # realpath="=",
-        throttle="d.throttle_name=",
-        # tracker="=",
-        is_active="d.is_active=",
-        is_complete="d.complete=",
-        is_ignored="d.ignore_commands=",
-        is_multi_file="d.is_multi_file=",
-        is_open="d.is_open=",
-        # done="=",
-        down="d.down.rate=",
-        # fno="=",
-        prio="d.priority=",
-        ratio="d.ratio=",
-        size="d.size_bytes=",
-        up="d.up.rate=",
-        uploaded="d.up.total=",
-        completed="d.custom=tm_completed",
-        loaded="d.custom=tm_loaded",
-        started="d.custom=tm_started",
-        # stopped="",
-        custom_tm_completed="d.custom=tm_completed",
-        custom_tm_loaded="d.custom=tm_loaded",
-        custom_tm_started="d.custom=tm_started",
-        # XXX: bad result: rtcontrol -Q2 -o- -v tagged='!'new,foo
-        #       use a 'd.is_tagged=tag' command?
-        tagged="d.custom=tags",
-    )
-
-    # active                last time a peer was connected
-    # directory             directory containing download data
-    # files                 list of files in this item
-    # is_ghost              has no data file or directory?
-    # is_private            private flag set (no DHT/PEX)?
-    # leechtime             time taken from start to completion
-    # seedtime              total seeding time after completion
-    # traits                automatic classification of this item (audio, video, tv, movie, etc.)
-    # views                 views this item is attached to
-    # xfer                  transfer rate
-
     def __init__(self, name: str, op: FilterOperator, value: str):
         """Store field name and filter value for later evaluations."""
         super().__init__([])  # Filters are the leaves of the tree and have no children
@@ -362,10 +316,11 @@ class PatternFilter(FieldFilter):
 
     def pre_filter_eq(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        if self._name not in self.PRE_FILTER_FIELDS or self._template:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is None or self._template:
             return ""
         if not self._value or self._value == '""':
-            return f'"equal={self.PRE_FILTER_FIELDS[self._name]},cat="'
+            return f'"equal={pf},cat="'
 
         if self._value.startswith("/") and (
             self._value.endswith("/") or self._value.endswith("/i")
@@ -387,9 +342,7 @@ class PatternFilter(FieldFilter):
             except UnicodeEncodeError:
                 return ""
             needle = needle.replace('"', r"\\\"")
-            return r'"string.contains_i=${},\"{}\""'.format(
-                self.PRE_FILTER_FIELDS[self._name], needle
-            )
+            return r'"string.contains_i=${},\"{}\""'.format(pf, needle)
 
         return ""
 
@@ -421,14 +374,15 @@ class TaggedAsFilter(FieldFilter):
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        if self._name in self.PRE_FILTER_FIELDS:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
             if not self._value:
-                return f'"not=${self.PRE_FILTER_FIELDS[self._name]}"'
+                return f'"not=${pf}"'
             val = self._value
             if self._exact:
                 val = val.split().pop()
             return r'"string.contains_i=${},\"{}\""'.format(
-                self.PRE_FILTER_FIELDS[self._name], val.replace('"', r"\\\"")
+                pf, val.replace('"', r"\\\"")
             )
         return ""
 
@@ -464,10 +418,9 @@ class BoolFilter(FieldFilter):
 
     def pre_filter_eq(self):
         """Return rTorrent condition to speed up data transfer."""
-        if self._name in self.PRE_FILTER_FIELDS:
-            return '"equal={},value={}"'.format(
-                self.PRE_FILTER_FIELDS[self._name], int(self._value)
-            )
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
+            return '"equal={},value={}"'.format(pf, int(self._value))
         return ""
 
     def validate(self):
@@ -511,35 +464,38 @@ class FloatFilter(NumericFilterBase):
 
     # pylint: disable=missing-function-docstring
     def pre_filter_eq(self):
-        if self._name in self.PRE_FILTER_FIELDS:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"equal=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
+            return f'"equal=value=${pf},value={val}"'
         return ""
 
     def pre_filter_ge(self):
-        if self._name in self.PRE_FILTER_FIELDS:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return (
-                f'"greater=value=${self.PRE_FILTER_FIELDS[self._name]},value={val-1}"'
-            )
+            return f'"greater=value=${pf},value={val-1}"'
         return ""
 
     def pre_filter_gt(self):
-        if self._name in self.PRE_FILTER_FIELDS:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"greater=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
+            return f'"greater=value=${pf},value={val}"'
         return ""
 
     def pre_filter_le(self):
-        if self._name in self.PRE_FILTER_FIELDS:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"less=value=${self.PRE_FILTER_FIELDS[self._name]},value={val+1}"'
+            return f'"less=value=${pf},value={val+1}"'
         return ""
 
     def pre_filter_lt(self):
-        if self._name in self.PRE_FILTER_FIELDS:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"less=value=${self.PRE_FILTER_FIELDS[self._name]},value={val}"'
+            return f'"less=value=${pf},value={val}"'
         return ""
 
     # pylint: enable=missing-function-docstring
@@ -574,7 +530,8 @@ class TimeFilter(NumericFilterBase):
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        if self._name in self.PRE_FILTER_FIELDS:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None:
             # Adding a day of fuzz to avoid any possible timezone problems
             if self._op.name == "gt":
                 timestamp = float(self._value) + 86400
@@ -595,9 +552,7 @@ class TimeFilter(NumericFilterBase):
                 else 0
             )
 
-            return '"{}=value=${},value={}"'.format(
-                cmp_, self.PRE_FILTER_FIELDS[self._name], int(timestamp)
-            )
+            return '"{}=value=${},value={}"'.format(cmp_, pf, int(timestamp))
         return ""
 
     def validate_time(self, duration=False):
@@ -705,10 +660,11 @@ class ByteSizeFilter(NumericFilterBase):
             "lt": "less",
             "eq": "equal",
         }
-        if self._name in self.PRE_FILTER_FIELDS and self._op.name in comparers:
+        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        if pf is not None and self._op.name in comparers:
             return '"{}={},value={}"'.format(
                 comparers[self._op.name],
-                self.PRE_FILTER_FIELDS[self._name],
+                pf,
                 int(self._value),
             )
         return ""

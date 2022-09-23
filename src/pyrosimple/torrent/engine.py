@@ -213,6 +213,7 @@ class FieldDefinition:
         matcher=None,
         formatter=None,
         requires=None,
+        prefilter_field=None,
     ):
         self.valtype = valtype
         self.name = name
@@ -221,6 +222,7 @@ class FieldDefinition:
         self._accessor = accessor
         self._matcher = matcher
         self.formatter = formatter
+        self.prefilter_field = prefilter_field
         if accessor is None:
             self._accessor = lambda o: o.rpc_call("d." + name)
             if requires is None:
@@ -280,9 +282,12 @@ class MutableField(FieldDefinition):
         matcher=None,
         formatter=None,
         requires=None,
+        prefilter_field=None,
         setter: Callable = None,
     ):
-        super().__init__(valtype, name, doc, accessor, matcher, formatter, requires)
+        super().__init__(
+            valtype, name, doc, accessor, matcher, formatter, requires, prefilter_field
+        )
         self._setter = setter
 
     def __set__(self, obj, val, cls=None):
@@ -299,6 +304,8 @@ def core_fields():
         "private flag set (no DHT/PEX)?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "PRV" if val else "PUB",
+        requires=["d.is_private"],
+        prefilter_field="d.is_private=",
     )
     # Classification
     yield DynamicField(
@@ -337,7 +344,11 @@ def core_fields():
 
     # Basic fields
     yield ConstantField(
-        str, "name", "name (file or root directory)", matcher=matching.PatternFilter
+        str,
+        "name",
+        "name (file or root directory)",
+        matcher=matching.PatternFilter,
+        prefilter_field="d.name=",
     )
     yield ConstantField(
         int,
@@ -346,6 +357,7 @@ def core_fields():
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.size_bytes"),
         requires=["d.size_bytes"],
+        prefilter_field="d.size_bytes=",
     )
     yield MutableField(
         int,
@@ -355,6 +367,7 @@ def core_fields():
         accessor=lambda o: o.rpc_call("d.priority"),
         requires=["d.priority"],
         formatter=lambda val: "X- +"[val],
+        prefilter_field="d.priority=",
     )
     yield ConstantField(
         str,
@@ -398,7 +411,12 @@ def core_fields():
         requires=["d.custom=memo_alias"],
     )
     yield DynamicField(
-        str, "message", "current tracker message", matcher=matching.PatternFilter
+        str,
+        "message",
+        "current tracker message",
+        matcher=matching.PatternFilter,
+        requires=["d.message"],
+        prefilter_field="d.message=",
     )
 
     # State
@@ -408,6 +426,8 @@ def core_fields():
         "download open?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "OPN" if val else "CLS",
+        requires=["d.is_open"],
+        prefilter_field="d.is_open=",
     )
     yield DynamicField(
         bool,
@@ -415,6 +435,8 @@ def core_fields():
         "download active?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "ACT" if val else "STP",
+        requires=["d.is_active"],
+        prefilter_field="d.is_active=",
     )
     yield DynamicField(
         bool,
@@ -424,6 +446,7 @@ def core_fields():
         formatter=lambda val: "DONE" if val else "PART",
         accessor=lambda o: o.rpc_call("d.complete"),
         requires=["d.complete"],
+        prefilter_field="d.complete=",
     )
     yield ConstantField(
         bool,
@@ -431,6 +454,7 @@ def core_fields():
         "single- or multi-file download?",
         matcher=matching.BoolFilter,
         formatter=lambda val: "DIR " if val else "FILE",
+        prefilter_field="d.is_multi_file=",
     )
     yield MutableField(
         bool,
@@ -440,6 +464,7 @@ def core_fields():
         formatter=lambda val: "IGN!" if int(val) else "HEED",
         accessor=lambda o: o.rpc_call("d.ignore_commands"),
         requires=["d.ignore_commands"],
+        prefilter_field="d.is_ignored=",
         setter=lambda o, val: o.ignore(int(val)),
     )
     yield DynamicField(
@@ -458,6 +483,7 @@ def core_fields():
         "directory",
         "directory containing download data",
         matcher=matching.PatternFilter,
+        prefilter_field="d.directory=",
     )
     yield DynamicField(
         str,
@@ -480,8 +506,8 @@ def core_fields():
         "metafile",
         "path to torrent file",
         matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(str(o.rpc_call("d.session_file"))),
-        requires=["d.session_file"],
+        accessor=lambda o: os.path.expanduser(str(o.rpc_call("d.tied_to_file"))),
+        requires=["d.tied_to_fiel"],
     )
     yield ConstantField(
         str,
@@ -490,6 +516,7 @@ def core_fields():
         matcher=matching.PatternFilter,
         accessor=lambda o: os.path.expanduser(str(o.rpc_call("d.session_file"))),
         requires=["d.session_file"],
+        prefilter_field="d.session_file=",
     )
     yield ConstantField(
         list,
@@ -525,6 +552,7 @@ def core_fields():
         matcher=matching.FloatFilter,
         accessor=lambda o: o.rpc_call("d.ratio"),
         requires=["d.ratio"],
+        prefilter_field="d.ratio=",
     )
     yield DynamicField(
         int,
@@ -533,6 +561,7 @@ def core_fields():
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.up.total"),
         requires=["d.up.total"],
+        prefilter_field="d.up.total=",
     )
     yield DynamicField(
         int,
@@ -571,6 +600,7 @@ def core_fields():
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.down.rate"),
         requires=["d.down.rate"],
+        prefilter_field="d.down.rate=",
     )
     yield DynamicField(
         int,
@@ -579,6 +609,7 @@ def core_fields():
         matcher=matching.ByteSizeFilter,
         accessor=lambda o: o.rpc_call("d.up.rate"),
         requires=["d.up.rate"],
+        prefilter_field="d.up.rate=",
     )
     yield DynamicField(
         str,
@@ -588,6 +619,7 @@ def core_fields():
         accessor=lambda o: o.rpc_call("d.throttle_name"),
         formatter=lambda v: v if v else "NONE",
         requires=["d.throttle_name"],
+        prefilter_field="d.throttle_name=",
     )
 
     # Lifecyle
@@ -599,6 +631,7 @@ def core_fields():
         accessor=lambda o: int(o.rpc_call("d.custom", ["tm_loaded"]) or "0", 10),
         formatter=fmt.iso_datetime_optional,
         requires=["d.custom=tm_loaded"],
+        prefilter_field="d.custom=tm_loaded",
     )
     yield DynamicField(
         int,
@@ -608,6 +641,7 @@ def core_fields():
         accessor=lambda o: int(o.rpc_call("d.custom", ["tm_started"]) or "0", 10),
         formatter=fmt.iso_datetime_optional,
         requires=["d.custom=tm_started"],
+        prefilter_field="d.custom=tm_loaded",
     )
 
     def _leechtime_accessor(o):
@@ -639,6 +673,7 @@ def core_fields():
         accessor=lambda o: int(o.rpc_call("d.custom", ["tm_completed"]) or "0", 10),
         formatter=fmt.iso_datetime_optional,
         requires=["d.custom=tm_completed"],
+        prefilter_field="d.custom=tm_completed",
     )
     yield DynamicField(
         untyped,
@@ -760,7 +795,13 @@ class TorrentProxy:
         """Compare items based on their infohash."""
         return other and self.hash == getattr(other, "hash", None)
 
-    hash = ConstantField(str, "hash", "info hash", matcher=matching.PatternFilter)
+    hash = ConstantField(
+        str,
+        "hash",
+        "info hash",
+        matcher=matching.PatternFilter,
+        prefilter_field="d.hash=",
+    )
 
     def __repr__(self):
         """Return a representation of internal state."""

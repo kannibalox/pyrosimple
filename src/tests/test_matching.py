@@ -177,6 +177,7 @@ def test_matcher_fail(matcher, item):
         ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
         ("size<1G", "less=d.size_bytes=,value=1073741824"),
         ("is_complete=no", "equal=d.complete=,value=0"),
+        ("is_private=yes", "equal=d.is_private=,value=1"),
     ],
 )
 def test_matcher_prefilter(matcher, item):
