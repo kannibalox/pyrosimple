@@ -21,7 +21,7 @@ below examples). They're also listed when you call ``rtcontrol
 
 Here's an example of adding a simple custom field:
 
-```python
+```python title="config.py"
 from pyrosimple.torrent import engine
 def _custom_fields():
     from pyrosimple.torrent import engine
@@ -48,71 +48,36 @@ for field in _custom_fields():
 rtcontrol // -o piece_size
 ```
 
+### Examples
+
 You can see how the built-in fields are defined in
 [torrent/engine.py](https://github.com/kannibalox/pyrosimple/blob/main/src/pyrosimple/torrent/engine.py)
 if you want to see more complete examples.
 
-### Examples
-
 #### Tracker info
 
+These allow you to see the number of downloaders, seeders and leechers
+on items, provided the tracker supports [announce
+scrapes](https://wiki.theory.org/BitTorrentSpecification#Tracker_.27scrape.27_Convention).
+
+By default rTorrent only does a single scrape on restart or when an
+item is first added, which is why these fields aren't available by
+default. You'll need to set up your configuration as described in the
+[rTorrent github
+wiki](https://github.com/rakshasa/rtorrent/wiki/Auto-Scraping) in
+order to see up-to-date values for these fields.
+
 ```python
-    # Add tracker attributes not available by default
-    def get_tracker_field(obj, name, aggregator=sum):
-        "Get an aggregated tracker field."
-        return aggregator(obj.rpc_call("t.multicall", ["", f"t.{name}="])[0])
-    yield engine.DynamicField(
-        int,
-        "downloaders",
-        "number of completed downloads",
-        matcher=matching.FloatFilter,
-        accessor=lambda o: get_tracker_field(o, "scrape_downloaded"),
-    )
-    yield engine.DynamicField(
-        int,
-        "seeds",
-        "number of seeds",
-        matcher=matching.FloatFilter,
-        accessor=lambda o: get_tracker_field(o, "scrape_complete"),
-        requires=['t.multicall=,t.scrape_complete=']
-    )
-    yield engine.DynamicField(
-        int,
-        "leeches",
-        "number of leeches",
-        matcher=matching.FloatFilter,
-        accessor=lambda o: get_tracker_field(o, "scrape_incomplete"),
-    )
+{% include 'examples/custom-fields-trackers.py' %}
 ```
 
-### Peer Information
+#### Peer Information
+
+Note that due to requiring a DNS lookup, `peers_hostname` may take a
+long time to display.
 
 ```python
-    # Add peer attributes not available by default
-    def get_peer_data(obj, name, aggregator=None):
-        "Get some peer data via a multicall."
-        aggregator = aggregator or (lambda _: _)
-        result = obj._engine._rpc.p.multicall(obj._fields["hash"], "", "p.%s=" % name)
-        return aggregator([i[0] for i in result])
-    yield engine.DynamicField(
-        set,
-        "peers_ip",
-        "list of IP addresses for connected peers",
-        matcher=matching.TaggedAsFilter,
-        formatter="\n".join,
-        accessor=lambda o: set(get_peer_data(o, "address")),
-    )
-
-    yield engine.DynamicField(
-        set,
-        "peers_hostname",
-        "list of hostnames for connected peers",
-        matcher=matching.TaggedAsFilter,
-        formatter="\n".join,
-        accessor=lambda o: set(
-            [socket.getfqdn(p) for p in get_peer_data(o, "address")]
-        ),
-    )
+{% include 'examples/custom-fields-peers.py' %}
 ```
 
 ## As a library
@@ -131,7 +96,7 @@ views and abstractions seen in `rtcontrol`:
 
 ```python
 engine.log("Hello world!") # Prints to console of rtorrent
-print(list(engine.view("incomplete")))
+print([item.done for item in engine.view("incomplete")]) # List the done percentage for torrents in the incomplete view
 ```
 
 While `proxy` allows for low-level direct RPC calls, just like
