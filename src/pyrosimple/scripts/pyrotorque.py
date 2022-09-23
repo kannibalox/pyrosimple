@@ -64,6 +64,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             help="file holding the process ID of the daemon, when running in background",
         )
 
+    # pylint: disable=no-self-use
     def parse_schedule(self, schedule):
         """Parse a job schedule."""
         result = {}
@@ -74,8 +75,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 key, val = param.split("=", 1)
                 if key == "jitter":
                     val = int(val)
-            except (TypeError, ValueError):
-                self.fatal(f"Bad param '{param}' in job schedule '{schedule}'")
+            except (TypeError, ValueError) as exc:
+                raise error.ConfigurationError(
+                    f"Bad param '{param}' in job schedule '{schedule}'"
+                ) from exc
             else:
                 result[key] = val
 
@@ -87,7 +90,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for name, params in config.settings.TORQUE.items():
             for key in ("handler", "schedule"):
                 if key not in params:
-                    self.fatal(
+                    raise error.ConfigurationError(
                         f"Job '{name}' is missing the required '{key}' parameter"
                     )
             self.jobs[name] = dict(params)
@@ -105,15 +108,30 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.sched.add_job(
                     params["handler"].run,
                     name=name,
+                    id=name,
                     trigger="cron",
                     **params["schedule"],
                 )
 
     def run_forever(self):
         """Run configured jobs until termination request."""
+        running_config = dict(config.settings.TORQUE)
         while True:
             try:
                 time.sleep(self.POLL_TIMEOUT)
+                try:
+                    config.settings.configure()
+                    if running_config != dict(config.settings.TORQUE):
+                        self.LOG.debug("Config change detected, reloading jobs")
+                        self.validate_config()
+                        self.sched.pause()
+                        for name in self.jobs:
+                            self.sched.remove_job(name)
+                        self.add_jobs()
+                        self.sched.resume()
+                        running_config = dict(config.settings.TORQUE)
+                except (Exception) as exc:  # pylint: disable=broad-except
+                    self.LOG.error("Error while checking config: %s", exc)
             except KeyboardInterrupt as exc:
                 self.LOG.info("Termination request received (%s)", exc)
                 break
@@ -124,7 +142,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
     def mainloop(self):
         """The main loop."""
-        self.validate_config()
+        try:
+            self.validate_config()
+        except (error.ConfigurationError, TypeError) as exc:
+            self.fatal(exc)
 
         # Defaults for process control paths
         if not self.options.pid_file:
