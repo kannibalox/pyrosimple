@@ -37,6 +37,7 @@ for pyrotorque itself, and then sub-sections for the individual jobs.
 Example:
 ```toml
 [TORQUE]
+autoreload = true
 [TORQUE.stats]
 handler = "pyrocore.torrent.jobs:EngineStats"
 schedule = "minute=*"
@@ -56,7 +57,7 @@ active = true
 dry_run = true
 ```
 
-As seen in the `stats` job, there are four main settings for a job:
+As seen in the example `stats` job, there are four main settings for a job:
 
 - `handler` defines what class will run. You shouldn't need to
   understand what this means unless you're writing custom jobs, see

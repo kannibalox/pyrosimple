@@ -15,6 +15,7 @@ from typing import Dict
 from apscheduler.schedulers.background import BackgroundScheduler
 from daemon import DaemonContext
 from daemon.pidfile import TimeoutPIDLockFile
+from dynaconf.utils.boxing import DynaBox
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
@@ -88,6 +89,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         """Handle and check configuration."""
 
         for name, params in config.settings.TORQUE.items():
+            # Skip non-dictionary keys
+            if not isinstance(params, DynaBox):
+                continue
             for key in ("handler", "schedule"):
                 if key not in params:
                     raise error.ConfigurationError(
@@ -113,25 +117,27 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     **params["schedule"],
                 )
 
+    def reload_jobs(self):
+        try:
+            config.settings.configure()
+            if self.running_config != dict(config.settings.TORQUE):
+                self.LOG.info("Config change detected, reloading jobs")
+                self.validate_config()
+                for name in self.jobs:
+                    self.sched.remove_job(name)
+                self.add_jobs()
+                self.running_config = dict(config.settings.TORQUE)
+        except (Exception) as exc:  # pylint: disable=broad-except
+            self.LOG.error("Error while checking config: %s", exc)
+
     def run_forever(self):
         """Run configured jobs until termination request."""
-        running_config = dict(config.settings.TORQUE)
+        self.running_config = dict(config.settings.TORQUE)
         while True:
             try:
                 time.sleep(self.POLL_TIMEOUT)
-                try:
-                    config.settings.configure()
-                    if running_config != dict(config.settings.TORQUE):
-                        self.LOG.debug("Config change detected, reloading jobs")
-                        self.validate_config()
-                        self.sched.pause()
-                        for name in self.jobs:
-                            self.sched.remove_job(name)
-                        self.add_jobs()
-                        self.sched.resume()
-                        running_config = dict(config.settings.TORQUE)
-                except (Exception) as exc:  # pylint: disable=broad-except
-                    self.LOG.error("Error while checking config: %s", exc)
+                if config.settings.TORQUE.get("autoreload", True):
+                    self.reload_jobs()
             except KeyboardInterrupt as exc:
                 self.LOG.info("Termination request received (%s)", exc)
                 break
@@ -144,7 +150,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         """The main loop."""
         try:
             self.validate_config()
-        except (error.ConfigurationError, TypeError) as exc:
+        except (error.ConfigurationError) as exc:
             self.fatal(exc)
 
         # Defaults for process control paths
