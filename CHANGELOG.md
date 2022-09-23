@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Option to automatically reload pyrotorque if the config changes (off by default)
+
 ## [2.1.0] - 2022-09-20
 
 ### Added

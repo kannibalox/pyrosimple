@@ -136,7 +136,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         while True:
             try:
                 time.sleep(self.POLL_TIMEOUT)
-                if config.settings.TORQUE.get("autoreload", True):
+                if config.settings.TORQUE.get("autoreload", False):
                     self.reload_jobs()
             except KeyboardInterrupt as exc:
                 self.LOG.info("Termination request received (%s)", exc)

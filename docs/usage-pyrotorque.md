@@ -37,7 +37,7 @@ for pyrotorque itself, and then sub-sections for the individual jobs.
 Example:
 ```toml
 [TORQUE]
-autoreload = true
+autoreload = true # false by default
 [TORQUE.stats]
 handler = "pyrocore.torrent.jobs:EngineStats"
 schedule = "minute=*"
