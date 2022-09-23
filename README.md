@@ -4,8 +4,8 @@
 [![PyPI](https://img.shields.io/pypi/v/pyrosimple)](https://pypi.org/project/pyrosimple/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyrosimple)
 
-A overhauled Python 3 fork of the [pyrocore tools](https://github.com/pyroscope/pyrocore),
-for working with the
+A overhauled Python 3 fork of the [pyrocore
+tools](https://github.com/pyroscope/pyrocore), for working with the
 [rTorrent client](https://github.com/rakshasa/rtorrent).
 
 ## Installation
@@ -32,7 +32,8 @@ internal improvements and refactoring.
 - Only supports python 3 and rTorrent 0.9.8+ (0.9.6/0.9.7 should still
   work just fine, but aren't officially supported)
 - Simpler poetry-based build/install system with a single package
-- Performance improvements
+- Performance improvements (faster templating and only fetching
+  required fields)
 
 ### New features
 
