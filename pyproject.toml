@@ -99,3 +99,9 @@ ignore_missing_imports = true
 exclude = [
     '/data/'
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+
+[tool.coverage.run]
+omit = ["src/tests/*"]
