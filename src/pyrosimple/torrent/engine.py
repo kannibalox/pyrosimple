@@ -316,6 +316,7 @@ def core_fields():
         accessor=lambda o: set(o.rpc_call("d.custom", ["tags"]).lower().split()),
         formatter=_fmt_tags,
         requires=["d.custom=tags"],
+        prefilter_field="d.custom=tags",
     )
     yield DynamicField(
         set,
@@ -324,6 +325,7 @@ def core_fields():
         matcher=matching.TaggedAsFilter,
         formatter=_fmt_tags,
         requires=["d.views"],
+        prefilter_field="d.views=",
     )
     yield DynamicField(
         set,
