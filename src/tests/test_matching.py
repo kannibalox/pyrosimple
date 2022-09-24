@@ -133,6 +133,11 @@ def test_conditions_prefilter(cond, expected):
         ("completed>2h", Bunch(completed=time.time() - (60 * 60 * 2))),
         ("completed<1h", Bunch(completed=time.time() - 1)),
         ("tagged=test", Bunch(tagged=["test", "notest"])),
+        ("completed>09/21/1990", Bunch(completed=time.time())),
+        ("completed>21.09.1990", Bunch(completed=time.time())),
+        ("completed>1990-09-21", Bunch(completed=time.time())),
+        ("completed>1990-09-21T12:00", Bunch(completed=time.time())),
+        ("completed>1990-09-21T12:00:00", Bunch(completed=time.time())),
         ("tagged=notest", Bunch(tagged=["test", "notest"])),
         (
             "files=test*",
@@ -161,6 +166,7 @@ def test_matcher(matcher, item):
         ("size<1G", Bunch(size=2 * (1024**3))),
         ("leechtime<1h", Bunch(leechtime=60 * 60 * 2)),
         ("completed>1h", Bunch(completed=time.time() - 1)),
+        ("completed<09/21/1990", Bunch(completed=time.time())),
         ("tagged=:test", Bunch(tagged=["test", "notest"])),
         ("tagged=faketest", Bunch(tagged=["test", "notest"])),
     ],
@@ -178,6 +184,19 @@ def test_matcher_fail(matcher, item):
         ("size<1G", "less=d.size_bytes=,value=1073741824"),
         ("is_complete=no", "equal=d.complete=,value=0"),
         ("is_private=yes", "equal=d.is_private=,value=1"),
+        ("prio=1", "equal=value=$d.priority=,value=1"),
+        ("ratio>1", "greater=value=$d.ratio=,value=1000"),
+        ("ratio>=1", "greater=value=$d.ratio=,value=999"),
+        ("ratio<1", "less=value=$d.ratio=,value=1000"),
+        ("ratio<=1", "less=value=$d.ratio=,value=1001"),
+        ("prio=1", "equal=value=$d.priority=,value=1"),
+        (
+            "completed>1990-09-21",
+            "greater=value=$d.custom=tm_completed,value=653803200",
+        ),
+        ("views=test", 'string.contains_i=$d.views=,"test"'),
+        # Example of a seemingly easy query that can't be prefiltered
+        ("done>0", ""),
     ],
 )
 def test_matcher_prefilter(matcher, item):
