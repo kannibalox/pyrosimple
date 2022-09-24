@@ -118,6 +118,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 )
 
     def reload_jobs(self):
+        """Reload the configured jobs gracefully."""
         try:
             config.settings.configure()
             if self.running_config != dict(config.settings.TORQUE):
