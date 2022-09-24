@@ -304,7 +304,7 @@ class MetafileChanger(ScriptBase):
                     if not self.options.no_cross_seed:
                         # Enforce unique hash per tracker
                         torrent["info"]["x_cross_seed"] = hashlib.md5(
-                            self.options.reannounce
+                            self.options.reannounce.encode()
                         ).hexdigest()
                 if self.options.no_ssl:
                     # We're assuming here the same (default) port is used
