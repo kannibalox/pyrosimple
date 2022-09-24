@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-  `chtor`: Fix `--reannounce-all` without `--no-cross-seed` #11
+
 ### Added
 
 - Option to automatically reload pyrotorque if the config changes (off
