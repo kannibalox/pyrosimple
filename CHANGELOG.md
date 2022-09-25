@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- pyrotorque: New `ItemCommand` job
+
 ## [2.1.1] - 2022-09-24
 
 ### Fixed

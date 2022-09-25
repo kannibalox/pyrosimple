@@ -17,7 +17,9 @@ class Command(BaseJob):
 
     def run(self):
         if not self.config["dry_run"]:
-            proc = subprocess.run(self.args, **self.kwargs, capture_output=True)
+            proc = subprocess.run( # pylint: disable=subprocess-run-check
+                self.args, **self.kwargs, capture_output=True
+            )
             self.log.info("Command %s finished with RC=%s", proc.args, proc.returncode)
             self.log.debug("stdout: %s", proc.stdout)
             self.log.debug("stderr: %s", proc.stderr)
@@ -25,7 +27,7 @@ class Command(BaseJob):
             self.log.info("Would run %s with parameters %s", self.args, self.kwargs)
 
 
-class ItemCommand(BaseJob):
+class ItemCommand(MatchableJob):
     """Runs a templated command against matching items."""
 
     def __init__(self, config=None):
@@ -36,7 +38,7 @@ class ItemCommand(BaseJob):
 
     def run_item(self, item):
         if not self.config["dry_run"]:
-            proc = subprocess.run(
+            proc = subprocess.run(  # pylint: disable=subprocess-run-check
                 [rtorrent.format_item(a, item) for a in self.args],
                 **self.kwargs,
                 capture_output=True,
