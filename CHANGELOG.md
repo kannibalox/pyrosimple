@@ -1,10 +1,11 @@
 # Changelog
 
-## [Unreleased]
+## [2.1.1] - 2022-09-24
 
 ### Fixed
 
-- `chtor`: Fix `--reannounce-all` without `--no-cross-seed` #11
+- https://github.com/kannibalox/pyrosimple/pull/11 `chtor`: Fix
+  `--reannounce-all` without `--no-cross-seed`
 
 ### Added
 
