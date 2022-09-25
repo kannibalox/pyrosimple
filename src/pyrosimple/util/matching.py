@@ -5,7 +5,7 @@ Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.co
 There's a lot of magic going on in this module, but essentially
 its primary responsibility is parsing queries from rtcontrol and other
 places. Once parsed, it uses the visitor pattern in some classes to do
-things like return lists of the fields being referenced, preprepare
+things like return lists of the fields being referenced, prepare
 d.multicall.filtered statements or check if it matches against an
 actual item.
 """
@@ -296,7 +296,7 @@ class PatternFilter(FieldFilter):
         self._template = None
         self._flags = 0
         self._matcher: Callable[Any, Any]
-        if self._value == '""': # Replace an empty string with a simle truthiness check
+        if self._value == '""':  # Replace an empty string with a simple truthiness check
             self._matcher = lambda val, _: val == ""
         elif self._value.startswith("/") and (
             self._value.endswith("/") or self._value.endswith("/i")
@@ -572,7 +572,8 @@ class TimeFilter(NumericFilterBase):
         return ""
 
     def validate_time(self, duration=False):
-        """Validate filter condition (template method) for timestamps and durations."""
+        """Validate filter condition (template method) for timestamps
+        and durations."""
         super().validate()
         timestamp = now = time.time()
 
@@ -595,8 +596,10 @@ class TimeFilter(NumericFilterBase):
 
                 if duration:
                     timestamp = now - timestamp
-                # Invert the value for more intuitive matching (in line with original code too)
-                # e.g. 'completed<1d' should return things completed less than one day *ago*
+                # Invert the value for more intuitive matching (in
+                # line with original code too) e.g. 'completed<1d'
+                # should return things completed less than one day
+                # *ago*
                 else:
                     if self._op.name == "gt":
                         self._op = Operators["le"]

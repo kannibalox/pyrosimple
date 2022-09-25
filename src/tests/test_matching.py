@@ -180,6 +180,8 @@ def test_matcher_fail(matcher, item):
     ("matcher", "item"),
     [
         ("name=arch", 'string.contains_i=$d.name=,"arch"'),
+        ('name="arch linux"', 'string.contains_i=$d.name=,"arch linux"'),
+        ("name=/arch/", 'string.contains_i=$d.name=,"arch"'),
         ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
         ("size<1G", "less=d.size_bytes=,value=1073741824"),
         ("is_complete=no", "equal=d.complete=,value=0"),

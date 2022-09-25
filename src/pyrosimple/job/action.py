@@ -17,7 +17,7 @@ class Command(BaseJob):
 
     def run(self):
         if not self.config["dry_run"]:
-            proc = subprocess.run( # pylint: disable=subprocess-run-check
+            proc = subprocess.run(  # pylint: disable=subprocess-run-check
                 self.args, **self.kwargs, capture_output=True
             )
             self.log.info("Command %s finished with RC=%s", proc.args, proc.returncode)
