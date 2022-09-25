@@ -4,6 +4,30 @@ title: Pyrotorque Jobs
 
 # Pyrotorque Jobs
 
+## Command
+
+This job runs a single untemplated command. While this can also be
+done with straight cron, having it in pyrotorque allows keeping all
+rTorrent changes in one place. It also offers several improvements,
+such as per-second resolution.
+
+```toml
+[TORQUE.send_mail]
+handler       = "pyrosimple.job.action:Command"
+active        = true
+args          = "echo pyrotorque is still running!' | mail -s 'pyrotorque check'"
+shell         = true
+dry_run       = false
+schedule      = "hour=*"
+matcher       = "is_ignored=no ratio>5.0"
+view          = "complete"
+action        = "stop"
+```
+
+There are optional parameters `shell`, `cwd`, `timeout`, `check`, and
+`env`, all of which correspond to the parameters of
+[`subprocess.run()`](https://docs.python.org/3/library/subprocess.html#subprocess.run)
+
 ## Action Job
 
 This is a simple job, intended to allow access to (almost)
@@ -24,7 +48,8 @@ action        = "stop"
 
 Arguments:
 
-* `action`: The action to perform. See `rtcontrol --help` for a list of actions.
+* `action`: The action to perform. See `rtcontrol --help` for a list
+  of actions.
 * `view`: The rtorrent view to query
 * `matcher`: The query to use when listing torrents
 
@@ -32,9 +57,8 @@ Arguments:
 
 ### Configuration
 
-The following is a minimal `config.toml` configuration
-example, only changing a few values from the defaults to demonstrate
-key features:
+The following is a minimal `config.toml` configuration example, only
+changing a few values from the defaults to demonstrate key features:
 
 ```toml
 [TORQUE.queue]
@@ -48,27 +72,28 @@ downloading_min = 1
 downloading_max = 100
 ```
 
-Having a minimal configuration with just your changes is recommended, so
-you get new defaults in later releases automatically.
+Having a minimal configuration with just your changes is recommended,
+so you get new defaults in later releases automatically.
 
 ### Queue Settings Explained
 
 In the above example for the `queue` job, `downloading_max` counts
-started-but-incomplete items including those that ignore commands. Only
-if there are fewer of these items in the client than that number, a new
-item will be started. This is the queue's length and thus the most
-important parameter.
+started-but-incomplete items including those that ignore
+commands. Only if there are fewer of these items in the client than
+that number, a new item will be started. This is the queue's length
+and thus the most important parameter.
 
 The queue *never* stops any items, i.e. `downloading_max` is not
-enforced and you can manually start more items than that if you want to.
-That is also the reason items that should be under queue control must be
-loaded in 'normal' mode, i.e. stopped.
+enforced and you can manually start more items than that if you want
+to.  That is also the reason items that should be under queue control
+must be loaded in 'normal' mode, i.e. stopped.
 
 Other queue parameters are the minimum number of items in
 'downloading' state named `downloading_min`, which trumps
-`start_at_once`, the maximum number of items to start in one run of the
-job. Both default to `1`. Since the default schedule is `second=*/15`,
-that means at most one item would be started every 15 seconds.
+`start_at_once`, the maximum number of items to start in one run of
+the job. Both default to `1`. Since the default schedule is
+`second=*/15`, that means at most one item would be started every 15
+seconds.
 
 But that default is changed using the following two lines:
 
@@ -77,18 +102,18 @@ schedule          = "second=*/5"
 intermission      = 60
 ```
 
-This makes the queue manager check more often whether there is something
-startable, but prevents it from starting the next batch of items when
-the last start was less than `intermission` seconds ago.
+This makes the queue manager check more often whether there is
+something startable, but prevents it from starting the next batch of
+items when the last start was less than `intermission` seconds ago.
 
 The `startable` condition (repeated below for reference) prevents
 ignored items, ones having a non-empty message, and those with the
 lowest priority from being started. Note that tree watch sets the
 priority of items loaded in 'normal' mode to zero -- that `prio>0`
-condition then excludes them from being started automatically some time
-later, until you press `+` to increase that priority. You can also delay
-not-yet-started items using the `-` key until the item has a priority of
-zero (a/k/a `off`).
+condition then excludes them from being started automatically some
+time later, until you press `+` to increase that priority. You can
+also delay not-yet-started items using the `-` key until the item has
+a priority of zero (a/k/a `off`).
 
 ```toml
 startable = '''
@@ -100,46 +125,46 @@ startable = '''
 This sample condition also adds the extra hurdle that audio downloads
 that don't stay below a 25% threshold regarding contained images are
 **not** started automatically. *Unless* you raise the priority to 3
-(`high`) using the `+` key, then they're fair game for the queue. Go do
-all that with a plain rTorrent watch dir, in one line of configuration.
+(`high`) using the `+` key, then they're fair game for the queue. Go
+do all that with a plain rTorrent watch dir, in one line of
+configuration.
 
 The parameter `sort_fields` is used to determinate in what order
 startable items are handled. By default, higher priority items are
 started first, and age is used within each priority class.
 
-Above, it was mentioned `downloading_max` counts started-but-incomplete
-items. The exact definition of that classification can be changed using
-the `downloading` condition. A given condition is *always* extended with
-`is_active=1 is_complete=0`, i.e. the started-but-incomplete
-requirement.
+Above, it was mentioned `downloading_max` counts
+started-but-incomplete items. The exact definition of that
+classification can be changed using the `downloading` condition. A
+given condition is *always* extended with `is_active=1 is_complete=0`,
+i.e. the started-but-incomplete requirement.
 
 ```toml
 downloading = "[ prio>1 [ down>3 OR started<2 ] ]"
 ```
 
 In plain English, this example says we only count items that have a
-normal or high priority, and transfer data or were started in the last 2
-minutes. The priority check means you can 'hide' started items from the
-queue by setting them to `low`, e.g. because they're awfully slow and
-prevent your full bandwidth from being used.
+normal or high priority, and transfer data or were started in the last
+2 minutes. The priority check means you can 'hide' started items from
+the queue by setting them to `low`, e.g. because they're awfully slow
+and prevent your full bandwidth from being used.
 
-The second part automatically ignores stalled items unless just started.
-This prevents disk trashing when a big item is still creating its files
-and thus has no data transfer -- it looks stalled, but we do not want
-yet another item to be started and increasing disk I/O even more, so the
-manager sees those idle but young items as occupying a slot in the
-queue.
+The second part automatically ignores stalled items unless just
+started.  This prevents disk trashing when a big item is still
+creating its files and thus has no data transfer -- it looks stalled,
+but we do not want yet another item to be started and increasing disk
+I/O even more, so the manager sees those idle but young items as
+occupying a slot in the queue.
 
 ## Tree Watch
 
 This job is for loading torrents into rtorrent. While the native tools
-work well enough for simply loading torrents, this jobs allows 
-for additional features like conditional logic and invalid file
-handling.
+work well enough for simply loading torrents, this jobs allows for
+additional features like conditional logic and invalid file handling.
 
-Note that this job uses inotify, which is much lighter-weight
-but has the potential to miss files. See the `check_unhandled` argument
-for a way to counter this issue.
+Note that this job uses inotify, which is much lighter-weight but has
+the potential to miss files. See the `check_unhandled` argument for a
+way to counter this issue.
 
 ### Configuration
 
@@ -160,27 +185,37 @@ cmd_label = """
 
 Arguments:
 
-* `path`: The path to watch for new files. Multiple paths can be separate with `:`. Note that the watch is recursive.
-* `started`: Controls whether new items are automatically started after adding
-* `check_unhandled`: If true, the job will try to find and update any file it may have missed on each `schedule`. This will also catch any files that were added while pyrotorque wasn't running
-* `remove_already_added`: If true, pytorque will remove files if the hash already exists in the client. This is mainly useful to prevent errors and files from building up if files are accidentally added to the directory twice.
-* `cmd_*`: Any argument starting with this prefix is treated as a custom command that will be run when the torrent is loaded. As seen in the example, this can be a fully-templated string, with some fields being auto-created by the job itself.
+* `path`: The path to watch for new files. Multiple paths can be
+  separate with `:`. Note that the watch is recursive.
+* `started`: Controls whether new items are automatically started
+  after adding
+* `check_unhandled`: If true, the job will try to find and update any
+  file it may have missed on each `schedule`. This will also catch any
+  files that were added while pyrotorque wasn't running
+* `remove_already_added`: If true, pytorque will remove files if the
+  hash already exists in the client. This is mainly useful to prevent
+  errors and files from building up if files are accidentally added to
+  the directory twice.
+* `cmd_*`: Any argument starting with this prefix is treated as a
+  custom command that will be run when the torrent is loaded. As seen
+  in the example, this can be a fully-templated string, with some
+  fields being auto-created by the job itself.
 
 ### Explanation
 
-As mentioned in `QueueManager`, commands
-configured to be executed during item loading can be templates. This can
-be used to support all sorts of tricks, the most common ones are
-explained here, including fully dynamic completion moving. If the
-following explanation of the inner workings is too technical and nerdy
-for you, skip to the [tree watch examples](pyrotorque-jobs.md#tree-watch-examples)
-section below, and just adapt one of the prepared use cases to your
-setup.
+As mentioned in `QueueManager`, commands configured to be executed
+during item loading can be templates. This can be used to support all
+sorts of tricks, the most common ones are explained here, including
+fully dynamic completion moving. If the following explanation of the
+inner workings is too technical and nerdy for you, skip to the [tree
+watch examples](pyrotorque-jobs.md#tree-watch-examples) section below,
+and just adapt one of the prepared use cases to your setup.
 
 So how does this work? When a `.torrent` file is notified for loading
 via `inotify`, it's parsed and contained data is put into variables
-that can be used in the command templates. In order to get an idea what
-variables are available, you can combine the dry-run and debug modes.
+that can be used in the command templates. In order to get an idea
+what variables are available, you can combine the dry-run and debug
+modes.
 
 Consider this example:
 
@@ -212,18 +247,18 @@ DEBUG   Templating values are:
 Things to take note of:
 
 1.  the `target` custom command is expanded to set the `targetdir`
-    rTorrent attribute to the completion path (which can then be used in
-    a typical `event.download.finished` handler), using the `relpath`
-    variable which is obtained from the full `.torrent` path, relative
-    to the watch dir root.
+    rTorrent attribute to the completion path (which can then be used
+    in a typical `event.download.finished` handler), using the
+    `relpath` variable which is obtained from the full `.torrent`
+    path, relative to the watch dir root.
 
 2.  all kinds of other information is made available, like the
     torrent's info hash and the tracker alias; thus you can write
-    conditional templates based on tracker, or use the tracker name in a
-    completion path.
+    conditional templates based on tracker, or use the tracker name in
+    a completion path.
 
-3.  for certain types of downloads, `traits` provides parsed information
-    to build specific target paths, e.g. for the
+3.  for certain types of downloads, `traits` provides parsed
+    information to build specific target paths, e.g. for the
     `Pioneer.One.S01E06.720p.x264-VODO` TV episode, you'll get this:
 
     ``` ini
@@ -239,8 +274,8 @@ Things to take note of:
 
 Since the templating namespace automatically includes the path of a
 loaded `.torrent` file relative to the watch root (in `relpath`, see
-above example namespace output and the config example further down), you
-can set the \"move on completion\" target using that value.
+above example namespace output and the config example further down),
+you can set the \"move on completion\" target using that value.
 
 ``` ini
 job.treewatch.cmd.target    = {{# set target path
