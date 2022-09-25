@@ -241,7 +241,7 @@ class MetafileChanger(ScriptBase):
                     filter_url_prefix
                 ):
                     self.LOG.warning(
-                        "Skipping metafile %r no tracked by %r!",
+                        "Skipping metafile %r: not tracked by %r!",
                         filename,
                         filter_url_prefix,
                     )
