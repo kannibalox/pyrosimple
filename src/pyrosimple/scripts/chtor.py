@@ -144,7 +144,7 @@ class MetafileChanger(ScriptBase):
         self.add_bool_option("--bump-date", help="set the creation date to right now")
         self.add_bool_option("--no-date", help="remove the 'creation date' field")
 
-    def mainloop(self):
+    def mainloop(self) -> None:
         """The main loop."""
         if not self.args:
             self.parser.print_help()
@@ -195,14 +195,11 @@ class MetafileChanger(ScriptBase):
             self.options.reannounce
             and not urllib.parse.urlparse(self.options.reannounce).scheme
         ):
-            tracker_alias, idx = self.options.reannounce, "0"
-            if "." in tracker_alias:
-                tracker_alias, idx = tracker_alias.split(".", 1)
-            try:
-                idx = int(idx, 10)
-                _, tracker_url = config.lookup_announce_alias(tracker_alias)
-                self.options.reannounce = tracker_url[idx]
-            except (KeyError, IndexError, TypeError, ValueError) as exc:
+            for conn in config.multi_connection_lookup(self.options.reannounce):
+                if urllib.parse.urlparse(conn).scheme:
+                    self.options.reannounce = conn
+                    break
+            else:
                 raise error.UserError(
                     "Unknown tracker alias or bogus URL %r (%s)!"
                     % (self.options.reannounce, exc)
