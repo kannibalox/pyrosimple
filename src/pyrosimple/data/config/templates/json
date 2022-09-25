@@ -1,9 +1,0 @@
-{{# This template serializes the result into JSON.
-
-    Use it like this:
-        rtcontrol -qOjson //
-}}[
-{{for loop, item in looper(matches)}}{{item.as_dict() | json}}{{if not loop.last}},
-{{endif}}{{endfor}}
-]
-{{#}}
