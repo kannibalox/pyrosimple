@@ -13,7 +13,7 @@ lstor is used for displaying information about torrents. Without any
 flags, it shows a human-friendly summary of the torrent:
 
 ```
-$ lstor ubuntu-22.04-desktop-amd64.iso.torrent 
+$ lstor ubuntu-22.04-desktop-amd64.iso.torrent
 NAME ubuntu-22.04-desktop-amd64.iso.torrent
 SIZE 3.4 GiB (13942 * 256.0 KiB + 142.0 KiB)
 META 272.7 KiB (pieces 272.3 KiB 99.9%)
@@ -32,7 +32,7 @@ However, you can also display the same information in JSON format with
 the `--raw` flag:
 
 ```
-$ lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw 
+$ lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw
 {
   "announce": "https://torrent.ubuntu.com/announce",
   "announce-list": [
@@ -81,7 +81,7 @@ with `-V`/`--skip-validation`.
 At its simplest, creating a torrent file requires only a path and an announce URL:
 
 ```bash
-echo date > date.txt
+date > date.txt
 mktor date.txt http://tracker.publicbt.com:80/announce
 ```
 
@@ -114,4 +114,34 @@ mktor --set info.source --set info.x_cross_seed date.txt http://tracker.publicbt
 
 ## chtor
 
-**TODO**
+If you have an existing .torrent file you'd like to change, whether
+created by `mktor` or an entirely different program, `chtor` is your
+friend.
+
+!!! warning
+
+    Changing any fields in the `info` section of the data will change
+    the torrent hash, which may have unintended consequences.
+
+The simplest way to change data is the `-s`/`--set` flag, which can
+add, change, or remove fields:
+
+```bash
+date > date.txt
+mktor date.txt http://tracker.publicbt.com:80/announce
+lstor --raw date.torrent
+chtor --set "last changed=$(date)" date.torrent # Add \
+  --set "created by=PyroSimple v2" # Change \
+  --set "creation date=" # Remove
+lstor --raw date.torrent
+```
+
+There's also a similar flag to set fields with a regex:
+
+```bash
+chtor --regex "created by/PyroSimple/PyroChanged/" date.torrent
+```
+
+There are many other flags available to perform common operations, such as
+removing non-standard fields (`--clean`) or adding fast resume data
+(`--datapath <DATA>`).
