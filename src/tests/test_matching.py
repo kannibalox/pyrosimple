@@ -192,7 +192,8 @@ def test_matcher_fail(matcher, item):
         ("prio=1", "equal=value=$d.priority=,value=1"),
         (
             "completed>1990-09-21",
-            "greater=value=$d.custom=tm_completed,value=653803200",
+            "greater=value=$d.custom=tm_completed,value="
+            + str(int(time.mktime(time.strptime("1990-09-20", "%Y-%m-%d")))),
         ),
         ("views=test", 'string.contains_i=$d.views=,"test"'),
         # Example of a seemingly easy query that can't be prefiltered
