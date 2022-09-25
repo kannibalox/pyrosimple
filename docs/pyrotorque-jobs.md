@@ -14,14 +14,27 @@ such as per-second resolution.
 ```toml
 [TORQUE.send_mail]
 handler       = "pyrosimple.job.action:Command"
-active        = true
 args          = "echo pyrotorque is still running!' | mail -s 'pyrotorque check'"
 shell         = true
-dry_run       = false
 schedule      = "hour=*"
-matcher       = "is_ignored=no ratio>5.0"
-view          = "complete"
-action        = "stop"
+```
+
+There are optional parameters `shell`, `cwd`, `timeout`, `check`, and
+`env`, all of which correspond to the parameters of
+[`subprocess.run()`](https://docs.python.org/3/library/subprocess.html#subprocess.run)
+
+## Item Command
+
+This job runs a templated command against all matching items.
+
+```toml
+[TORQUE.log_messaages]
+handler       = "pyrosimple.job.action:ItemCommand"
+args          = "echo '{{item.hash}} has message {{item.message}}' >> /var/log/rtorrent/messages.log"
+shell         = true
+schedule      = "hour=*"
+matcher       = "message=/.+/"
+view          = "default"
 ```
 
 There are optional parameters `shell`, `cwd`, `timeout`, `check`, and
@@ -38,8 +51,6 @@ Example of stopping completed torrents after they reach a >5 ratio:
 ```toml
 [TORQUE.stop_well_seeded]
 handler       = "pyrosimple.job.action:Action"
-active        = true
-dry_run       = false
 schedule      = "hour=*"
 matcher       = "is_ignored=no ratio>5.0"
 view          = "complete"
@@ -64,8 +75,6 @@ changing a few values from the defaults to demonstrate key features:
 [TORQUE.queue]
 handler = "pyrocore.torrent.queue:QueueManager"
 schedule = "minute=*"
-active = true
-dry_run = true
 sort_fields = "-prio,loaded,name"
 #startable = "is_open=no tagged=torqued is_ignored=no done=0 message=''"
 downloading_min = 1
@@ -172,8 +181,6 @@ way to counter this issue.
 [TORQUE.watch]
 handler = "pyrocore.job.watch:TreeWatch"
 schedule = "second=*/5"
-active = true
-dry_run = false
 path = "/var/torrents/watch"
 started = false
 check_unhandled = true

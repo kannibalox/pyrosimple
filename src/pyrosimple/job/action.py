@@ -17,8 +17,29 @@ class Command(BaseJob):
 
     def run(self):
         if not self.config["dry_run"]:
+            proc = subprocess.run(self.args, **self.kwargs, capture_output=True)
+            self.log.info("Command %s finished with RC=%s", proc.args, proc.returncode)
+            self.log.debug("stdout: %s", proc.stdout)
+            self.log.debug("stderr: %s", proc.stderr)
+        else:
+            self.log.info("Would run %s with parameters %s", self.args, self.kwargs)
+
+
+class ItemCommand(BaseJob):
+    """Runs a templated command against matching items."""
+
+    def __init__(self, config=None):
+        super().__init__(config)
+        self.args = [rtorrent.env.from_string(a) for a in self.config.get("args", [])]
+        allowed_kwargs = ["shell", "cwd", "timeout", "check", "env"]
+        self.kwargs = {k: self.config[k] for k in allowed_kwargs if k in self.config}
+
+    def run_item(self, item):
+        if not self.config["dry_run"]:
             proc = subprocess.run(
-                self.args, **self.kwargs, capture_output=True, check=False
+                [rtorrent.format_item(a, item) for a in self.args],
+                **self.kwargs,
+                capture_output=True,
             )
             self.log.info("Command %s finished with RC=%s", proc.args, proc.returncode)
             self.log.debug("stdout: %s", proc.stdout)
