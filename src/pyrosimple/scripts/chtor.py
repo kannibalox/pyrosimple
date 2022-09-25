@@ -201,8 +201,8 @@ class MetafileChanger(ScriptBase):
                     break
             else:
                 raise error.UserError(
-                    "Unknown tracker alias or bogus URL %r (%s)!"
-                    % (self.options.reannounce, exc)
+                    "Unknown tracker alias or URL %r!"
+                    % (self.options.reannounce)
                 )
 
         # go through given files
