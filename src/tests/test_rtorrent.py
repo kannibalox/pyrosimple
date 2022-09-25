@@ -3,14 +3,16 @@
 
     Copyright (c) 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
-import pytest
 import unittest
 
+import pytest
+
 import pyrosimple
+
 from pyrosimple import error
 from pyrosimple.torrent import rtorrent
-from pyrosimple.util.rpc import RTorrentProxy
 from pyrosimple.util.parts import Bunch
+from pyrosimple.util.rpc import RTorrentProxy
 
 
 @pytest.mark.parametrize(

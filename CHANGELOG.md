@@ -4,7 +4,7 @@
 
 ### Fixed
 
--  `chtor`: Fix `--reannounce-all` without `--no-cross-seed` #11
+- `chtor`: Fix `--reannounce-all` without `--no-cross-seed` #11
 
 ### Added
 
