@@ -1,6 +1,13 @@
-""" Torrent Item Filters.
+"""Torrent Item Filters.
 
-    Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
+Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
+
+There's a lot of magic going on in this module, but essentially
+its primary responsibility is parsing queries from rtcontrol and other
+places. Once parsed, it uses the visitor pattern in some classes to do
+things like return lists of the fields being referenced, preprepare
+d.multicall.filtered statements or check if it matches against an
+actual item.
 """
 
 
@@ -231,6 +238,9 @@ class FieldFilter(MatcherNode):
         )
 
     # Unfortunate but necessary boilerplate functions
+    # This makes it so that by default all operators are available to fields
+    # If there's a more effecient way to implement it for a specific subclass, it needs
+    # to happen in there.
     # pylint: disable=missing-function-docstring
     def ge(self, item) -> bool:
         return self.eq(item) or self.gt(item)
@@ -286,11 +296,12 @@ class PatternFilter(FieldFilter):
         self._template = None
         self._flags = 0
         self._matcher: Callable[Any, Any]
-        if self._value == '""':
+        if self._value == '""': # Replace an empty string with a simle truthiness check
             self._matcher = lambda val, _: val == ""
         elif self._value.startswith("/") and (
             self._value.endswith("/") or self._value.endswith("/i")
         ):
+            # Pick out a couple regexes that can be simplified
             if self._value in ["//", "/.*/", "//i", "/.*/i"]:
                 self._matcher = lambda _, __: True
             else:
@@ -334,6 +345,7 @@ class PatternFilter(FieldFilter):
         else:
             needle = self.CLEAN_PRE_VAL_RE.sub(" ", self._value)
             split_needle = self.SPLIT_PRE_GLOB_RE.split(needle)
+        # Grab the longest needle available from the array
         needle = list(sorted(split_needle, key=len))[-1]
 
         if needle:
@@ -357,7 +369,10 @@ class FilesFilter(PatternFilter):
     """Pattern filter on filenames in a torrent."""
 
     def match(self, item) -> bool:
-        """Return True if filter matches item."""
+        """Return True if filter matches item. Overridden from the
+        parent class to deal with with an array of strings rather than
+        a single string
+        """
         val = getattr(item, self._name)
         if val is not None:
             for fileinfo in val:
@@ -368,8 +383,8 @@ class FilesFilter(PatternFilter):
 
 
 class TaggedAsFilter(FieldFilter):
-    """Case-insensitive tags filter. Tag fields are white-space separated lists
-    of tags.
+    """Case-insensitive tags filter. Tag fields are white-space
+    separated lists of tags.
     """
 
     def pre_filter(self) -> str:
@@ -391,7 +406,7 @@ class TaggedAsFilter(FieldFilter):
         super().validate()
         self._value = self._value.lower()
 
-        # If the tag starts with '=', test on equality (just this tag, no others)
+        # If the tag starts with ':', test for exact equality (just this tag, no others)
         if self._value.startswith(":"):
             self._exact = True
             self._value = self._value[1:]
@@ -407,7 +422,7 @@ class TaggedAsFilter(FieldFilter):
         """Return True if filter matches item."""
         tags = getattr(item, self._name) or []
         if self._exact:
-            # Equality check
+            # Exact equality check
             return self._value == set(tags)
         # Is given tag in list?
         return self._value in tags
@@ -462,6 +477,7 @@ class FloatFilter(NumericFilterBase):
         ratio=1000,
     )
 
+    # TODO: This can probably be refactored to just a pre_filter()
     # pylint: disable=missing-function-docstring
     def pre_filter_eq(self):
         pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
