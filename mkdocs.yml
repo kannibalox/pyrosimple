@@ -9,6 +9,8 @@ nav:
       - rtcontrol: usage-rtcontrol.md
       - pyrotorque: usage-pyrotorque.md
       - "mktor/lstor/chtor": usage-tor.md
+  - How-tos:
+      - Changing announce URLs: changing-announce.md
   - Reference:
       - Configuration: configuration.md
       - Torque Jobs: pyrotorque-jobs.md
