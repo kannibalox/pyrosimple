@@ -5,6 +5,10 @@
 ### Added
 - pyrotorque: New `ItemCommand` job
 
+### Changed
+- Warn if rTorrent doesn't support `string.contains_i` for fast
+  queries
+
 ## [2.1.1] - 2022-09-24
 
 ### Fixed
