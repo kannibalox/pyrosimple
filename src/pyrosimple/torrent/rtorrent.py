@@ -822,8 +822,18 @@ class RtorrentEngine:
                     pre_filter = matching.unquote_pre_filter(view.matcher.pre_filter())
                     self.LOG.info("!!! pre-filter: %s", pre_filter or "N/A")
                     if pre_filter:
-                        multi_call = self.open().d.multicall.filtered
-                        multi_args.insert(2, pre_filter)
+                        if (
+                            config.settings.SAFETY_CHECKS_ENABLED
+                            and "string.contains_i" in pre_filter
+                            and not self.has_method("string.contains_i")
+                        ):
+                            self.LOG.warning(
+                                "Method 'strings.contains_i' does not exist! Fast query %r would return an empty list, disabling query.",
+                                pre_filter,
+                            )
+                        else:
+                            multi_call = self.open().d.multicall.filtered
+                            multi_args.insert(2, pre_filter)
                 raw_items = multi_call(*tuple(multi_args))
 
             self.LOG.debug(
