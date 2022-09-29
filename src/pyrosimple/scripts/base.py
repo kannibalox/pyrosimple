@@ -14,6 +14,8 @@ import traceback
 from argparse import ArgumentParser
 from typing import Iterator, List
 
+import shtab
+
 from pyrosimple import config, error, io
 from pyrosimple.torrent import rtorrent
 from pyrosimple.util import fmt, pymagic
@@ -72,6 +74,7 @@ class ScriptBase:
             + "\n\nFor more details, see the full documentation at"
             + "\n\n    https://kannibalox.github.io/pyrosimple/",
         )
+        shtab.add_argument_to(self.parser, ["--print-completion"])
 
         self.parser.add_argument(
             "--version", action="version", version=f"%(prog)s {version_info}"

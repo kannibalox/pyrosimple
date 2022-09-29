@@ -675,6 +675,14 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "shtab"
+version = "1.5.5"
+description = "Automagic shell tab completion for Python CLI applications"
+category = "main"
+optional = false
+python-versions = ">=3.2"
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -797,7 +805,7 @@ torque = ["APScheduler", "pyinotify"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4"
-content-hash = "25db78aeac88650446829086506cc0389e39e81a812826b8ebb39a767f595e93"
+content-hash = "1ddfa4821bec70084e49baa2452cc3693a06b050905937e54b40aec33a2fb634"
 
 [metadata.files]
 APScheduler = [
@@ -1297,6 +1305,10 @@ requests = [
 setuptools = [
     {file = "setuptools-65.4.0-py3-none-any.whl", hash = "sha256:c2d2709550f15aab6c9110196ea312f468f41cd546bceb24127a1be6fdcaeeb1"},
     {file = "setuptools-65.4.0.tar.gz", hash = "sha256:a8f6e213b4b0661f590ccf40de95d28a177cd747d098624ad3f69c40287297e9"},
+]
+shtab = [
+    {file = "shtab-1.5.5-py2.py3-none-any.whl", hash = "sha256:f4bf7cc122fb434cb65b96db7e3adcf3b5258846e906e60c48b3725d2965c6b5"},
+    {file = "shtab-1.5.5.tar.gz", hash = "sha256:f90a6ce64b821002d5881b6212992a27ab40c3bab36aabca8de118b0b78f61f6"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},

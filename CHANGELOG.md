@@ -4,6 +4,7 @@
 
 ### Added
 - pyrotorque: New `ItemCommand` job
+- Basic tab completion
 
 ### Changed
 - Warn if rTorrent doesn't support `string.contains_i` for fast
