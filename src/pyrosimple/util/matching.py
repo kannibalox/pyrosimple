@@ -12,6 +12,7 @@ actual item.
 
 
 import fnmatch
+import math
 import operator
 import re
 import time
@@ -487,44 +488,25 @@ class FloatFilter(NumericFilterBase):
         ratio=1000,
     )
 
-    # TODO: This can probably be refactored to just a pre_filter()
-    # pylint: disable=missing-function-docstring
-    def pre_filter_eq(self):
-        pf = prefilter_field_lookup(self._name)
-        if pf is not None:
-            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"equal=value=${pf},value={val}"'
-        return ""
+    def pre_filter(self):
+        """Prefilter a float value.
 
-    def pre_filter_ge(self):
+        rTorrent doesn't actually have floats, so we need to do a
+        little translation for the prefiltering
+        """
         pf = prefilter_field_lookup(self._name)
-        if pf is not None:
-            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"greater=value=${pf},value={val-1}"'
-        return ""
-
-    def pre_filter_gt(self):
-        pf = prefilter_field_lookup(self._name)
-        if pf is not None:
-            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"greater=value=${pf},value={val}"'
-        return ""
-
-    def pre_filter_le(self):
-        pf = prefilter_field_lookup(self._name)
-        if pf is not None:
-            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"less=value=${pf},value={val+1}"'
-        return ""
-
-    def pre_filter_lt(self):
-        pf = prefilter_field_lookup(self._name)
-        if pf is not None:
-            val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
-            return f'"less=value=${pf},value={val}"'
-        return ""
-
-    # pylint: enable=missing-function-docstring
+        if pf is None:
+            return ""
+        val = self._value * self.FIELD_SCALE.get(self._name, 1)
+        lookup_table = {
+            "eq": ("equal", int(val)),
+            "ge": ("greater", math.floor(val - 1)),
+            "gt": ("greater", math.floor(val)),
+            "le": ("less", math.ceil(val + 1)),
+            "lt": ("less", math.ceil(val)),
+        }
+        op, val = lookup_table[self._op.name]
+        return f'"{op}=value=${pf},value={val}"'
 
     def validate(self):
         """Validate filter condition (template method)."""
