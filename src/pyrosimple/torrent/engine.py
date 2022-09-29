@@ -717,56 +717,50 @@ class TorrentProxy:
     """A single download item."""
 
     @classmethod
-    def add_manifold_attribute(cls, name):
+    def add_manifold_attribute(cls, name) -> Optional[FieldDefinition]:
         """Register a manifold engine attribute.
 
         @return: field definition object, or None if "name" isn't a manifold attribute.
         """
+        if name in FieldDefinition.FIELDS:
+            return FieldDefinition.FIELDS[name]
         if name.startswith("custom_"):
-            try:
-                return FieldDefinition.FIELDS[name]
-            except KeyError:
-                custom_name = name.split("_", 1)[1]
-                accessor = lambda o: o.rpc_call("d.custom", [custom_name])
-                description = f"custom attribute {custom_name}"
-                requires = [f"d.custom={custom_name}"]
-                # Handle custom1, custom2, etc as a special case
-                if len(custom_name) == 1 and custom_name in "12345":
-                    accessor = lambda o: o.rpc_call(f"d.custom{custom_name}")
-                    description = f"custom{custom_name}"
-                    requires = [f"d.custom{custom_name}"]
-                field = DynamicField(
-                    str,
-                    name,
-                    description,
-                    matcher=matching.PatternFilter,
-                    accessor=accessor,
-                    requires=requires,
-                )
-                setattr(cls, name, field)  # add field to all proxy objects
+            custom_name = name.split("_", 1)[1]
+            accessor = lambda o: o.rpc_call("d.custom", [custom_name])
+            description = f"custom attribute {custom_name}"
+            requires = [f"d.custom={custom_name}"]
+            # Handle custom1, custom2, etc as a special case
+            if len(custom_name) == 1 and custom_name in "12345":
+                accessor = lambda o: o.rpc_call(f"d.custom{custom_name}")
+                description = f"custom{custom_name}"
+                requires = [f"d.custom{custom_name}"]
+            field = DynamicField(
+                str,
+                name,
+                description,
+                matcher=matching.PatternFilter,
+                accessor=accessor,
+                requires=requires,
+            )
+            setattr(cls, name, field)  # add field to all proxy objects
 
-                return field
-        elif name.startswith("kind_") and name[5:].isdigit():
-            try:
-                return FieldDefinition.FIELDS[name]
-            except KeyError:
-                # pylint: disable=raise-missing-from
-                limit = int(name[5:].lstrip("0") or "0", 10)
-                if limit > 100:
-                    raise error.UserError(f"kind_N: N > 100 in {name!r}")
-                field = DynamicField(
-                    set,
-                    name,
-                    f"kinds of files that make up more than {limit}% of this item's size",
-                    matcher=matching.TaggedAsFilter,
-                    formatter=_fmt_tags,
-                    requires=[f"kind_{limit}"],
-                )
-                setattr(cls, name, field)
+            return field
+        if name.startswith("kind_") and name[5:].isdigit():
+            limit = int(name[5:].lstrip("0") or "0", 10)
+            if limit > 100:
+                raise error.UserError(f"kind_N: N > 100 in {name!r}")
+            field = DynamicField(
+                set,
+                name,
+                f"kinds of files that make up more than {limit}% of this item's size",
+                matcher=matching.TaggedAsFilter,
+                formatter=_fmt_tags,
+                requires=[f"kind_{limit}"],
+            )
+            setattr(cls, name, field)
 
-                return field
-        else:
-            return None
+            return field
+        return None
 
     @classmethod
     def add_field(cls, field):

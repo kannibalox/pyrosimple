@@ -296,7 +296,9 @@ class PatternFilter(FieldFilter):
         self._template = None
         self._flags = 0
         self._matcher: Callable[Any, Any]
-        if self._value == '""':  # Replace an empty string with a simple truthiness check
+        if (
+            self._value == '""'
+        ):  # Replace an empty string with a simple truthiness check
             self._matcher = lambda val, _: val == ""
         elif self._value.startswith("/") and (
             self._value.endswith("/") or self._value.endswith("/i")
