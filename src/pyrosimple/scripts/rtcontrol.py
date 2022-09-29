@@ -670,15 +670,15 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Holds summary information, will be populated later
         summary = FieldStatistics()
 
-        dcontext = DaemonContext(
-            detach_process=False,
-            stdin=sys.stdin,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-        )
+        dcontext = None
         if self.options.detach:
-            dcontext.detach_process = True
-        dcontext.open()
+            dcontext = DaemonContext(
+                detach_process=False,
+                stdin=sys.stdin,
+                stdout=sys.stdout,
+                stderr=sys.stderr,
+            )
+            dcontext.open()
 
         # Find matching torrents
         engines = {}
@@ -896,7 +896,8 @@ class RtorrentControl(ScriptBaseWithConfig):
                 )
 
             self.LOG.debug("RPC stats: %s", self.rpc_stats())
-        dcontext.close()
+        if dcontext is not None:
+            dcontext.close()
 
 
 def run():  # pragma: no cover
