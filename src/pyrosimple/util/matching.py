@@ -391,7 +391,7 @@ class TaggedAsFilter(FieldFilter):
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        pf = prefilter_field_lookup
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             if not self._value:
                 return f'"not=${pf}"'
