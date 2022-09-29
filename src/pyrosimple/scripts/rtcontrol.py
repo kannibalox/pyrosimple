@@ -45,7 +45,7 @@ def print_help_fields():
             [
                 "  %-21s %s" % (name, field.__doc__)
                 for name, field in sorted(
-                    list(engine.FieldDefinition.FIELDS.items())
+                    list(engine.FIELD_REGISTRY.items())
                     + [
                         custom_manifold(),
                         kind_manifold(),
@@ -91,7 +91,7 @@ class FieldStatistics:
 
     def add(self, field, val):
         "Add a sample"
-        if engine.FieldDefinition.FIELDS[field]._matcher is matching.TimeFilter:
+        if engine.FIELD_REGISTRY[field]._matcher is matching.TimeFilter:
             val = self._basetime - val
 
         try:
@@ -115,10 +115,10 @@ class FieldStatistics:
             )
 
         # Handle time fields
-        # for key, fielddef in  engine.FieldDefinition.FIELDS.items():
+        # for key, fielddef in  engine.FIELD_REGISTRY.items():
         #    if key in result and fielddef._matcher is matching.TimeFilter:
         #       result[key] = ''
-        # for key, fielddef in  engine.FieldDefinition.FIELDS.items():
+        # for key, fielddef in  engine.FIELD_REGISTRY.items():
         #    if key in result and fielddef._matcher is matching.TimeFilter:
         #        result[key] = engine._fmt_duration(result[key])
         # print self.total
@@ -562,7 +562,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         """Get field names from output template."""
         result = []
         for name in rtorrent.get_fields_from_template(self.options.output_format):
-            if name not in engine.FieldDefinition.FIELDS:
+            if name not in engine.FIELD_REGISTRY:
                 self.LOG.warning(
                     "Omitted unknown name '%s' from statistics and output format sorting",
                     name,
@@ -693,7 +693,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             def fetch(e):
                 view = e.view(self.options.from_view, matcher)
                 prefetch = [
-                    engine.FieldDefinition.FIELDS[f].requires
+                    engine.FIELD_REGISTRY[f].requires
                     for f in self.get_output_fields()
                     + key_names
                     + [
@@ -827,10 +827,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     ]
                 else:
                     json_data = [
-                        {
-                            name: getattr(i, name)
-                            for name in engine.FieldDefinition.FIELDS
-                        }
+                        {name: getattr(i, name) for name in engine.FIELD_REGISTRY}
                         for i in matches
                     ]
                 json.dump(

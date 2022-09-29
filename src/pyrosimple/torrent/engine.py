@@ -8,7 +8,7 @@ import re
 import time
 import warnings
 
-from typing import Any, Callable, Dict, Optional, Set
+from typing import Callable, Dict, Optional, Set
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
@@ -187,22 +187,7 @@ def detect_traits(item):
 class FieldDefinition:
     """Download item field."""
 
-    FIELDS: Dict[str, Any] = {}
     CONSTANT_FIELDS = {"hash"}
-
-    @classmethod
-    def lookup(cls, name):
-        """Try to find field C{name}.
-
-        @return: Field descriptions, see C{matching.ConditionParser} for details.
-        """
-        try:
-            field = cls.FIELDS[name]
-        except KeyError:
-            # Is it a custom attribute?
-            field = TorrentProxy.add_manifold_attribute(name)
-
-        return field if field else None
 
     def __init__(
         self,
@@ -222,15 +207,15 @@ class FieldDefinition:
         self._accessor = accessor
         self._matcher = matcher
         self.formatter = formatter
-        self.prefilter_field = prefilter_field
+        self.prefilter_field: Optional[str] = prefilter_field
         if accessor is None:
             self._accessor = lambda o: o.rpc_call("d." + name)
             if requires is None:
                 self.requires = ["d." + name]
 
-        if name in FieldDefinition.FIELDS:
+        if name in FIELD_REGISTRY:
             raise RuntimeError("INTERNAL ERROR: Duplicate field definition")
-        FieldDefinition.FIELDS[name] = self
+        FIELD_REGISTRY[name] = self
 
     def __repr__(self):
         """Return a representation of internal state."""
@@ -294,6 +279,22 @@ class MutableField(FieldDefinition):
         if self._setter is None:
             raise NotImplementedError
         self._setter(obj, val)
+
+
+FIELD_REGISTRY: Dict[str, FieldDefinition] = {}
+
+
+def field_lookup(name: str) -> Optional[FieldDefinition]:
+    """Try to find field C{name}.
+
+    @return: Field descriptions, see C{matching.ConditionParser} for details.
+    """
+    if name not in FIELD_REGISTRY:
+        TorrentProxy.add_manifold_attribute(name)
+    try:
+        return FIELD_REGISTRY[name]
+    except KeyError:
+        return None
 
 
 def core_fields():
@@ -722,8 +723,8 @@ class TorrentProxy:
 
         @return: field definition object, or None if "name" isn't a manifold attribute.
         """
-        if name in FieldDefinition.FIELDS:
-            return FieldDefinition.FIELDS[name]
+        if name in FIELD_REGISTRY:
+            return FIELD_REGISTRY[name]
         if name.startswith("custom_"):
             custom_name = name.split("_", 1)[1]
             accessor = lambda o: o.rpc_call("d.custom", [custom_name])
@@ -766,7 +767,7 @@ class TorrentProxy:
     def add_field(cls, field):
         """Add a custom field to the class"""
         setattr(cls, field.name, field)
-        FieldDefinition.FIELDS[field.name] = field
+        FIELD_REGISTRY[field.name] = field
         if isinstance(field, ConstantField):
             FieldDefinition.CONSTANT_FIELDS.add(field.name)
 
@@ -774,10 +775,7 @@ class TorrentProxy:
     def add_core_fields(cls, *_, **__):
         """Add any custom fields defined in the configuration."""
         for field in core_fields():
-            setattr(cls, field.name, field)
-            FieldDefinition.FIELDS[field.name] = field
-            if isinstance(field, ConstantField):
-                FieldDefinition.CONSTANT_FIELDS.add(field.name)
+            cls.add_field(field)
 
     def __init__(self):
         """Initialize object."""

@@ -17,7 +17,7 @@ import re
 import time
 
 from dataclasses import dataclass
-from typing import Any, Callable, List
+from typing import Any, Callable, List, Optional
 
 from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
@@ -329,7 +329,7 @@ class PatternFilter(FieldFilter):
 
     def pre_filter_eq(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is None or self._template:
             return ""
         if not self._value or self._value == '""':
@@ -391,7 +391,7 @@ class TaggedAsFilter(FieldFilter):
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup
         if pf is not None:
             if not self._value:
                 return f'"not=${pf}"'
@@ -435,7 +435,7 @@ class BoolFilter(FieldFilter):
 
     def pre_filter_eq(self):
         """Return rTorrent condition to speed up data transfer."""
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             return '"equal={},value={}"'.format(pf, int(self._value))
         return ""
@@ -472,6 +472,14 @@ class NumericFilterBase(FieldFilter):
         return bool(op(float(val), self._value))
 
 
+def prefilter_field_lookup(name: str) -> Optional[str]:
+    """Return the prefield field for a given name (if available)"""
+    field = torrent.engine.field_lookup(name)
+    if field is None:
+        return None
+    return field.prefilter_field
+
+
 class FloatFilter(NumericFilterBase):
     """Filter float values."""
 
@@ -482,35 +490,35 @@ class FloatFilter(NumericFilterBase):
     # TODO: This can probably be refactored to just a pre_filter()
     # pylint: disable=missing-function-docstring
     def pre_filter_eq(self):
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return f'"equal=value=${pf},value={val}"'
         return ""
 
     def pre_filter_ge(self):
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return f'"greater=value=${pf},value={val-1}"'
         return ""
 
     def pre_filter_gt(self):
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return f'"greater=value=${pf},value={val}"'
         return ""
 
     def pre_filter_le(self):
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return f'"less=value=${pf},value={val+1}"'
         return ""
 
     def pre_filter_lt(self):
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             val = int(self._value * self.FIELD_SCALE.get(self._name, 1))
             return f'"less=value=${pf},value={val}"'
@@ -548,7 +556,7 @@ class TimeFilter(NumericFilterBase):
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None:
             # Adding a day of fuzz to avoid any possible timezone problems
             if self._op.name == "gt":
@@ -681,7 +689,7 @@ class ByteSizeFilter(NumericFilterBase):
             "lt": "less",
             "eq": "equal",
         }
-        pf = torrent.engine.FieldDefinition.lookup(self._name).prefilter_field
+        pf = prefilter_field_lookup(self._name)
         if pf is not None and self._op.name in comparers:
             return '"{}={},value={}"'.format(
                 comparers[self._op.name],
@@ -771,7 +779,7 @@ class KeyNameVisitor(NodeVisitor):
 
 def create_filter(name: str, op: str, value: str):
     """Generates a filter class with the given name, operation and value"""
-    field = torrent.engine.FieldDefinition.lookup(name)
+    field = torrent.engine.field_lookup(name)
     if field is None:
         raise SyntaxError(f"No such field '{name}'")
     filt = field._matcher

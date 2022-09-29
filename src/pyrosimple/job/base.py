@@ -59,9 +59,7 @@ class MatchableJob(BaseJob):
         that still needs to happen in run_item()"""
         try:
             self.engine.open()
-            prefetch = [
-                engine.FieldDefinition.FIELDS[f].requires for f in self.prefetch_fields
-            ]
+            prefetch = [engine.FIELD_REGISTRY[f].requires for f in self.prefetch_fields]
             prefetch = [item for sublist in prefetch for item in sublist]
             view = self.engine.view(self.config["view"], self.matcher)
             matches = list(self.engine.items(view=view, prefetch=prefetch))

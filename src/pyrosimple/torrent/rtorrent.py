@@ -972,7 +972,7 @@ def validate_field_list(
                     )
 
         if (
-            name not in engine.FieldDefinition.FIELDS
+            name not in engine.FIELD_REGISTRY
             and not engine.TorrentProxy.add_manifold_attribute(name)
         ):
             raise error.UserError(f"Unknown field name {name!r}")
