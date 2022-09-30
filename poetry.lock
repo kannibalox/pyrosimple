@@ -412,7 +412,7 @@ pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 
 [[package]]
 name = "parsimonious"
-version = "0.9.0"
+version = "0.10.0"
 description = "(Soon to be) the fastest pure-Python PEG parser I could muster"
 category = "main"
 optional = false
@@ -805,7 +805,7 @@ torque = ["APScheduler", "pyinotify"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4"
-content-hash = "1ddfa4821bec70084e49baa2452cc3693a06b050905937e54b40aec33a2fb634"
+content-hash = "ad86b2f45ac2584aebbe4198de3176773c66a5c71680238484539ebecda580b5"
 
 [metadata.files]
 APScheduler = [
@@ -1097,7 +1097,8 @@ packaging = [
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
 ]
 parsimonious = [
-    {file = "parsimonious-0.9.0.tar.gz", hash = "sha256:b2ad1ae63a2f65bd78f5e0a8ac510a98f3607a43f1db2a8d46636a5d9e4a30c1"},
+    {file = "parsimonious-0.10.0-py3-none-any.whl", hash = "sha256:982ab435fabe86519b57f6b35610aa4e4e977e9f02a14353edf4bbc75369fc0f"},
+    {file = "parsimonious-0.10.0.tar.gz", hash = "sha256:8281600da180ec8ae35427a4ab4f7b82bfec1e3d1e52f80cb60ea82b9512501c"},
 ]
 pathspec = [
     {file = "pathspec-0.10.1-py3-none-any.whl", hash = "sha256:46846318467efc4556ccfd27816e004270a9eeeeb4d062ce5e6fc7a87c573f93"},
