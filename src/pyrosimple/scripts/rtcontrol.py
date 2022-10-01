@@ -17,7 +17,6 @@ import time
 from multiprocessing.pool import ThreadPool
 from typing import Callable, List, Union
 
-from daemon import DaemonContext
 from prompt_toolkit import prompt
 
 from pyrosimple import config, error
@@ -672,6 +671,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         dcontext = None
         if self.options.detach:
+            from daemon import DaemonContext # pylint: disable=import-outside-toplevel
             dcontext = DaemonContext(
                 detach_process=False,
                 stdin=sys.stdin,
