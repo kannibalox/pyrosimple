@@ -3,6 +3,7 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
+import logging
 import os
 import re
 import time
@@ -12,6 +13,9 @@ from typing import Callable, Dict, Optional, Set
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
+
+
+logger = logging.getLogger(__name__)
 
 
 def untyped(val):
@@ -760,6 +764,30 @@ class TorrentProxy:
             )
             setattr(cls, name, field)
 
+            return field
+        if name.startswith("guessit_"):
+            try:
+                import guessit  # pylint: disable=import-outside-toplevel
+            except ModuleNotFoundError:
+                logger.error(
+                    "'guessit' module not found while loading field '%s', install with: pip install guessit",
+                    name,
+                )
+                return None
+
+            guess_field = name[8:]
+
+            def _guess_accessor(o):
+                return guessit.guessit(o.rpc_call("d.name")).get(guess_field, "")
+
+            field = DynamicField(
+                str,
+                name,
+                f"Guessit field {guess_field}",
+                accessor=_guess_accessor,
+                requires=["d.name"],
+            )
+            setattr(cls, name, field)
             return field
         return None
 

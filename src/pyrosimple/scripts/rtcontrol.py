@@ -671,7 +671,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         dcontext = None
         if self.options.detach:
-            from daemon import DaemonContext # pylint: disable=import-outside-toplevel
+            from daemon import DaemonContext  # pylint: disable=import-outside-toplevel
             dcontext = DaemonContext(
                 detach_process=False,
                 stdin=sys.stdin,
