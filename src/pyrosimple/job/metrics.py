@@ -7,39 +7,30 @@ from time import sleep
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY, GaugeMetricFamily
 
-import pyrosimple
-
 from pyrosimple import config as config_ini
 from pyrosimple import error
 from pyrosimple.job.base import BaseJob
-from pyrosimple.util import fmt, pymagic, rpc
+from pyrosimple.util import fmt, rpc
 from pyrosimple.util.parts import Bunch
 
 
-class EngineStats:
+class EngineStats(BaseJob):
     """Simple rTorrent connection statistics logger."""
-
-    def __init__(self, config=None):
-        """Set up statistics logger."""
-        self.config = config or {}
-        self.LOG = pymagic.get_class_logger(self)
-        self.LOG.debug("Statistics logger created with config %r", self.config)
-        self.engine = pyrosimple.connect()
-        self.engine.open()
 
     def run(self):
         """Statistics logger job callback."""
         try:
-            self.LOG.info(
-                "Stats for %s - up %s, %s",
+            self.engine.open()
+            self.log.info(
+                "Stats for %s - up %s, %s torrents",
                 self.engine.engine_id,
                 fmt.human_duration(
                     self.engine.rpc.system.time() - self.engine.startup, 0, 2, True
                 ).strip(),
-                self.engine.rpc,
+                self.engine.rpc.view.size(rpc.NOHASH, "defaults"),
             )
         except (error.LoggableError, *rpc.ERRORS) as exc:
-            self.LOG.warning(str(exc))
+            self.log.warning(str(exc))
 
 
 class ClientServer(threading.Thread):
