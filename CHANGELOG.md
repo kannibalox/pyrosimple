@@ -3,9 +3,13 @@
 ## [Unreleased]
 
 ### Added
-- pyrotorque: New `ItemCommand` job
-- Basic tab completion
-- Optional `guessit_*` fields
+- `rtcontrol`/`rtxmlrpc`:
+  - Basic tab completion
+  - Optional `guessit_*` fields (requires guessit to be installed:
+    `pip install guessit`)
+- `pyrotorque`
+  - New `ItemCommand` job
+  - Allow overriding `scgi_url` for individual jobs
 
 ### Changed
 - Warn if rTorrent doesn't support `string.contains_i` for fast

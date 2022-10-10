@@ -27,7 +27,7 @@ class EngineStats(BaseJob):
                 fmt.human_duration(
                     self.engine.rpc.system.time() - self.engine.startup, 0, 2, True
                 ).strip(),
-                self.engine.rpc.view.size(rpc.NOHASH, "defaults"),
+                self.engine.rpc.view.size(rpc.NOHASH, "default"),
             )
         except (error.LoggableError, *rpc.ERRORS) as exc:
             self.log.warning(str(exc))
