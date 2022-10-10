@@ -19,7 +19,12 @@ class BaseJob:
     def __init__(self, config: Optional[Dict] = None):
         self.config = config or {}
         self.config.setdefault("dry_run", False)
-        self.engine = pyrosimple.connect()
+        url = None
+        if "scgi_url" in self.config:
+            url = pyrosimple.config.lookup_connection_alias(
+                str(self.config.get("scgi_url"))
+            )
+        self.engine = pyrosimple.connect(url)
         self.log = pymagic.get_class_logger(__name__)
         if "log_level" in self.config:
             self.log.setLevel(self.config["log_level"])

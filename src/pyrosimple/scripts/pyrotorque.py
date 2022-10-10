@@ -108,9 +108,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         """Add configured jobs."""
         for name, params in self.jobs.items():
             if params.get("active", True):
-                params["handler"] = params["handler"](params)
                 self.sched.add_job(
-                    params["handler"].run,
+                    params["handler"](params).run,
                     name=name,
                     id=name,
                     trigger="cron",
@@ -124,8 +123,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             if self.running_config != dict(config.settings.TORQUE):
                 self.LOG.info("Config change detected, reloading jobs")
                 self.validate_config()
-                for name in self.jobs:
-                    self.sched.remove_job(name)
+                self.sched.remove_all_jobs()
                 self.add_jobs()
                 self.running_config = dict(config.settings.TORQUE)
         except (Exception) as exc:  # pylint: disable=broad-except
