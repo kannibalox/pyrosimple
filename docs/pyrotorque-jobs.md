@@ -14,7 +14,7 @@ such as per-second resolution.
 ```toml
 [TORQUE.send_mail]
 handler       = "pyrosimple.job.action:Command"
-args          = "echo pyrotorque is still running!' | mail -s 'pyrotorque check'"
+args          = "echo 'pyrotorque is still running!' | mail -s 'pyrotorque check'"
 shell         = true
 schedule      = "hour=*"
 ```
