@@ -86,6 +86,16 @@ def test_parsim_error_conditions(cond):
 
 
 @pytest.mark.parametrize(
+    "cond",
+    [
+        ["name=*", "custom_test=foo"],
+    ],
+)
+def test_parsim_good_cli_conditions(cond):
+    matching.create_matcher(cond)
+
+
+@pytest.mark.parametrize(
     ("cond", "expected"),
     [
         ("name=arch", '"string.contains_i=$d.name=,\\"arch\\""'),
@@ -104,6 +114,7 @@ def test_conditions_prefilter(cond, expected):
         ("arch", Bunch(name="arch")),
         ("name=arch", Bunch(name="arch")),
         ("name=/arch/i", Bunch(name="ARCH")),
+        (["name=/arch/i"], Bunch(name="ARCH")),
         ("name=/ar.*/i", Bunch(name="ARCH")),
         ("name=ARCH", Bunch(name="ARCH")),
         ("name=rtörrent", Bunch(name="rtörrent")),
@@ -177,6 +188,7 @@ def test_matcher_fail(matcher, item):
     ("matcher", "item"),
     [
         ("name=arch", 'string.contains_i=$d.name=,"arch"'),
+        (["name=arch"], 'string.contains_i=$d.name=,"arch"'),
         ('name="arch linux"', 'string.contains_i=$d.name=,"arch linux"'),
         ("name=/arch/", 'string.contains_i=$d.name=,"arch"'),
         ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),

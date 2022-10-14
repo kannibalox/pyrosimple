@@ -18,7 +18,7 @@ import re
 import time
 
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, Union, Sequence
 
 from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
@@ -856,6 +856,12 @@ class MatcherBuilder(NodeVisitor):
         return None
 
 
-def create_matcher(query: str):
+def create_matcher(query: Union[str, Sequence[str]]):
     """Utility function to build a matcher from a query string."""
-    return MatcherBuilder().visit(QueryGrammar.parse(query))
+    if isinstance(query, str):
+        return MatcherBuilder().visit(QueryGrammar.parse(query))
+    else:
+        children = []
+        for subquery in query:
+            children.append(MatcherBuilder().visit(QueryGrammar['stmt'].parse(subquery)))
+        return GroupNode(children, False)
