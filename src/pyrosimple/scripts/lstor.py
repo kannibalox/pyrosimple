@@ -39,7 +39,7 @@ class MetafileLister(ScriptBase):
         self.add_value_option(
             "-o",
             "--output",
-            "KEY,KEY1.KEY2,...",
+            "KEY1,KEY2.SUBKEY,...",
             action="append",
             default=[],
             help="select fields to print, output is separated by TABs;"

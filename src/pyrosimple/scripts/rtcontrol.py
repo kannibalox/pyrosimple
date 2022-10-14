@@ -365,7 +365,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             "--call",
             action=RtorrentInteractiveAction,
             help="call an OS command pattern in the shell (implies -i)",
-            metavar="CMD [--call]",
+            metavar="CMD",
         )
         action_group.add_argument(
             "--move-to-host",
@@ -377,7 +377,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             "--spawn",
             action=RtorrentInteractiveAction,
             help="execute OS command pattern(s) directly (implies -i)",
-            metavar="CMD [--spawn ...]",
+            metavar="CMD",
         )
         action_group.add_argument(
             "--flush",

@@ -79,7 +79,7 @@ class MetafileChanger(ScriptBase):
         self.add_value_option(
             "-s",
             "--set",
-            "KEY=VAL [-s ...]",
+            "KEY=VAL",
             action="append",
             default=[],
             help="set a specific key to the given value; omit the '=' to delete a key",
@@ -87,7 +87,7 @@ class MetafileChanger(ScriptBase):
         self.add_value_option(
             "-r",
             "--regex",
-            "KEYcREGEXcSUBSTc [-r ...]",
+            "KEY/REGEX/SUBST/",
             action="append",
             default=[],
             help="replace pattern in a specific key by the given substitution",
