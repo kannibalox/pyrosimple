@@ -147,9 +147,6 @@ def test_conditions_prefilter(cond, expected):
 )
 def test_matcher(matcher, item):
     m = matching.create_matcher(matcher)
-    print(type(m))
-    if isinstance(m, matching.PatternFilter):
-        print(m._matcher)
     assert m.match(item)
 
 
