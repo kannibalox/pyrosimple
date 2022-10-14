@@ -70,9 +70,10 @@ As seen in the example `stats` job, there are four main settings for a job:
   for details.
 - `active` provides an easy way to enable or disable jobs.
 - `dry_run` tells the job to not make any actual changes if it's `true`.
+- `scgi_url` allows overriding the target instance, and can accept aliases.
 
 Any other settings are job-specific. For detailed documentation on
-each job, see the [pyrotorque reference](pyrotorque-jobs.md).
+each job, see the [reference documentation](pyrotorque-jobs.md).
 
 ## Usage
 

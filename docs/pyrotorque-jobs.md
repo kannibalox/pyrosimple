@@ -25,7 +25,8 @@ There are optional parameters `shell`, `cwd`, `timeout`, `check`, and
 
 ## Item Command
 
-This job runs a templated command against all matching items.
+This job is very similar to Command, but instead runs a templated
+command against all matching items.
 
 ```toml
 [TORQUE.log_messaages]

@@ -30,9 +30,10 @@ ubuntu-22.04-desktop-amd64.iso                                         3.4 GiB
 
 However, you can also display the same information in JSON format with
 the `--raw` flag:
-
 ```
-$ lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw
+lstor ubuntu-22.04-desktop-amd64.iso.torrent --raw
+```
+```json
 {
   "announce": "https://torrent.ubuntu.com/announce",
   "announce-list": [
