@@ -150,6 +150,11 @@ def test_conditions_prefilter(cond, expected):
         ("completed>1990-09-21T12:00", Bunch(completed=time.time())),
         ("completed>1990-09-21T12:00:00", Bunch(completed=time.time())),
         ("tagged=notest", Bunch(tagged=["test", "notest"])),
+        ("tagged!=notest", Bunch(tagged=["bar", "foo"])),
+        (
+            "tagged!=notest is_complete=no",
+            Bunch(tagged=["bar", "foo"], is_complete=False),
+        ),
         (
             "files=test*",
             Bunch(files=[Bunch(path="test/test.mkv"), Bunch(path="test.nfo")]),
@@ -177,6 +182,7 @@ def test_matcher(matcher, item):
         ("completed<09/21/1990", Bunch(completed=time.time())),
         ("tagged=:test", Bunch(tagged=["test", "notest"])),
         ("tagged=faketest", Bunch(tagged=["test", "notest"])),
+        ("tagged!=notest", Bunch(tagged=["test", "notest"])),
     ],
 )
 def test_matcher_fail(matcher, item):
@@ -201,6 +207,8 @@ def test_matcher_fail(matcher, item):
         ("ratio<1", "less=value=$d.ratio=,value=1000"),
         ("ratio<=1", "less=value=$d.ratio=,value=1001"),
         ("prio=1", "equal=value=$d.priority=,value=1"),
+        ("tagged=foo", 'string.contains_i=$d.custom=tags,"foo"'),
+        ("tagged!=foo", 'not="$string.contains_i=$d.custom=tags,"foo""'),
         (
             "completed>1990-09-21",
             "greater=value=$d.custom=tm_completed,value="

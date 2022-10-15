@@ -18,7 +18,7 @@ import re
 import time
 
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional, Union, Sequence
+from typing import Any, Callable, List, Optional, Sequence, Union
 
 from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
@@ -390,7 +390,7 @@ class TaggedAsFilter(FieldFilter):
     separated lists of tags.
     """
 
-    def pre_filter(self) -> str:
+    def pre_filter_eq(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         pf = prefilter_field_lookup(self._name)
         if pf is not None:
@@ -421,7 +421,7 @@ class TaggedAsFilter(FieldFilter):
             # Empty tag means empty set, not set of one empty string
             self._value = {self._value} if self._value else set()
 
-    def match(self, item) -> bool:
+    def eq(self, item) -> bool:
         """Return True if filter matches item."""
         tags = getattr(item, self._name) or []
         if self._exact:
