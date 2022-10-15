@@ -152,6 +152,7 @@ def test_conditions_prefilter(cond, expected):
         ("tagged=notest", Bunch(tagged=["test", "notest"])),
         ("tagged=:", Bunch(tagged=[])),
         ('tagged=""', Bunch(tagged=[])),
+        ('tagged!=""', Bunch(tagged=["foo"])),
         ("tagged!=:", Bunch(tagged=["bar", "foo"])),
         ("tagged!=notest", Bunch(tagged=["bar", "foo"])),
         (
