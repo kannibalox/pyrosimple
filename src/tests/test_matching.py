@@ -150,6 +150,8 @@ def test_conditions_prefilter(cond, expected):
         ("completed>1990-09-21T12:00", Bunch(completed=time.time())),
         ("completed>1990-09-21T12:00:00", Bunch(completed=time.time())),
         ("tagged=notest", Bunch(tagged=["test", "notest"])),
+        ("tagged=:", Bunch(tagged=[])),
+        ("tagged!=:", Bunch(tagged=["bar", "foo"])),
         ("tagged!=notest", Bunch(tagged=["bar", "foo"])),
         (
             "tagged!=notest is_complete=no",
@@ -208,7 +210,11 @@ def test_matcher_fail(matcher, item):
         ("ratio<=1", "less=value=$d.ratio=,value=1001"),
         ("prio=1", "equal=value=$d.priority=,value=1"),
         ("tagged=foo", 'string.contains_i=$d.custom=tags,"foo"'),
-        ("tagged!=foo", 'not="$string.contains_i=$d.custom=tags,"foo""'),
+        ("tagged=:foo", 'string.contains_i=$d.custom=tags,"foo"'),
+        ("tagged=:", "equal=d.custom=tags,cat="),
+        ("tagged!=:", 'not="$equal=d.custom=tags,cat="'),
+        ("tagged!=:foo", 'not="$string.contains_i=$d.custom=tags,\\"foo\\""'),
+        ("tagged!=foo", 'not="$string.contains_i=$d.custom=tags,\\"foo\\""'),
         (
             "completed>1990-09-21",
             "greater=value=$d.custom=tm_completed,value="

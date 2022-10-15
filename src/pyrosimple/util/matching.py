@@ -394,13 +394,13 @@ class TaggedAsFilter(FieldFilter):
         """Return rTorrent condition to speed up data transfer."""
         pf = prefilter_field_lookup(self._name)
         if pf is not None:
+            print(self._exact and not self._value)
+            if self._exact and not self._value:
+                return f'"equal={pf},cat="'
             if not self._value:
                 return f'"not=${pf}"'
-            val = self._value
-            if self._exact:
-                val = val.split().pop()
             return r'"string.contains_i=${},\"{}\""'.format(
-                pf, val.replace('"', r"\\\"")
+                pf, self._value.replace('"', r"\\\"")
             )
         return ""
 
@@ -416,17 +416,12 @@ class TaggedAsFilter(FieldFilter):
         else:
             self._exact = not self._value
 
-        # For exact matches, value is the set to compare to
-        if self._exact:
-            # Empty tag means empty set, not set of one empty string
-            self._value = {self._value} if self._value else set()
-
     def eq(self, item) -> bool:
         """Return True if filter matches item."""
         tags = getattr(item, self._name) or []
         if self._exact:
             # Exact equality check
-            return self._value == set(tags)
+            return set(self._value) == set(tags)
         # Is given tag in list?
         return self._value in tags
 
