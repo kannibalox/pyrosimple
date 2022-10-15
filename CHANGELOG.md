@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.2.0] - 2022-10-15
 
 ### Fixed
 - Fix setting tags
