@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+- Fix setting tags
+  (https://github.com/kannibalox/pyrosimple/issues/12)
+
 ### Added
 - `rtcontrol`/`rtxmlrpc`:
   - Basic tab completion

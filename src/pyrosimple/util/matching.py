@@ -863,5 +863,7 @@ def create_matcher(query: Union[str, Sequence[str]]):
     else:
         children = []
         for subquery in query:
-            children.append(MatcherBuilder().visit(QueryGrammar['stmt'].parse(subquery)))
+            children.append(
+                MatcherBuilder().visit(QueryGrammar["stmt"].parse(subquery))
+            )
         return GroupNode(children, False)

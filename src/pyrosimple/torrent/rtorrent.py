@@ -305,8 +305,9 @@ class RtorrentItem(engine.TorrentProxy):
         """Add or remove tags."""
         # Get tag list and add/remove given tags
         tags = tags.lower()
-        previous = self.rpc_call("d.custom", ["tags"])
-        tagset = previous.copy()
+
+        previous: List[str] = self.rpc_call("d.custom", ["tags"]).split()
+        tagset = set(previous)
         for tag in tags.replace(",", " ").split():
             if tag.startswith("-"):
                 tagset.discard(tag[1:])
@@ -317,12 +318,15 @@ class RtorrentItem(engine.TorrentProxy):
 
         # Write back new tagset, if changed
         tagset.discard("")
-        if tagset != previous:
-            tagset = " ".join(sorted(tagset))
+        if list(tagset) != previous:
+            new_tags = " ".join(sorted(tagset))
             self._make_it_so(
-                f"setting tags {tagset!r} on", ["d.custom.set"], "tags", tagset
+                f"setting changed tags {tagset!r} on",
+                ["d.custom.set"],
+                "tags",
+                new_tags,
             )
-            self._fields["custom_tags"] = tagset
+            self._fields["custom_tags"] = new_tags
 
     def set_throttle(self, name: str):
         """Assign to throttle group."""
