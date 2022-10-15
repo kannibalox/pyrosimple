@@ -211,7 +211,7 @@ rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/download
 
 ### Filter examples
 
-* `*HDTV*`:
+* `'*HDTV*'`:
     Anything with "HDTV" in its name
 
 * `/s\d+e\d+/`:
@@ -223,10 +223,10 @@ rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/download
 * `xfer=+0`:
     All active torrents (transferring data)
 
-* `up=+0` or `up>0`:
+* `up=+0` or `up\>0`:
     All seeding torrents (uploading data)
 
-* `down=+0 down=-5k` or `down>0 down<=5k`:
+* `down=+0 down=-5k` or `down\>0 down\<=5k`:
     Slow torrents (downloading, but with < 5 KiB/s)
 
 * `down=0 is_complete=no is_open=yes`:
@@ -249,16 +249,16 @@ rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/download
     [configuration](/configuration/#aliases) on how to add aliases for
     trackers)
 
-* `ratio=+1 realpath!=/mnt/*`:
+* `ratio=+1 realpath\!=/mnt/\*`:
     1:1 seeds not on a mounted path (i.e. likely on localhost)
 
 * `completed=+2w`:
     Completed more than 2 weeks ago
 
-* `tagged=""`:
+* `tagged=:` or `tagged=\"\"`:
     Not tagged at all
 
-* `tagged=\!`:
+* `tagged!=:`:
     Has at least one tag
 
 * `tagged=foo,bar`:
@@ -271,7 +271,7 @@ rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/download
 * `kind=flac,mp3`:
     Music downloads
 
-* `files=sample/*`:
+* `files=sample/\*`:
     Items with a top-level `sample` folder
 
 * `ratio=+2.5 OR seedtime=+1w`:

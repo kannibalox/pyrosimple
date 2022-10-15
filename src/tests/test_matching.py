@@ -151,6 +151,7 @@ def test_conditions_prefilter(cond, expected):
         ("completed>1990-09-21T12:00:00", Bunch(completed=time.time())),
         ("tagged=notest", Bunch(tagged=["test", "notest"])),
         ("tagged=:", Bunch(tagged=[])),
+        ('tagged=""', Bunch(tagged=[])),
         ("tagged!=:", Bunch(tagged=["bar", "foo"])),
         ("tagged!=notest", Bunch(tagged=["bar", "foo"])),
         (
