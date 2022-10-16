@@ -259,7 +259,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         self.open()
         session = PromptSession(
             completer=WordCompleter(
-                self.proxies[0].system.listMethods() + ["\help", "\stats", "\connect"]
+                self.proxies[0].system.listMethods() + ["\help", "\stats", "\connect"],
+                WORD=True,
             )
         )
         self.print_repl_help()
