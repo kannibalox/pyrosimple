@@ -761,7 +761,7 @@ class TorrentProxy:
                 accessor=lambda o: o._get_kind(limit),
                 matcher=matching.TaggedAsFilter,
                 formatter=_fmt_tags,
-                requires=[f"d.custom=kind"],
+                requires=["d.custom=kind"],
             )
             setattr(cls, name, field)
 
