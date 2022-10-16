@@ -758,9 +758,10 @@ class TorrentProxy:
                 set,
                 name,
                 f"kinds of files that make up more than {limit}% of this item's size",
+                accessor=lambda o: o._get_kind(limit),
                 matcher=matching.TaggedAsFilter,
                 formatter=_fmt_tags,
-                requires=[f"kind_{limit}"],
+                requires=[f"d.custom=kind"],
             )
             setattr(cls, name, field)
 

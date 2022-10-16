@@ -5,6 +5,8 @@
 ### Fixed
 - Fix inverse tag matching and prefiltering
   (https://github.com/kannibalox/pyrosimple/issues/13)
+- Fix `kind_N` fields
+  (https://github.com/kannibalox/pyrosimple/issues/14)
 
 ### Added
 - `rtxmlrpc`: Re-implement `--repl`

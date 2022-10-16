@@ -179,7 +179,7 @@ class RtorrentItem(engine.TorrentProxy):
         """Get a set of dominant file types. The files must contribute
         at least C{limit}% to the item's total size.
         """
-        histo = self.fetch("custom_kind")
+        histo = self.rpc_call("d.custom", ["kind"])
 
         if histo:
             # Parse histogram from cached field
