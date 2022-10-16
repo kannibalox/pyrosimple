@@ -394,7 +394,6 @@ class TaggedAsFilter(FieldFilter):
         """Return rTorrent condition to speed up data transfer."""
         pf = prefilter_field_lookup(self._name)
         if pf is not None:
-            print(self._exact and not self._value)
             if self._exact and not self._value:
                 return f'"equal={pf},cat="'
             if not self._value:
