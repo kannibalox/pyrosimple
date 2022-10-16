@@ -28,8 +28,6 @@ from xmlrpc import client as xmlrpc_client
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import WordCompleter
 
-import pyrosimple
-
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
 from pyrosimple.util import fmt, rpc
@@ -237,10 +235,11 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         for proxy in self.open():
             self.execute(proxy, method, self.cooked(raw_args))
 
-    def print_repl_help(self):
+    def print_repl_help(self):  # pylint: disable=no-self-use
+        """Short REPL help output"""
         print(
             textwrap.dedent(
-                """\
+                r"""\
         Entering prompt. Press Ctrl-D to exit.
         rTorrent XMLRPC REPL Help Summary
         =================================
@@ -259,7 +258,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         self.open()
         session = PromptSession(
             completer=WordCompleter(
-                self.proxies[0].system.listMethods() + ["\help", "\stats", "\connect"],
+                self.proxies[0].system.listMethods()
+                + [r"\help", r"\stats", r"\connect"],
                 WORD=True,
             )
         )
