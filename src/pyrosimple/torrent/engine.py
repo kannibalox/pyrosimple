@@ -753,7 +753,7 @@ class TorrentProxy:
         if name.startswith("kind_") and name[5:].isdigit():
             limit = int(name[5:].lstrip("0") or "0", 10)
             if limit > 100:
-                raise error.UserError(f"kind_N: N > 100 in {name!r}")
+                raise error.UserError(f"kind_N: N can't be greater than 100 in {name!r}")
             field = DynamicField(
                 set,
                 name,
