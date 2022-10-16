@@ -471,7 +471,7 @@ def core_fields():
         formatter=lambda val: "IGN!" if int(val) else "HEED",
         accessor=lambda o: o.rpc_call("d.ignore_commands"),
         requires=["d.ignore_commands"],
-        prefilter_field="d.is_ignored=",
+        prefilter_field="d.ignore_commands=",
         setter=lambda o, val: o.ignore(int(val)),
     )
     yield DynamicField(
