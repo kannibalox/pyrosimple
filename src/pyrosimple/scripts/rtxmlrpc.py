@@ -8,8 +8,10 @@ import difflib
 import json
 import logging
 import os
+import shlex
 import sys
 import tempfile
+import textwrap
 
 from pprint import pformat
 
@@ -22,6 +24,11 @@ except ImportError:
     requests_found = False
 
 from xmlrpc import client as xmlrpc_client
+
+from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import WordCompleter
+
+import pyrosimple
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
@@ -97,6 +104,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             "--session",
             "--restore",
             help="restore session state from .rtorrent session file(s)",
+        )
+        self.add_bool_option(
+            "--repl",
+            help="Open an interactive prompt to run commands",
         )
 
         # TODO: Template with "result" object in namespace
@@ -226,11 +237,63 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         for proxy in self.open():
             self.execute(proxy, method, self.cooked(raw_args))
 
+    def print_repl_help(self):
+        print(
+            textwrap.dedent(
+                """\
+        Entering prompt. Press Ctrl-D to exit.
+        rTorrent XMLRPC REPL Help Summary
+        =================================
+
+        <Ctrl-D>            Exit the REPL.
+        ?                   Show this help text.
+        \help               Show this help text.
+        \stats              Show current call stats.
+        \connect URL        Connect to a different host
+        cmd=arg1,arg2,..    Call a XMLRPC command"""
+            )
+        )
+
+    def do_repl(self):
+        """Run a simple REPL loop"""
+        self.open()
+        session = PromptSession(
+            completer=WordCompleter(
+                self.proxies[0].system.listMethods() + ["\help", "\stats", "\connect"]
+            )
+        )
+        self.print_repl_help()
+        while True:
+            try:
+                label = ",".join([p.system.hostname() for p in self.proxies])
+                text = session.prompt(f"{label}> ")
+                if not text:
+                    continue
+                if text in {"?", r"\help"}:
+                    self.print_repl_help()
+                    continue
+                if text == r"\stats":
+                    print(self.rpc_stats())
+                    continue
+                if text.startswith(r"\connect "):
+                    config.settings["SCGI_URL"] = text.split(" ")[1]
+                    self.proxies = []
+                    self.open()
+                    continue
+                self.args = shlex.split(text)
+                self.do_command()
+            except KeyboardInterrupt:
+                continue  # Control-C pressed. Try again.
+            except EOFError:
+                break  # Control-D pressed.
+
     def mainloop(self):
         """The main loop."""
         # Dispatch to handlers
         if self.options.as_import:
             self.do_import()
+        elif self.options.repl:
+            self.do_repl()
         else:
             self.do_command()
 

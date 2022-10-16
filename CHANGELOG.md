@@ -6,6 +6,9 @@
 - Fix inverse tag matching and prefiltering
   (https://github.com/kannibalox/pyrosimple/issues/13)
 
+### Added
+- `rtxmlrpc`: Re-implement `--repl`
+
 ## [2.2.0] - 2022-10-15
 
 ### Fixed
