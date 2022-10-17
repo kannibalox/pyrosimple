@@ -787,7 +787,6 @@ class RtorrentEngine:
         @param prefetch: Optional list of field names to fetch initially.
         """
 
-        multi_args: List
         if view is None:
             view = engine.TorrentView(self, "default")
         elif isinstance(view, str):
@@ -801,10 +800,12 @@ class RtorrentEngine:
 
         # Fetch items
         items = []
+        multi_args: List
         try:
             # Prepare multi-call arguments
             args = sorted(prefetch)
 
+            # Check if view is in the format of a single hash
             infohash = view._check_hash_view()
             if infohash:
                 multi_call = self.open().system.multicall
@@ -817,6 +818,7 @@ class RtorrentEngine:
                     for field in args
                 ]
                 raw_items = [[i[0] for i in multi_call(args)]]
+            # Otherwise prepare a multicall as expected
             else:
                 multi_call = self.open().d.multicall2
                 multi_args = ["", view.viewname] + [
@@ -826,13 +828,16 @@ class RtorrentEngine:
                     pre_filter = matching.unquote_pre_filter(view.matcher.pre_filter())
                     self.LOG.info("!!! pre-filter: %s", pre_filter or "N/A")
                     if pre_filter:
+                        # rTorrent 0.9.8+ does not have
+                        # sting.contains_i, so we check for it here
                         if (
                             config.settings.SAFETY_CHECKS_ENABLED
                             and "string.contains_i" in pre_filter
                             and not self.has_method("string.contains_i")
                         ):
                             self.LOG.warning(
-                                "Method 'strings.contains_i' does not exist! Fast query %r would return an empty list, disabling query.",
+                                "Method 'strings.contains_i' does not exist!"
+                                "Fast query %r would return an empty list, disabling fast query.",
                                 pre_filter,
                             )
                         else:
@@ -846,6 +851,7 @@ class RtorrentEngine:
                 len(prefetch),
             )
 
+            # Build objects from the received data
             for item in raw_items:
                 ritem = RtorrentItem(
                     self,
@@ -872,7 +878,8 @@ class RtorrentEngine:
         append: bool = False,
         disjoin: bool = False,
     ):
-        """Visualize a set of items (search result), and return the view name."""
+        """Place a set of items (search result) into a view, and
+        return the view name."""
         proxy = self.open()
         view_name: str = self._resolve_viewname(view or "rtcontrol")
 
@@ -1005,8 +1012,9 @@ def validate_sort_fields(sort_fields: str):
         ", ".join([("-" if descending else "") + i for i, descending in sort_spec]),
     )
 
-    # Need to provide complex key in order to allow for the minimum amount of attribute fetches,
-    # since they could mean a potentially expensive RPC call.
+    # Need to provide complex key in order to allow for the minimum
+    # amount of attribute fetches, since they could mean a potentially
+    # expensive RPC call.
     class Key:
         "Complex sort order key"
 
