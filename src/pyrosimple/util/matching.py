@@ -350,7 +350,6 @@ class PatternFilter(FieldFilter):
             split_needle = self.SPLIT_PRE_GLOB_RE.split(needle)
         # If the cleaning of the needle did not succeed and we still
         # have regex-y values, don't prefilter
-        print(needle)
         if any(metachar in needle for metachar in r'{}[]\\|()'):
             return ""
         # Grab the longest needle available from the array
