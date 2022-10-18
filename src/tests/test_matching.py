@@ -18,6 +18,8 @@ log = logging.getLogger(__name__)
 log.debug("module loaded")
 
 
+# Some of these are redundant due to the more comprehensive tests
+# later on, but it can't hurt to have them here
 @pytest.mark.parametrize(
     "cond",
     [
@@ -111,6 +113,7 @@ def test_conditions_prefilter(cond, expected):
 @pytest.mark.parametrize(
     ("matcher", "item"),
     [
+        # Patterns
         ("arch", Bunch(name="arch")),
         ("name=arch", Bunch(name="arch")),
         ("name=/arch/i", Bunch(name="ARCH")),
@@ -122,6 +125,7 @@ def test_conditions_prefilter(cond, expected):
         ("name={{d.alias}}*", Bunch(name="ubuntu-server", alias="ubuntu")),
         ("name=rtör*", Bunch(name="rtörrent")),
         ("name=arch*", Bunch(name="arch-linux")),
+        ("name=arch* is_complete=yes", Bunch(name="arch-linux", is_complete=True)),
         ("name=arch*", Bunch(name="arch linux")),
         ('name="arch *"', Bunch(name="arch linux")),
         ("arch*", Bunch(name="arch linux")),
@@ -136,11 +140,14 @@ def test_conditions_prefilter(cond, expected):
         (r"/s\d+e\d+/i", Bunch(name="Test.S03E04.mkv")),
         ('message=""', Bunch(message="")),
         ('message!=""', Bunch(message="Oh no!")),
+        # Booleans
         ("is_complete=no", Bunch(is_complete=False)),
+        # Numbers
         ("ratio>2", Bunch(ratio=5.0)),
         ("ratio>2 ratio<6.0", Bunch(ratio=5.0)),
         ("size>1G", Bunch(size=2 * (1024**3))),
         ("size>1G", Bunch(size=2 * (1024**3))),
+        # Datetimes
         ("leechtime>1h", Bunch(leechtime=60 * 60 * 2)),
         ("completed>2h", Bunch(completed=time.time() - (60 * 60 * 2))),
         ("completed<1h", Bunch(completed=time.time() - 1)),
@@ -150,6 +157,7 @@ def test_conditions_prefilter(cond, expected):
         ("completed>1990-09-21", Bunch(completed=time.time())),
         ("completed>1990-09-21T12:00", Bunch(completed=time.time())),
         ("completed>1990-09-21T12:00:00", Bunch(completed=time.time())),
+        # Tags
         ("tagged=notest", Bunch(tagged=["test", "notest"])),
         ("tagged=:", Bunch(tagged=[])),
         ('tagged=""', Bunch(tagged=[])),
@@ -176,6 +184,7 @@ def test_matcher(matcher, item):
     [
         ("name=arch", Bunch(name="ARCH")),
         ("name=ARCH", Bunch(name="arch")),
+        ("name=ARCH name=arch", Bunch(name="ARCH")),
         ("name=arch", Bunch(name="asdfsafad")),
         ("name!=arch*", Bunch(name="arch-linux")),
         ("name!=/arch$/", Bunch(name="base-arch")),
@@ -183,6 +192,7 @@ def test_matcher(matcher, item):
         ("ratio<2", Bunch(ratio=5.0)),
         ("size<1G", Bunch(size=2 * (1024**3))),
         ("leechtime<1h", Bunch(leechtime=60 * 60 * 2)),
+        ("leechtime<1h is_complete=yes", Bunch(leechtime=60 * 60 * 2, is_complete=False)),
         ("completed>1h", Bunch(completed=time.time() - 1)),
         ("completed<09/21/1990", Bunch(completed=time.time())),
         ("tagged=:test", Bunch(tagged=["test", "notest"])),
@@ -202,30 +212,37 @@ def test_matcher_fail(matcher, item):
         (["name=arch"], 'string.contains_i=$d.name=,"arch"'),
         ('name="arch linux"', 'string.contains_i=$d.name=,"arch linux"'),
         ("name=/arch/", 'string.contains_i=$d.name=,"arch"'),
+        # Avoid getting trapped in trying to prefilter strings inside
+        # regex logic
         ("name=/(arch|foo)k+/", 'string.contains_i=$d.name=,"k"'),
+        # Too complex of a regex to properly clean
         ("name=/((arch|ubuntu)|foo)k+/", ''),
         ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
-        ("size<1G", "less=d.size_bytes=,value=1073741824"),
+        # Booleans
         ("is_complete=no", "equal=d.complete=,value=0"),
         ("is_private=yes", "equal=d.is_private=,value=1"),
+        # Numbers
+        ("size<1G", "less=d.size_bytes=,value=1073741824"),
         ("prio=1", "equal=value=$d.priority=,value=1"),
         ("ratio>1", "greater=value=$d.ratio=,value=1000"),
         ("ratio>=1", "greater=value=$d.ratio=,value=999"),
         ("ratio<1", "less=value=$d.ratio=,value=1000"),
         ("ratio<=1", "less=value=$d.ratio=,value=1001"),
         ("prio=1", "equal=value=$d.priority=,value=1"),
+        # Tags
         ("tagged=foo", 'string.contains_i=$d.custom=tags,"foo"'),
         ("tagged=:foo", 'string.contains_i=$d.custom=tags,"foo"'),
         ("tagged=:", "equal=d.custom=tags,cat="),
         ("tagged!=:", 'not="$equal=d.custom=tags,cat="'),
         ("tagged!=:foo", 'not="$string.contains_i=$d.custom=tags,\\"foo\\""'),
         ("tagged!=foo", 'not="$string.contains_i=$d.custom=tags,\\"foo\\""'),
+        ("views=test", 'string.contains_i=$d.views=,"test"'),
+        # Dates
         (
             "completed>1990-09-21",
             "greater=value=$d.custom=tm_completed,value="
             + str(int(time.mktime(time.strptime("1990-09-20", "%Y-%m-%d")))),
         ),
-        ("views=test", 'string.contains_i=$d.views=,"test"'),
         # Example of a seemingly easy query that can't be prefiltered
         ("done>0", ""),
     ],
