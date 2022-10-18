@@ -285,7 +285,7 @@ class FieldFilter(MatcherNode):
 class PatternFilter(FieldFilter):
     """Pattern filter, either a glob or a /regex/ pattern."""
 
-    CLEAN_PRE_VAL_RE = re.compile(r"(?:\[.*?]\])|(?:\(.*?]\))|(?:{.*?]})|(?:\\)")
+    CLEAN_PRE_VAL_RE = re.compile(r"(?:\[.*?\])|(?:\(.*?\))|(?:{.*?})|(?:\\)")
     SPLIT_PRE_VAL_RE = re.compile(r"[^a-zA-Z0-9/_]+")
     SPLIT_PRE_GLOB_RE = re.compile(r"[?*]+")
 
