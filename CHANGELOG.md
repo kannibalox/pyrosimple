@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added:
+- `mktor`: Add flags for controlling min/max piece size, as well
+  as specifying it manually
+
 ### Fixed
 - Use all trackers when aggregating in example custom field code
   (credit goes to @kchiem: https://github.com/pyroscope/pyrocore/pull/105)

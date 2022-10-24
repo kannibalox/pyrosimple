@@ -68,6 +68,27 @@ class MetafileCreator(ScriptBase):
             help="exclude files matching a glob pattern from hashing; can be specified multiple times",
         )
         self.add_value_option(
+            "--piece-size",
+            "SIZE",
+            default="0",
+            type=fmt.human_bytes,
+            help="specify the piece size manually: allows byte sizes (e.g. 5M)",
+        )
+        self.add_value_option(
+            "--piece-size-min",
+            "SIZE",
+            default="32K",
+            type=fmt.human_bytes,
+            help="specify a minimum piece size",
+        )
+        self.add_value_option(
+            "--piece-size-max",
+            "SIZE",
+            default="16M",
+            type=fmt.human_bytes,
+            help="specify a maximum piece size",
+        )
+        self.add_value_option(
             "--comment", "TEXT", help="optional human-readable comment"
         )
         self.add_value_option(
@@ -194,6 +215,9 @@ class MetafileCreator(ScriptBase):
                     re.compile(fnmatch.translate(glob))
                     for glob in self.options.exclude + config.settings.MKTOR_IGNORE
                 ],
+                piece_size=self.options.piece_size,
+                piece_size_min=self.options.piece_size_min,
+                piece_size_max=self.options.piece_size_max,
             )
         torrent["created by"] = "PyroSimple"
         if self.options.comment:

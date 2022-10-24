@@ -245,6 +245,17 @@ def iso_datetime_optional(timestamp) -> str:
     return "never"
 
 
+def human_bytes(val: str) -> int:
+    units = dict(b=1, k=1024, m=1024**2, g=1024**3)
+    lower_val = str(val).lower()
+    if any(lower_val.endswith(i) for i in units):
+        scale = units[lower_val[-1]]
+        val = val[:-1]
+    else:
+        scale = 1
+    return int(val) * scale
+
+
 def human_duration(
     time1: float, time2: Optional[float] = None, precision: int = 0, short: bool = False
 ) -> str:

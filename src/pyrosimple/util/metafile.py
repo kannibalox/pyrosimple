@@ -482,17 +482,17 @@ class Metafile(dict):
         private: bool,
         progress: Optional[Callable[[int, int], None]] = None,
         piece_size: int = 0,
+        piece_size_min: int = 2**15,
+        piece_size_max: int = 2**24,
     ):
-        """Create torrent dict."""
+        """Create torrent dictionary from a file path."""
         if piece_size <= 0:
-            total_size = self._calc_size(datapath)
-            if total_size:
-                piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
-            else:
-                piece_size_exp = 0
-
-            piece_size_exp = min(max(15, piece_size_exp), 24)
-            piece_size = 2**piece_size_exp
+            # Calculate a good size for the data
+            piece_size_exp = int(math.log(self._calc_size(datapath)) / math.log(2)) - 9
+            # Limit it to the min and max
+            piece_size = min(piece_size_max, max(piece_size_min, 2**piece_size_exp))
+        # Round to the nearest power of two for all use cases
+        piece_size = 2 ** (int(math.ceil(math.log(piece_size) / math.log(2))))
 
         # Build info hash
         info, totalhashed = self._make_info(
@@ -559,6 +559,9 @@ class Metafile(dict):
         no_date: bool = False,
         progress=None,
         ignore=None,
+        piece_size: int = 0,
+        piece_size_min: int = 2**15,
+        piece_size_max: int = 2**24,
     ):
         """Create a metafile with the path given on object creation.
         Returns the last metafile dict that was written (as an object, not bencoded).
@@ -582,7 +585,14 @@ class Metafile(dict):
             ) from exc
 
         meta, _ = torrent._make_meta(
-            datapath, tracker_url, root_name, private, progress
+            datapath,
+            tracker_url,
+            root_name,
+            private,
+            progress,
+            piece_size,
+            piece_size_min,
+            piece_size_max,
         )
 
         # Add optional fields
