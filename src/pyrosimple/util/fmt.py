@@ -245,7 +245,9 @@ def iso_datetime_optional(timestamp) -> str:
     return "never"
 
 
-def human_bytes(val: str) -> int:
+def bytes_from_human(val: str) -> int:
+    """Convert a human string to integer bytes. Follows the same logic
+    as rtcontrol's byte filter"""
     units = dict(b=1, k=1024, m=1024**2, g=1024**3)
     lower_val = str(val).lower()
     if any(lower_val.endswith(i) for i in units):

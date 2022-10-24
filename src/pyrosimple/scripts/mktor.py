@@ -71,21 +71,21 @@ class MetafileCreator(ScriptBase):
             "--piece-size",
             "SIZE",
             default="0",
-            type=fmt.human_bytes,
+            type=fmt.bytes_from_human,
             help="specify the piece size manually: allows byte sizes (e.g. 5M)",
         )
         self.add_value_option(
             "--piece-size-min",
             "SIZE",
             default="32K",
-            type=fmt.human_bytes,
+            type=fmt.bytes_from_human,
             help="specify a minimum piece size",
         )
         self.add_value_option(
             "--piece-size-max",
             "SIZE",
             default="16M",
-            type=fmt.human_bytes,
+            type=fmt.bytes_from_human,
             help="specify a maximum piece size",
         )
         self.add_value_option(
