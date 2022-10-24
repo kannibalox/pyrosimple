@@ -1,12 +1,14 @@
 # Changelog
 
-## [Unreleased] - 2022-10-15
+## [2.2.1] - 2022-10-24
 
 ### Fixed
 - Fix inverse tag matching and prefiltering
   (https://github.com/kannibalox/pyrosimple/issues/13)
 - Fix `kind_N` fields
   (https://github.com/kannibalox/pyrosimple/issues/14)
+- Properly clean regexes for finding the prefiltering string, and
+  account for unclean-able regexes
 
 ### Added
 - `rtxmlrpc`: Re-implement `--repl`
