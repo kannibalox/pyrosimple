@@ -8,7 +8,7 @@ def _custom_fields():
     # Add rTorrent attributes not available by default
     def get_tracker_field(obj, name, aggregator=sum):
         "Get an aggregated tracker field."
-        return aggregator(obj.rpc_call("t.multicall", ["", f"t.{name}="])[0])
+        return aggregator([t[0] for t in obj.rpc_call("t.multicall", ["", f"t.{name}="])])
 
     yield engine.DynamicField(
         int,
