@@ -4,6 +4,7 @@
 
 ### Changed:
 - Defer imports to improve loading times
+
 |        | mktor -h | lstor -h | rtcontrol -h | rtcontrol // -o '' |
 |--------|----------|----------|--------------|--------------------|
 | Before | 0.364s   | 0.377s   | 0.382s       | 0.469s             |
