@@ -28,7 +28,7 @@ from typing import (
 
 import bencode  # typing: ignore
 
-from pyrosimple import config, error
+from pyrosimple import error
 from pyrosimple.util import fmt, pymagic
 from pyrosimple.util.parts import Bunch
 
@@ -577,6 +577,8 @@ class Metafile(dict):
                 )
                 tracker_alias = tracker_alias[-2 if len(tracker_alias) > 1 else 0]
             else:
+                from pyrosimple import config  # pylint: disable=import-outside-toplevel
+
                 tracker_alias, tracker_url = config.lookup_announce_url(tracker_url)
                 tracker_url = tracker_url[0]
         except (KeyError, IndexError) as exc:

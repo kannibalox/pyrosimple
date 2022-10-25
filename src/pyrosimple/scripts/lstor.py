@@ -13,7 +13,6 @@ from pathlib import Path
 import bencode
 
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import fmt, metafile
 
 
 class MetafileLister(ScriptBase):
@@ -56,6 +55,8 @@ class MetafileLister(ScriptBase):
 
     def mainloop(self):
         """The main loop."""
+        from pyrosimple.util import metafile  # pylint: disable=import-outside-toplevel
+
         if not self.args:
             self.parser.print_help()
             self.parser.error("No metafiles given, nothing to do!")
@@ -84,7 +85,10 @@ class MetafileLister(ScriptBase):
                     raise
 
                 if self.options.check_data:
-                    with fmt.HashProgressBar() as pb:
+                    # pylint: disable=import-outside-toplevel
+                    from pyrosimple.util.ui import HashProgressBar
+
+                    with HashProgressBar() as pb:
                         if (
                             logging.getLogger().isEnabledFor(logging.WARNING)
                             and sys.stdout.isatty()

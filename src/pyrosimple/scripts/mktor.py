@@ -17,9 +17,8 @@ from urllib.parse import parse_qs
 
 import bencode
 
-from pyrosimple import config, error
+from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import fmt, metafile
 
 
 class MetafileCreator(ScriptBase):
@@ -38,6 +37,8 @@ class MetafileCreator(ScriptBase):
     def add_options(self):
         """Add program options."""
         super().add_options()
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple.util.fmt import bytes_from_human
 
         self.add_bool_option("-p", "--private", help="disallow DHT and PEX")
         self.add_bool_option("--no-date", help="leave out creation date")
@@ -71,21 +72,21 @@ class MetafileCreator(ScriptBase):
             "--piece-size",
             "SIZE",
             default="0",
-            type=fmt.bytes_from_human,
+            type=bytes_from_human,
             help="specify the piece size manually: allows byte sizes (e.g. 5M)",
         )
         self.add_value_option(
             "--piece-size-min",
             "SIZE",
             default="32K",
-            type=fmt.bytes_from_human,
+            type=bytes_from_human,
             help="specify a minimum piece size",
         )
         self.add_value_option(
             "--piece-size-max",
             "SIZE",
             default="16M",
-            type=fmt.bytes_from_human,
+            type=bytes_from_human,
             help="specify a maximum piece size",
         )
         self.add_value_option(
@@ -146,6 +147,12 @@ class MetafileCreator(ScriptBase):
 
     def mainloop(self):
         """The main loop."""
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple import config
+        from pyrosimple.util import metafile
+
+        # pylint: enable=import-outside-toplevel
+
         if len(self.args) == 1 and "=urn:btih:" in self.args[0]:
             # Handle magnet link
             self.make_magnet_meta(self.args[0])
@@ -188,7 +195,10 @@ class MetafileCreator(ScriptBase):
             metapath = datapath.with_suffix(".torrent")
 
         # Build progress bar
-        with fmt.HashProgressBar() as pb:
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple.util.ui import HashProgressBar
+
+        with HashProgressBar() as pb:
             if (
                 logging.getLogger().isEnabledFor(logging.WARNING)
                 and sys.stdout.isatty()

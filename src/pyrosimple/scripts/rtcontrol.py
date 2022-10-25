@@ -17,17 +17,16 @@ import time
 from multiprocessing.pool import ThreadPool
 from typing import Callable, List, Union
 
-from prompt_toolkit import prompt
-
-from pyrosimple import config, error
+from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
-from pyrosimple.torrent import engine, rtorrent
-from pyrosimple.util import fmt, matching, pymagic, rpc
+from pyrosimple.util import fmt, pymagic, rpc
 from pyrosimple.util.parts import DefaultBunch
 
 
 def print_help_fields():
     """Print help about fields and field formatters."""
+    from pyrosimple.torrent import engine  # pylint: disable=import-outside-toplevel
+
     # Mock entries, so they fulfill the expectations towards a field definition
     def custom_manifold():
         "named rTorrent custom attribute, e.g. 'custom_completion_target'"
@@ -90,6 +89,12 @@ class FieldStatistics:
 
     def add(self, field, val):
         "Add a sample"
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple.torrent import engine
+        from pyrosimple.util import matching
+
+        # pylint: enable=import-outside-toplevel
+
         if engine.FIELD_REGISTRY[field]._matcher is matching.TimeFilter:
             val = self._basetime - val
 
@@ -468,6 +473,8 @@ class RtorrentControl(ScriptBaseWithConfig):
     # TODO: refactor to engine.TorrentProxy as format() method
     def format_item(self, item: str, defaults=None, stencil=None) -> str:
         """Format an item."""
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple.torrent import rtorrent
 
         try:
             item_text: str = rtorrent.format_item(
@@ -522,6 +529,12 @@ class RtorrentControl(ScriptBaseWithConfig):
     # TODO: refactor to formatting.OutputMapping as a class method
     def validate_output_format(self, default_format):
         """Prepare output format for later use."""
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple import config
+        from pyrosimple.torrent import rtorrent
+
+        # pylint: enable=import-outside-toplevel
+
         output_format = self.options.output_format
 
         # Use default format if none is given
@@ -559,6 +572,11 @@ class RtorrentControl(ScriptBaseWithConfig):
     # TODO: refactor to engine.FieldDefinition as a class method
     def get_output_fields(self) -> List[str]:
         """Get field names from output template."""
+        from pyrosimple.torrent import (  # pylint: disable=import-outside-toplevel
+            engine,
+            rtorrent,
+        )
+
         result = []
         for name in rtorrent.get_fields_from_template(self.options.output_format):
             if name not in engine.FIELD_REGISTRY:
@@ -573,6 +591,11 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def validate_sort_fields(self):
         """Take care of sorting."""
+        from pyrosimple import config  # pylint: disable=import-outside-toplevel
+        from pyrosimple.torrent import (  # pylint: disable=import-outside-toplevel
+            rtorrent,
+        )
+
         if self.options.sort_fields is None:
             self.options.sort_fields = config.settings.SORT_FIELDS
         if self.options.sort_fields == "*":
@@ -606,8 +629,14 @@ class RtorrentControl(ScriptBaseWithConfig):
         if self.options.help_fields:
             print_help_fields()
             print_help_filters()
-            sys.exit(1)
+            sys.exit(0)
 
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple import config
+        from pyrosimple.torrent import rtorrent
+        from pyrosimple.util import matching
+
+        # pylint: enable=import-outside-toplevel
         # Print usage if no conditions are provided
         if not self.args:
             self.parser.error("No filter conditions given!")
@@ -692,6 +721,9 @@ class RtorrentControl(ScriptBaseWithConfig):
         for url, r_engine in engines.items():
 
             def fetch(e):
+                # pylint: disable=import-outside-toplevel
+                from pyrosimple.torrent import engine
+
                 view = e.view(self.options.from_view, matcher)
                 prefetch = [
                     engine.FIELD_REGISTRY[f].requires
@@ -772,6 +804,10 @@ class RtorrentControl(ScriptBaseWithConfig):
                         action["interactive"] or self.options.interactive
                     ) and not self.options.yes:
                         self.emit(item, defaults)
+                        from prompt_toolkit import (  # pylint: disable=import-outside-toplevel
+                            prompt,
+                        )
+
                         answer = prompt(
                             f"{action_name}? [Y)es, n)o, a)ll yes, q)uit]: "
                         )
@@ -827,6 +863,10 @@ class RtorrentControl(ScriptBaseWithConfig):
                         for i in matches
                     ]
                 else:
+                    from pyrosimple.torrent import (  # pylint: disable=import-outside-toplevel
+                        engine,
+                    )
+
                     json_data = [
                         {name: getattr(i, name) for name in engine.FIELD_REGISTRY}
                         for i in matches

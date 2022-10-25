@@ -10,8 +10,6 @@ from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib
 
-import requests
-
 from prometheus_client import Counter, Summary
 
 
@@ -92,6 +90,9 @@ class HTTPTransport(RTorrentTransport):
     # Notably the request here is *not* encoded into SCGI
     # since the web proxy handles that itself.
     def request(self, host, handler, request_body, verbose=False):
+        # Defer loading for performance reasons
+        import requests  # pylint: disable=import-outside-toplevel
+
         request_counter.inc()
         request_size_counter.inc(len(request_body))
         with response_time_summary.time():

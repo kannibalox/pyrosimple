@@ -18,9 +18,8 @@ from typing import Iterator, List
 
 import shtab
 
-from pyrosimple import config, error, io
-from pyrosimple.torrent import rtorrent
-from pyrosimple.util import fmt, pymagic
+from pyrosimple import error
+from pyrosimple.util import pymagic
 
 
 class ScriptBase:
@@ -221,6 +220,10 @@ class ScriptBase:
     # pylint: disable=no-self-use
     def rpc_stats(self) -> str:
         """Return a string with RPC statistics"""
+
+        from pyrosimple import io  # pylint: disable=import-outside-toplevel
+        from pyrosimple.util import fmt  # pylint: disable=import-outside-toplevel
+
         req_num = int(io.scgi.request_counter._value.get())
         req_sz = fmt.human_size(io.scgi.request_size_counter._value.get())
         req_time = round(
@@ -240,6 +243,12 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
     def get_options(self):
         """Get program options."""
         super().get_options()
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple import config
+        from pyrosimple.torrent import rtorrent
+
+        # pylint: enable=import-outside-toplevel
+
         if self.options.url:
             config.settings["SCGI_URL"] = self.options.url
         config.load_custom_py()
@@ -247,6 +256,8 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
 
     def lookup_connection_alias(self, url: str) -> str:  # pylint: disable=no-self-use
         """Convert a connection alias to the actual URL (if set in the config"""
+        from pyrosimple import config  # pylint: disable=import-outside-toplevel
+
         if url in config.settings["CONNECTIONS"]:
             return str(config.settings["CONNECTIONS"][url])
         return url
@@ -256,6 +267,8 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
 
         This is separate from lookup_connection_alias due to scripts needing to be written specifically
         to handle this"""
+        from pyrosimple import config  # pylint: disable=import-outside-toplevel
+
         val = config.settings["CONNECTIONS"].get(url, [url])
         if isinstance(val, list):
             for v in val:
