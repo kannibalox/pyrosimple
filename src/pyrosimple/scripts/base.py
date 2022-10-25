@@ -6,6 +6,7 @@
 
 import errno
 import logging.config
+import os
 import signal
 import sys
 import textwrap

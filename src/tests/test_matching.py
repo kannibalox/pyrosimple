@@ -131,7 +131,7 @@ def test_conditions_prefilter(cond, expected):
         ("arch*", Bunch(name="arch linux")),
         ('"arch lin*"', Bunch(name="arch linux")),
         ('name="arch linux"', Bunch(name="arch linux")),
-        ('/(foo|arch)/', Bunch(name="arch linux")),
+        ("/(foo|arch)/", Bunch(name="arch linux")),
         ('name="arch lin*"', Bunch(name="arch linux")),
         ("name=*arch", Bunch(name="base-arch")),
         ("name=/arch/", Bunch(name="base-arch")),
@@ -192,7 +192,10 @@ def test_matcher(matcher, item):
         ("ratio<2", Bunch(ratio=5.0)),
         ("size<1G", Bunch(size=2 * (1024**3))),
         ("leechtime<1h", Bunch(leechtime=60 * 60 * 2)),
-        ("leechtime<1h is_complete=yes", Bunch(leechtime=60 * 60 * 2, is_complete=False)),
+        (
+            "leechtime<1h is_complete=yes",
+            Bunch(leechtime=60 * 60 * 2, is_complete=False),
+        ),
         ("completed>1h", Bunch(completed=time.time() - 1)),
         ("completed<09/21/1990", Bunch(completed=time.time())),
         ("tagged=:test", Bunch(tagged=["test", "notest"])),
@@ -216,7 +219,7 @@ def test_matcher_fail(matcher, item):
         # regex logic
         ("name=/(arch|foo)k+/", 'string.contains_i=$d.name=,"k"'),
         # Too complex of a regex to properly clean
-        ("name=/((arch|ubuntu)|foo)k+/", ''),
+        ("name=/((arch|ubuntu)|foo)k+/", ""),
         ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
         # Booleans
         ("is_complete=no", "equal=d.complete=,value=0"),
