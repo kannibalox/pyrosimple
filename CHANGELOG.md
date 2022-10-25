@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed:
+- Defer imports to improve loading times
+|        | mktor -h | lstor -h | rtcontrol -h | rtcontrol // -o '' |
+|--------|----------|----------|--------------|--------------------|
+| Before | 0.364s   | 0.377s   | 0.382s       | 0.469s             |
+| After  | 0.112s   | 0.098s   | 0.141s       | 0.384s             |
+
+
 ### Added:
 - `mktor`: Add flags for controlling min/max piece size, as well
   as specifying it manually
