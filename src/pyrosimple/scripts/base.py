@@ -6,6 +6,7 @@
 
 import errno
 import logging.config
+import signal
 import sys
 import textwrap
 import time
@@ -187,7 +188,8 @@ class ScriptBase:
             except KeyboardInterrupt:
                 print()
                 self.LOG.critical("Aborted by CTRL-C!\n")
-                sys.exit(error.EX_TEMPFAIL)
+                signal.signal(signal.SIGINT, signal.SIG_DFL)
+                os.kill(os.getpid(), signal.SIGINT)
             except OSError as exc:
                 # [Errno 32] Broken pipe?
                 if exc.errno == errno.EPIPE:
