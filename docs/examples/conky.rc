@@ -1,0 +1,35 @@
+conky.config = {
+-- Sample conky Configuration
+
+-- The settings below are just for demo purposes
+-- Integrate the TEXT portion into your normal ~/.conkyrc
+
+	update_interval = 5.0,
+	own_window = true,
+	own_window_transparent = false,
+	own_window_hints = 'undecorated,below,skip_taskbar,skip_pager',
+	maximum_width = 320,
+	minimum_width = 320, minimum_height = 600,
+	alignment = 'top_right',
+
+	default_shade_color = '#999999',
+	default_outline_color = '#222222',
+	draw_outline = true,
+	draw_shades = true,
+
+	use_xft = false,
+	font = 'Lucida Sans Typewriter:size=8',
+	xftalpha = 0.8,
+
+        background = yes,
+	double_buffer = true,
+	total_run_times = 0,
+	override_utf8_locale = true,
+	text_buffer_size = 16768,
+
+
+};
+
+conky.text = [[
+${execpi 5 rtcontrol -qO rtorstat --from-view incomplete is_open=yes is_ignored=no}
+]];
