@@ -488,7 +488,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
         )
         try:
-            torrent.add_fast_resume(proxy.d.directory_base(self.hash))
+            torrent.add_fast_resume(Path(proxy.d.directory_base(self.hash)))
         except (FileNotFoundError, OSError) as e:
             self._engine.LOG.error("Could not add fast resume data: %s", e)
         # Do some basic escaping, nothing else should be necessary.
