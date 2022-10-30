@@ -74,10 +74,10 @@ changing a few values from the defaults to demonstrate key features:
 
 ```toml
 [TORQUE.queue]
-handler = "pyrocore.torrent.queue:QueueManager"
+handler = "pyrosimple.job.queue:QueueManager"
 schedule = "minute=*"
 sort_fields = "-prio,loaded,name"
-#startable = "is_open=no tagged=torqued is_ignored=no done=0 message=''"
+matcher = "is_open=no tagged=torqued is_ignored=no done=0 message=''"
 downloading_min = 1
 downloading_max = 100
 ```

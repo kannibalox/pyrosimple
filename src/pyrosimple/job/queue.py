@@ -16,8 +16,8 @@ class QueueManager(MatchableJob):
 
     def __init__(self, config=None):
         """Set up queue manager."""
-        self.config = config or {}
-        print(self.config)
+        if "startable" in config and "matcher" not in config:
+            config["matcher"] = config["startable"]
         super().__init__(config)
         self.proxy = None
         self.last_start = 0

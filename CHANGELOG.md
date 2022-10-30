@@ -17,6 +17,7 @@
 ### Fixed
 - Use all trackers when aggregating in example custom field code
   (credit goes to @kchiem: https://github.com/pyroscope/pyrocore/pull/105)
+- `pyrotorque`: Allow using `startable` instead of `matcher` for QueueManager
 
 ## [2.2.1] - 2022-10-24
 
