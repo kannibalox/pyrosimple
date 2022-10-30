@@ -26,7 +26,7 @@ class QueueManager(MatchableJob):
         self.config.setdefault("viewname", "main")
         self.config.setdefault("downloading_min", 0)
         self.config.setdefault("downloading_max", 20)
-        self.config.setdefault("max_downloading_traffic", 0)
+        self.config.setdefault("downloading_traffic_max", 0)
         self.config["log_to_client"] = bool_param("log_to_client", True)
         self.log.info(
             "Startable matcher is: %s",
@@ -82,11 +82,11 @@ class QueueManager(MatchableJob):
         )
         start_now = min(start_now, len(startable))
 
-        if self.config["max_downloading_traffic"] > 0:
+        if self.config["downloading_traffic_max"] > 0:
             down_traffic = sum(i.down for i in downloading)
             self.log.debug("%d downloading, down %d", len(downloading), down_traffic)
-            if down_traffic > int(self.config["max_downloading_traffic"]):
-                self.log.debug("Max download traffic reaching, skipping start")
+            if down_traffic > int(self.config["downloading_traffic_max"]):
+                self.log.debug("Max download traffic (%s) reached, skipping start", self.config["downloading_traffic_max"])
                 return
 
         # Start eligible items

@@ -8,7 +8,8 @@
   |--------|----------|----------|--------------|--------------------|
   | Before | 0.364s   | 0.377s   | 0.382s       | 0.469s             |
   | After  | 0.112s   | 0.098s   | 0.141s       | 0.384s             |
-
+- `pyrotorque`: Change `max_downloading_traffic` to
+  `downloading_traffic_max`, in order to match other setting names.
 
 ### Added:
 - `mktor`: Add flags for controlling min/max piece size, as well
