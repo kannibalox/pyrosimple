@@ -166,17 +166,15 @@ def transport_from_url(url: str) -> Type[xmlrpclib.Transport]:
         url = "scgi://" + url
     if url.startswith("/") or url.startswith("~"):
         url = "scgi+unix://" + url
-    parsed_url = urlparse.urlsplit(url, scheme="scgi", allow_fragments=False)
-
+    parsed_url = urlparse.urlsplit(url, allow_fragments=False)
     try:
         transport = TRANSPORTS[parsed_url.scheme.lower()]
+        return transport
     except KeyError:
-        # pylint: disable=raise-missing-from
+        # Support simplified "domain:port" URLs
         if not any((parsed_url.netloc, parsed_url.query)) and parsed_url.path.isdigit():
-            # Support simplified "domain:port" URLs
             return transport_from_url(f"scgi://{parsed_url.netloc}:{parsed_url.path}")
-        raise URLError(f"Unsupported scheme in URL {parsed_url.geturl()}")
-    return transport
+    raise URLError(f"Unsupported scheme in URL {parsed_url.geturl()!r}")
 
 
 def _encode_netstring(data: bytes) -> bytes:
