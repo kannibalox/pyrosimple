@@ -246,11 +246,10 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         # pylint: disable=import-outside-toplevel
         from pyrosimple import config
         from pyrosimple.torrent import rtorrent
-
         # pylint: enable=import-outside-toplevel
 
         if self.options.url:
-            config.settings["SCGI_URL"] = self.options.url
+            config.settings["SCGI_URL"] = self.lookup_connection_alias(self.options.url)
         config.load_custom_py()
         self.engine = rtorrent.RtorrentEngine()
 
