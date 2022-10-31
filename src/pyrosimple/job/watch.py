@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict
 
+import pyrosimple
 from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
