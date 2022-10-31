@@ -11,6 +11,8 @@ done with straight cron, having it in pyrotorque allows keeping all
 rTorrent changes in one place. It also offers several improvements,
 such as per-second resolution.
 
+### Configuration
+
 ```toml
 [TORQUE.send_mail]
 handler       = "pyrosimple.job.action:Command"
@@ -27,6 +29,8 @@ There are optional parameters `shell`, `cwd`, `timeout`, `check`, and
 
 This job is very similar to Command, but instead runs a templated
 command against all matching items.
+
+### Configuration
 
 ```toml
 [TORQUE.log_messaages]
@@ -46,6 +50,8 @@ There are optional parameters `shell`, `cwd`, `timeout`, `check`, and
 
 This is a simple job, intended to allow access to (almost)
 the same actions as `rtcontrol`.
+
+### Configuration
 
 Example of stopping completed torrents after they reach a >5 ratio:
 
@@ -85,7 +91,37 @@ downloading_max = 100
 Having a minimal configuration with just your changes is recommended,
 so you get new defaults in later releases automatically.
 
-### Queue Settings Explained
+Arguments:
+
+* `matcher`/`startable`  
+  The query to use to determine which torrents are valid candidates to
+  be started.
+* `start_at_once`  
+  The maximum number of items to start during a single run. May be
+  overrridden by the `downloading_min` settings. Defaults to `1`.
+* `downloading`  
+  The query used to determine the number of actively downloading
+  torrents. Defaults to `is_active=1 is_complete=0`
+* `downloading_min`  
+  If the number of actively downloading torrents is less than this
+  number, the job will ignore `start_at_once` to get to this
+  number. Defaults to `0` (meaning `start_at_once` will always be
+  honored).
+* `downloading_max`  
+  If the number of actively downloading torrents is greater than this
+  number, pyrotorque will not start any items. Defaults to `20`.
+* `intermission`  
+  If any items are started, pyrotorque will wait this many seconds
+  before attempting to start another. This is helpful to avoid
+  potentially starting too many items too quickly. Defaults to `120`.
+* `max_downloading_traffic`  
+  If set, this setting will skip starting torrents when the torrents
+  in `downloading` exceed this value.
+* `log_to_client`  
+  Can be set to `False` to avoid logging messages in rTorrent whenever
+  a torrent is started. Defaults to `True`.
+
+### Explaination
 
 In the above example for the `queue` job, `downloading_max` counts
 started-but-incomplete items including those that ignore
@@ -169,7 +205,7 @@ occupying a slot in the queue.
 ## Tree Watch
 
 This job is for loading torrents into rtorrent. While the native tools
-work well enough for simply loading torrents, this jobs allows for
+work well enough for simply loading torrents, this job allows for
 additional features like conditional logic and invalid file handling.
 
 Note that this job uses inotify, which is much lighter-weight but has
@@ -276,7 +312,7 @@ Things to take note of:
         release_tags=None, season='01', show='Pioneer.One', sound=None, title=None)
     ```
 
-### Tree Watch Examples
+### Examples
 
 #### Completion Moving
 
