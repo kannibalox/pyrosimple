@@ -308,7 +308,7 @@ class TreeWatch:
                 self.custom_cmds[key] = val
 
         # Get client proxy
-        self.proxy = rpc.RTorrentProxy(configuration.settings.SCGI_URL)
+        self.proxy = self.engine.open()
 
         self.setup()
 
