@@ -308,6 +308,12 @@ class TreeWatch:
                 self.custom_cmds[key] = val
 
         # Get client proxy
+        url = None
+        if "scgi_url" in self.config:
+            url = pyrosimple.config.lookup_connection_alias(
+                str(self.config.get("scgi_url"))
+            )
+        self.engine = pyrosimple.connect(url)
         self.proxy = self.engine.open()
 
         self.setup()
