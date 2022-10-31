@@ -160,8 +160,12 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 ", ".join(repr(i) for i in args),
                 exc,
             )
-            if f"Method '{method}' not defined" in str(exc):
-                cmds = difflib.get_close_matches(method, proxy.system.listMethods())
+            if f"Method '{method}' not defined" in str(
+                exc
+            ) or f"method not found: {method}" in str(exc):
+                cmds = difflib.get_close_matches(
+                    method, proxy.system.listMethods() + ["system.listMethods"]
+                )
                 if cmds:
                     print("The most similar methods are:")
                     for w in cmds:
