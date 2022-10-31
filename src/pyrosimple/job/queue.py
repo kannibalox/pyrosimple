@@ -84,9 +84,14 @@ class QueueManager(MatchableJob):
 
         if self.config["downloading_traffic_max"] > 0:
             down_traffic = sum(i.down for i in downloading)
-            self.log.debug("%d downloading, download traffic is %d", len(downloading), down_traffic)
+            self.log.debug(
+                "%d downloading, download traffic is %d", len(downloading), down_traffic
+            )
             if down_traffic > int(self.config["downloading_traffic_max"]):
-                self.log.debug("Max download traffic '%s' reached, skipping start", self.config["downloading_traffic_max"])
+                self.log.debug(
+                    "Max download traffic '%s' reached, skipping start",
+                    self.config["downloading_traffic_max"],
+                )
                 return
 
         # Start eligible items

@@ -19,6 +19,7 @@
 - Use all trackers when aggregating in example custom field code
   (credit goes to @kchiem: https://github.com/pyroscope/pyrocore/pull/105)
 - `pyrotorque`: Allow using `startable` instead of `matcher` for QueueManager
+- `pyrotorque`: Resolve connection aliases in job definitions and CLI
 
 ## [2.2.1] - 2022-10-24
 

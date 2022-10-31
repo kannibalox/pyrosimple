@@ -246,6 +246,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         # pylint: disable=import-outside-toplevel
         from pyrosimple import config
         from pyrosimple.torrent import rtorrent
+
         # pylint: enable=import-outside-toplevel
 
         if self.options.url:
