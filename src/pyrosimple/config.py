@@ -48,6 +48,7 @@ settings = Dynaconf(
         Validator("SCGI_URL", default=""),
         # TOML sections
         Validator("ALIASES", default={}),
+        Validator("ALIAS_TRAITS", default={}),
         Validator("CONNECTIONS", default={}),
         # Allow individual overrides in FORMATS section
         Validator(
