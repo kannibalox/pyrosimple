@@ -90,7 +90,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             "-o",
             "--output-format",
             default="pretty",
-            choices=["pretty", "xml", "repr", "json"],
+            choices=["pretty", "repr", "json"],
             help="Output format to use. Defaults to 'pretty'",
         )
         self.add_bool_option(
