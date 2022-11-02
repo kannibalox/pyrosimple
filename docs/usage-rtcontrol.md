@@ -285,5 +285,5 @@ rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/download
 * `custom_1!=?*`:
   matches any torrent without a rutorrent label
   
-* `custom_1!=*`:
+* `custom_1==*`:
   matches any torrent with or without a rutorrent label
