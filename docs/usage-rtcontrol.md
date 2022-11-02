@@ -282,6 +282,7 @@ rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/download
 
 * `traits=avi traits=tv,movies`:
   TV or movies in AVI containers
+
 * `custom_1!=?*`:
   matches any torrent without a rutorrent label
   

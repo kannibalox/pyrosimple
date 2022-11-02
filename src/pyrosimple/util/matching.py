@@ -307,6 +307,8 @@ class PatternFilter(FieldFilter):
             # Pick out a couple regexes that can be simplified
             if self._value in ["//", "/.*/", "//i", "/.*/i"]:
                 self._matcher = lambda _, __: True
+            elif self._value in ["/.+/", "/.+/i"]:
+                self._matcher = lambda val, __: bool(val)
             else:
                 value = self._value
                 if self._value.endswith("/i"):
@@ -326,7 +328,11 @@ class PatternFilter(FieldFilter):
             self._template = self._value
             self._matcher = _template_globber
         else:
-            self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)
+            # Pick out a glob that can be simplified
+            if self._value == "*":
+                self._matcher = lambda _, __: True
+            else:
+                self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)
 
     def pre_filter_eq(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
@@ -356,6 +362,7 @@ class PatternFilter(FieldFilter):
         needle = list(sorted(split_needle, key=len))[-1]
 
         if needle:
+            # Skip trying to filter on non-ASCII characters
             try:
                 needle.encode("ascii")
             except UnicodeEncodeError:
