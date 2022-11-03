@@ -19,15 +19,18 @@ class QueueManager(MatchableJob):
         if "startable" in config and "matcher" not in config:
             config["matcher"] = config["startable"]
         super().__init__(config)
-        self.proxy = None
+        self.proxy = self.engine.open()
         self.last_start = 0
 
-        bool_param = lambda key, default: matching.truth(self.config.get(key, default))
         self.config.setdefault("viewname", "main")
+        self.config.setdefault("start_at_once", 1)
+        self.config.setdefault("intermission", 120)
         self.config.setdefault("downloading_min", 0)
         self.config.setdefault("downloading_max", 20)
         self.config.setdefault("downloading_traffic_max", 0)
-        self.config["log_to_client"] = bool_param("log_to_client", True)
+        self.config["log_to_client"] = matching.truth(
+            self.config.get("log_to_client", True)
+        )
         self.log.info(
             "Startable matcher is: %s",
             self.config["matcher"],
@@ -40,48 +43,25 @@ class QueueManager(MatchableJob):
             self.config["downloading"],
         )
 
-    def _start(self, items):
-        """Start some items if conditions are met."""
-        # TODO: Filter by a custom date field, for scheduled downloads starting at a certain time
-        # or after a given delay
-
-        # TODO: Don't start anything more if download BW is used >= config threshold in %
-
-        # Check if anything more is ready to start downloading
-        startable = [i for i in items if self.matcher.match(i)]
-        if not startable:
-            self.log.debug(
-                "Checked %d item(s), none startable according to %s",
-                len(items),
-                self.config["matcher"],
-            )
-            return
-
+    def run(self):
         # Check intermission delay
-        intermission = self.config.get("intermission", 120)
         now = time.time()
         if now < self.last_start:
-            # compensate for summer time and other oddities
+            # Compensate for DST and other oddities
             self.last_start = now
-        delayed = int(self.last_start + intermission - now)
+        delayed = int(self.last_start + self.config["intermission"] - now)
         if delayed > 0:
             self.log.debug(
-                "Delaying start of %d item(s),"
-                " due to %ds intermission with %ds left",
-                len(startable),
+                "Skipping start due to %ds intermission with %ds left",
                 intermission,
                 delayed,
             )
             return
-
-        # Stick to "start_at_once" parameter, unless "downloading_min" is violated
-        downloading = [i for i in items if self.config["downloading"].match(i)]
-        start_now = max(
-            self.config.get("start_at_once", 1),
-            self.config["downloading_min"] - len(downloading),
-        )
-        start_now = min(start_now, len(startable))
-
+        downloading = [
+            i for i in self.engine.view("incomplete", self.config["downloading"])
+        ]
+        self.downloading_count = len(downloading)
+        # Check download traffic
         if self.config["downloading_traffic_max"] > 0:
             down_traffic = sum(i.down for i in downloading)
             self.log.debug(
@@ -89,74 +69,50 @@ class QueueManager(MatchableJob):
             )
             if down_traffic > int(self.config["downloading_traffic_max"]):
                 self.log.debug(
-                    "Max download traffic '%s' reached, skipping start",
+                    "Skipping start due to max download traffic '%s' reached",
                     self.config["downloading_traffic_max"],
                 )
                 return
+        self.allowed_start_count: int = max(
+            self.config["start_at_once"],
+            self.config["downloading_min"] - len(downloading),
+        )
+        self.log.info("Starting torrents (capped at %d)", self.allowed_start_count)
+        # Run parent method
+        super().run()
 
-        # Start eligible items
-        for idx, item in enumerate(sorted(startable, key=self.sort_key)):
-            # Check if we reached 'start_now' in this run
-            if idx >= start_now:
-                self.log.debug(
-                    "Only starting %d item(s) in this run, %d more could be downloading",
-                    start_now,
-                    len(startable) - idx,
+    def run_item(self, item):
+        if self.allowed_start_count <= 0:
+            return
+        if self.downloading_count >= self.config["downloading_max"]:
+            return
+        if self.config["dry_run"]:
+            self.log.info(
+                "Would start %s '%s'",
+                item.hash,
+                item.name,
+            )
+        else:
+            self.log.info(
+                "Starting %s '%s'",
+                item.hash,
+                item.name,
+            )
+            item.start()
+            if self.config["log_to_client"]:
+                self.proxy.log(
+                    rpc.NOHASH,
+                    f"{self.__class__.__name__}: Started '{item.name}' [{item.alias}]",
                 )
-                break
-
-            # TODO: Prevent start of more torrents that can fit on the drive (taking "off" files into account)
-            # (restarts items that were stopped due to the "low_diskspace" schedule, and also avoids triggering it at all)
-
-            # Only check the other conditions when we have `downloading_min` covered
-            if len(downloading) < self.config["downloading_min"]:
-                self.log.debug(
-                    "Catching up from %d to a minimum of %d downloading item(s)",
-                    len(downloading),
-                    self.config["downloading_min"],
-                )
-            else:
-                # Limit to the given maximum of downloading items
-                if len(downloading) >= self.config["downloading_max"]:
-                    self.log.debug(
-                        "Already downloading %d item(s) out of %d max, %d more could be downloading",
-                        len(downloading),
-                        self.config["downloading_max"],
-                        len(startable) - idx,
-                    )
-                    break
-
-            # If we made it here, start it!
-            self.last_start = now
-            downloading.append(item)
-            if self.config["dry_run"]:
-                self.log.info(
-                    "Would start %s '%s'",
-                    item.hash,
-                    item.name,
-                )
-            else:
-                self.log.info(
-                    "Starting %s '%s'",
-                    item.hash,
-                    item.name,
-                )
-                item.start()
-                if self.config["log_to_client"]:
-                    self.engine.open().log(
-                        rpc.NOHASH,
-                        f"{self.__class__.__name__}: Started '{item.name}' {item.alias}",
-                    )
-
-    def run(self):
-        """Queue manager job callback."""
-        try:
-            # Get items from 'main' view
-            items = list(self.engine.view(self.config["view"]))
-
-            items.sort(key=self.sort_key)
-
-            # Handle found items
-            self._start(items)
-        except (error.LoggableError, *rpc.ERRORS) as exc:
-            self.log.warning(str(exc))
+        self.downloading_count += 1
+        self.allowed_start_count -= 1
+        self.last_start = time.time()
+        # These should only be logged once to prevent spam, hence the
+        # duplicate conditionals
+        if self.allowed_start_count <= 0:
+            self.log.debug("Finished starting torrents: allowed start count reached")
+        if self.downloading_count >= self.config["downloading_max"]:
+            self.log.debug(
+                "Finished starting torrents: maximum downloading torrents %d reached",
+                self.config["downloading_max"],
+            )
