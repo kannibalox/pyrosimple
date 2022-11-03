@@ -9,6 +9,7 @@ import json
 import logging
 import random
 import urllib
+import warnings
 
 from typing import Any, Dict, List, Tuple, cast
 from xmlrpc import client as xmlrpclib
@@ -88,6 +89,11 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         # The /RPC2 convention just comes from the xmlrpc CLI tool, but is
         # generally used during ruTorrent setups
         if not self.__handler and parsed_url.scheme in ("http", "https"):
+            warnings.warn(
+                "Automatically adding '/RPC2' to the end of URLs is deprecated and will be removed in a future release."
+                f"To fix this warning, change the connection URL to '{url}/RPC2'",
+                stacklevel=2,
+            )
             self.__handler = "/RPC2"
             self.__url += "/RPC2"
 

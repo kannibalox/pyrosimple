@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Deprecated:
+- In a future release, `/RPC2` will no longer be added to HTTP
+  connections
+
 ### Changed:
 - Defer imports to improve loading times
   |        | mktor -h | lstor -h | rtcontrol -h | rtcontrol // -o '' |
