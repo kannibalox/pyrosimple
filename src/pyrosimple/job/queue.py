@@ -5,12 +5,10 @@
 
 import time
 
-from pyrosimple import error
 from pyrosimple.job.base import MatchableJob
 from pyrosimple.util import matching, rpc
 
 
-# pylint: disable=abstract-method
 class QueueManager(MatchableJob):
     """rTorrent queue manager implementation."""
 
@@ -20,7 +18,9 @@ class QueueManager(MatchableJob):
             config["matcher"] = config["startable"]
         super().__init__(config)
         self.proxy = self.engine.open()
-        self.last_start = 0
+        self.last_start: int = 0
+        self.downloading_count: int = 0
+        self.allowed_start_count: int = 0
 
         self.config.setdefault("viewname", "main")
         self.config.setdefault("start_at_once", 1)
@@ -53,13 +53,11 @@ class QueueManager(MatchableJob):
         if delayed > 0:
             self.log.debug(
                 "Skipping start due to %ds intermission with %ds left",
-                intermission,
+                self.config["intermission"],
                 delayed,
             )
             return
-        downloading = [
-            i for i in self.engine.view("incomplete", self.config["downloading"])
-        ]
+        downloading = list(self.engine.view("incomplete", self.config["downloading"]))
         self.downloading_count = len(downloading)
         # Check download traffic
         if self.config["downloading_traffic_max"] > 0:

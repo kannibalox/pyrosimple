@@ -204,7 +204,7 @@ def load_custom_py():
         log.debug("Configuration file '%s' not found!", config_file)
 
 
-def lookup_connection_alias(url: str) -> str:  # pylint: disable=no-self-use
+def lookup_connection_alias(url: str) -> str:
     """Convert a connection alias to the actual URL (if set in the config"""
     if url in settings["CONNECTIONS"]:
         return str(settings["CONNECTIONS"][url])
