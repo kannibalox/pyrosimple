@@ -899,7 +899,6 @@ class RtorrentEngine:
         proxy.ui.current_view.set(rpc.NOHASH, view_name)
 
         # Add items
-        # TODO: should be a "system.multicall"
         for item in items:
             if disjoin:
                 proxy.d.views.remove(item.hash, view_name)
