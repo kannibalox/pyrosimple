@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.1] - 2022-11-03
+
+### Fixed:
+- `rtcontrol`: Handle multi-connection aliases properly
+
 ## [2.3.0] - 2022-11-03
 
 ### Deprecated:
@@ -133,7 +138,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.3.1...HEAD
+[2.3.1]: https://github.com/kannibalox/pyrosimple/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/kannibalox/pyrosimple/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/kannibalox/pyrosimple/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/kannibalox/pyrosimple/compare/v2.1.1...v2.2.0
