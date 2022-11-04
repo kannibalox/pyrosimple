@@ -149,6 +149,7 @@ def test_conditions_prefilter(cond, expected):
         ("size>1G", Bunch(size=2 * (1024**3))),
         ("size>1G", Bunch(size=2 * (1024**3))),
         # Datetimes
+        ("leechtime==0", Bunch(leechtime=None)),
         ("leechtime>1h", Bunch(leechtime=60 * 60 * 2)),
         ("completed>2h", Bunch(completed=time.time() - (60 * 60 * 2))),
         ("completed<1h", Bunch(completed=time.time() - 1)),
@@ -203,6 +204,7 @@ def test_matcher(matcher, item):
         ("ratio<2", Bunch(ratio=5.0)),
         ("size<1G", Bunch(size=2 * (1024**3))),
         ("leechtime<1h", Bunch(leechtime=60 * 60 * 2)),
+        ("leechtime>3d", Bunch(leechtime=None)),
         (
             "leechtime<1h is_complete=yes",
             Bunch(leechtime=60 * 60 * 2, is_complete=False),
