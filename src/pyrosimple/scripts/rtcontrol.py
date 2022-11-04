@@ -711,7 +711,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Find matching torrents
         engines = {}
-        for url in self.multi_connection_lookup(self.options.url):
+        for url in self.multi_connection_lookup(
+            self.options.url or config.settings["SCGI_URL"]
+        ):
             engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
 
         # Kick off the result fetcher in a thread pool
