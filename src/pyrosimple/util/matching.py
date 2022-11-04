@@ -711,7 +711,7 @@ class ByteSizeFilter(NumericFilterBase):
 
 QueryGrammar = Grammar(
     r"""
-    query = (group / stmt)+
+    query = (group / stmt) (ws (group / stmt))*
     stmt = (or_stmt / conds)
     or_stmt = (group / conds) ws or ws (group / conds)
     group = (not ws)? lpar ws stmt ws rpar
@@ -820,6 +820,9 @@ class MatcherBuilder(NodeVisitor):
             return create_filter("name", Operators["eq"], visited_children[0])
         return self.generic_visit(node, visited_children)
 
+    def visit_query(self, node, visited_children):
+        return self.__pare_children(visited_children, AndNode)
+
     # Unfortunate but necessary boilerplate methods
 
     def visit_word(self, node, visited_children):
@@ -866,9 +869,10 @@ def create_matcher(query: Union[str, Sequence[str]]):
     if isinstance(query, str):
         return MatcherBuilder().visit(QueryGrammar.parse(query))
     else:
-        children = []
-        for subquery in query:
-            children.append(
-                MatcherBuilder().visit(QueryGrammar["stmt"].parse(subquery))
-            )
-        return GroupNode(children, False)
+        args = []
+        for a in query:
+            if " " in a and not set("=><") & set(a) and not a.startswith('"'):
+                a = f'"{a}"'
+            args.append(a)
+        tree = QueryGrammar.parse(" ".join(args))
+        return MatcherBuilder().visit(tree)

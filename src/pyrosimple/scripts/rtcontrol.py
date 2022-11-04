@@ -673,7 +673,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # `*Ubuntu` and `Server*`
         args = []
         for a in self.args:
-            if not set("=><") & set(a) and not a.startswith('"'):
+            if not set("=><") & set(a) and " " in a and not a.startswith('"'):
                 a = f'"{a}"'
             args.append(a)
         query_tree = matching.QueryGrammar.parse(" ".join(args))

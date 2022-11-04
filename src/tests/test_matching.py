@@ -119,6 +119,7 @@ def test_conditions_prefilter(cond, expected):
         ("name=/arch/i", Bunch(name="ARCH")),
         (["name=/arch/i"], Bunch(name="ARCH")),
         ("name=/ar.*/i", Bunch(name="ARCH")),
+        (["custom_1=TV", "OR", "custom_1=Movie"], Bunch(custom_1="TV")),
         ("name=ARCH", Bunch(name="ARCH")),
         ("name=rtörrent", Bunch(name="rtörrent")),
         ("name={{d.alias}}", Bunch(name="ubuntu", alias="ubuntu")),
@@ -172,6 +173,15 @@ def test_conditions_prefilter(cond, expected):
             "files=test*",
             Bunch(files=[Bunch(path="test/test.mkv"), Bunch(path="test.nfo")]),
         ),
+        # Multi-type
+        (
+            "[ ratio<1 OR seedtime<1 ] custom_1=TV",
+            Bunch(custom_1="TV", ratio=0.5, seedtime=5),
+        ),
+        (
+            ["[", "ratio=-1", "OR", "seedtime=-1", "]", "custom_1=TV"],
+            Bunch(custom_1="TV", ratio=0.5, seedtime=5),
+        ),
     ],
 )
 def test_matcher(matcher, item):
@@ -185,6 +195,7 @@ def test_matcher(matcher, item):
         ("name=arch", Bunch(name="ARCH")),
         ("name=ARCH", Bunch(name="arch")),
         ("name=ARCH name=arch", Bunch(name="ARCH")),
+        (["name=ARCH", "name=arch"], Bunch(name="ARCH")),
         ("name=arch", Bunch(name="asdfsafad")),
         ("name!=arch*", Bunch(name="arch-linux")),
         ("name!=/arch$/", Bunch(name="base-arch")),
@@ -201,6 +212,10 @@ def test_matcher(matcher, item):
         ("tagged=:test", Bunch(tagged=["test", "notest"])),
         ("tagged=faketest", Bunch(tagged=["test", "notest"])),
         ("tagged!=notest", Bunch(tagged=["test", "notest"])),
+        (
+            ["[", "ratio=+1", "OR", "seedtime=+8d", "]", "custom_1=TV"],
+            Bunch(custom_1="TV", ratio=0.5, seedtime=5),
+        ),
     ],
 )
 def test_matcher_fail(matcher, item):
