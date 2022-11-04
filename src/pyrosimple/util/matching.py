@@ -660,7 +660,7 @@ class DurationFilter(TimeFilter):
         """Return True if filter matches item."""
         if getattr(item, self._name) is None:
             # Never match "N/A" items, except when "-0" was specified
-            return bool(self._value)
+            return not bool(self._value)
         return super().match(item)
 
 
@@ -735,8 +735,8 @@ QueryGrammar = Grammar(
     ws          = ~r"\s*"
     lpar = "["
     rpar = "]"
-    or = "OR"
-    not = ( "NOT" / "!" )
+    or   = "OR"
+    not  = ( "NOT" / "!" )
     """
 )
 
