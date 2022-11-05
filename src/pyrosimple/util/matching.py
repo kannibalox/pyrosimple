@@ -351,13 +351,12 @@ class PatternFilter(FieldFilter):
                 needle = self._value[1:-1]
             needle = self.CLEAN_PRE_VAL_RE.sub(" ", needle)
             split_needle = self.SPLIT_PRE_VAL_RE.split(needle)
+            # If the cleaning of the needle did not succeed and we still
+            # have regex-y values, don't prefilter
+            if any(metachar in needle for metachar in r"{}[]\\|()"):
+                return ""
         else:
-            needle = self.CLEAN_PRE_VAL_RE.sub(" ", self._value)
-            split_needle = self.SPLIT_PRE_GLOB_RE.split(needle)
-        # If the cleaning of the needle did not succeed and we still
-        # have regex-y values, don't prefilter
-        if any(metachar in needle for metachar in r"{}[]\\|()"):
-            return ""
+            split_needle = self.SPLIT_PRE_GLOB_RE.split(self._value)
         # Grab the longest needle available from the array
         needle = list(sorted(split_needle, key=len))[-1]
 

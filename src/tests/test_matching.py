@@ -231,6 +231,9 @@ def test_matcher_fail(matcher, item):
         ("name=arch", 'string.contains_i=$d.name=,"arch"'),
         (["name=arch"], 'string.contains_i=$d.name=,"arch"'),
         ('name="arch linux"', 'string.contains_i=$d.name=,"arch linux"'),
+        # Make sure to not process globs that might look like regexes
+        ('name="Long Movie Name (1979)"', 'string.contains_i=$d.name=,"Long Movie Name (1979)"'),
+        ('name="Long Movie Name (1979)*"', 'string.contains_i=$d.name=,"Long Movie Name (1979)"'),
         ("name=/arch/", 'string.contains_i=$d.name=,"arch"'),
         # Avoid getting trapped in trying to prefilter strings inside
         # regex logic

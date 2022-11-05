@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed:
+- `rtcontrol`: Handle complex queries better (e.g. `[ seedtime>8d OR
+  ratio>1 ] custom_1=TV` should work as expected now).
+- `rtcontrol`: Fix prefiltering for globs with regex characters
+
 ## [2.3.1] - 2022-11-03
 
 ### Fixed:
