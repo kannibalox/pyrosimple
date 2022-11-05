@@ -12,6 +12,7 @@ nav:
   - How-tos:
       - Changing announce URLs: changing-announce.md
       - Integrate with Conky: conky.md
+      - General maintenance tasks: maintenance-tasks.md
   - Reference:
       - Configuration: configuration.md
       - Torque Jobs: pyrotorque-jobs.md
