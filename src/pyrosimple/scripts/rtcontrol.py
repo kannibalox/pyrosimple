@@ -469,7 +469,6 @@ class RtorrentControl(ScriptBaseWithConfig):
             help="execute RPC command pattern",
         )
 
-    # TODO: refactor to engine.TorrentProxy as format() method
     def format_item(self, item: str, defaults=None, stencil=None) -> str:
         """Format an item."""
         # pylint: disable=import-outside-toplevel
@@ -525,7 +524,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         else:
             print(item_text)
 
-    # TODO: refactor to formatting.OutputMapping as a class method
     def validate_output_format(self, default_format):
         """Prepare output format for later use."""
         # pylint: disable=import-outside-toplevel
@@ -568,7 +566,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.options.output_format = output_format
         self.options.output_format_template = rtorrent.env.from_string(output_format)
 
-    # TODO: refactor to engine.FieldDefinition as a class method
     def get_output_fields(self) -> List[str]:
         """Get field names from output template."""
         from pyrosimple.torrent import (  # pylint: disable=import-outside-toplevel
@@ -668,7 +665,9 @@ class RtorrentControl(ScriptBaseWithConfig):
             default_output_format = "action"
         self.validate_output_format(default_output_format)
         sort_key = self.validate_sort_fields()
-        query_tree = matching.QueryGrammar.parse(matching.cli_args_to_match_str(self.args))
+        query_tree = matching.QueryGrammar.parse(
+            matching.cli_args_to_match_str(self.args)
+        )
         # Use validate_sort_fields to pre-validate key name
         key_names = matching.KeyNameVisitor().visit(query_tree)
         # Handles the empty regex query "//"

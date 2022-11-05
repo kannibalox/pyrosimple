@@ -1,8 +1,5 @@
 """Data Formatting.
 
-These might look like they can be easily placed into torrent/formatting.py, but doing so
-causes too many circular imports
-
 Copyright (c) 2009, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
