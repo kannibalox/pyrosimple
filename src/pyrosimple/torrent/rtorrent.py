@@ -734,16 +734,7 @@ class RtorrentEngine:
         # Get other manifest values
         self.engine_software = f"rTorrent {self.properties['system.library_version']}/{self.properties['system.client_version']}"
 
-        if "+ssh:" in self.url:
-            self.startup = int(self.rpc.startup_time() or time.time())
-        else:
-            lockfile = os.path.join(self.properties["session.path"], "rtorrent.lock")
-            try:
-                self.startup = int(
-                    self.rpc.execute.capture("", ["stat", "-c", "%Y", lockfile])
-                )
-            except (ValueError, xmlrpclib.Fault):
-                self.startup = time.time()
+        self.startup = int(self.rpc.startup_time() or time.time())
 
         # Return connection
         self.LOG.debug("%s", repr(self))
