@@ -8,6 +8,9 @@ While no rTorrent configuration is strictly required, some fields will
 only work correctly with configuration, and commands can be assigned
 for easy access.
 
+For quick usage, a full-featured `rtorrent.rc` is provided
+[here](https://github.com/kannibalox/pyrosimple/raw/main/src/pyrosimple/data/full-example.rc).
+
 ## Fields
 
 ### Timestamps

@@ -1,0 +1,201 @@
+# -*- mode: conf -*-
+# Based on https://github.com/rakshasa/rtorrent/wiki/CONFIG-Template
+# and https://github.com/pyroscope/pyrocore/tree/master/src/pyrocore/data/config/rtorrent.d/, modified to be less rTorrent-PS specific and more daemon-mode friendly
+### Fundamentals ############################################################
+
+
+# Instance layout (base paths)
+method.insert = cfg.basedir,  private|const|string, (cat,"/home/USERNAME/rtorrent/")
+method.insert = cfg.download, private|const|string, (cat,(cfg.basedir),"download/")
+method.insert = cfg.logs,     private|const|string, (cat,(cfg.basedir),"log/")
+method.insert = cfg.logfile,  private|const|string, (cat,(cfg.logs),"rtorrent-",(system.time),".log")
+method.insert = cfg.session,  private|const|string, (cat,(cfg.basedir),".session/")
+method.insert = cfg.watch,    private|const|string, (cat,(cfg.basedir),"watch/")
+
+session.path.set = (cat, (cfg.session))
+directory.default.set = (cat, (cfg.download))
+network.xmlrpc.size_limit.set = 8M
+system.cwd.set = (directory.default)
+execute.nothrow = sh, -c, (cat, "echo >",\
+    (session.path), "rtorrent.pid", " ",(system.pid))
+
+print = (cat, "Logging to ", (cfg.logfile))
+log.open_file = "log", (cfg.logfile)
+log.add_output = "info", "log"
+
+# Create instance directories
+execute.throw = sh, -c, (cat,\
+    "mkdir -p \"",(cfg.download),"\" ",\
+    "\"",(cfg.logs),"\" ",\
+    "\"",(cfg.session),"\" ",\
+    "\"",(cfg.watch),"/load\" ",\
+    "\"",(cfg.watch),"/start\" ")
+
+# Return path to item data (never empty, unlike `d.base_path`);
+# multi-file items return a path ending with a '/'.
+method.insert = d.data_path, simple,\
+    "if=(d.is_multi_file),\
+        (cat, (d.directory), /),\
+        (cat, (d.directory), /, (d.name))"
+
+# COMMAND: Return path to session file
+method.insert = d.session_file, simple, "cat=(session.path), (d.hash), .torrent"
+
+# COMMAND: Get mtime of a path, return 2nd argument when path does not exist
+method.insert = os.path.mtime, simple, \
+    "execute.capture = sh, -c, \
+                       \"echo -n \$(stat -c '%Y' \\\"$1\\\" 2>/dev/null || echo \\\"$2\\\")\", \
+                       getmtime, (argument.0), (argument.1)"
+
+### Tracker Auto-Scraping ###################################################
+# [devised by @chros73]
+
+# Regularly update scrape information for all torrents, even stopped ones.
+# It won't affect the operation of rtorrent, but it is nice to have these values updated.
+# By default, this info is only updated when rtorrent starts or a torrent is added.
+#
+# Try to balance calls to not fire them up at the same time, since multiscraping
+# isn't implemented in libtorrent.
+#
+# Polls for elapsed scrape intervals every 5 minutes, and splits items into two groups:
+#   - data-transferring items: update every 10 minutes
+#   - idle or stopped items: update every 12 hours
+#
+# To check the scrape status, just list recorded scrape times in order:
+#
+#   rtcontrol --from started -s* -qco custom_tm_last_scrape.raw.delta,name //
+#
+# To debug, call this after startup (on a test instance with just a few items):
+#
+#   rtxmlrpc pyro.scrape_verbose.set=,1 ; rtxmlrpc pyro.scrape_interval.idle.set=,200
+
+# VALUE: Enable verbose mode by setting to '1' → log any scrape, not just manual ones
+method.insert.value = pyro.scrape_verbose, 0
+
+# VALUE: Scrape intervals (for active and idle items)
+method.insert.value = pyro.scrape_interval.active,   600
+method.insert.value = pyro.scrape_interval.idle,   43200
+
+
+# HELPER: Log a scraping event
+method.insert = pyro._last_scrape.print, simple|private,\
+    "print=\"Sending scrape for #\",$d.hash=,\" \",[,$d.name=,]"
+
+# HELPER: Set current time in a custom field (tm_last_scrape) and save session
+method.insert = pyro._last_scrape.bump, simple|private,\
+    "d.custom.set=tm_last_scrape, $cat=$system.time= ; d.save_resume="
+
+# COMMAND: Send the scrape request, set 'tm_last_scrape' timestamp, and save session
+method.insert = d.tracker.bump_scrape, simple,\
+    "d.tracker.send_scrape=0 ; pyro._last_scrape.bump= ; branch=pyro.scrape_verbose=,pyro._last_scrape.print="
+
+# HELPER: Check if the required time interval (arg.0) has passed,
+#         if yes then call 'd.tracker.bump_scrape'
+method.insert = pyro._scrape.send_after, simple|private,\
+    "branch={(elapsed.greater, $d.custom=tm_last_scrape, $argument.0=), d.tracker.bump_scrape=}"
+
+# HELPER: Check for non-existing or empty custom field,
+#         to be able to test its validity later
+method.insert = pyro._last_scrape.poll, simple|private,\
+    "branch={d.custom=tm_last_scrape, pyro._scrape.send_after=$argument.0=, d.tracker.bump_scrape=}"
+
+# SCHEDULE: Check for elapsed intervals every 5 minutes, and update scrape info
+#           for active items and idle/stopped ones according to their interval settings.
+schedule2 = pyro_last_scrape_check, 333, 300,\
+    ((d.multicall2,default,\
+        "branch=\"or={d.up.rate=,d.down.rate=,}\",\
+            pyro._last_scrape.poll=$pyro.scrape_interval.active=,\
+            pyro._last_scrape.poll=$pyro.scrape_interval.idle="))
+
+# EVENT: Initialize 'tm_last_scrape' for newly added items
+method.set_key = event.download.inserted_new, pyro_last_scrape_init, "pyro._last_scrape.bump="
+
+# UI/CMD: Use rtcontrol filter (^X s=KEYWORD, ^X t=TRACKER, ^X f="FILTER")
+method.insert = s, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",--detach,-qV,\
+     [,\"$cat=*,$argument.0=,*\",OR,\"$cat=custom_displayname=,*,$argument.0=,*\",]"
+method.insert = t, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",--detach,-qV,\"$cat=\\\"alias=\\\",$argument.0=\""
+method.insert = f, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",--detach,-qV,$argument.0="
+
+# UI/CMD: Housekeeping (delete item + data)
+method.insert = purge, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",-q,--detach,--purge,--yes,--from-view,$d.hash=,//"
+method.insert = cull, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",-q,--detach,--cull,--yes,--from-view,$d.hash=,//"
+
+# UI/CMD: Add, remove, and show tags
+method.insert = tag.show, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",--detach,-qV,-otag_show,--from-view,$d.hash=,//,--flush"
+method.insert = tag.add, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",--detach,-qV,-otag_show,--flush,--yes,--from-view,$d.hash=,//,--tag,$argument.0="
+method.insert = tag.rm, simple|private,\
+    "execute.nothrow=\"$cat=$pyro.bin_dir=,rtcontrol\",--detach,-qV,-otag_show,--flush,--yes,--from-view,$d.hash=,//,--tag,\"$cat=-,$argument.0=\""
+
+### EVENTS: Timestamps ######################################################
+#   tm_loaded = time loaded into client
+#   tm_started = time of *first* start
+#   tm_completed = time of completion
+
+method.insert = pyro._tm_started.now, simple|private,\
+    "d.custom.set=tm_started,$cat=$system.time= ; d.save_resume="
+method.insert = pyro._tm_completed.now, simple|private,\
+    "d.custom.set=tm_completed,$cat=$system.time= ; d.save_resume="
+
+method.set_key = event.download.resumed, !time_stamp,\
+    "branch=d.custom=tm_started,false=,pyro._tm_started.now="
+method.set_key = event.download.inserted_new, !time_stamp,\
+    "d.custom.set=tm_loaded,$cat=$system.time= ; d.save_resume="
+method.set_key = event.download.finished, !time_stamp,\
+    "pyro._tm_completed.now="
+method.set_key = event.download.hash_done, !time_stamp,\
+    "branch=\"and={d.complete=,not=$d.custom=tm_completed}\", pyro._tm_completed.now="
+
+
+# EVENTS: Activation intervals
+method.insert = pyro._activations.append, simple|private,\
+    "d.custom.set=activations,\"$cat=$d.custom=activations,$argument.0=,$system.time=\" ; d.save_resume="
+method.set_key = event.download.paused, !activations, "pyro._activations.append=P"
+method.set_key = event.download.resumed, !activations, "pyro._activations.append=R"
+
+
+# EVENTS: Timestamp 'tm_downloaded' (time when meta (torrent) file was downloaded)
+method.insert = pyro._tm_downloaded_init, simple|private,\
+    "d.custom.set = tm_downloaded, (os.path.mtime, (d.tied_to_file), (cat, (system.time))) ; d.save_resume="
+method.insert = d.timestamp.downloaded, simple, "d.custom=tm_downloaded"
+method.set_key = event.download.inserted_new, set_downloaded_date, ((pyro._tm_downloaded_init))
+
+
+# SCHEDULE: Set "last_active" custom timestamp field for items that have peers
+method.insert = d.timestamp.last_active, simple, "if=$d.peers_connected=,$cat=$system.time=,$d.custom=last_active"
+method.insert = d.timestamp.last_active.update, simple|private,\
+    "d.custom.set=last_active,$cat=$system.time= ; branch=argument.0=,d.save_resume="
+
+schedule2 = pyro_update_last_active, 24, 42,\
+    "d.multicall2=started,\"branch=$d.peers_connected=,d.timestamp.last_active.update=\""
+
+method.set_key = event.download.resumed, !last_active,\
+    "branch=\"or={d.peers_connected=,not=$d.custom=last_active}\", d.timestamp.last_active.update=1"
+method.set_key = event.download.finished, !last_active, "d.timestamp.last_active.update=1"
+
+method.insert = d.timestamp.last_active.print, simple|private,\
+    "print=\"$cat={$convert.date=$d.timestamp.last_active=, \\\" \\\", $convert.time=$d.timestamp.last_active=}\""
+
+
+# SCHEDULE: Set "last_xfer" custom timestamp field for items that transfer data
+method.insert.value = pyro.last_xfer.min_rate, 5000
+
+method.insert = pyro._last_xfer_check_min_rate, simple|private,\
+    "greater=argument.0=,pyro.last_xfer.min_rate="
+method.insert = pyro._last_xfer_update, simple|private,\
+    "d.custom.set=last_xfer,$cat=$system.time= ; branch=argument.0=,d.save_resume="
+method.insert = d.last_xfer.is_active, simple,\
+    "or={pyro._last_xfer_check_min_rate=$d.up.rate=,pyro._last_xfer_check_min_rate=$d.down.rate=}"
+method.insert = d.timestamp.last_xfer, simple, "if=$d.last_xfer.is_active=,$cat=$system.time=,$d.custom=last_xfer"
+
+schedule2 = pyro_update_last_xfer, 33, 17,\
+    "d.multicall2=active,\"branch=$d.last_xfer.is_active=,pyro._last_xfer_update=\""
+
+method.insert = d.timestamp.last_xfer.print, simple|private,\
+    "print=\"$cat={$convert.date=$d.timestamp.last_xfer=, \\\" \\\", $convert.time=$d.timestamp.last_xfer=}\""
