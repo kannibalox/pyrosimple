@@ -10,6 +10,7 @@ import logging
 import random
 import urllib
 import warnings
+import base64
 
 from typing import Any, Dict, List, Tuple, cast
 from xmlrpc import client as xmlrpclib
@@ -22,6 +23,17 @@ logger = logging.getLogger(__name__)
 NOHASH = (
     ""  # use named constant to make new-syntax commands with no hash easily searchable
 )
+
+
+class JSONRPCEncoder(json.JSONEncoder):
+    """Encode xmlrpc.Binary data in a format jesec/rtorrent
+    expects. The necessary command logic when handling load vs
+    load.raw still needs to be handled separately."""
+
+    def default(self, o):
+        if isinstance(o, xmlrpclib.Binary):
+            return "data:base64," + base64.b64encode(o.data).decode("ascii")
+        return json.JSONEncoder.default(self, o)
 
 
 CACHE_METHOD = {
@@ -182,14 +194,18 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         # This random ID feels silly but there's not much need for anything better at the moment
         # since the RPC interface is synchronous.
         rpc_id = random.randint(0, 100)
-        request = json.dumps(
-            {
-                "params": params,
-                "method": methodname,
-                "jsonrpc": "2.0",
-                "id": rpc_id,
-            }
-        ).encode(self.__encoding, "xmlcharrefreplace")
+        request = (
+            JSONRPCEncoder()
+            .encode(
+                {
+                    "params": params,
+                    "method": methodname,
+                    "jsonrpc": "2.0",
+                    "id": rpc_id,
+                }
+            )
+            .encode(self.__encoding, "xmlcharrefreplace")
+        )
         if self.__verbose:
             print("req: ", request)
 

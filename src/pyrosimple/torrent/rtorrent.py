@@ -452,17 +452,8 @@ class RtorrentItem(engine.TorrentProxy):
         parsed_url = urllib.parse.urlsplit(remote_url)
         queries = urllib.parse.parse_qs(parsed_url.query)
         queries["rpc"] = ["xml"]
-        rebuilt_url = urllib.parse.urlunsplit(
-            (
-                parsed_url.scheme,
-                parsed_url.netloc,
-                parsed_url.path,
-                urllib.parse.urlencode(queries, doseq=True),
-                parsed_url.fragment,
-            )
-        )
-
-        remote_proxy = RtorrentEngine(rebuilt_url).open()
+        rpc_protocol = queries.get("rpc", ["xml"])[0]
+        remote_proxy = RtorrentEngine(remote_url).open()
         proxy = self._engine.open()
         self._engine.LOG.debug("Attempting to move %s to %s", self.hash, remote_url)
         extra_cmds: List[str] = []
@@ -498,7 +489,10 @@ class RtorrentItem(engine.TorrentProxy):
         if not copy:
             proxy.d.stop(self.hash)
         self._engine.LOG.debug("Running extra commands on load: %s", extra_cmds)
-        remote_proxy.load.raw_verbose("", rpc_metafile, *extra_cmds)
+        if rpc_protocol == "json":
+            remote_proxy.load.verbose("", rpc_metafile, *extra_cmds)
+        else:
+            remote_proxy.load.raw_verbose("", rpc_metafile, *extra_cmds)
         for _ in range(0, 10):
             try:
                 remote_proxy.d.hash(self.hash)
