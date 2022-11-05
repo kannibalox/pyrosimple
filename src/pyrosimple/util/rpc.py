@@ -195,7 +195,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         # since the RPC interface is synchronous.
         rpc_id = random.randint(0, 100)
         request = (
-            JSONRPCEncoder()
+            JSONRPCEncoder(separators=(",", ":"))
             .encode(
                 {
                     "params": params,
