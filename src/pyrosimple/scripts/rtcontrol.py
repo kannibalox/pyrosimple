@@ -668,15 +668,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             default_output_format = "action"
         self.validate_output_format(default_output_format)
         sort_key = self.validate_sort_fields()
-        # This bit of magic here is to make the CLI more intuitive.
-        # Without it, `rtcontrol "*Ubuntu Server*"` would become two queries:
-        # `*Ubuntu` and `Server*`
-        args = []
-        for a in self.args:
-            if not set("=><") & set(a) and " " in a and not a.startswith('"'):
-                a = f'"{a}"'
-            args.append(a)
-        query_tree = matching.QueryGrammar.parse(" ".join(args))
+        query_tree = matching.QueryGrammar.parse(matching.cli_args_to_match_str(self.args))
         # Use validate_sort_fields to pre-validate key name
         key_names = matching.KeyNameVisitor().visit(query_tree)
         # Handles the empty regex query "//"

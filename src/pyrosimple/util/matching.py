@@ -863,15 +863,22 @@ class MatcherBuilder(NodeVisitor):
         return None
 
 
+def cli_args_to_match_str(query: Sequence) -> str:
+    """Convert CLI arguments to a string. Most usefully, this will
+    automatically double quote unnamed conditions if they have a space
+    in them."""
+    args = []
+    for a in query:
+        if " " in a and not set("=><") & set(a) and not a.startswith('"'):
+            a = f'"{a}"'
+        args.append(a)
+    return " ".join(args)
+
+
 def create_matcher(query: Union[str, Sequence[str]]):
     """Utility function to build a matcher from a query string."""
-    if isinstance(query, str):
-        return MatcherBuilder().visit(QueryGrammar.parse(query))
+    if not isinstance(query, str):
+        query_str = cli_args_to_match_str(query)
     else:
-        args = []
-        for a in query:
-            if " " in a and not set("=><") & set(a) and not a.startswith('"'):
-                a = f'"{a}"'
-            args.append(a)
-        tree = QueryGrammar.parse(" ".join(args))
-        return MatcherBuilder().visit(tree)
+        query_str = query
+    return MatcherBuilder().visit(QueryGrammar.parse(query_str))
