@@ -1,10 +1,15 @@
 # Changelog
 
+## [Unreleassed]
+
+### Fixed:
+- `rtcontrol`: Properly handle `--from=<hash>` system.multicalls
+
 ## [2.3.2] - 2022-11-05
 
 ### Fixed:
 - `rtcontrol`: Handle complex queries better (e.g. `[ seedtime>8d OR
-  ratio>1 ] custom_1=TV` should work as expected now).
+  ratio>1 ] custom_1=TV` should work as expected now)
 - `rtcontrol`: Fix prefiltering for globs which include regex-like
   characters
 - `rtcontrol`: Make null durations only match on `<field>==0` as per

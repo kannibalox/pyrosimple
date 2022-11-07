@@ -802,7 +802,7 @@ class RtorrentEngine:
                     )
                     for field in args
                 ]
-                raw_items = [[i[0] for i in multi_call(args)]]
+                raw_items = [[i[0] for i in multi_call(multi_args)]]
             # Otherwise prepare a multicall as expected
             else:
                 multi_call = self.open().d.multicall2

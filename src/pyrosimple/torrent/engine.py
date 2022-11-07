@@ -877,7 +877,7 @@ class TorrentView:
             except (TypeError, ValueError):
                 pass
             else:
-                infohash = self.viewname
+                infohash = str(self.viewname)
         return infohash
 
     def size(self) -> int:
