@@ -449,7 +449,7 @@ class RtorrentItem(engine.TorrentProxy):
         behavior"""
         if move_func is None:
             def _default_move(_item, src, dest):
-                import shutil # pylint disable=import-outside-toplevel
+                import shutil # pylint: disable=import-outside-toplevel
                 shutil.move(src, dest)
             move_func = _default_move
         if self.rpc_call("d.is_multi_file"):
