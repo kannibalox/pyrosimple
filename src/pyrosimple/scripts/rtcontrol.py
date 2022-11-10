@@ -378,6 +378,12 @@ class RtorrentControl(ScriptBaseWithConfig):
             metavar="URL",
         )
         action_group.add_argument(
+            "--move",
+            action=RtorrentInteractiveAction,
+            help="move item to another directory (implies -i)",
+            metavar="PATH",
+        )
+        action_group.add_argument(
             "--spawn",
             action=RtorrentInteractiveAction,
             help="execute OS command pattern(s) directly (implies -i)",

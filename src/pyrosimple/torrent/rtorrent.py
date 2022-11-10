@@ -442,6 +442,23 @@ class RtorrentItem(engine.TorrentProxy):
             ]
         )
 
+    def move(self, dest: os.PathLike, move_func: Optional[Callable] = None):
+        """Move files from one path to another. By default it will do
+        a simple move of only related files while replicating the same
+        directory structure, but `move_func` allows providing custom
+        behavior"""
+        if move_func is None:
+            def _default_move(_item, src, dest):
+                import shutil # pylint disable=import-outside-toplevel
+                shutil.move(src, dest)
+            move_func = _default_move
+        if self.rpc_call("d.is_multi_file"):
+            for f in self._get_files():
+                src = Path(self.datapath(), f.path)
+                move_func(self, src, Path(dest, f.path))
+        else:
+            move_func(self, self.datapath(), dest)
+
     def move_to_host(self, remote_url: str, copy: bool = False):
         """Migrate an item to a remote host"""
 
