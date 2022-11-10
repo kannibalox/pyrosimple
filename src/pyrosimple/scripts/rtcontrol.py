@@ -739,7 +739,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
             futures[url] = pool.apply_async(fetch, (r_engine,))
 
-        # The rest of the process should still be done in sequence
+        # The rest of the pipeline should still be done in sequence
         for url, r_engine in engines.items():
             view = r_engine.view(self.options.from_view, matcher)
             matches = futures[url].get()

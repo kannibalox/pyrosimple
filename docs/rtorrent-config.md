@@ -6,10 +6,19 @@ title: rTorrent configuration
 
 While no rTorrent configuration is strictly required, some fields will
 only work correctly with configuration, and commands can be assigned
-for easy access.
+to rTorrent functions for easy access.
 
 For quick usage, a full-featured `rtorrent.rc` is provided
 [here](https://github.com/kannibalox/pyrosimple/raw/main/src/pyrosimple/data/full-example.rc).
+
+## rTorrent installation
+
+Any version of rTorrent >=0.9.6 is supported, however the efficiency
+improvements and JSON-RPC that have been added to
+[jesec/rtorrent](https://github.com/jesec/rtorrent) make it highly
+recommended. If you prefer a nice UI (among other quality-of-life
+changes), consider
+[rTorrent-PS](https://github.com/pyroscope/rtorrent-ps) as well.
 
 ## Fields
 
