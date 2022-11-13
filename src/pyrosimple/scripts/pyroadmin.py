@@ -3,8 +3,11 @@
     Copyright (c) 2010 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
+import re
+
 from datetime import datetime
 from pathlib import Path
+from xmlrpc import client as xmlrpclib
 
 import pyrosimple
 
@@ -42,9 +45,9 @@ class AdminTool(ScriptBaseWithConfig):
         )
 
     def dump_rc(self):
-        import re
-        from pyrosimple.util import rpc
-        from xmlrpc import client as xmlrpclib
+        """Print a representative .rtorrent.rc as gleaned from a running instance.
+
+        This is neat but somewhat brittle, and behaves differently between XMLRPC and JSON-RPC."""
 
         proxy = pyrosimple.connect().open()
         methods = proxy.system.listMethods()
