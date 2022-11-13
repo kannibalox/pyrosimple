@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleassed]
+## [Unreleased]
 
 ### Fixed:
 - `rtcontrol`: Properly handle `--from=<hash>` system.multicalls
+- `pyroadmin`: Add `config --dump-rc`
 
 ## [2.3.2] - 2022-11-05
 
