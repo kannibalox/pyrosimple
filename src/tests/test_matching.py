@@ -183,6 +183,10 @@ def test_conditions_prefilter(cond, expected):
             ["[", "ratio=-1", "OR", "seedtime=-1", "]", "custom_1=TV"],
             Bunch(custom_1="TV", ratio=0.5, seedtime=5),
         ),
+        (
+            ["custom_1=TV", "OR", "[", "ratio=-1", "OR", "seedtime=-1", "]"],
+            Bunch(custom_1="TV", ratio=1.5, seedtime=5),
+        ),
     ],
 )
 def test_matcher(matcher, item):
