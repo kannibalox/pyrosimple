@@ -1,5 +1,6 @@
 """Contains some base jobs to reduce boilerplate across jobs"""
 from typing import Dict, Optional
+import logging
 
 import pyrosimple
 
@@ -16,7 +17,7 @@ class BaseJob:
     custom job would need to look like.
     """
 
-    def __init__(self, config: Optional[Dict] = None):
+    def __init__(self, config: Optional[Dict] = None, name: str = ""):
         self.config = config or {}
         self.config.setdefault("dry_run", False)
         url = None
@@ -26,6 +27,13 @@ class BaseJob:
             )
         self.engine = pyrosimple.connect(url)
         self.log = pymagic.get_class_logger(__name__)
+        self.log.propagate = False
+        ch = logging.StreamHandler()
+        f_format = logging.Formatter(
+            "%(asctime)s %(levelname)5s job:" + name + ": %(message)s"
+        )
+        ch.setFormatter(f_format)
+        self.log.addHandler(ch)
         if "log_level" in self.config:
             self.log.setLevel(self.config["log_level"])
         self.log.debug("%s created with config %r", __name__, self.config)

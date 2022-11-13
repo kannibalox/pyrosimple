@@ -4,6 +4,7 @@
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
+import logging
 import os
 import signal
 import sys
@@ -109,7 +110,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for name, params in self.jobs.items():
             if params.get("active", True):
                 self.sched.add_job(
-                    params["handler"](params).run,
+                    params["handler"](params, name).run,
                     name=name,
                     id=name,
                     trigger="cron",
@@ -229,6 +230,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 "Writing pid to %s and detaching process...", self.options.pid_file
             )
             self.LOG.info("Logging stderr/stdout to %s", logutil.get_logfile())
+
+        # Change logging format
+        logging.basicConfig(
+            force=True, format="%(asctime)s %(levelname)5s apscheduler: %(message)s"
+        )
 
         with dcontext:
             # Set up services
