@@ -83,7 +83,7 @@ long time to display.
 ## As a library
 
 The main interface has been designed to be deliberately simple if you
-wish to connect to rtorrent from within another Python program:
+wish to connect to rtorrent from within another Python program.
 
 ```python
 import pyrosimple
@@ -92,7 +92,7 @@ proxy = engine.open()
 ```
 
 With this setup, `engine` can provide the same kind of high-level
-views and abstractions seen in `rtcontrol`:
+views and abstractions seen in `rtcontrol`.
 
 ```python
 engine.log("Hello world!") # Prints to console of rtorrent
@@ -100,7 +100,7 @@ print([item.done for item in engine.view("incomplete")]) # List the done percent
 ```
 
 While `proxy` allows for low-level direct RPC calls, just like
-`rtxmlrpc`:
+`rtxmlrpc`.
 
 ```python
 print(proxy.system.hostname())
@@ -108,7 +108,7 @@ print(proxy.d.multicall2('', 'main', 'd.hash='))
 ```
 
 If you want to skip the auto-detection of rtorrent's URL, simply pass
-in your own to `connect()`:
+in your own to `connect()`.
 
 ```python
 engine = pyrosimple.connect("scgi://localhost:9000")

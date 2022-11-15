@@ -4,6 +4,17 @@ title: General maintenance tasks
 
 This is just to meant to be a section for useful commands that may not merit a full page.
 
+### Dumping items as a JSON array
+
+If you want to access rTorrent item data in a machine readable form, you can feed the output of `rtcontrol` with the `--json` option into another script for further processing. By using `-o/--output`, you can also filter the fields being output. The following examples use the [`jq`](https://stedolan.github.io/jq/tutorial/) utility to validate and re-print the JSON data.
+
+```bash
+# Process all known fields through jq
+rtcontrol -/1 // | jq .
+# Process only the name and size
+rtcontrol -o name,size -/1 // | jq .
+```
+
 ### Flush all session data to disk
 
 The
@@ -41,8 +52,8 @@ By changing the first `rtcontrol` command that populates the tagged view, you ca
 
 By using the `--tag` command, it becomes easy to write scripts that will only run once against each item:
 
-```
-#! /usr/bin/env bash
+```bash
+#!/usr/bin/env bash
 guard="handled"
 rtcontrol --from-view complete -qohash tagged=\!$guard | \
 while read hash; do
