@@ -16,12 +16,17 @@ method.set_key = event.download.finished, !time_stamp,\
 method.set_key = event.download.hash_done, !time_stamp,\
     "branch=\"and={d.complete=,not=$d.custom=tm_completed}\", pyro._tm_completed.now="
 
-# active
-method.insert = d.last_xfer.is_active, simple,\
-    "or={pyro._last_xfer_check_min_rate=$d.up.rate=,pyro._last_xfer_check_min_rate=$d.down.rate=}"
-method.insert = d.timestamp.last_xfer, simple, "if=$d.last_xfer.is_active=,$cat=$system.time=,$d.custom=last_xfer"
-schedule2 = pyro_update_last_xfer, 33, 17,\
-    "d.multicall2=active,\"branch=$d.last_xfer.is_active=,pyro._last_xfer_update=\""
+# active - This section is *not* needed for variants that implement `d.timestamp.last_active` natively (i.e. jesec/rtorrent)
+method.insert = d.timestamp.last_active, simple, "if=$d.peers_connected=,$cat=$system.time=,$d.custom=last_active"
+method.insert = d.timestamp.last_active.update, simple|private,\
+    "d.custom.set=last_active,$cat=$system.time= ; branch=argument.0=,d.save_resume="
+
+schedule2 = pyro_update_last_active, 24, 42,\
+    "d.multicall2=started,\"branch=$d.peers_connected=,d.timestamp.last_active.update=\""
+
+method.set_key = event.download.resumed, !last_active,\
+    "branch=\"or={d.peers_connected=,not=$d.custom=last_active}\", d.timestamp.last_active.update=1"
+method.set_key = event.download.finished, !last_active, "d.timestamp.last_active.update=1"
 
 # last_xfer
 method.insert.value = pyro.last_xfer.min_rate, 5000
