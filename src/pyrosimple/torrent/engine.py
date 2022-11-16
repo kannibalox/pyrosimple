@@ -695,12 +695,26 @@ def core_fields():
         formatter=_fmt_duration,
         requires=["d.custom=tm_completed", "d.complete", "d.custom=activations"],
     )
+
+    def _last_active_accessor(o):
+        engine = o._engine
+        if config.settings.SAFETY_CHECKS_ENABLED and not engine.has_method(
+            "d.timestamp.last_active"
+        ):
+            warnings.warn(
+                "Method 'd.timestamp.last_active' does not exist! See https://kannibalox.github.io/pyrosimple/rtorrent-config/ for information on setting up rtorrent.rc.",
+                stacklevel=2,
+            )
+            return 0
+        else:
+            return int(o.rpc_call("d.timestamp.last_active") or 0)
+
     yield DynamicField(
         int,
         "active",
         "last time a peer was connected",
         matcher=matching.TimeFilter,
-        accessor=lambda o: int(o.rpc_call("d.timestamp.last_active") or 0),
+        accessor=_last_active_accessor,
         formatter=fmt.iso_datetime_optional,
         requires=["d.timestamp.last_active"],
     )
