@@ -751,7 +751,10 @@ class RtorrentEngine:
         # Get other manifest values
         self.engine_software = f"rTorrent {self.properties['system.library_version']}/{self.properties['system.client_version']}"
 
-        self.startup = int(self.rpc.startup_time() or time.time())
+        try:
+            self.startup = int(self.rpc.startup_time() or time.time())
+        except xmlrpclib.Fault:
+            self.startup = int(time.time())
 
         # Return connection
         self.LOG.debug("%s", repr(self))
