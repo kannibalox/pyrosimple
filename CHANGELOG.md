@@ -3,8 +3,14 @@
 ## [Unreleased]
 
 ### Fixed:
-- `rtcontrol`: Properly handle `--from=<hash>` system.multicalls
+- `rtcontrol`: Properly handle `--from=<hash>` multicalls
+- Add safety check for d.timestamp.last_active
+
+### Added:
 - `pyroadmin`: Add `config --dump-rc`
+
+### Changed:
+- `pyrotorque`: Change log format to include the job name.
 
 ## [2.3.2] - 2022-11-05
 
