@@ -1,6 +1,7 @@
 """Contains some base jobs to reduce boilerplate across jobs"""
-from typing import Dict, Optional
 import logging
+
+from typing import Dict, Optional
 
 import pyrosimple
 

@@ -7,7 +7,8 @@ from typing import Any, Dict, Hashable, Optional, Set, Tuple, Union
 
 
 class ExpiringCache(abc.MutableMapping):
-    """Caches items for a fixed time, with an optional exlusionary list"""
+    """Caches items for a fixed time, with an optional exlusionary
+    list of static keys."""
 
     def __init__(
         self,
