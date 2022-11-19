@@ -9,7 +9,7 @@ import re
 import time
 import warnings
 
-from typing import Callable, Dict, Optional, Set
+from typing import Callable, Dict, Optional, Set, cast
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
@@ -286,6 +286,7 @@ class MutableField(FieldDefinition):
 
 
 FIELD_REGISTRY: Dict[str, FieldDefinition] = {}
+FIELD_GENERATOR_REGISTRY: Dict[str, Callable] = {}
 
 
 def field_lookup(name: str) -> Optional[FieldDefinition]:
@@ -732,6 +733,65 @@ def core_fields():
     )
 
 
+def generate_custom_field(name: str) -> FieldDefinition:
+    custom_name = name.split("_", 1)[1]
+    accessor = lambda o: o.rpc_call("d.custom", [custom_name])
+    description = f"custom attribute {custom_name}"
+    requires = [f"d.custom={custom_name}"]
+    # Handle custom1, custom2, etc as a special case
+    if len(custom_name) == 1 and custom_name in "12345":
+        accessor = lambda o: o.rpc_call(f"d.custom{custom_name}")
+        description = f"custom{custom_name}"
+        requires = [f"d.custom{custom_name}"]
+    return DynamicField(
+        str,
+        name,
+        description,
+        matcher=matching.PatternFilter,
+        accessor=accessor,
+        requires=requires,
+    )
+
+
+def generate_kind_field(name: str) -> FieldDefinition:
+    limit = int(name[5:].lstrip("0") or "0", 10)
+    if limit > 100:
+        raise error.UserError(f"kind_N: N can't be greater than 100 in {name!r}")
+    return DynamicField(
+        set,
+        name,
+        f"kinds of files that make up more than {limit}% of this item's size",
+        accessor=lambda o: o._get_kind(limit),
+        matcher=matching.TaggedAsFilter,
+        formatter=_fmt_tags,
+        requires=["d.custom=kind"],
+    )
+
+
+def generate_guessit_field(name: str) -> Optional[FieldDefinition]:
+    try:
+        import guessit  # pylint: disable=import-outside-toplevel
+    except ModuleNotFoundError:
+        logger.error(
+            "'guessit' module not found while loading field '%s', install with: pip install guessit",
+            name,
+        )
+        return None
+
+    guess_field = name[8:]
+
+    def _guess_accessor(o):
+        return guessit.guessit(o.rpc_call("d.name")).get(guess_field, "")
+
+    return DynamicField(
+        str,
+        name,
+        f"Guessit field {guess_field}",
+        accessor=_guess_accessor,
+        requires=["d.name"],
+    )
+
+
 class TorrentProxy:
     """A single download item."""
 
@@ -743,70 +803,20 @@ class TorrentProxy:
         """
         if name in FIELD_REGISTRY:
             return FIELD_REGISTRY[name]
-        if name.startswith("custom_"):
-            custom_name = name.split("_", 1)[1]
-            accessor = lambda o: o.rpc_call("d.custom", [custom_name])
-            description = f"custom attribute {custom_name}"
-            requires = [f"d.custom={custom_name}"]
-            # Handle custom1, custom2, etc as a special case
-            if len(custom_name) == 1 and custom_name in "12345":
-                accessor = lambda o: o.rpc_call(f"d.custom{custom_name}")
-                description = f"custom{custom_name}"
-                requires = [f"d.custom{custom_name}"]
-            field = DynamicField(
-                str,
-                name,
-                description,
-                matcher=matching.PatternFilter,
-                accessor=accessor,
-                requires=requires,
-            )
-            setattr(cls, name, field)  # add field to all proxy objects
-
-            return field
-        if name.startswith("kind_") and name[5:].isdigit():
-            limit = int(name[5:].lstrip("0") or "0", 10)
-            if limit > 100:
-                raise error.UserError(
-                    f"kind_N: N can't be greater than 100 in {name!r}"
-                )
-            field = DynamicField(
-                set,
-                name,
-                f"kinds of files that make up more than {limit}% of this item's size",
-                accessor=lambda o: o._get_kind(limit),
-                matcher=matching.TaggedAsFilter,
-                formatter=_fmt_tags,
-                requires=["d.custom=kind"],
-            )
-            setattr(cls, name, field)
-
-            return field
-        if name.startswith("guessit_"):
-            try:
-                import guessit  # pylint: disable=import-outside-toplevel
-            except ModuleNotFoundError:
-                logger.error(
-                    "'guessit' module not found while loading field '%s', install with: pip install guessit",
-                    name,
-                )
-                return None
-
-            guess_field = name[8:]
-
-            def _guess_accessor(o):
-                return guessit.guessit(o.rpc_call("d.name")).get(guess_field, "")
-
-            field = DynamicField(
-                str,
-                name,
-                f"Guessit field {guess_field}",
-                accessor=_guess_accessor,
-                requires=["d.name"],
-            )
-            setattr(cls, name, field)
-            return field
+        for prefix, generator in FIELD_GENERATOR_REGISTRY.items():
+            if name.startswith(prefix):
+                field = generator(name)
+                if field is not None:
+                    setattr(cls, name, field)
+                    FIELD_REGISTRY[name] = field
+                    return cast(FieldDefinition, field)
+                else:
+                    return None
         return None
+
+    @classmethod
+    def add_field_generator(cls, prefix: str, generator: Callable):
+        FIELD_GENERATOR_REGISTRY[prefix] = generator
 
     @classmethod
     def add_field(cls, field):
@@ -821,6 +831,12 @@ class TorrentProxy:
         """Add any custom fields defined in the configuration."""
         for field in core_fields():
             cls.add_field(field)
+        for prefix, generator in {
+            "custom_": generate_custom_field,
+            "kind_": generate_kind_field,
+            "guessit_": generate_guessit_field,
+        }.items():
+            cls.add_field_generator(prefix, generator)
 
     def __init__(self):
         """Initialize object."""
