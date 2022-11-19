@@ -734,6 +734,7 @@ def core_fields():
 
 
 def generate_custom_field(name: str) -> FieldDefinition:
+    """Create fields from custom keys"""
     custom_name = name.split("_", 1)[1]
     accessor = lambda o: o.rpc_call("d.custom", [custom_name])
     description = f"custom attribute {custom_name}"
@@ -754,6 +755,7 @@ def generate_custom_field(name: str) -> FieldDefinition:
 
 
 def generate_kind_field(name: str) -> FieldDefinition:
+    """Generate kind percentile fields"""
     limit = int(name[5:].lstrip("0") or "0", 10)
     if limit > 100:
         raise error.UserError(f"kind_N: N can't be greater than 100 in {name!r}")
@@ -769,6 +771,7 @@ def generate_kind_field(name: str) -> FieldDefinition:
 
 
 def generate_guessit_field(name: str) -> Optional[FieldDefinition]:
+    """Create fields based on the guessit parser (if installed)."""
     try:
         import guessit  # pylint: disable=import-outside-toplevel
     except ModuleNotFoundError:
@@ -816,6 +819,7 @@ class TorrentProxy:
 
     @classmethod
     def add_field_generator(cls, prefix: str, generator: Callable):
+        """Add a field generator with a given prefix to the registry"""
         FIELD_GENERATOR_REGISTRY[prefix] = generator
 
     @classmethod
