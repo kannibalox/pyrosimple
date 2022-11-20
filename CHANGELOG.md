@@ -1,20 +1,20 @@
 # Changelog
 
-## [Unreleased]
+## [2.3.3] - 2022-11-20
 
-### Fixed:
+### Fixed
 - `rtcontrol`: Properly handle `--from=<hash>` multicalls
 - Add safety check for d.timestamp.last_active
 
-### Added:
+### Added
 - `pyroadmin`: Add `config --dump-rc`
 
-### Changed:
+### Changed
 - `pyrotorque`: Change log format to include the job name.
 
 ## [2.3.2] - 2022-11-05
 
-### Fixed:
+### Fixed
 - `rtcontrol`: Handle complex queries better (e.g. `[ seedtime>8d OR
   ratio>1 ] custom_1=TV` should work as expected now)
 - `rtcontrol`: Fix prefiltering for globs which include regex-like
@@ -24,16 +24,16 @@
 
 ## [2.3.1] - 2022-11-03
 
-### Fixed:
+### Fixed
 - `rtcontrol`: Handle multi-connection aliases properly
 
 ## [2.3.0] - 2022-11-03
 
-### Deprecated:
+### Deprecated
 - In a future release, `/RPC2` will no longer be added to HTTP
   connections
 
-### Changed:
+### Changed
 - Defer imports to improve loading times
   |        | mktor -h | lstor -h | rtcontrol -h | rtcontrol // -o '' |
   |--------|----------|----------|--------------|--------------------|
@@ -42,7 +42,7 @@
 - `pyrotorque`: Change `max_downloading_traffic` to
   `downloading_traffic_max`, in order to match other setting names.
 
-### Added:
+### Added
 - `mktor`: Add flags for controlling min/max piece size, as well
   as specifying it manually
 
@@ -160,7 +160,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.3.2...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.3.3...HEAD
+[2.3.2]: https://github.com/kannibalox/pyrosimple/compare/v2.3.2...v2.3.3
 [2.3.2]: https://github.com/kannibalox/pyrosimple/compare/v2.3.1...v2.3.2
 [2.3.1]: https://github.com/kannibalox/pyrosimple/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/kannibalox/pyrosimple/compare/v2.2.1...v2.3.0
