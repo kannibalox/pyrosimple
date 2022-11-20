@@ -17,7 +17,6 @@ class QueueManager(MatchableJob):
         if "startable" in config and "matcher" not in config:
             config["matcher"] = config["startable"]
         super().__init__(config)
-        self.proxy = self.engine.open()
         self.last_start: int = 0
         self.downloading_count: int = 0
         self.allowed_start_count: int = 0
@@ -98,7 +97,7 @@ class QueueManager(MatchableJob):
             )
             item.start()
             if self.config["log_to_client"]:
-                self.proxy.log(
+                self.engine.open().log(
                     rpc.NOHASH,
                     f"{self.__class__.__name__}: Started '{item.name}' [{item.alias}]",
                 )
