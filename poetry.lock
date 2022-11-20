@@ -669,7 +669,7 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "setuptools"
-version = "65.5.1"
+version = "65.6.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
@@ -682,11 +682,11 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [[package]]
 name = "shtab"
-version = "1.5.7"
+version = "1.5.8"
 description = "Automagic shell tab completion for Python CLI applications"
 category = "main"
 optional = false
-python-versions = ">=3.2"
+python-versions = ">=3.7"
 
 [[package]]
 name = "six"
@@ -1281,12 +1281,12 @@ requests = [
     {file = "requests-2.28.1.tar.gz", hash = "sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983"},
 ]
 setuptools = [
-    {file = "setuptools-65.5.1-py3-none-any.whl", hash = "sha256:d0b9a8433464d5800cbe05094acf5c6d52a91bfac9b52bcfc4d41382be5d5d31"},
-    {file = "setuptools-65.5.1.tar.gz", hash = "sha256:e197a19aa8ec9722928f2206f8de752def0e4c9fc6953527360d1c36d94ddb2f"},
+    {file = "setuptools-65.6.0-py3-none-any.whl", hash = "sha256:6211d2f5eddad8757bd0484923ca7c0a6302ebc4ab32ea5e94357176e0ca0840"},
+    {file = "setuptools-65.6.0.tar.gz", hash = "sha256:d1eebf881c6114e51df1664bc2c9133d022f78d12d5f4f665b9191f084e2862d"},
 ]
 shtab = [
-    {file = "shtab-1.5.7-py2.py3-none-any.whl", hash = "sha256:6547fa85b4722ce25b34717307c3dacfecc6314b127064d9397694cdea6c7bb6"},
-    {file = "shtab-1.5.7.tar.gz", hash = "sha256:42f56a4e29cd6fd039d75c0830559f7be06e3bcd2a77781c8ab52c99a61367db"},
+    {file = "shtab-1.5.8-py2.py3-none-any.whl", hash = "sha256:1d326ea131edbba96e0489470a2c969da1976a586a2d9376bb4923a6fe8eaae0"},
+    {file = "shtab-1.5.8.tar.gz", hash = "sha256:1f944e2e33c1554be69e6b26ef638ba3b516ac9449fdd2a40d197f9061c8bed8"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
