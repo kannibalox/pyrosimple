@@ -21,6 +21,7 @@ class BaseJob:
     def __init__(self, config: Optional[Dict] = None, name: str = ""):
         self.config = config or {}
         self.config.setdefault("dry_run", False)
+        self.name = name
         url = None
         if "scgi_url" in self.config:
             url = pyrosimple.config.lookup_connection_alias(
