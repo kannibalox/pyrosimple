@@ -32,13 +32,13 @@ class BaseJob:
         self.log.propagate = False
         ch = logging.StreamHandler()
         f_format = logging.Formatter(
-            "%(asctime)s %(levelname)5s job:" + name + ": %(message)s"
-        )
+            "%(asctime)s %(levelname)5s job:" + self.name + ": %(message)s"
+        )s
         ch.setFormatter(f_format)
         self.log.addHandler(ch)
         if "log_level" in self.config:
             self.log.setLevel(self.config["log_level"])
-        self.log.debug("%s created with config %r", __name__, self.config)
+        self.log.debug("%s:%s created with config %r", __name__, self.name, self.config)
 
     def run(self):
         """Let all child classes determine what the action is."""
