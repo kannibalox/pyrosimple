@@ -18,7 +18,7 @@ from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.job.base import BaseJob
 from pyrosimple.torrent import rtorrent
-from pyrosimple.util import metafile, rpc, traits
+from pyrosimple.util import metafile, rpc
 
 
 class TreeWatch(BaseJob):
@@ -73,6 +73,7 @@ class TreeWatch(BaseJob):
                         filepath.unlink()
 
     def load_metafile_data(self, metapath: Path) -> Optional[metafile.Metafile]:
+        """Check metafile validity and return data if validation succeeds"""
         if metapath.suffix not in {".torrent", ".load", ".start", ".queue"}:
             self.log.debug("Unrecognized extension %s, skipping", metapath.suffix)
             return None
@@ -102,6 +103,7 @@ class TreeWatch(BaseJob):
     def build_metafile_variables(
         self, metapath: Path, torrent_data: Optional[metafile.Metafile]
     ) -> Dict:
+        """Build a list of varibles to apply to templated commands when loading the metafile"""
         if torrent_data is None:
             torrent_data = self.load_metafile_data(metapath)
             if torrent_data is None:
@@ -143,10 +145,10 @@ class TreeWatch(BaseJob):
                     template_vars["commands"].append(split_cmd.strip())
             except error.LoggableError as exc:
                 self.log.error("While expanding '%s' custom command: %r", key, exc)
-        template_vars["watch_path"] = set([str(p) for p in self.config["paths"]])
+        template_vars["watch_path"] = {str(p) for p in self.config["paths"]}
 
         try:
-            import guessit
+            import guessit  # pylint: disable=import-outside-toplevel
 
             template_vars["guessit"] = guessit.guessit(
                 torrent_data["info"]["name"], options={"single_value": True}
@@ -217,9 +219,15 @@ class TreeWatch(BaseJob):
 
 
 if __name__ == "__main__":
-    import sys
+    main()
+
+
+def main():
+    """Show available templating values for a file"""
+    # pylint: disable=import-outside-toplevel
     import logging
     import pprint
+    import sys
 
     if len(sys.argv) < 2:
         print("File path required")
