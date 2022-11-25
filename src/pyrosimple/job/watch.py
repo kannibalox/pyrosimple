@@ -9,7 +9,7 @@ import threading
 import time
 
 from pathlib import Path
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional, Sequence, cast
 
 import inotify.adapters
 import inotify.constants
@@ -18,7 +18,7 @@ from pyrosimple import config as configuration
 from pyrosimple import error
 from pyrosimple.job.base import BaseJob
 from pyrosimple.torrent import rtorrent
-from pyrosimple.util import metafile, rpc
+from pyrosimple.util import metafile, rpc, traits
 
 
 class TreeWatch(BaseJob):
@@ -36,6 +36,8 @@ class TreeWatch(BaseJob):
         self.config.setdefault("check_unhandled", False)
         self.config.setdefault("remove_unhandled", False)
         self.config.setdefault("remove_already_added", False)
+        self.config.setdefault("load_mode", "")
+        self.config.setdefault("start_immediately", True)
         self.config["paths"] = {
             Path(p).expanduser().absolute()
             for p in self.config["path"].split(os.pathsep)
@@ -44,7 +46,8 @@ class TreeWatch(BaseJob):
         for key, val in self.config.items():
             if key.startswith("cmd_"):
                 self.custom_cmds[key] = val
-        self.run()
+        if self.config["start_immediately"]:
+            self.run()
 
     def run(self):
         """Start the watcher if it's not running, and load any unhandled files"""
@@ -69,51 +72,65 @@ class TreeWatch(BaseJob):
                     ):
                         filepath.unlink()
 
-    def load_metafile(self, metapath: Path):
-        """Load file into client, with templating and load commands"""
-        # Perform some sanity checks on the file
+    def load_metafile_data(self, metapath: Path) -> Optional[metafile.Metafile]:
         if metapath.suffix not in {".torrent", ".load", ".start", ".queue"}:
             self.log.debug("Unrecognized extension %s, skipping", metapath.suffix)
-            return
+            return None
         if not metapath.is_file():
             self.log.debug("Path is not a file: %s", metapath)
-            return
+            return None
         if metapath.stat().st_size == 0:
             self.log.debug("Skipping 0-byte file %s", metapath)
-            return
+            return None
         metainfo = metafile.Metafile.from_file(metapath)
         try:
             metainfo.check_meta()
         except ValueError as exc:
             self.log.error("Could not validate torrent file %s: %s", metapath, exc)
-            return
+            return None
         proxy = self.engine.open()
         try:
             proxy.d.hash(metainfo.info_hash())
             self.log.info(
                 "Hash %s already found in client, skipping", metainfo.info_hash()
             )
-            return
+            return None
         except rpc.HashNotFound:
             pass
-        # Build templating values
+        return cast(metafile.Metafile, metainfo)
+
+    def build_metafile_variables(
+        self, metapath: Path, torrent_data: Optional[metafile.Metafile]
+    ) -> Dict:
+        if torrent_data is None:
+            torrent_data = self.load_metafile_data(metapath)
+            if torrent_data is None:
+                return {}
+
         template_vars = {
             "pathname": str(metapath),
-            "info_hash": metainfo.info_hash(),
-            "info_name": metainfo["info"]["name"],
+            "info_hash": torrent_data.info_hash(),
+            "info_name": torrent_data["info"]["name"],
             "watch_path": self.config["path"],
         }
-        if metainfo.get("announce", ""):
+        if torrent_data.get("announce", ""):
             template_vars["tracker_alias"] = configuration.map_announce2alias(
-                metainfo["announce"]
+                torrent_data["announce"]
             )
-        main_file = metainfo["info"]["name"]
-        if "files" in metainfo["info"]:
+        main_file = torrent_data["info"]["name"]
+        if "files" in torrent_data["info"]:
             main_file = list(
-                sorted((i["length"], i["path"][-1]) for i in metainfo["info"]["files"])
+                sorted(
+                    (i["length"], i["path"][-1]) for i in torrent_data["info"]["files"]
+                )
             )[-1][1]
         template_vars["filetype"] = os.path.splitext(main_file)[1]
         template_vars["commands"] = []
+        template_vars["rel_path"] = str(metapath)
+        for p in self.config["paths"]:
+            if metapath.is_relative_to(p):
+                template_vars["rel_path"] = metapath.relative_to(p).parent
+                break
         flags = str(metapath).split(os.sep)
         flags.extend(flags[-1].split("."))
         template_vars["flags"] = {i for i in flags if i}
@@ -126,7 +143,29 @@ class TreeWatch(BaseJob):
                     template_vars["commands"].append(split_cmd.strip())
             except error.LoggableError as exc:
                 self.log.error("While expanding '%s' custom command: %r", key, exc)
+        template_vars["watch_path"] = set([str(p) for p in self.config["paths"]])
+        kind, info = traits.name_trait(torrent_data["info"]["name"], add_info=True)
+        template_vars["traits"] = info
+        template_vars["traits"]["kind"] = kind
 
+        try:
+            import guessit
+
+            template_vars["guessit"] = guessit.guessit(torrent_data["info"]["name"])
+        except ImportError:
+            pass
+        return template_vars
+
+    def load_metafile(self, metapath: Path):
+        """Load file into client, with templating and load commands"""
+        # Perform some sanity checks on the file
+        # Build templating values
+        torrent_data = self.load_metafile_data(metapath)
+        if torrent_data is None:
+            return
+        template_vars = self.build_metafile_variables(metapath, torrent_data)
+
+        proxy = self.engine.open()
         if self.config["load_mode"] in ("start", "started"):
             load_cmd = proxy.load.start_verbose
         else:
@@ -135,7 +174,7 @@ class TreeWatch(BaseJob):
             load_cmd = proxy.load.start_verbose
         elif "load" in template_vars["flags"]:
             load_cmd = proxy.load.verbose
-        self.log.debug("Templating values are: %r", template_vars.items())
+        self.log.debug("Templating values are: %r", template_vars)
         if self.config["dry_run"]:
             self.log.info(
                 "Would load %s with commands %r", metapath, template_vars["commands"]
@@ -150,7 +189,7 @@ class TreeWatch(BaseJob):
         # Announce new item
         if self.config["print_to_client"]:
             try:
-                name = proxy.d.name(metainfo.info_hash())
+                name = proxy.d.name(torrent_data.info_hash())
             except rpc.HashNotFound:
                 name = "NOHASH"
             proxy.log(rpc.NOHASH, f"{self.name}: Loaded	{name} '{str(metapath)}'")
@@ -173,3 +212,23 @@ class TreeWatch(BaseJob):
                 self.load_metafile(metapath)
             except Exception as exc:  # pylint: disable=broad-except
                 self.log.error("Could not load metafile from event %s: %s", event, exc)
+
+
+if __name__ == "__main__":
+    import sys
+    import logging
+    import pprint
+
+    if len(sys.argv) < 2:
+        print("File path required")
+        sys.exit(1)
+    path = Path(sys.argv[1])
+    if not path.is_file():
+        print(f"File '{str(path)}' not found")
+    job = TreeWatch({"path": "/tmp", "start_immediately": False})
+    logging.getLogger().setLevel(logging.INFO)
+    job.log.info("Building template variables for '%s'", path)
+    job.log.info(
+        "Available variables: %s",
+        pprint.pformat(job.build_metafile_variables(path, None)),
+    )

@@ -267,41 +267,27 @@ Consider this example:
 $ cd /var/torrent/watch
 $ date >example.dat
 $ mktor -q example.dat http://tracker.example.com/
-$ pyrotorque --dry-run --debug --run-once watch
-…
-DEBUG    Tree watcher created with config Bunch(active=False, …
-    cmd.target='{{# set target path\n}}d.custom.set=targetdir,/var/torrent/done/{{label}}/{{relpath}}',
-    dry_run=True, handler='pyrosimple.job.watch:TreeWatch', job_name='treewatch',
-    load_mode='start', path='/var/torrent', queued='True', quiet='False', schedule='hour=*')
-DEBUG    custom commands = {'target': <Template 2d01990 name=None>, 'nfo': f.multicall=*.nfo,f.set_priority=2, …}
-DEBUG   Templating values are:
-    commands=[…, 'd.custom.set=targetdir,/var/torrent/done//pyrocore', …]
-    filetype='.dat'
-    …
-    info_hash='8D59E3FD8E78CC9896BDE4D65B0DC9BDBA0ADC70'
-    info_name='example.dat'
-    label=''
-    pathname='/var/torrent/pyroscope/example.dat.torrent'
-    relpath='pyrocore'
-    tracker_alias='tracker.example.com'
-    traits=Bunch(kind=None)
-    watch_path=set(['/var/torrent'])
+$ python -m pyrosimple.job.watch
+2022-11-25 11:21:47,588  INFO job:: Building template variables for '/var/torrent/watch/example.torrent'
+2022-11-25 11:21:47,597  INFO job:: Available variables: {'commands': [],
+ 'filetype': '.dat',
+ 'flags': {'example.torrent', 'example', 'var', 'torrent', 'watch'},
+ 'info_hash': '96336C9C3A1D8EC99C02FF79115476DDD4474A7A',
+ 'info_name': 'example.dat',
+ 'pathname': '/var/torrent/watch/example.torrent',
+ 'rel_path': 'example.torrent',
+ 'tracker_alias': 'example.com',
+ 'watch_path': {'/var/torrent/watch/'}}
 ```
 
 Things to take note of:
 
-1.  the `target` custom command is expanded to set the `targetdir`
-    rTorrent attribute to the completion path (which can then be used
-    in a typical `event.download.finished` handler), using the
-    `relpath` variable which is obtained from the full `.torrent`
-    path, relative to the watch dir root.
-
-2.  all kinds of other information is made available, like the
+1.  All kinds of information is made available, like the
     torrent's info hash and the tracker alias; thus you can write
     conditional templates based on tracker, or use the tracker name in
     a completion path.
 
-3.  for certain types of downloads, `traits` provides parsed
+2.  For certain types of downloads, `traits` provides parsed
     information to build specific target paths, e.g. for the
     `Pioneer.One.S01E06.720p.x264-VODO` TV episode, you'll get this:
 
@@ -322,8 +308,8 @@ above example namespace output and the config example further down),
 you can set the \"move on completion\" target using that value.
 
 ``` ini
-job.treewatch.cmd.target    = {{# set target path
-    }}d.custom.set=targetdir,/var/torrent/done/{{label}}/{{relpath}}
+cmd_target    = {# set target path
+    #}d.custom.set=targetdir,/var/torrent/done/{{label}}/{{relpath}}
 ```
 
 Note that this still needs a typical completion event handler that takes
