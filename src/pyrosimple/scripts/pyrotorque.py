@@ -234,7 +234,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         # Change logging format
         logging.basicConfig(
-            force=True, format="%(asctime)s %(levelname)5s apscheduler: %(message)s"
+            force=True, format="%(asctime)s %(levelname)5s %(name)s: %(message)s"
         )
 
         with dcontext:

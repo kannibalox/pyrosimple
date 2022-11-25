@@ -29,14 +29,7 @@ class BaseJob:
             )
         self.engine = pyrosimple.connect(url)
 
-        self.log = logging.getLogger(self.__class__.__module__ + "." + self.name)
-        self.log.propagate = False
-        ch = logging.StreamHandler()
-        f_format = logging.Formatter(
-            "%(asctime)s %(levelname)5s job:" + self.name + ": %(message)s"
-        )
-        ch.setFormatter(f_format)
-        self.log.addHandler(ch)
+        self.log = logging.getLogger("pyrosimple.pyrotorque.jobs." + self.name)
         if "log_level" in self.config:
             self.log.setLevel(self.config["log_level"])
         self.log.debug("%s:%s created with config %r", __name__, self.name, self.config)
