@@ -33,7 +33,7 @@ class BaseJob:
         ch = logging.StreamHandler()
         f_format = logging.Formatter(
             "%(asctime)s %(levelname)5s job:" + self.name + ": %(message)s"
-        )s
+        )
         ch.setFormatter(f_format)
         self.log.addHandler(ch)
         if "log_level" in self.config:
