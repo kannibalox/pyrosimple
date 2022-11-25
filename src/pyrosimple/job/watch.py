@@ -26,9 +26,9 @@ class TreeWatch(BaseJob):
     run is used to check for the thread's liveness, and optionally try
     to load any files the watch may have missed"""
 
-    def __init__(self, config: Optional[Dict] = None, name=""):
+    def __init__(self, config: Optional[Dict] = None):
         """Initialize watch job and set default"""
-        super().__init__(config or {}, name=name)
+        super().__init__(config or {})
         self.watch_thread: Optional[threading.Thread] = None
         self.config.setdefault("print_to_client", True)
         self.config.setdefault("started", False)
