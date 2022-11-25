@@ -110,7 +110,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for name, params in self.jobs.items():
             if params.get("active", True):
                 self.sched.add_job(
-                    params["handler"](params, name).run,
+                    params["handler"](params.update({"__job_name": name})).run,
                     name=name,
                     id=name,
                     trigger="cron",

@@ -18,10 +18,10 @@ class BaseJob:
     custom job would need to look like.
     """
 
-    def __init__(self, config: Optional[Dict] = None, name: str = ""):
+    def __init__(self, config: Optional[Dict] = None):
         self.config = config or {}
         self.config.setdefault("dry_run", False)
-        self.name = name
+        self.name = self.config.get("__job_name", type(self).__name__)
         url = None
         if "scgi_url" in self.config:
             url = pyrosimple.config.lookup_connection_alias(
