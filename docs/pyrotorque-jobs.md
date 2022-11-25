@@ -68,7 +68,7 @@ Arguments:
 
 * `action`: The action to perform. See `rtcontrol --help` for a list
   of actions.
-* `view`: The rtorrent view to query
+* `view`: The rTorrent view to query
 * `matcher`: The query to use when listing torrents
 
 ## Queue Manager
@@ -98,7 +98,7 @@ Arguments:
   be started.
 * `start_at_once`  
   The maximum number of items to start during a single run. May be
-  overrridden by the `downloading_min` settings. Defaults to `1`.
+  overridden by the `downloading_min` settings. Defaults to `1`.
 * `downloading`  
   The query used to determine the number of actively downloading
   torrents. Defaults to `is_active=1 is_complete=0`
@@ -121,7 +121,7 @@ Arguments:
   Can be set to `False` to avoid logging messages in rTorrent whenever
   a torrent is started. Defaults to `True`.
 
-### Explaination
+### Explanation
 
 In the above example for the `queue` job, `downloading_max` counts
 started-but-incomplete items including those that ignore
@@ -204,7 +204,7 @@ occupying a slot in the queue.
 
 ## Tree Watch
 
-This job is for loading torrents into rtorrent. While the native tools
+This job is for loading torrents into rTorrent. While the native tools
 work well enough for simply loading torrents, this job allows for
 additional features like conditional logic and invalid file handling.
 
@@ -236,7 +236,7 @@ Arguments:
 * `check_unhandled`: If true, the job will try to find and update any
   file it may have missed on each `schedule`. This will also catch any
   files that were added while pyrotorque wasn't running
-* `remove_already_added`: If true, pytorque will remove files if the
+* `remove_already_added`: If true, pyrotorque will remove files if the
   hash already exists in the client. This is mainly useful to prevent
   errors and files from building up if files are accidentally added to
   the directory twice.
