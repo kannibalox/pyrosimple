@@ -144,14 +144,16 @@ class TreeWatch(BaseJob):
             except error.LoggableError as exc:
                 self.log.error("While expanding '%s' custom command: %r", key, exc)
         template_vars["watch_path"] = set([str(p) for p in self.config["paths"]])
-        kind, info = traits.name_trait(torrent_data["info"]["name"], add_info=True)
-        template_vars["traits"] = info
-        template_vars["traits"]["kind"] = kind
 
         try:
             import guessit
 
-            template_vars["guessit"] = guessit.guessit(torrent_data["info"]["name"])
+            template_vars["guessit"] = guessit.guessit(
+                torrent_data["info"]["name"], options={"single_value": True}
+            )
+            media_type = template_vars["guessit"].get("type", "unknown")
+            container = template_vars["guessit"].get("container", "unknown")
+            template_vars["label"] = f"{media_type}/{container}"
         except ImportError:
             pass
         return template_vars
