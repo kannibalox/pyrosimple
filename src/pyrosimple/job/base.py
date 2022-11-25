@@ -7,7 +7,7 @@ import pyrosimple
 
 from pyrosimple import error
 from pyrosimple.torrent import engine, rtorrent
-from pyrosimple.util import matching, pymagic, rpc
+from pyrosimple.util import matching, rpc
 
 
 class BaseJob:
