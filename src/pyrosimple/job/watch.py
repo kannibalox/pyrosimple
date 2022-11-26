@@ -95,7 +95,7 @@ class TreeWatch(BaseJob):
             self.log.info(
                 "Hash %s already found in client, skipping", metainfo.info_hash()
             )
-            if self.config["remove_already_handled"]:
+            if self.config["remove_already_added"]:
                 metapath.unlink()
             return None
         except rpc.HashNotFound:
