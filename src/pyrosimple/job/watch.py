@@ -61,12 +61,12 @@ class TreeWatch(BaseJob):
                 daemon=True,
             )
             self.watch_thread.start()
-        if self.config.get("check_unhandled", False):
+        if self.config["check_unhandled"]:
             for path in self.config["paths"]:
                 for filepath in path.rglob("**/*.torrent"):
                     self.load_metafile(filepath)
                     if (
-                        self.config.get("remove_unhandled", False)
+                        self.config["remove_unhandled"]
                         and filepath.exists()
                         and not self.config["dry_run"]
                     ):
