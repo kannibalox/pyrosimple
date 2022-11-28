@@ -74,7 +74,7 @@ class QueueManager(MatchableJob):
             self.config["start_at_once"],
             self.config["downloading_min"] - len(downloading),
         )
-        self.log.info("Starting torrents (capped at %d)", self.allowed_start_count)
+        self.log.debug("Starting torrents (capped at %d)", self.allowed_start_count)
         # Run parent method
         super().run()
 
