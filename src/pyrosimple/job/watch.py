@@ -30,6 +30,7 @@ class TreeWatch(BaseJob):
         """Initialize watch job and set default"""
         super().__init__(config or {})
         self.watch_thread: Optional[threading.Thread] = None
+        self.mask = inotify.constants.IN_CLOSE_WRITE | inotify.constants.IN_MOVED_TO
         self.config.setdefault("print_to_client", True)
         self.config.setdefault("started", False)
         self.config.setdefault("trace_inotify", False)
@@ -205,15 +206,19 @@ class TreeWatch(BaseJob):
         watcher = inotify.adapters.InotifyTrees(
             [str(p) for p in paths],
             block_duration_s=5,
-            mask=inotify.constants.IN_CLOSE_WRITE | inotify.constants.IN_MOVED_TO,
+            mask=self.mask
         )
         for event in watcher.event_gen():
             if event is None:
                 continue
             try:
-                _header, _type_names, path, filename = event
+                header, _type_names, path, filename = event
                 if self.config["trace_inotify"]:
                     self.log.info("%r", event)
+                # InotifyTrees subscribes to more events than we care
+                # about, so we re-filter here.
+                if header.mask & self.mask != 0:
+                    continue
                 metapath = Path(path, filename)
                 self.load_metafile(metapath)
             except Exception as exc:  # pylint: disable=broad-except
