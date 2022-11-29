@@ -471,7 +471,6 @@ class RtorrentItem(engine.TorrentProxy):
         # TODO Generalize this overriding of query parameters
         parsed_url = urllib.parse.urlsplit(remote_url)
         queries = urllib.parse.parse_qs(parsed_url.query)
-        queries["rpc"] = ["xml"]
         rpc_protocol = queries.get("rpc", ["xml"])[0]
         remote_proxy = RtorrentEngine(remote_url).open()
         proxy = self._engine.open()
