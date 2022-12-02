@@ -80,6 +80,39 @@ long time to display.
 {% include 'examples/custom-fields-peers.py' %}
 ```
 
+#### Checking for specific files
+
+```python
+{% include 'examples/custom-fields-files.py' %}
+```
+
+#### Partial Downloads
+
+Note that the `partial_done` value can be a little lower than it
+actually should be, when chunks shared by different files are not yet
+complete; but it will eventually reach `100` when all selected chunks
+are downloaded in full.
+
+```python
+{% include 'examples/custom-fields-partial.py' %}
+```
+
+#### Checking disk space
+
+This custom field also introduces the concept of using custom settings
+from `config.toml`. The code below uses `diskspace_threshold_mb` to
+decide if there's enough extra space on the disk (in addition to the
+amount the torrent uses) to consider it valid. If that setting isn't
+defined, it defaults to `500`.
+
+This field is particularly powerful when combined with the
+[QueueManager](pyrotorque-jobs.md#queue-manager), to prevent it from
+accidentally filling up a disk.
+
+```python
+{% include 'examples/custom-fields-disk-space.py' %}
+```
+
 ## As a library
 
 The main interface has been designed to be deliberately simple if you

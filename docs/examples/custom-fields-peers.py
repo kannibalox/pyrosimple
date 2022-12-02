@@ -41,6 +41,15 @@ def _custom_fields():
         ),
         requires=["p.multicall=,p.address="],
     )
+    yield engine.DynamicField(
+        set,
+        "peers_client",
+        "Client/version for connected peers",
+        matcher=matching.TaggedAsFilter,
+	formatter=", ".join,
+        accessor=lambda o: set(get_peer_data(o, "client_version")),
+        requires=["p.multicall=,p.client_version="],
+    )
     # Insert any other custom fields here
 
 
