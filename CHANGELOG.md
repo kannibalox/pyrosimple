@@ -5,6 +5,9 @@
 ### Changed
 - `pyrotorque`: Overhaul TreeWatch and log format
 
+### Fixed
+- `rtcontrol`: Correctly handle moving torrents via JSON-RPC
+
 ## [2.3.3] - 2022-11-20
 
 ### Fixed
