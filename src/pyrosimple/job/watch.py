@@ -204,9 +204,7 @@ class TreeWatch(BaseJob):
     def watch_trees(self, paths: Sequence[os.PathLike]):
         """Thread-able inotify watcher"""
         watcher = inotify.adapters.InotifyTrees(
-            [str(p) for p in paths],
-            block_duration_s=5,
-            mask=self.mask
+            [str(p) for p in paths], block_duration_s=5, mask=self.mask
         )
         for event in watcher.event_gen():
             if event is None:
