@@ -5,7 +5,6 @@ def _custom_fields():
     from pyrosimple.torrent import engine
     from pyrosimple.util import fmt, matching
 
-    # Add rTorrent attributes not available by default
     def get_tracker_field(obj, name, aggregator=sum):
         "Get an aggregated tracker field."
         return aggregator([t[0] for t in obj.rpc_call("t.multicall", ["", f"t.{name}="])])
@@ -43,7 +42,6 @@ def _custom_fields():
         formatter=lambda dt: fmt.human_duration(float(dt), precision=2, short=True),
         requires=["t.multicall=,t.scrape_time_last="],
     )
-    # Insert any other custom fields here
 
 
 # Register our custom fields to the proxy

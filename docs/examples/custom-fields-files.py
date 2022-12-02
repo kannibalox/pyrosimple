@@ -1,4 +1,3 @@
-# Add file checkers
 from pyrosimple.torrent import engine
 
 
@@ -12,6 +11,7 @@ def _custom_file_fields():
     def has_glob(glob):
         regex = re.compile(fnmatch.translate(glob))  # Pre-compile regex for performance
 
+        # Return a function containing the compiled regex to match against
         def _has_glob_accessor(obj):
             return any([f for f in obj._get_files() if regex.match(f.path)])
 
@@ -22,7 +22,7 @@ def _custom_file_fields():
         "has_nfo",
         "does download have a .NFO file?",
         matcher=matching.BoolFilter,
-        accessor=has_glob("*.mkv"),
+        accessor=has_glob("*.nfo"),
         formatter=lambda val: "NFO" if val else "!DTA" if val is None else "----",
     )
     yield engine.DynamicField(
