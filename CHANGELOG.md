@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.4.0] - 2022-12-03
 
 ### Changed
 - `pyrotorque`: Overhaul TreeWatch and log format
@@ -168,8 +168,9 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.3.3...HEAD
-[2.3.2]: https://github.com/kannibalox/pyrosimple/compare/v2.3.2...v2.3.3
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/kannibalox/pyrosimple/compare/v2.3.3...v2.4.0
+[2.3.3]: https://github.com/kannibalox/pyrosimple/compare/v2.3.2...v2.3.3
 [2.3.2]: https://github.com/kannibalox/pyrosimple/compare/v2.3.1...v2.3.2
 [2.3.1]: https://github.com/kannibalox/pyrosimple/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/kannibalox/pyrosimple/compare/v2.2.1...v2.3.0
