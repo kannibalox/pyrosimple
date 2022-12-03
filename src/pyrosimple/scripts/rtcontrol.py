@@ -601,7 +601,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         if self.options.sort_fields is None:
             self.options.sort_fields = config.settings.SORT_FIELDS
         if self.options.sort_fields == "*":
-            self.options.sort_fields = self.get_output_fields()
+            self.options.sort_fields = ",".join(self.get_output_fields())
 
         return rtorrent.validate_sort_fields(self.options.sort_fields)
 

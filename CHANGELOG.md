@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- `rtcontrol`: Fix `-s *`
+
 ## [2.4.0] - 2022-12-03
 
 ### Changed
