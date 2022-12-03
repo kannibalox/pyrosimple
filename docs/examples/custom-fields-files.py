@@ -2,11 +2,11 @@ from pyrosimple.torrent import engine
 
 
 def _custom_file_fields():
-    from pyrosimple.torrent import engine
-    from pyrosimple.util import fmt, matching
-
     import fnmatch
     import re
+
+    from pyrosimple.torrent import engine
+    from pyrosimple.util import fmt, matching
 
     def has_glob(glob):
         regex = re.compile(fnmatch.translate(glob))  # Pre-compile regex for performance

@@ -7,7 +7,9 @@ def _custom_fields():
 
     def get_tracker_field(obj, name, aggregator=sum):
         "Get an aggregated tracker field."
-        return aggregator([t[0] for t in obj.rpc_call("t.multicall", ["", f"t.{name}="])])
+        return aggregator(
+            [t[0] for t in obj.rpc_call("t.multicall", ["", f"t.{name}="])]
+        )
 
     yield engine.DynamicField(
         int,

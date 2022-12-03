@@ -46,7 +46,7 @@ def _custom_fields():
         "peers_client",
         "Client/version for connected peers",
         matcher=matching.TaggedAsFilter,
-	formatter=", ".join,
+        formatter=", ".join,
         accessor=lambda o: set(get_peer_data(o, "client_version")),
         requires=["p.multicall=,p.client_version="],
     )
