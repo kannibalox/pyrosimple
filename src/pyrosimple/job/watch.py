@@ -234,12 +234,14 @@ def main():
     import pprint
     import sys
 
+    logger = logging.getLogger(__name__)
     if len(sys.argv) < 2:
-        print("File path required")
+        logger.error("File path required")
         sys.exit(1)
     path = Path(sys.argv[1])
     if not path.is_file():
-        print(f"File '{str(path)}' not found")
+        logger.error("File '%s' not found", path)
+        sys.exit(1)
     job = TreeWatch({"path": "/tmp", "start_immediately": False})
     logging.getLogger().setLevel(logging.INFO)
     job.log.info("Building template variables for '%s'", path)

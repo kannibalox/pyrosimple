@@ -181,25 +181,25 @@ class AdminTool(ScriptBaseWithConfig):
                 mtime = int(Path(i.metafile).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    print(
-                        f"Would set {i.hash} tm_loaded to {dt} from metafile {i.metafile}"
+                    self.LOG.info(
+                        "Would set %s tm_loaded to %s from metafile %s", i.hash, dt, i.metafile
                     )
                 else:
                     i.rpc_call("d.custom.set", ["tm_loaded", str(mtime)])
                     i.flush()
             except Exception as e:
-                print(f"Could not set tm_loaded for {i.hash}: {e}")
+                self.LOG.error("Could not set tm_loaded for %s: %s", i.hash, e)
         for i in engine.view("main", matching.create_matcher("loaded=0 path=/.+/")):
             try:
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    print(f"Would set {i.hash} tm_loaded to {dt} from path {i.path}")
+                    self.LOG.info("Would set %s tm_loaded to %s from path %s", i.hash, dt, i.path)
                 else:
                     i.rpc_call("d.custom.set", ["tm_loaded", str(mtime)])
                     i.flush()
             except Exception as e:
-                print(f"Could not set tm_loaded for {i.hash}: {e}")
+                self.LOG.error("Could not set tm_loaded for %s: %s", i.hash, e)
         for i in engine.view(
             "main", matching.create_matcher("completed=0 is_complete=yes path=/.+/")
         ):
@@ -207,12 +207,12 @@ class AdminTool(ScriptBaseWithConfig):
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    print(f"Would set {i.hash} tm_completed to {dt} from path {i.path}")
+                    self.LOG.info("Would set %s tm_completed to %s from path %s", i.hash, dt, i.path)
                 else:
                     i.rpc_call("d.custom.set", ["tm_completed", str(mtime)])
                     i.flush()
             except Exception as e:
-                print(f"Could not set tm_loaded for {i.hash}: {e}")
+                self.LOG.error("Could not set tm_loaded for %s: %s", i.hash, e)
 
     def config(self):
         """Handle the config subcommand"""

@@ -77,9 +77,9 @@ class SSHTransport(RTorrentTransport):
                 check=False,
             )
         if resp.returncode > 0:
-            print("SSH command returned non-zero exit code")
-            print("stderr:", resp.stderr)
-            print("stdout:", resp.stdout)
+            logger.error("SSH command returned non-zero exit code")
+            logger.error("stderr: %s", resp.stderr)
+            logger.error("stdout: %s", resp.stdout)
         response_size_counter.inc(len(resp.stdout))
         return self.parse_response(io.BytesIO(_parse_response(resp.stdout)[0]))
 

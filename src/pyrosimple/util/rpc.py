@@ -140,7 +140,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             allow_none=self.__allow_none,
         ).encode(self.__encoding, "xmlcharrefreplace")
         if self.__verbose:
-            print("req: ", request)
+            logger.info("req: %s", request)
 
         response = self.__transport.request(
             self.__host, self.__handler, request, verbose=self.__verbose
@@ -207,7 +207,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             .encode(self.__encoding, "xmlcharrefreplace")
         )
         if self.__verbose:
-            print("req: ", request)
+            logger.info("req: %s", request)
 
         response: Dict = self.__transport.request(
             self.__host,

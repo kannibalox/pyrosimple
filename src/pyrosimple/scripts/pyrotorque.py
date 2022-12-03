@@ -168,16 +168,16 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
             if self.options.status:
                 if running:
-                    print(f"Pyrotorque is running (PID {pid}).")
+                    self.LOG.info("Pyrotorque is running (PID %d).", pid)
                     sys.exit(0)
                 else:
-                    print("No pyrotorque process found.")
+                    self.LOG.error("No pyrotorque process found.")
                     sys.exit(1)
 
             if self.options.stop or self.options.restart:
                 if running:
                     os.kill(pid, signal.SIGTERM)
-                    self.LOG.debug("Process #%d sent SIGTERM.", pid)
+                    self.LOG.debug("Process %d sent SIGTERM.", pid)
 
                     # Wait for termination (max. 10 secs)
                     for _ in range(100):
@@ -186,16 +186,16 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                             break
                         time.sleep(0.1)
 
-                    self.LOG.info("Process #%d stopped.", pid)
+                    self.LOG.info("Process %d stopped.", pid)
                 elif pid:
-                    self.LOG.info("Process #%d NOT running anymore.", pid)
+                    self.LOG.info("Process %d NOT running anymore.", pid)
                 else:
                     self.LOG.info(
                         "No pid file '%s'", (self.options.pid_file or "<N/A>")
                     )
             else:
                 self.LOG.info(
-                    "Process #%d %s running.", pid, "UP and" if running else "NOT"
+                    "Process %d %s running.", pid, "UP and" if running else "NOT"
                 )
 
             if self.options.stop:
