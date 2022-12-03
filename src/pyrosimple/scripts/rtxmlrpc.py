@@ -44,7 +44,7 @@ def read_blob(arg: str) -> bytes:
                 "You must 'pip install requests' to support @URL arguments."
             )
         try:
-            response = requests.get(arg[1:])
+            response = requests.get(arg[1:], timeout=60)
             response.raise_for_status()
             return response.content
         except requests.RequestException as exc:
