@@ -241,7 +241,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         for proxy in self.open():
             self.execute(proxy, method, self.cooked(raw_args))
 
-    def print_repl_help(self):  # pylint: disable=no-self-use
+    def print_repl_help(self):
         """Short REPL help output"""
         print(
             textwrap.dedent(

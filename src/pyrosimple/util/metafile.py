@@ -258,7 +258,7 @@ class Metafile(dict):
 
         # Initialize progress state
         hashing_secs = time.time()
-        totalsize: int = sum([Path(filename).stat().st_size for filename in files])
+        totalsize: int = sum(Path(filename).stat().st_size for filename in files)
         totalhashed: int = 0
 
         # Start a new piece

@@ -215,10 +215,6 @@ class FieldFilter(MatcherNode):
     def validate(self):
         """Validate filter condition (template method)."""
 
-    # def pre_filter(self) -> str: # pylint: disable=no-self-use
-    #     """Return a condition for use in d.multicall.filtered."""
-    #     return ""
-
     def match(self, item) -> bool:
         """Test if item matches filter.
 
@@ -744,7 +740,7 @@ class KeyNameVisitor(NodeVisitor):
     """Walk through a query tree and returns an array of key names.
     Implicit key names are not included."""
 
-    # pylint: disable=no-self-use,unused-argument,missing-function-docstring
+    # pylint: disable=unused-argument,missing-function-docstring
     def visit_expr(self, node, visited_children):
         output = ""
         for child in visited_children:
@@ -775,7 +771,7 @@ def create_filter(name: str, op: str, value: str):
 class MatcherBuilder(NodeVisitor):
     """Build a simplified tree of MatcherNodes to match an item against."""
 
-    # pylint: disable=no-self-use,unused-argument,missing-function-docstring
+    # pylint: disable=unused-argument,missing-function-docstring
     def visit_named_cond(self, node, visited_children):
         key, cond, needle = visited_children
         return create_filter(key, cond, needle)

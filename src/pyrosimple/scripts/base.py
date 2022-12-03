@@ -217,7 +217,6 @@ class ScriptBase:
         """The main loop."""
         raise NotImplementedError()
 
-    # pylint: disable=no-self-use
     def rpc_stats(self) -> str:
         """Return a string with RPC statistics"""
 
@@ -254,7 +253,7 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         config.load_custom_py()
         self.engine = rtorrent.RtorrentEngine()
 
-    def lookup_connection_alias(self, url: str) -> str:  # pylint: disable=no-self-use
+    def lookup_connection_alias(self, url: str) -> str:
         """Convert a connection alias to the actual URL (if set in the config"""
         from pyrosimple import config  # pylint: disable=import-outside-toplevel
 

@@ -983,7 +983,7 @@ def validate_field_list(
             fullname = name
             name, fmtspecs = name.split(".", 1)
             for fmtspec in fmtspecs.split("."):
-                if fmtspec not in env.filters.keys() and fmtspec != "raw":
+                if fmtspec not in env.filters and fmtspec != "raw":
                     raise error.UserError(
                         f"Unknown format specification {fmtspec!r} in {fullname!r}"
                     )

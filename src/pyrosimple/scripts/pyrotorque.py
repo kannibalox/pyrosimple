@@ -66,7 +66,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             help="file holding the process ID of the daemon, when running in background",
         )
 
-    # pylint: disable=no-self-use
     def parse_schedule(self, schedule):
         """Parse a job schedule."""
         result = {}
