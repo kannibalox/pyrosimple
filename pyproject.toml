@@ -25,7 +25,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4"
+python = ">=3.7.2,<4"
 "bencode.py" = "^4.0.0"
 APScheduler = {version = "^3.9.0", optional = true}
 Jinja2 = "^3.1.0"
@@ -55,7 +55,7 @@ pyroadmin = "pyrosimple.scripts.pyroadmin:run"
 optional = true
 [tool.poetry.group.dev.dependencies]
 coverage = "^6.3.2"
-pylint = "^2.12.2"
+pylint = "^2.15.7"
 pytest = "^7.0.1"
 typing-extensions = "^4.1.1"
 black = "^22.6.0"
