@@ -40,6 +40,18 @@ title: Migrating from pyroscope
   e.g. `name=/UbUnTu.*/i`
 * Relative times (e.g. `2d3m`) are now case-sensitive.
 
+## `rtxmlrpc`
+
+* `-x` for XML output is no longer available. See `--output <format>`
+  for the new options.
+* REPL mode no longer triggers automatically with 0 arguments. To
+  enter it, use the `--repl` flag.
+
+## `pyroadmin`
+
+`pyroadmin` has been completely rebuilt. See `pyroadmin --help` for
+available utilities.
+
 ### Templating
 
 * Tempita has been replaced with
