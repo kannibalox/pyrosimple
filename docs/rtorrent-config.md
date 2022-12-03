@@ -9,15 +9,18 @@ only work correctly with configuration, and commands can be assigned
 to rTorrent functions for easy access.
 
 For quick usage, a full-featured `rtorrent.rc` is provided
-[here](https://github.com/kannibalox/pyrosimple/raw/main/src/pyrosimple/data/full-example.rc).
+[here](https://github.com/kannibalox/pyrosimple/raw/main/src/pyrosimple/data/full-example.rc). The
+configuration [provided by
+pyrocore](https://github.com/pyroscope/pyrocore/tree/master/src/pyrocore/data/config/rtorrent.d)
+should still be mostly compatible as well.
 
 ## rTorrent installation
 
 Any version of rTorrent >=0.9.6 is supported, however the efficiency
-improvements and JSON-RPC that have been added to
+improvements and JSON-RPC support that have been added to
 [jesec/rtorrent](https://github.com/jesec/rtorrent) make it highly
 recommended. If you prefer a nice UI (among other quality-of-life
-changes), consider
+fixes), consider
 [rTorrent-PS](https://github.com/pyroscope/rtorrent-ps) as well.
 
 ## Fields
