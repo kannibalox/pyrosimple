@@ -736,14 +736,18 @@ def core_fields():
 def generate_custom_field(name: str) -> FieldDefinition:
     """Create fields from custom keys"""
     custom_name = name.split("_", 1)[1]
+
     def accessor(obj):
         return obj.rpc_call("d.custom", [custom_name])
+
     description = f"custom attribute {custom_name}"
     requires = [f"d.custom={custom_name}"]
     # Handle custom1, custom2, etc as a special case
     if len(custom_name) == 1 and custom_name in "12345":
-        def accessor(obj): # pylint: disable=function-redefined
+
+        def accessor(obj):  # pylint: disable=function-redefined
             return obj.rpc_call("d.custom", [custom_name])
+
         description = f"custom{custom_name}"
         requires = [f"d.custom{custom_name}"]
     return DynamicField(

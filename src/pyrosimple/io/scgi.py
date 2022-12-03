@@ -96,7 +96,9 @@ class HTTPTransport(RTorrentTransport):
         request_counter.inc()
         request_size_counter.inc(len(request_body))
         with response_time_summary.time():
-            req = requests.post(self.url, headers=self._headers, data=request_body, timeout=60)
+            req = requests.post(
+                self.url, headers=self._headers, data=request_body, timeout=60
+            )
         response_size_counter.inc(len(req.content))
         req.raise_for_status()
         return self.parse_response(io.BytesIO(req.content))
