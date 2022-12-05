@@ -43,6 +43,9 @@ internal improvements and refactoring.
   https://github.com/jesec/rtorrent)
 - Actions to move torrent between paths, or torrents between hosts
 
+See https://kannibalox.github.io/pyrosimple/migrate/ for how to
+migrate scripts to the new features.
+
 ## Legacy branch
 
 If you just want to use the pyrocore tools on python 3 without all the

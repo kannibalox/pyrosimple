@@ -73,8 +73,9 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     Method calls are built from attribute accesses, i.e. you can do
     something like `proxy.system.client_version()`.
 
-    All methods from ServerProxy are being overridden due to the combination
-    of self.__var name mangling and the __call__/__getattr__ magic.
+    All methods from ServerProxy are being overridden due to the
+    combination of self.__var name mangling and the
+    __call__/__getattr__ magic.
     """
 
     def __init__(
@@ -98,8 +99,8 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         self.__url = url
         self.__host = parsed_url.netloc
         self.__handler = urllib.parse.urlunsplit(["", "", *parsed_url[2:]])
-        # The /RPC2 convention just comes from the xmlrpc CLI tool, but is
-        # generally used during ruTorrent setups
+        # The /RPC2 convention just comes from the xmlrpc CLI tool,
+        # but is generally used during ruTorrent setups
         if not self.__handler and parsed_url.scheme in ("http", "https"):
             warnings.warn(
                 "Automatically adding '/RPC2' to the end of URLs is deprecated and will be removed in a future release."
@@ -151,8 +152,9 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         return response
 
     def __batch_request_json(self, calls: List) -> List:
-        """Handle multicalls in place of XMLRPC's built-in
-        system.multilcall."""
+        """Handle JSON-RPC multicalls in place of XMLRPC's built-in
+        system.multilcall.
+        """
         batch_call: List[Dict] = [
             {
                 "jsonrpc": "2.0",
@@ -185,14 +187,14 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if not params:
             params = [""]
 
-        # system.multicall isn't defined by the app,
-        # but by the xmlrpc library, so we intercept it
-        # and turn it into a batch request
+        # system.multicall isn't defined by the app, but by the xmlrpc
+        # library, so we intercept it and turn it into a batch request
         if methodname == "system.multicall":
             return self.__batch_request_json(params[0])
 
-        # This random ID feels silly but there's not much need for anything better at the moment
-        # since the RPC interface is synchronous.
+        # This random ID feels silly but there's not much need for
+        # anything better at the moment since the RPC interface is
+        # synchronous.
         rpc_id = random.randint(0, 100)
         request = (
             JSONRPCEncoder(separators=(",", ":"))
@@ -245,7 +247,8 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     @functools.lru_cache(maxsize=32)
     def __cached_request(self, methodname, params):
-        """Simpled cache pass-through method to more easily take advantage of functools.lru_cache"""
+        """Simpled cache pass-through method to more easily take
+        advantage of functools.lru_cache"""
         return self.__request_switch(methodname, params)
 
     def __request_switch(self, methodname, params):

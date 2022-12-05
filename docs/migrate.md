@@ -25,6 +25,18 @@ title: Migrating from pyroscope
   PYRO_RTORRENT_RC=/etc/rtorrent/rtorrent.rc rtcontrol //
   ```
 
+## `rtxmlrpc`
+
+* `-x, --xml, -r, --repr` for XML output is no longer available. See
+  `--output <format>` for the new options.
+* REPL mode no longer triggers automatically with 0 arguments. To
+  enter it, use the `--repl` flag.
+
+## `pyroadmin`
+
+`pyroadmin` has been completely rebuilt. See `pyroadmin --help` for
+available utilities.
+
 ## `rtcontrol`
 
 * Multiple actions flags are allowed, and the order in which they are
@@ -39,18 +51,6 @@ title: Migrating from pyroscope
   case-insensitive matching, use a regex with the `i` flag,
   e.g. `name=/UbUnTu.*/i`
 * Relative times (e.g. `2d3m`) are now case-sensitive.
-
-## `rtxmlrpc`
-
-* `-x` for XML output is no longer available. See `--output <format>`
-  for the new options.
-* REPL mode no longer triggers automatically with 0 arguments. To
-  enter it, use the `--repl` flag.
-
-## `pyroadmin`
-
-`pyroadmin` has been completely rebuilt. See `pyroadmin --help` for
-available utilities.
 
 ### Templating
 
@@ -84,8 +84,3 @@ available utilities.
   rtcontrol // --exec "d.directory.set={{item.directory}}/{{item.custom_target_folder}}"
   rtcontrol --exec "event.download.finished=" loaded=-10i done=100
   ```
-
-## `rtxmlrpc`
-
-* `-x, --xml, -r, --repr` have been removed. Use `-o <format>` to
-  control the output format.
