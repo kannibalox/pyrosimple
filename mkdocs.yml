@@ -1,6 +1,7 @@
 ---
 site_name: pyrosimple
-site_url: https://example.com/
+site_url: https://kannibalox.github.io/pyrosimple/
+repo_url: https://github.com/kannibalox/pyrosimple
 nav:
   - Home: index.md
   - Quick Start: quickstart.md
@@ -25,6 +26,10 @@ nav:
       - Custom Code: custom-code.md
 theme:
   name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - toc.integrate
   font:
     code: Inconsolata
     text: Lato
@@ -34,7 +39,7 @@ theme:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
       scheme: slate
-      primary: blue grey
+      primary: teal
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
@@ -50,7 +55,7 @@ theme:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: blue grey
+      primary: teal
       toggle:
         icon: material/brightness-4
         name: Switch to system preference
