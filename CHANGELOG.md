@@ -2,10 +2,15 @@
 
 ## [Unreleased]
 
+### Changed
+- `rtcontrol`: Certain floats will display less precision for better
+  output
+
 ### Fixed
 - `rtcontrol`: Fix `-s *`
 - `rtcontrol`: Warn if fast query is enabled for a host with
   `d.multicall.filtered`
+
 
 ## [2.4.0] - 2022-12-03
 
