@@ -515,7 +515,7 @@ def core_fields():
         "path to torrent file",
         matcher=matching.PatternFilter,
         accessor=lambda o: os.path.expanduser(str(o.rpc_call("d.tied_to_file"))),
-        requires=["d.tied_to_fiel"],
+        requires=["d.tied_to_file"],
     )
     yield ConstantField(
         str,
