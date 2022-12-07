@@ -549,6 +549,7 @@ def core_fields():
         "done",
         "completion in percent",
         matcher=matching.FloatFilter,
+        formatter=lambda v: round(v, 2),
         accessor=lambda o: float(o.rpc_call("d.completed_bytes"))
         / o.rpc_call("d.size_bytes"),
         requires=["d.size_bytes", "d.completed_bytes"],
