@@ -173,8 +173,6 @@ class ScriptBase:
 
     def run(self):
         """The main program skeleton."""
-        log_total = True
-
         try:
             try:
                 # Preparation steps
@@ -199,7 +197,7 @@ class ScriptBase:
                     raise
         finally:
             # Shut down
-            if log_total and self.options:  ## No time logging on --version and such
+            if self.options:  ## No time logging on --version and such
                 running_time = time.time() - self.startup
                 self.LOG.log(
                     self.STD_LOG_LEVEL, "Total time: %.3f seconds.", running_time
