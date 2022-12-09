@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### BREAKING CHANGES
+- HTTP URLs will no longer automatically append `/RPC2` on the end if
+  the path isn't there. This has been deprecated since 2.3.0.
+
 ### Changed
 - `rtcontrol`: Certain floats will display less precision for better
   output (`<field>.raw` can still be used to get the real value).
