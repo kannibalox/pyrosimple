@@ -229,9 +229,10 @@ class Metafile(dict):
         return hashlib.sha1(bencode.encode(self["info"])).hexdigest().upper()
 
     def walk(self, datapath: Path) -> Generator[Path, None, None]:
-        """Generate paths in "self.datapath", ignoring files/dirs as necesarry"""
+        """Generate paths from "datapath", ignoring files/dirs as necessary"""
         if datapath.is_dir():
-            # Walk the directory tree
+            # Walk the directory tree. `path.rglob` is not suitable
+            # here due to how the blacklisting happens
             for dirpath, dirnames, filenames in os.walk(datapath):
                 # Don't scan blacklisted directories
                 for bad in dirnames[:]:
@@ -246,7 +247,7 @@ class Metafile(dict):
             yield Path(datapath)
 
     def _calc_size(self, datapath) -> int:
-        """Get total size of "self.datapath"."""
+        """Get total size of a path."""
         return sum(os.path.getsize(filename) for filename in self.walk(datapath))
 
     def _make_info(
@@ -344,7 +345,9 @@ class Metafile(dict):
         return metainfo, totalhashed
 
     def sanitize(self) -> Tuple[Set, Set]:
-        """Try to fix common problems, especially transcode non-standard string encodings."""
+        """Try to fix common problems. In particular, try to transcode
+        non-standard string encodings.
+        """
         bad_encodings, bad_fields = set(), set()
 
         def sane_encoding(field, text):

@@ -132,7 +132,7 @@ class FieldStatistics:
 class RtorrentAction(argparse.Action):
     """This class is used by the argparse action parameter for adding rtcontrol actions to a master list in the namespace.
 
-    There is a rather unforunate name collision between argparse's actions and rtcontrol's actions.
+    There is a rather unfortunate name collision between argparse's actions and rtcontrol's actions.
     'const' is used as the method name to call, with the arguments being pulled from the value"""
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
@@ -147,7 +147,7 @@ class RtorrentAction(argparse.Action):
     def __call__(
         self, parser, namespace, values, option_string=None, interactive=False
     ):
-        """Add any action to the namesapce in order"""
+        """Add any action to the namespace in order"""
         actions = getattr(namespace, "actions", [])
         actions.append(
             {"method": self.const, "args": values, "interactive": interactive}
@@ -193,7 +193,7 @@ class RtorrentControl(ScriptBaseWithConfig):
     # argument description for the usage information
     ARGS_HELP = "<filter>..."
 
-    # additonal stuff appended after the command handler's docstring
+    # additional stuff appended after the command handler's docstring
     ADDITIONAL_HELP = [
         "",
         "",
