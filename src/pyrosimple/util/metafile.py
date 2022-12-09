@@ -170,7 +170,7 @@ class Metafile(dict):
         assert_value(len(pieces) % 20 == 0, "pieces not in multiples of 20")
         piece_size = cast(int, info.get("piece length"))
         assert_value(
-            isinstance(piece_size, int) or piece_size <= 0, "illegal piece length"
+            isinstance(piece_size, int) and piece_size > 0, "illegal piece length"
         )
         name = cast(str, info.get("name"))
         assert_value(
