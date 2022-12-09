@@ -130,6 +130,8 @@ class Metafile(dict):
 
     @property
     def is_multi_file(self) -> bool:
+        """Provide a standard way to detect if metafile contains
+        multiple files"""
         if "length" in self["info"]:
             return False
         return True
