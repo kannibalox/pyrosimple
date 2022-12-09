@@ -159,7 +159,8 @@ class RtorrentItem(engine.TorrentProxy):
             return result
 
     def memoize(self, name: str, getter: Callable, *args, **kwargs):
-        """Cache a stable expensive-to-get item value for later (optimized) retrieval."""
+        """Cache a stable expensive-to-get item value for later
+        (optimized) retrieval."""
         field = "custom_memo_" + name
         cached = self.rpc_call("d.custom", ["memo_" + name])
         if cached:
@@ -175,7 +176,7 @@ class RtorrentItem(engine.TorrentProxy):
             self._fields[field] = value
         return value
 
-    def _get_kind(self, limit):
+    def _get_kind(self, limit) -> Set[str]:
         """Get a set of dominant file types. The files must contribute
         at least C{limit}% to the item's total size.
         """

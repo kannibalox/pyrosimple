@@ -257,7 +257,7 @@ class Metafile(dict):
         progress_callback: Optional[Callable[[int, int], None]] = None,
         piece_callback: Optional[Callable] = None,
         datapath: Optional[Path] = None,
-    ):
+    ) -> Tuple[Dict, int]:
         """Create info dict from a list of files."""
         # These collect the file descriptions and piece hashes
         file_list = []
@@ -350,14 +350,14 @@ class Metafile(dict):
         """
         bad_encodings, bad_fields = set(), set()
 
-        def sane_encoding(field, text):
+        def sane_encoding(field, text) -> bytes:
             "Transcoding helper."
             if isinstance(text, str):
                 return text.encode("utf-8")
             for encoding in ("utf-8", self.get("encoding", None), "cp1252"):
                 if encoding:
                     try:
-                        u8_text = text.decode(encoding).encode("utf-8")
+                        u8_text: bytes = text.decode(encoding).encode("utf-8")
                         if encoding != "utf-8":
                             bad_encodings.add(encoding)
                             bad_fields.add(field)
@@ -492,7 +492,7 @@ class Metafile(dict):
         piece_size: int = 0,
         piece_size_min: int = 2**15,
         piece_size_max: int = 2**24,
-    ):
+    ) -> Tuple[Dict, int]:
         """Create torrent dictionary from a file path."""
         if piece_size <= 0:
             # Calculate a good size for the data
@@ -633,12 +633,14 @@ class Metafile(dict):
         )
         return bool(datameta["pieces"] == self["info"]["pieces"])
 
-    def listing(self, masked=True):
+    def listing(self, masked=True) -> List[str]:
         """List torrent info & contents in human-readable format. Returns a list of formatted lines."""
         # Assemble data
-        bad_encodings = []
-        bad_fields = []
-        announce = self["announce"]
+        bad_encodings: List[str] = []
+        bad_fields: List[str] = []
+        announce = str(self["announce"])
+        if masked:
+            announce = mask_keys(announce)
         info = self["info"]
         infohash = self.info_hash()
 
@@ -663,7 +665,7 @@ class Metafile(dict):
                 100.0 * len(info["pieces"]) / self.data_size(),
             ),
             f"HASH {infohash.upper()}",
-            f"URL  {(mask_keys if masked else str)(announce)}",
+            f"URL  {announce}",
             "PRV  %s"
             % (
                 "YES (DHT/PEX disabled)"
