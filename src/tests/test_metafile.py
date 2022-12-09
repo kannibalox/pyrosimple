@@ -161,34 +161,36 @@ def test_metafile_from_path(good_metafile_from_path):
     meta = copy.deepcopy(good_metafile_from_path)
     meta.check_meta()
     assert len(meta.clean_meta(including_info=True)) == 0
-    meta.hash_check(Path(Path(__file__).parent, "data"))
-    meta.add_fast_resume(Path(Path(__file__).parent, "data"))
+    assert meta.hash_check(Path(Path(__file__).parent, "data"))
+    assert meta.add_fast_resume(Path(Path(__file__).parent, "data")) == None
 
 
 def test_metafile_from_filepath():
     filepath = Path(Path(__file__).parent, "data", "file.txt")
     meta = Metafile.from_path(filepath, "http://example.com")
     assert len(meta.clean_meta(including_info=True)) == 0
-    meta.hash_check(filepath)
-    meta.add_fast_resume(filepath)
+    assert meta.hash_check(filepath)
+    assert meta.add_fast_resume(filepath) == None
 
 
 def test_metafile_fast_resume():
     single_metafile = Path(Path(__file__).parent, "single.torrent")
     multi_metafile = Path(Path(__file__).parent, "multi.torrent")
     meta = Metafile.from_file(single_metafile)
-    meta.add_fast_resume(Path(single_metafile.parent, "data", "file.txt"))
-    meta.add_fast_resume(Path(single_metafile.parent, "data"))
-    meta.add_fast_resume(Path(multi_metafile.parent, "data"))
+    assert (
+        meta.add_fast_resume(Path(single_metafile.parent, "data", "file.txt")) == None
+    )
+    assert meta.add_fast_resume(Path(single_metafile.parent, "data")) == None
+    assert meta.add_fast_resume(Path(multi_metafile.parent, "data")) == None
 
 
 def test_metafile_hash_check():
     single_metafile = Path(Path(__file__).parent, "single.torrent")
     multi_metafile = Path(Path(__file__).parent, "multi.torrent")
     meta = Metafile.from_file(single_metafile)
-    meta.hash_check(Path(single_metafile.parent, "data", "file.txt"))
-    meta.hash_check(Path(single_metafile.parent, "data"))
-    meta.hash_check(Path(multi_metafile.parent, "data"))
+    assert meta.hash_check(Path(single_metafile.parent, "data", "file.txt"))
+    assert meta.hash_check(Path(single_metafile.parent, "data"))
+    assert meta.hash_check(Path(multi_metafile.parent, "data"))
 
 
 if __name__ == "__main__":
