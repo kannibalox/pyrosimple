@@ -173,5 +173,23 @@ def test_metafile_from_filepath():
     meta.add_fast_resume(filepath)
 
 
+def test_metafile_fast_resume():
+    single_metafile = Path(Path(__file__).parent, "single.torrent")
+    multi_metafile = Path(Path(__file__).parent, "multi.torrent")
+    meta = Metafile.from_file(single_metafile)
+    meta.add_fast_resume(Path(single_metafile.parent, "data", "file.txt"))
+    meta.add_fast_resume(Path(single_metafile.parent, "data"))
+    meta.add_fast_resume(Path(multi_metafile.parent, "data"))
+
+
+def test_metafile_hash_check():
+    single_metafile = Path(Path(__file__).parent, "single.torrent")
+    multi_metafile = Path(Path(__file__).parent, "multi.torrent")
+    meta = Metafile.from_file(single_metafile)
+    meta.hash_check(Path(single_metafile.parent, "data", "file.txt"))
+    meta.hash_check(Path(single_metafile.parent, "data"))
+    meta.hash_check(Path(multi_metafile.parent, "data"))
+
+
 if __name__ == "__main__":
     unittest.main()
