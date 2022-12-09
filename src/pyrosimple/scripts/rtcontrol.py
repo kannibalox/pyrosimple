@@ -665,20 +665,20 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Preparation steps
         if self.options.fast_query != "=":
             config.settings.set("FAST_QUERY", int(self.options.fast_query))
+        # Set the output format
         raw_output_format = self.options.output_format
         default_output_format = "default"
         if actions:
             default_output_format = "action"
         self.validate_output_format(default_output_format)
+        # Parse and validate sort fields
         sort_key = self.validate_sort_fields()
+        # Get key names from the query
         query_tree = matching.QueryGrammar.parse(
             matching.cli_args_to_match_str(self.args)
         )
-        # Use validate_sort_fields to pre-validate key name
         key_names = matching.KeyNameVisitor().visit(query_tree)
-        # Handles the empty regex query "//"
-        if not key_names:
-            key_names = ["name"]
+        # Use validate_sort_fields to pre-validate key names
         rtorrent.validate_sort_fields(",".join(key_names))
         matcher = matching.MatcherBuilder().visit(query_tree)
         self.LOG.debug("Matcher is: %s", matcher)

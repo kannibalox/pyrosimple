@@ -753,6 +753,9 @@ class KeyNameVisitor(NodeVisitor):
     def visit_word(self, node, visited_children):
         return [node.text]
 
+    def visit_filter(self, node, visited_children):
+        return ["name"]
+
     def generic_visit(self, node, visited_children):
         if visited_children:
             return [item for sublist in visited_children for item in sublist]

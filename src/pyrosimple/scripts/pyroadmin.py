@@ -182,7 +182,10 @@ class AdminTool(ScriptBaseWithConfig):
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
                     self.LOG.info(
-                        "Would set %s tm_loaded to %s from metafile %s", i.hash, dt, i.metafile
+                        "Would set %s tm_loaded to %s from metafile %s",
+                        i.hash,
+                        dt,
+                        i.metafile,
                     )
                 else:
                     i.rpc_call("d.custom.set", ["tm_loaded", str(mtime)])
@@ -194,7 +197,9 @@ class AdminTool(ScriptBaseWithConfig):
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    self.LOG.info("Would set %s tm_loaded to %s from path %s", i.hash, dt, i.path)
+                    self.LOG.info(
+                        "Would set %s tm_loaded to %s from path %s", i.hash, dt, i.path
+                    )
                 else:
                     i.rpc_call("d.custom.set", ["tm_loaded", str(mtime)])
                     i.flush()
@@ -207,7 +212,12 @@ class AdminTool(ScriptBaseWithConfig):
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    self.LOG.info("Would set %s tm_completed to %s from path %s", i.hash, dt, i.path)
+                    self.LOG.info(
+                        "Would set %s tm_completed to %s from path %s",
+                        i.hash,
+                        dt,
+                        i.path,
+                    )
                 else:
                     i.rpc_call("d.custom.set", ["tm_completed", str(mtime)])
                     i.flush()

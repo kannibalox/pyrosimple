@@ -4,7 +4,10 @@
 
 ### Changed
 - `rtcontrol`: Certain floats will display less precision for better
-  output
+  output (`<field>.raw` can still be used to get the real value).
+- `rtcontrol`: Correctly detect fields from unnamed conditions
+  combined with named ones (e.g. `// is_compelete=no` would previously
+  not pre-fetch `d.name`)
 
 ### Fixed
 - `rtcontrol`: Fix `-s *`
