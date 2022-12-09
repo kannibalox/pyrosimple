@@ -16,7 +16,6 @@ import urllib
 from pathlib import Path, PurePath
 from typing import (
     Callable,
-    cast,
     Dict,
     Generator,
     List,
@@ -25,6 +24,7 @@ from typing import (
     Set,
     Tuple,
     Union,
+    cast,
 )
 
 import bencode  # typing: ignore
