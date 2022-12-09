@@ -218,9 +218,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             stderr=sys.stderr,
         )
         # Detach, if not disabled via option
-        if (
-            not self.options.no_fork
-        ):  # or getattr(sys.stdin, "isatty", lambda: False)():
+        if not self.options.no_fork:
             dcontext.detach_process = True
             dcontext.stdin = None
             dcontext.stderr = logutil.get_logfile()

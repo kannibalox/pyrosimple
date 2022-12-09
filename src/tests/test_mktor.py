@@ -1,10 +1,11 @@
-import pytest
-
 from pathlib import Path
 
+import pytest
+
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.scripts.mktor import MetafileCreator
 from pyrosimple.scripts.lstor import MetafileLister
+from pyrosimple.scripts.mktor import MetafileCreator
+
 
 def test_mktor(tmp_path_factory):
     test_file = Path(tmp_path_factory.mktemp("mktor"), "hello.txt")

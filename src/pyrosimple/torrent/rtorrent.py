@@ -927,7 +927,7 @@ class RtorrentEngine:
 
 
 def expand_template(template_path: str, namespace: Dict) -> str:
-    """Expand the given (preparsed) template.
+    """Expand the given template file.
     Currently, only jinja2 templates are supported.
 
     @param template: The name of the template, to be loaded by the jinja2 loaders.

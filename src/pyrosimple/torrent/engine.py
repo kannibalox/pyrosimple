@@ -52,7 +52,7 @@ def _interval_split(
     interval: str, only: Optional[str] = None, event_re=re.compile("[A-Z][0-9]+")
 ):
     """Split C{interval} into a series of event type and timestamp tuples.
-    An exaple of the input is "R1283008245P1283008268".
+    An example of the input is "R1283008245P1283008268".
     Returns events in reversed order (latest first).
     """
 
@@ -256,7 +256,7 @@ class DynamicField(ImmutableField):
 
 
 class OnDemandField(DynamicField):
-    """Only exists for backwards compatiblity."""
+    """Only exists for backwards compatibility."""
 
 
 class MutableField(FieldDefinition):
@@ -631,7 +631,7 @@ def core_fields():
         prefilter_field="d.throttle_name=",
     )
 
-    # Lifecyle
+    # Lifestyle
     yield DynamicField(
         int,
         "loaded",

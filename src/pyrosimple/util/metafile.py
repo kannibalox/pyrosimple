@@ -688,7 +688,11 @@ class Metafile(dict):
             [
                 "",
                 "FILE LISTING%s"
-                % ("" if not self.is_multi_file else " [%d file(s)]" % len(info["files"]),),
+                % (
+                    ""
+                    if not self.is_multi_file
+                    else " [%d file(s)]" % len(info["files"]),
+                ),
             ]
         )
         if not self.is_multi_file:
