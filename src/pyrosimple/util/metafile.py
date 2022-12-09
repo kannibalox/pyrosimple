@@ -128,6 +128,12 @@ class Metafile(dict):
             raw_data = handle.read()
         return Metafile(bencode.decode(raw_data))
 
+    @property
+    def is_multi_file(self) -> bool:
+        if "length" in self["info"]:
+            return False
+        return True
+
     def dict_copy(self) -> Dict:
         """Provide a copy of the metafile as a pure dict"""
         return copy.deepcopy(dict(self))
@@ -166,7 +172,7 @@ class Metafile(dict):
         if not ALLOWED_ROOT_NAME.match(name):
             raise ValueError(f"name {name} disallowed for security reasons")
 
-        if ("files" in info) == ("length" in info):
+        if ("files" in info) and ("length" in info):
             raise ValueError("single/multiple file mix")
 
         if "length" in info:
@@ -413,8 +419,7 @@ class Metafile(dict):
         """Add fast resume data to a metafile dict."""
         # Get list of files
         files = self["info"].get("files", None)
-        single = files is None
-        if single:
+        if not self.is_multi_file:
             if datapath.is_dir():
                 datapath = datapath.joinpath(self["info"]["name"])
             files = [
@@ -434,7 +439,7 @@ class Metafile(dict):
         for fileinfo in files:
             # Get the path into the filesystem
             filepath = Path(*fileinfo["path"])
-            if not single:
+            if self.is_multi_file:
                 filepath = Path(datapath, filepath)
 
             # Check file size
@@ -466,7 +471,7 @@ class Metafile(dict):
         """Calculate the size of a torrent based on parsed metadata."""
         info = self["info"]
 
-        if "length" in info:
+        if not self.is_multi_file:
             # Single file
             return int(info["length"])
         # Directory structure
@@ -676,10 +681,10 @@ class Metafile(dict):
             [
                 "",
                 "FILE LISTING%s"
-                % ("" if "length" in info else " [%d file(s)]" % len(info["files"]),),
+                % ("" if self.is_multi_file else " [%d file(s)]" % len(info["files"]),),
             ]
         )
-        if "length" in info:
+        if not self.is_multi_file:
             # Single file
             result.append(
                 "%-69s%9s"
