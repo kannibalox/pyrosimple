@@ -16,6 +16,7 @@ import urllib
 from pathlib import Path, PurePath
 from typing import (
     Callable,
+    cast,
     Dict,
     Generator,
     List,
@@ -155,63 +156,61 @@ class Metafile(dict):
 
         Raise ValueError if validation fails.
         """
-        info = self.get("info")
-        if not isinstance(info, dict):
-            raise ValueError("bad metainfo - not a dict")
-        pieces = info.get("pieces")
-        if not isinstance(pieces, bytes) or len(pieces) % 20 != 0:
-            raise ValueError("bad metainfo - bad pieces key")
 
-        piece_size = info.get("piece length")
-        if not isinstance(piece_size, int) or piece_size <= 0:
-            raise ValueError("bad metainfo - illegal piece length")
+        def assert_value(cond, error_str):
+            """Helper method to reduce boilerplate"""
+            if not bool(cond):
+                raise ValueError(f"bad metainfo - {error_str}")
 
-        name = info.get("name")
-        if not isinstance(name, str):
-            raise ValueError(
-                f"bad metainfo - bad name (type is {type(name).__name__!r})"
-            )
-        if not ALLOWED_ROOT_NAME.match(name):
-            raise ValueError(f"name {name} disallowed for security reasons")
-
-        if ("files" in info) and ("length" in info):
-            raise ValueError("single/multiple file mix")
-
+        # The `cast` calls here are just to satisfy mypy's type checking
+        info = cast(Dict, self.get("info"))
+        assert_value(isinstance(info, dict), "not a dict")
+        pieces = cast(bytes, info.get("pieces"))
+        assert_value(isinstance(pieces, bytes), "pieces key is not data")
+        assert_value(len(pieces) % 20 == 0, "pieces not in multiples of 20")
+        piece_size = cast(int, info.get("piece length"))
+        assert_value(
+            isinstance(piece_size, int) or piece_size <= 0, "illegal piece length"
+        )
+        name = cast(str, info.get("name"))
+        assert_value(
+            isinstance(name, str), f"bad name (type is {type(name).__name__!r})"
+        )
+        assert_value(
+            ALLOWED_ROOT_NAME.match(name),
+            f"name {name!r} disallowed for security reasons",
+        )
+        assert_value(
+            len(set(info.keys()) & {"length", "files"}) != 2, "single/multiple file mix"
+        )
         if "length" in info:
-            length = info.get("length")
-            if not isinstance(length, int) or length < 0:
-                raise ValueError("bad metainfo - bad length")
+            length = cast(int, info.get("length"))
+            assert_value(isinstance(length, int) or length < 0, "bad length")
         else:
-            files = info.get("files")
-            if not isinstance(files, (list, tuple)):
-                raise ValueError("bad metainfo - bad file list")
-
+            files = cast(List, info.get("files"))
+            assert_value(isinstance(files, (list, tuple)), "bad file list")
+            path_set = set()
             for item in files:
-                if not isinstance(item, dict):
-                    raise ValueError("bad metainfo - bad file value")
-
+                assert_value(isinstance(item, dict), "bad file value")
                 length = item.get("length")
-                if not isinstance(length, int) or length < 0:
-                    raise ValueError("bad metainfo - bad length")
-
+                assert_value(isinstance(length, int) or length < 0, "bad file length")
                 path = item.get("path")
-                if not isinstance(path, (list, tuple)) or not path:
-                    raise ValueError("bad metainfo - bad path")
-
+                assert_value(path, "empty path")
+                assert_value(isinstance(path, (list, tuple)), "bad path")
                 for part in path:
-                    if not isinstance(part, str):
-                        raise ValueError("bad metainfo - bad path dir")
-                    if part == "..":
-                        raise ValueError(
-                            "relative path in %s disallowed for security reasons"
-                            % "/".join(path)
+                    assert_value(isinstance(part, str), "bad path dir")
+                    assert_value(
+                        part != "..",
+                        f"relative path in {path!r} disallowed for security reasons",
+                    )
+                    if part:
+                        assert_value(
+                            ALLOWED_PATH_NAME.match(part),
+                            f"part {part!r} of path {path!r} disallowed for security reasons",
                         )
-                    if part and not ALLOWED_PATH_NAME.match(part):
-                        raise ValueError(f"path {part} disallowed for security reasons")
-
-            file_paths = [os.sep.join(item["path"]) for item in files]
-            if len(set(file_paths)) != len(file_paths):
-                raise ValueError("bad metainfo - duplicate path")
+                full_path = os.sep.join(path)
+                assert_value(full_path not in path_set, f"duplicate path {full_path!r}")
+                path_set.add(full_path)
 
     def check_meta(self) -> None:
         """Validate meta dict.
