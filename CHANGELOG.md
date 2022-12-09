@@ -11,8 +11,10 @@
 
 ### Fixed
 - `rtcontrol`: Fix `-s *`
-- `rtcontrol`: Warn if fast query is enabled for a host with
+- `rtcontrol`: Warn if fast query is enabled for a host without
   `d.multicall.filtered`
+- `Metafile.hash_check()` and `Metafile.add_fast_resume()` now handle
+  single file torrents the same way
 
 
 ## [2.4.0] - 2022-12-03
