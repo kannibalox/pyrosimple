@@ -619,10 +619,12 @@ class Metafile(dict):
     ) -> bool:
         """Check piece hashes of a metafile against the given datapath."""
 
-        if "length" in self["info"]:
-            files = [datapath]
-        else:
+        if self.is_multi_file:
             files = [Path(datapath, *i["path"]) for i in self["info"]["files"]]
+        else:
+            if datapath.is_dir():
+                datapath = datapath.joinpath(self["info"]["name"])
+            files = [datapath]
         datameta, _ = self._make_info(
             files,
             int(self["info"]["piece length"]),
