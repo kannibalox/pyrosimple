@@ -148,9 +148,9 @@ class ScriptBase:
         self.add_options()
 
         if self.intermixed_args:
-            self.options = self.parser.parse_intermixed_args()
+            self.options = self.parser.parse_intermixed_args(self.args)
         else:
-            self.options = self.parser.parse_args()
+            self.options = self.parser.parse_args(self.args)
         self.args = self.options.args
 
         if self.options.log_level:
@@ -171,8 +171,9 @@ class ScriptBase:
             self.LOG.fatal(msg)
         sys.exit(error.EX_SOFTWARE)
 
-    def run(self):
+    def run(self, args=None):
         """The main program skeleton."""
+        self.args = args
         try:
             try:
                 # Preparation steps
