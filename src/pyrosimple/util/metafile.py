@@ -243,7 +243,8 @@ class Metafile(dict):
                     if not any(pattern.match(filename) for pattern in self.ignore):
                         yield Path(dirpath, filename)
         else:
-            yield Path(datapath)
+            if not any(pattern.match(datapath) for pattern in self.ignore):
+                yield Path(datapath)
 
     def _calc_size(self, datapath) -> int:
         """Get total size of a path."""
