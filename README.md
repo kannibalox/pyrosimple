@@ -31,6 +31,7 @@ internal improvements and refactoring.
 
 - Only supports python 3 and rTorrent 0.9.6+ (this includes
   rTorrent-PS and rTorrent-PS-CH)
+  - pypy is supported, but not as well tested
 - Simpler poetry-based build system, with a single package to install
 - Performance improvements (faster templating and only fetching
   required fields)
