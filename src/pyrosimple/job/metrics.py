@@ -11,7 +11,6 @@ from pyrosimple import config as config_ini
 from pyrosimple import error
 from pyrosimple.job.base import BaseJob
 from pyrosimple.util import fmt, rpc
-from pyrosimple.util.parts import Bunch
 
 
 class EngineStats(BaseJob):
@@ -248,7 +247,7 @@ if __name__ == "__main__":
 
     engine = connect()
 
-    job = RtorrentExporter(Bunch(jobs="system", port=8005))
+    job = RtorrentExporter({"jobs": "system", "port": 8005})
     while True:
         job.run()
         sleep(5)
