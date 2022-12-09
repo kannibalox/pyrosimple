@@ -258,13 +258,12 @@ class RtorrentItem(engine.TorrentProxy):
 
     def datapath(self) -> Path:
         """Get an item's data path."""
-        path = self.rpc_call("d.directory")
-        if path and not self.rpc_call("d.is_multi_file"):
-            path = os.path.join(path, self.rpc_call("d.name"))
-        path = os.path.expanduser(path)
+        directory = self.rpc_call("d.directory")
         if self.rpc_call("d.is_multi_file"):
-            return Path(path)
-        return Path(path)
+            path = Path(directory)
+        else:
+            path = Path(directory, self.rpc_call("d.name"))
+        return path.expanduser()
 
     def announce_urls(self, default=[]):  # pylint: disable=dangerous-default-value
         """Get a list of all announce URLs.
