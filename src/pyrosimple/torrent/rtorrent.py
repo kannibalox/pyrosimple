@@ -27,8 +27,7 @@ from pyrosimple.util.cache import ExpiringCache
 from pyrosimple.util.parts import Bunch
 
 
-log = logging.getLogger(__name__)
-
+# Prepare the jinja template environment at the module level
 env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(
         [Path("~/.config/pyrosimple/templates/").expanduser()]
@@ -1022,7 +1021,8 @@ def validate_sort_fields(sort_fields: str):
 
     # Validate field list
     validate_field_list(",".join([name for name, _ in sort_spec]))
-    log.debug(
+    logger = logging.getLogger(__name__)
+    logger.debug(
         "Validated keys ares: %s",
         ", ".join([("-" if descending else "") + i for i, descending in sort_spec]),
     )
