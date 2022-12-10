@@ -19,6 +19,7 @@
   `d.multicall.filtered`
 - `Metafile.hash_check()` and `Metafile.add_fast_resume()` now handle
   single file torrents the same way (#24)
+- `mktor`: Fix `-o/--output-filename`
 
 
 ## [2.4.0] - 2022-12-03
