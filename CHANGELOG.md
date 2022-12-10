@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.5.0] - 2022-12-10
 
 ### BREAKING CHANGES
 - HTTP URLs will no longer automatically append `/RPC2` on the end if
@@ -190,7 +190,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/kannibalox/pyrosimple/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/kannibalox/pyrosimple/compare/v2.3.3...v2.4.0
 [2.3.3]: https://github.com/kannibalox/pyrosimple/compare/v2.3.2...v2.3.3
 [2.3.2]: https://github.com/kannibalox/pyrosimple/compare/v2.3.1...v2.3.2
