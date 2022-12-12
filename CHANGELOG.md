@@ -18,7 +18,8 @@
 - `rtcontrol`: Warn if fast query is enabled for a host without
   `d.multicall.filtered`
 - `Metafile.hash_check()` and `Metafile.add_fast_resume()` now handle
-  single file torrents the same way (#24)
+  single file torrents the same way
+  ([#24](https://github.com/kannibalox/pyrosimple/issues/24))
 - `mktor`: Fix `-o/--output-filename`
 
 
