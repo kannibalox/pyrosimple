@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Added
+- `rtcontrol`: Added `d_<call name>` field for arbitrary rpc calls. As
+  an example, to show the
+  [`d.creation_date`](https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-creation-date)
+  of all torrent with connected peers (`d.connected_peers`), you can
+  now run `rtcontrol d_peers_connected=1 -o d_creation_date`. Note
+  that the built-in fields are recommend due to the advanced filtering
+  and output capabilities (currently all `d_<call name>` fields are
+  treated as strings). There are also some commands that will work
+  under the `d_<call name>` system, such as `d.skip.rate`.
+
 ### Changed
 - `lstor`: Error with non-zero return code when `--check-data` fails
 

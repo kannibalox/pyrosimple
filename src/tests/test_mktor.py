@@ -15,6 +15,7 @@ def test_mktor(tmp_path_factory):
     MetafileCreator().run([str(test_file), "http://example.com"])
     MetafileLister().run([str(test_file.with_suffix(".torrent"))])
 
+
 def test_mktor_output(tmp_path_factory):
     test_file = Path(tmp_path_factory.mktemp("mktor"), "hello.txt")
     out_file = Path(tmp_path_factory.mktemp("mktor"), "out.torrent")

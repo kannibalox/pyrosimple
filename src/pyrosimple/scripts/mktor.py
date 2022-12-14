@@ -190,7 +190,9 @@ class MetafileCreator(ScriptBase):
         if self.options.output_filename:
             metapath = Path(self.options.output_filename)
             if metapath.is_dir():
-                metapath = metapath.joinpath(os.path.basename(datapath)).with_suffix('.torrent')
+                metapath = metapath.joinpath(os.path.basename(datapath)).with_suffix(
+                    ".torrent"
+                )
         else:
             metapath = datapath.with_suffix(".torrent")
 

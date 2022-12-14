@@ -802,6 +802,19 @@ def generate_guessit_field(name: str) -> Optional[FieldDefinition]:
     )
 
 
+def generate_d_call(name: str) -> Optional[FieldDefinition]:
+    """Create fields for arbitrary d.* commands"""
+    call_name = "d." + name[2:]
+    return DynamicField(
+        str,
+        name,
+        f"Dynamic rpc call for {call_name}",
+        accessor=lambda o: o.rpc_call(call_name),
+        matcher=matching.PatternFilter,
+        requires=[call_name],
+    )
+
+
 class TorrentProxy:
     """A single download item."""
 
@@ -846,6 +859,7 @@ class TorrentProxy:
             "custom_": generate_custom_field,
             "kind_": generate_kind_field,
             "guessit_": generate_guessit_field,
+            "d_": generate_d_call,
         }.items():
             cls.add_field_generator(prefix, generator)
 

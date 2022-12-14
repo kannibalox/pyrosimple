@@ -812,7 +812,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         if answer.lower() in ["n", "no"]:
                             continue
                         if answer.lower() in ["q", "quit"]:
-                            self.LOG.warning("Abort due to user choice!")
+                            self.LOG.warning("Qutting due to user choice!")
                             sys.exit(error.EX_TEMPFAIL)
                         if answer.lower() in ["a", "all"]:
                             self.options.yes = True
@@ -923,7 +923,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     )
 
                 self.LOG.info(
-                    "Dumped %d out of %d torrents.",
+                    "Displayed %d out of %d torrents.",
                     len(matches),
                     view.size(),
                 )
