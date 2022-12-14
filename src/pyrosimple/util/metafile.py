@@ -88,7 +88,7 @@ class PieceLogger:
             != self.meta["info"]["pieces"][self.piece_index : self.piece_index + 20]
         ):
             self.log.warning(
-                "Piece #%d: Hashes differ in file %r",
+                "Piece #%d: Hashes differ in file %s",
                 self.piece_index // 20,
                 filename,
             )

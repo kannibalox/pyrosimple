@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- `lstor`: Error with non-zero return code when `--check-data` fails
+
 ## [2.5.0] - 2022-12-10
 
 ### BREAKING CHANGES

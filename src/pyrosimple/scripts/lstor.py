@@ -87,6 +87,7 @@ class MetafileLister(ScriptBase):
                 if self.options.check_data:
                     # pylint: disable=import-outside-toplevel
                     from pyrosimple.util.ui import HashProgressBar
+                    from pyrosimple.util.metafile import PieceLogger
 
                     with HashProgressBar() as pb:
                         if (
@@ -98,10 +99,20 @@ class MetafileLister(ScriptBase):
                         else:
                             progress_callback = None
 
-                        torrent.hash_check(
+                        piece_logger = PieceLogger(torrent, self.LOG)
+
+                        data_correct = torrent.hash_check(
                             Path(self.options.check_data),
                             progress_callback=progress_callback,
+                            piece_callback=piece_logger.check_piece,
                         )
+                    if not data_correct:
+                        self.LOG.error(
+                            "File %s does match data from %s",
+                            filename,
+                            self.options.check_data,
+                        )
+                        sys.exit(4)
                 listing = None
 
                 if self.options.raw:
