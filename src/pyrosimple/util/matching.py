@@ -638,7 +638,7 @@ class TimeFilter(NumericFilterBase):
 
     def validate(self):
         """Validate filter condition (template method)."""
-        self._value # pylint: disable=pointless-statement
+        self._value  # pylint: disable=pointless-statement
 
 
 class TimeFilterNotNull(TimeFilter):

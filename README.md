@@ -1,6 +1,6 @@
 # pyrosimple
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kannibalox/pyrosimple/Pylint)](https://github.com/kannibalox/pyrosimple/actions/workflows/pylint.yml)
+[![GitHub Workflow Status](http://img.shields.io/github/actions/workflow/status/kannibalox/pyrosimple/pylint.yml?branch=main)](https://github.com/kannibalox/pyrosimple/actions/workflows/pylint.yml)
 [![PyPI](https://img.shields.io/pypi/v/pyrosimple)](https://pypi.org/project/pyrosimple/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyrosimple)
 
