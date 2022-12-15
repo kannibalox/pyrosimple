@@ -536,6 +536,15 @@ class TimeFilter(NumericFilterBase):
         "^" + "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms") + "$"
     )
 
+    # pylint: disable=super-init-not-called
+    def __init__(self, name: str, op: FilterOperator, value: str):
+        self.children = []
+        self._name = name
+        self.not_null = False
+        self._condition = value
+        self._op: FilterOperator = op
+        self._duration = False
+
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         pf = prefilter_field_lookup(self._name)
@@ -563,30 +572,28 @@ class TimeFilter(NumericFilterBase):
             return '"{}=value=${},value={}"'.format(cmp_, pf, int(timestamp))
         return ""
 
-    def validate_time(self, duration=False):
-        """Validate filter condition (template method) for timestamps
-        and durations."""
-        super().validate()
+    @property
+    def _value(self):
         timestamp = now = time.time()
 
-        if str(self._value).isdigit():
+        if str(self._condition).isdigit():
             # Literal UNIX timestamp
             try:
-                timestamp = float(self._value)
+                timestamp = float(self._condition)
             except (ValueError, TypeError) as exc:
                 raise FilterError(
-                    f"Bad timestamp value {self._value!r} in {self._condition!r}"
+                    f"Bad timestamp value {self._condition!r} in {self._condition!r}"
                 ) from exc
         else:
             # Something human readable
-            delta = self.TIMEDELTA_RE.match(self._value)
+            delta = self.TIMEDELTA_RE.match(self._condition)
             if delta:
                 # Time delta
                 for unit, val in delta.groupdict().items():
                     if val:
                         timestamp = self.TIMEDELTA_UNITS[unit](timestamp, int(val, 10))
 
-                if duration:
+                if self._duration:
                     timestamp = now - timestamp
                 # Invert the value for more intuitive matching (in
                 # line with original code too) e.g. 'completed<1d'
@@ -603,17 +610,17 @@ class TimeFilter(NumericFilterBase):
                         self._op = Operators["gt"]
             else:
                 # Assume it's an absolute date
-                if "/" in self._value:
+                if "/" in self._condition:
                     # U.S.
                     dtfmt = "%m/%d/%Y"
-                elif "." in self._value:
+                elif "." in self._condition:
                     # European
                     dtfmt = "%d.%m.%Y"
                 else:
                     # Fall back to ISO
                     dtfmt = "%Y-%m-%d"
 
-                val = str(self._value).upper().replace(" ", "T")
+                val = str(self._condition).upper().replace(" ", "T")
                 if "T" in val:
                     # Time also given
                     dtfmt += "T%H:%M:%S"[: 3 + 3 * val.count(":")]
@@ -622,34 +629,34 @@ class TimeFilter(NumericFilterBase):
                     timestamp = time.mktime(tuple(time.strptime(val, dtfmt)))
                 except (ValueError) as exc:
                     raise FilterError(
-                        f"Bad timestamp value {self._value!r} in {self._condition!r} ({exc})"
+                        f"Bad timestamp value {self._condition!r} in {self._condition!r} ({exc})"
                     ) from exc
 
-                if duration:
+                if self._duration:
                     timestamp -= now
-
-        self._value = timestamp
+        return timestamp
 
     def validate(self):
         """Validate filter condition (template method)."""
-        self.validate_time(duration=False)
+        self._value # pylint: disable=pointless-statement
 
 
 class TimeFilterNotNull(TimeFilter):
     """Filter UNIX timestamp values, ignore unset values unless compared to 0."""
 
-    def validate(self):
-        """Validate filter condition (template method)."""
-        super().validate()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.not_null = True
+        self._duration = False
 
 
 class DurationFilter(TimeFilter):
     """Filter durations in seconds."""
 
-    def validate(self):
-        """Validate filter condition (template method)."""
-        super().validate_time(duration=True)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.not_null = True
+        self._duration = True
 
     def match(self, item) -> bool:
         """Return True if filter matches item."""

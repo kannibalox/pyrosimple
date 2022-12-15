@@ -60,7 +60,7 @@ class ExpiringCache(abc.MutableMapping):
     def __iter__(self):
         for k in list(self.data.keys()):
             try:
-                self[k]
-                yield k
+                if k in self:
+                    yield k
             except KeyError:
                 pass

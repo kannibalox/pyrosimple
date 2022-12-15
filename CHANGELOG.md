@@ -13,6 +13,11 @@
   treated as strings). There are also some commands that will work
   under the `d_<call name>` system, such as `d.skip.rate`.
 
+### Fixed
+- Dynamically generate timestamps during the filtering process. For
+  example, a matcher created from `completed>1h` will still match as
+  expected even a couple hours later.
+
 ### Changed
 - `lstor`: Error with non-zero return code when `--check-data` fails
 
