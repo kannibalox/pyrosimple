@@ -184,7 +184,7 @@ def detect_traits(item):
     return traits.detect_traits(
         name=item.name,
         alias=item.alias,
-        filetype=(list(item.fetch("kind_51")) or [None]).pop(),
+        filetype=(list(item.kind_51) or [None]).pop(),
     )
 
 
@@ -339,7 +339,7 @@ def core_fields():
         "ALL kinds of files in this item (the same as kind_0)",
         matcher=matching.TaggedAsFilter,
         formatter=_fmt_tags,
-        accessor=lambda o: o.fetch("kind_0"),
+        accessor=lambda o: o.kind_0,
     )
     yield DynamicField(
         list,
@@ -577,7 +577,7 @@ def core_fields():
         "xfer",
         "transfer rate",
         matcher=matching.ByteSizeFilter,
-        accessor=lambda o: o.fetch("up") + o.fetch("down"),
+        accessor=lambda o: o.rpc_call("d.up.rate") + o.rpc_call("d.down.rate"),
         requires=["d.up.rate", "d.down.rate"],
     )
 

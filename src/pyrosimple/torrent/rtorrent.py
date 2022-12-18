@@ -188,7 +188,7 @@ class RtorrentItem(engine.TorrentProxy):
         else:
             # Get file types
             histo = traits.get_filetypes(
-                self.fetch("files"),
+                self._get_files(),
                 path=operator.attrgetter("path"),
                 size=operator.attrgetter("size"),
             )
@@ -234,27 +234,14 @@ class RtorrentItem(engine.TorrentProxy):
                 return self._fields[name]
             except KeyError:
                 pass
-        if isinstance(name, int):
-            name = f"custom_{name}"
-        if name.startswith("kind_") and name[5:].isdigit():
-            val = self._get_kind(int(name[5:], 10))
-        elif name.startswith("custom_"):
-            key = name[7:]
-            try:
-                if len(key) == 1 and key in "12345":
-                    val = getattr(self._engine.rpc.d, "custom" + key)(
-                        self._fields["hash"]
-                    )
-                else:
-                    val = self._engine.rpc.d.custom(self._fields["hash"], key)
-            except rpc.ERRORS as exc:
-                raise error.EngineError(f"While accessing field {name!r}: {exc}")
-        else:
-            val = getattr(self, name)
+        if engine.TorrentProxy.add_manifold_attribute(name) is None:
+            raise AttributeError(name)
+        value = getattr(self, name)
+        self._fields[name] = value
+        return value
 
-        self._fields[name] = val
-
-        return val
+    def __getattr__(self, name):
+        return self.fetch(name)
 
     def datapath(self) -> Path:
         """Get an item's data path."""
@@ -537,7 +524,8 @@ class RtorrentItem(engine.TorrentProxy):
     def delete(self):
         """Remove torrent from client."""
         self.stop()
-        if self.fetch("metafile"):
+        tied_file = self.rpc_call("d.tied_to_file")
+        if tied_file:
             self._make_it_so("removing metafile of", ["d.delete_tied"])
         self._make_it_so("erasing", ["d.erase"])
 
@@ -564,7 +552,7 @@ class RtorrentItem(engine.TorrentProxy):
             file_filter to use).
         """
         dry_run = False  # set to True for testing
-        path = Path(self.fetch("directory"))
+        path = Path(self.rpc_call("d.directory"))
         if not path.is_absolute():
             raise error.EngineError(
                 f"Directory '{path}' for item {self.hash} is not absolute, which is a bad idea,"

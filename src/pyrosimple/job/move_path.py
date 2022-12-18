@@ -33,9 +33,9 @@ class PathMover(base.MatchableJob):
         if not target:
             self.log.debug("Empty target for %s", item.hash)
             return
-        if (Path(item.fetch("directory")) == Path(target)) or (
+        if (Path(item.directory) == Path(target)) or (
             item.rpc_call("d.is_multi_file")
-            and Path(item.fetch("directory")).parent == Path(target)
+            and Path(item.directory).parent == Path(target)
         ):
             self.log.debug("%s already moved, skipping", item.hash)
             return
