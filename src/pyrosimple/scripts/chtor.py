@@ -12,6 +12,7 @@ import time
 import urllib.parse
 
 from pathlib import Path
+from typing import Optional, Tuple
 
 import bencode  # typing: ignore
 
@@ -164,16 +165,16 @@ class MetafileChanger(ScriptBase):
             )
 
         # Set filter criteria for metafiles
-        filter_url_prefix = None
+        filter_url_prefix: Optional[str] = None
         if self.options.reannounce:
             # <scheme>://<netloc>/<path>?<query>
-            filter_url_prefix = urllib.parse.urlsplit(
+            split_url = urllib.parse.urlsplit(
                 self.options.reannounce, allow_fragments=False
             )
             filter_url_prefix = urllib.parse.urlunsplit(
                 (
-                    filter_url_prefix.scheme,
-                    filter_url_prefix.netloc,
+                    split_url.scheme,
+                    split_url.netloc,
                     "/",
                     "",
                     "",
@@ -210,7 +211,7 @@ class MetafileChanger(ScriptBase):
         for filename in self.args:
             try:
                 # Read and remember current content
-                torrent = metafile.Metafile.from_file(Path(filename))
+                torrent: metafile.Metafile = metafile.Metafile.from_file(Path(filename))
             except (OSError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.LOG.warning(
                     "Skipping bad metafile %r (%s: %s)",
@@ -236,7 +237,7 @@ class MetafileChanger(ScriptBase):
                 if filter_url_prefix and not torrent["announce"].startswith(
                     filter_url_prefix
                 ):
-                    self.LOG.warning(
+                    self.LOG.info(
                         "Skipping metafile %r: not tracked by %r!",
                         filename,
                         filter_url_prefix,
@@ -323,7 +324,7 @@ class MetafileChanger(ScriptBase):
 
                 # Add fast-resume data?
                 if self.options.hashed:
-                    datadir = self.options.hashed
+                    datadir: str = self.options.hashed
                     if "{}" in datadir and not os.path.exists(datadir):
                         datadir = datadir.replace("{}", torrent["info"]["name"])
                     try:
