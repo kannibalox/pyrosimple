@@ -327,7 +327,7 @@ class MetafileChanger(ScriptBase):
                     if "{}" in datadir and not os.path.exists(datadir):
                         datadir = datadir.replace("{}", torrent["info"]["name"])
                     try:
-                        torrent.add_fast_resume(datadir)
+                        torrent.add_fast_resume(Path(datadir))
                     except OSError as exc:
                         self.fatal("Error making fast-resume data (%s)", exc)
                         raise

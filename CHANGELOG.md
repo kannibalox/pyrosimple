@@ -17,6 +17,7 @@
 - Dynamically generate timestamps during the filtering process. For
   example, a matcher created from `completed>1h` will still match as
   expected even a couple hours later.
+- `chtor`: Fix `--fast-resume`
 
 ### Changed
 - `lstor`: Error with non-zero return code when `--check-data` fails
