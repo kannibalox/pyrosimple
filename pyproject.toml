@@ -23,6 +23,10 @@ classifiers = [
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
 ]
+packages = [
+         {include = "pyrosimple", from = "src"},
+         {include = "pyrosimple/py.typed", from = "src"},
+]
 
 [tool.poetry.dependencies]
 python = ">=3.7.2,<4"
