@@ -653,6 +653,12 @@ class Metafile(dict):
         piece_number, last_piece_length = divmod(total_size, piece_length)
 
         # Build result
+        if "creation date" in self and self["creation date"]:
+            creation_date = time.strftime(
+                "%Y-%m-%d %H:%M:%S", time.localtime(self["creation date"])
+            )
+        else:
+            creation_date = "N/A"
         result: List[str] = [
             f"NAME {self['info']['name']}",
             "SIZE %s (%i * %s + %s)"
@@ -676,14 +682,7 @@ class Metafile(dict):
                 if info.get("private")
                 else "NO (DHT/PEX enabled)"
             ),
-            "TIME %s"
-            % (
-                "N/A"
-                if "creation date" not in self
-                else time.strftime(
-                    "%Y-%m-%d %H:%M:%S", time.localtime(self["creation date"])
-                )
-            ),
+            "TIME %s" % creation_date,
         ]
 
         for label, key in (("BY  ", "created by"), ("REM ", "comment")):

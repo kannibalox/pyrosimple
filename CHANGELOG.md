@@ -18,6 +18,7 @@
   example, a matcher created from `completed>1h` will still match as
   expected even a couple hours later.
 - `chtor`: Fix `--fast-resume`
+- `lstor`: Don't throw error on empty creation date
 
 ### Changed
 - `lstor`: Error with non-zero return code when `--check-data` fails
