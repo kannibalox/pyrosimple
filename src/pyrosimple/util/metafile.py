@@ -86,7 +86,7 @@ class PieceLogger:
         else:
             self.log = logger
 
-    def check_piece(self, filename: os.PathLike[Any], piece: bytes):
+    def check_piece(self, filename: os.PathLike, piece: bytes):
         "Callback for new piece"
         if (
             piece
@@ -104,7 +104,7 @@ class PieceFailer(PieceLogger):
     """Raises an OSError if any pieces don't match, with context on
     the piece and file that failed"""
 
-    def check_piece(self, filename: os.PathLike[Any], piece: bytes):
+    def check_piece(self, filename: os.PathLike, piece: bytes):
         "Callback for new piece"
         if (
             piece
@@ -260,7 +260,7 @@ class Metafile(dict):
         files: Sequence[os.PathLike],
         piece_size: int,
         progress_callback: Optional[Callable[[int, int], None]] = None,
-        piece_callback: Optional[Callable[[os.PathLike[Any], bytes], None]] = None,
+        piece_callback: Optional[Callable[[os.PathLike, bytes], None]] = None,
         datapath: Optional[Path] = None,
     ) -> Tuple[Dict, int]:
         """Create info dict from a list of files."""
