@@ -12,7 +12,7 @@ import time
 import urllib.parse
 
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 
 import bencode  # typing: ignore
 
