@@ -12,9 +12,11 @@ import os
 import re
 import time
 import urllib
+import logging
 
 from pathlib import Path, PurePath
 from typing import (
+    Any,
     Callable,
     Dict,
     Generator,
@@ -76,12 +78,15 @@ class PieceLogger:
     """Holds some state to display useful error messages
     if pieces fail to hash check"""
 
-    def __init__(self, meta, logger):
+    def __init__(self, meta, logger=None):
         self.piece_index = 0
         self.meta = meta
-        self.log = logger
+        if logger is None:
+            self.log = logging.getLogger(__name__)
+        else:
+            self.log = logger
 
-    def check_piece(self, filename, piece):
+    def check_piece(self, filename: os.PathLike[Any], piece: bytes):
         "Callback for new piece"
         if (
             piece
@@ -99,7 +104,7 @@ class PieceFailer(PieceLogger):
     """Raises an OSError if any pieces don't match, with context on
     the piece and file that failed"""
 
-    def check_piece(self, filename, piece):
+    def check_piece(self, filename: os.PathLike[Any], piece: bytes):
         "Callback for new piece"
         if (
             piece
@@ -255,7 +260,7 @@ class Metafile(dict):
         files: Sequence[os.PathLike],
         piece_size: int,
         progress_callback: Optional[Callable[[int, int], None]] = None,
-        piece_callback: Optional[Callable] = None,
+        piece_callback: Optional[Callable[[os.PathLike[Any], bytes], None]] = None,
         datapath: Optional[Path] = None,
     ) -> Tuple[Dict, int]:
         """Create info dict from a list of files."""
