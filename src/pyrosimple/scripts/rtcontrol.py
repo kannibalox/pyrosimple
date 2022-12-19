@@ -17,7 +17,7 @@ from multiprocessing.pool import ThreadPool
 from typing import Callable, List, Union
 
 from pyrosimple import error
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import fmt, pymagic, rpc
 from pyrosimple.util.parts import DefaultBunch
 
@@ -941,7 +941,6 @@ class RtorrentControl(ScriptBaseWithConfig):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup()
     RtorrentControl().run()
 
 

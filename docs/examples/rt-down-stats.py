@@ -103,5 +103,4 @@ class DownloadStats(base.ScriptBaseWithConfig):
 
 
 if __name__ == "__main__":
-    base.ScriptBase.setup()
     DownloadStats().run()

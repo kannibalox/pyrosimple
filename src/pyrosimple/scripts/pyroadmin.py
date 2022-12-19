@@ -12,7 +12,7 @@ from xmlrpc import client as xmlrpclib
 import pyrosimple
 
 from pyrosimple import config
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import matching
 
 
@@ -257,7 +257,6 @@ class AdminTool(ScriptBaseWithConfig):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup()
     AdminTool().run()
 
 

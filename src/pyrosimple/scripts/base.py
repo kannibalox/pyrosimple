@@ -37,11 +37,6 @@ class ScriptBase:
     # Can be empty or None in derived classes
     COPYRIGHT = ""
 
-    @classmethod
-    def setup(cls, _=None):
-        """Set up the runtime environment."""
-        logging.basicConfig(level=logging.WARNING)
-
     def __init__(self):
         """Initialize CLI."""
         self.startup = time.time()
@@ -53,6 +48,7 @@ class ScriptBase:
         self.engine = None
         self.intermixed_args = False
 
+        logging.basicConfig(level=logging.WARNING)
         # For python 3.7 compatibility
         try:
             import importlib.metadata  # pylint: disable=import-outside-toplevel
@@ -126,6 +122,7 @@ class ScriptBase:
             help="silence warnings",
             dest="log_level",
             action="store_const",
+            default=logging.WARNING,
             const=logging.CRITICAL,
         )
         self.parser.add_argument(
@@ -154,7 +151,7 @@ class ScriptBase:
         self.args = self.options.args
 
         if self.options.log_level:
-            logging.getLogger().setLevel(self.options.log_level)
+            logging.getLogger("pyrosimple").setLevel(self.options.log_level)
 
         self.LOG.debug(
             "Options: %s",

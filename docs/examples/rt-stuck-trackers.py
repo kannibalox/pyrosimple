@@ -125,5 +125,4 @@ class StuckTrackers(base.ScriptBaseWithConfig):
 
 
 if __name__ == "__main__":
-    base.ScriptBase.setup()
     StuckTrackers().run()

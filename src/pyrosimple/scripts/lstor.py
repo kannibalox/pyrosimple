@@ -176,7 +176,6 @@ class MetafileLister(ScriptBase):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup()
     MetafileLister().run()
 
 

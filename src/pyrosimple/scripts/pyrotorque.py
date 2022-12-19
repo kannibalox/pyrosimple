@@ -19,7 +19,7 @@ from daemon.pidfile import TimeoutPIDLockFile
 from dynaconf.utils.boxing import DynaBox
 
 from pyrosimple import config, error
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import logutil, pymagic
 
 
@@ -249,7 +249,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup()
     RtorrentQueueManager().run()
 
 

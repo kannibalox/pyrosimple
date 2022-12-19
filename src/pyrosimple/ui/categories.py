@@ -5,7 +5,7 @@
 
 
 from pyrosimple import error
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.torrent import rtorrent
 from pyrosimple.util import rpc
 
@@ -84,7 +84,6 @@ class CategoryManager(ScriptBaseWithConfig):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup()
     CategoryManager().run()
 
 

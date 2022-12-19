@@ -273,7 +273,6 @@ class MetafileCreator(ScriptBase):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup()
     MetafileCreator().run()
 
 

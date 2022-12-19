@@ -11,7 +11,6 @@ def test_mktor(tmp_path_factory):
     test_file = Path(tmp_path_factory.mktemp("mktor"), "hello.txt")
     with test_file.open("w") as fh:
         fh.write("Hello world!")
-    ScriptBase.setup()
     MetafileCreator().run([str(test_file), "http://example.com"])
     MetafileLister().run([str(test_file.with_suffix(".torrent"))])
 
@@ -21,6 +20,5 @@ def test_mktor_output(tmp_path_factory):
     out_file = Path(tmp_path_factory.mktemp("mktor"), "out.torrent")
     with test_file.open("w") as fh:
         fh.write("Hello world!")
-    ScriptBase.setup()
     MetafileCreator().run([str(test_file), "http://example.com", "-o", str(out_file)])
     MetafileLister().run([str(out_file)])

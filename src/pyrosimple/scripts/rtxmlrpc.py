@@ -29,7 +29,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import WordCompleter
 
 from pyrosimple import config, error
-from pyrosimple.scripts.base import ScriptBase, ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import fmt, rpc
 
 
@@ -310,7 +310,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
 def run():  # pragma: no cover
     """The entry point."""
-    ScriptBase.setup()
     RtorrentXmlRpc().run()
 
 
