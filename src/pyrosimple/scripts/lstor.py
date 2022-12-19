@@ -12,6 +12,7 @@ from pathlib import Path
 
 import bencode
 
+from pyrosimple.error import EX_DATAERR
 from pyrosimple.scripts.base import ScriptBase
 
 
@@ -112,7 +113,7 @@ class MetafileLister(ScriptBase):
                             filename,
                             self.options.check_data,
                         )
-                        sys.exit(4)
+                        sys.exit(EX_DATAERR)
                 listing = None
 
                 if self.options.raw:
