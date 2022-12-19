@@ -1011,7 +1011,7 @@ def validate_sort_fields(sort_fields: str):
     validate_field_list(",".join([name for name, _ in sort_spec]))
     logger = logging.getLogger(__name__)
     logger.debug(
-        "Validated keys ares: %s",
+        "Validated key names: %s",
         ", ".join([("-" if descending else "") + i for i, descending in sort_spec]),
     )
 
