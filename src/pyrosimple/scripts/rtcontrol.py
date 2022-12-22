@@ -425,6 +425,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         action_group.add_argument(
             "--prio",
             action=RtorrentAction,
+            const="set_prio",
             choices=self.PRIO_OPTIONS,
             help="set priority of torrent",
         )

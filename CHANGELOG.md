@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- `rtcontrol`: Fix `--prio`
+
 ## [2.5.1] - 2022-12-22
 
 ### Added

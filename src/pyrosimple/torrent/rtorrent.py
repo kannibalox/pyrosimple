@@ -283,7 +283,7 @@ class RtorrentItem(engine.TorrentProxy):
     def set_prio(self, prio: int):
         """Set priority (0-3)."""
         self._make_it_so(
-            "setting priority for", ["d.priority.set"], max(0, min(int(prio), 3))
+            "setting priority for", ["d.priority.set"], str(max(0, min(int(prio), 3)))
         )
 
     def tag(self, tags: str):
