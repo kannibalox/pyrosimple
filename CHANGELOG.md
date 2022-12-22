@@ -22,6 +22,7 @@
 
 ### Changed
 - `lstor`: Error with non-zero return code when `--check-data` fails
+- Mark package as typed
 
 ## [2.5.0] - 2022-12-10
 
