@@ -206,7 +206,9 @@ class Metafile(dict):
                 assert_value(path, "empty path")
                 assert_value(isinstance(path, (list, tuple)), "bad path")
                 for part in path:
-                    assert_value(isinstance(part, str), "bad path dir")
+                    assert_value(
+                        isinstance(part, str), f"bad path dir {part!r} in {path}"
+                    )
                     assert_value(
                         part != "..",
                         f"relative path in {path!r} disallowed for security reasons",
