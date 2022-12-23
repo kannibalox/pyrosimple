@@ -145,10 +145,14 @@ class Metafile(dict):
         """Provide a copy of the metafile as a pure dict"""
         return copy.deepcopy(dict(self))
 
+    def bencode(self) -> bytes:
+        """Helper function to turn the metafile into bytes"""
+        return bytes(bencode.encode(dict(self)))
+
     def save(self, filename: Path) -> None:
         """Save the metafile to an actual file."""
         with filename.open("wb") as handle:
-            handle.write(bencode.encode(dict(self)))
+            handle.write(self.bencode())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
