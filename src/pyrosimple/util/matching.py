@@ -842,7 +842,7 @@ class MatcherBuilder(NodeVisitor):
 
     def visit_regex(self, node, visited_children):
         return node.text
-    
+
     def visit_quoted_regex(self, node, visited_children):
         return node.text[1:-1]
 
@@ -872,7 +872,10 @@ class MatcherBuilder(NodeVisitor):
             return real_children
         return None
 
-RE_UNQUOTED_REGEX = re.compile(r'(\w*)(!?=)(\/.*\/)')
+
+RE_UNQUOTED_REGEX = re.compile(r"(\w*)(!?=)(\/.*\/)")
+
+
 def cli_args_to_match_str(query: Sequence) -> str:
     """Convert CLI arguments to a string. Most usefully, this will
     automatically double quote unnamed conditions or regexes if they
