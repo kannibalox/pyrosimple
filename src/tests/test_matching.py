@@ -233,6 +233,7 @@ def test_matcher_fail(matcher, item):
     ("matcher", "item"),
     [
         ("name=arch", 'string.contains_i=$d.name=,"arch"'),
+        ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
         (["name=arch"], 'string.contains_i=$d.name=,"arch"'),
         ('name="arch linux"', 'string.contains_i=$d.name=,"arch linux"'),
         # Make sure to not process globs that might look like regexes
@@ -250,7 +251,9 @@ def test_matcher_fail(matcher, item):
         ("name=/(arch|foo)k+/", 'string.contains_i=$d.name=,"k"'),
         # Too complex of a regex to properly clean
         ("name=/((arch|ubuntu)|foo)k+/", ""),
-        ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
+        # Regex with a space
+        ('message="/not registered/"', 'string.contains_i=$d.message=,"registered"'),
+        (["message=/not registered/"], 'string.contains_i=$d.message=,"registered"'),
         # Booleans
         ("is_complete=no", "equal=d.complete=,value=0"),
         ("is_private=yes", "equal=d.is_private=,value=1"),

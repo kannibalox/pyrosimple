@@ -4,6 +4,8 @@
 
 ### Fixed
 - `rtcontrol`: Fix `--prio`
+- `rtcontrol`: Allow spaces in regexes (e.g. `rtcontrol "message=/(not
+  |un)registered/"` will work as expected now)
 
 ## [2.5.1] - 2022-12-22
 

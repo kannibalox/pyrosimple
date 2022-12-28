@@ -721,9 +721,10 @@ QueryGrammar = Grammar(
     cond = (&or / &lpar / &rpar / &not / named_cond / unnamed_cond)
     named_cond = word conditional filter
     unnamed_cond = filter
-    filter      = (quoted / glob / regex / word)
+    filter      = (quoted_regex / quoted / glob / regex / word)
     glob = ~r"[\S]+"
-    regex = ~"/[^/]*/i?"
+    quoted_regex =  ~r'"/[^/\"]*/i?"'
+    regex = ~r"/[^/]*/i?"
     quoted      = ~'"[^\"]*"'
     word        = ~r"[\w]+"
     conditional = (ne / ge / le / lt / gt / eq)
@@ -841,6 +842,9 @@ class MatcherBuilder(NodeVisitor):
 
     def visit_regex(self, node, visited_children):
         return node.text
+    
+    def visit_quoted_regex(self, node, visited_children):
+        return node.text[1:-1]
 
     def visit_eq(self, node, visited_children):
         return Operators["eq"]
@@ -868,15 +872,18 @@ class MatcherBuilder(NodeVisitor):
             return real_children
         return None
 
-
+RE_UNQUOTED_REGEX = re.compile(r'(\w*)(!?=)(\/.*\/)')
 def cli_args_to_match_str(query: Sequence) -> str:
     """Convert CLI arguments to a string. Most usefully, this will
-    automatically double quote unnamed conditions if they have a space
-    in them."""
+    automatically double quote unnamed conditions or regexes if they
+    have a space in them.
+    """
     args = []
     for a in query:
         if " " in a and not set("=><") & set(a) and not a.startswith('"'):
             a = f'"{a}"'
+        if " " in a and RE_UNQUOTED_REGEX.match(a):
+            a = RE_UNQUOTED_REGEX.sub(r'\1\2"\3"', a)
         args.append(a)
     return " ".join(args)
 
