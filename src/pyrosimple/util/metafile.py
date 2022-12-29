@@ -51,24 +51,21 @@ PASSKEY_OK = (
 
 
 METAFILE_STD_KEYS = [
-    _i.split(".")
-    for _i in (
-        "announce",
-        "announce-list",  # BEP-0012
-        "comment",
-        "created by",
-        "creation date",
-        "encoding",
-        "info",
-        "info.length",
-        "info.name",
-        "info.piece length",
-        "info.pieces",
-        "info.private",
-        "info.files",
-        "info.files.length",
-        "info.files.path",
-    )
+    ["announce"],
+    ["announce-list"],  # BEP-0012
+    ["comment"],
+    ["created by"],
+    ["creation date"],
+    ["encoding"],
+    ["info"],
+    ["info", "length"],
+    ["info", "name"],
+    ["info", "piece length"],
+    ["info", "pieces"],
+    ["info", "private"],
+    ["info", "files"],
+    ["info", "files", "length"],
+    ["info", "files", "path"],
 ]
 
 # PieceLogger and PieceFailer are both utility classes for passing
