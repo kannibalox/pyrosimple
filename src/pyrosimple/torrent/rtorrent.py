@@ -959,20 +959,16 @@ def format_item(
 
 def validate_field_list(
     fields: str,
-    allow_fmt_specs=False,
-):
+    allow_fmt_specs: bool = False,
+) -> List[str]:
     """Make sure the fields in the given list exist.
 
     @param fields: List of fields (comma-/space-separated if a string).
-    @type fields: list or str
+    @type fields: str
     @return: validated field names.
     @rtype: list
     """
-    try:
-        split_fields = [i.strip() for i in fields.split(",")]
-    except AttributeError:
-        # Not a string, expecting an iterable
-        pass
+    split_fields = [i.strip() for i in fields.split(",")]
 
     for name in split_fields:
         if allow_fmt_specs and "." in name:
@@ -983,7 +979,6 @@ def validate_field_list(
                     raise error.UserError(
                         f"Unknown format specification {fmtspec!r} in {fullname!r}"
                     )
-
         if (
             name not in engine.FIELD_REGISTRY
             and not engine.TorrentProxy.add_manifold_attribute(name)
