@@ -208,7 +208,6 @@ class FieldDefinition:
         self.name = name
         self.__doc__ = doc
         self.requires = requires or []
-        self._accessor = accessor
         self._matcher = matcher
         self.formatter = formatter
         self.prefilter_field: Optional[str] = prefilter_field
@@ -216,6 +215,9 @@ class FieldDefinition:
             self._accessor = lambda o: o.rpc_call("d." + name)
             if requires is None:
                 self.requires = ["d." + name]
+        else:
+            self._accessor = accessor
+
 
         if name in FIELD_REGISTRY:
             raise RuntimeError("INTERNAL ERROR: Duplicate field definition")
@@ -591,8 +593,7 @@ def core_fields():
                 stacklevel=2,
             )
             return 0
-        else:
-            return int(o.rpc_call("d.timestamp.last_xfer") or 0)
+        return int(o.rpc_call("d.timestamp.last_xfer") or 0)
 
     yield DynamicField(
         int,
@@ -708,8 +709,7 @@ def core_fields():
                 stacklevel=2,
             )
             return 0
-        else:
-            return int(o.rpc_call("d.timestamp.last_active") or 0)
+        return int(o.rpc_call("d.timestamp.last_active") or 0)
 
     yield DynamicField(
         int,
@@ -833,8 +833,6 @@ class TorrentProxy:
                     setattr(cls, name, field)
                     FIELD_REGISTRY[name] = field
                     return cast(FieldDefinition, field)
-                else:
-                    return None
         return None
 
     @classmethod
