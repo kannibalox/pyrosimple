@@ -997,6 +997,7 @@ def validate_sort_fields(sort_fields: str):
     # Create sort specification
     sort_spec: Tuple = tuple()
     for name in sort_fields.split(","):
+        name = name.strip()
         descending = False
         if name.startswith("-"):
             name = name[1:]
