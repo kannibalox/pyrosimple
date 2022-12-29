@@ -84,3 +84,11 @@ available utilities.
   rtcontrol // --exec "d.directory.set={{item.directory}}/{{item.custom_target_folder}}"
   rtcontrol --exec "event.download.finished=" loaded=-10i done=100
   ```
+
+## `pyrotorque`
+
+* All job classes have been moved under the `pyrosimple.job`
+  submodule. Specifically, `pyrocore.torrent.watch:QueueManager` is
+  now `pyrocore.job.queue:QueueManager` and
+  `pyrocore.torrent.watch:TreeWatch` is now
+  `pyrocore.job.watch:TreeWatch`
