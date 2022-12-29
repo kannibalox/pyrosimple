@@ -74,6 +74,13 @@ class QueueManager(MatchableJob):
             self.config["start_at_once"],
             self.config["downloading_min"] - len(downloading),
         )
+        if self.allowed_start_count <= 0:
+            self.log.debug("Skipping start due to allowed start count reached")
+        if self.downloading_count >= self.config["downloading_max"]:
+            self.log.debug(
+                "Skipping start due to maximum downloading torrents %d reached",
+                self.config["downloading_max"],
+            )
         self.log.debug("Starting torrents (capped at %d)", self.allowed_start_count)
         # Run parent method
         super().run()
@@ -104,12 +111,3 @@ class QueueManager(MatchableJob):
         self.downloading_count += 1
         self.allowed_start_count -= 1
         self.last_start = time.time()
-        # These should only be logged once to prevent spam, hence the
-        # duplicate conditionals
-        if self.allowed_start_count <= 0:
-            self.log.debug("Finished starting torrents: allowed start count reached")
-        if self.downloading_count >= self.config["downloading_max"]:
-            self.log.debug(
-                "Finished starting torrents: maximum downloading torrents %d reached",
-                self.config["downloading_max"],
-            )
