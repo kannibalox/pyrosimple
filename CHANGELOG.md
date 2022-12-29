@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.5.2] - 2022-12-29
 
 ### Added
 - `pyroadmin config`: Add `--create-config` and `--create-rtorrent-rc`
@@ -229,7 +229,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.5.1...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.5.2...HEAD
+[2.5.2]: https://github.com/kannibalox/pyrosimple/compare/v2.5.1...v2.5.2
 [2.5.1]: https://github.com/kannibalox/pyrosimple/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/kannibalox/pyrosimple/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/kannibalox/pyrosimple/compare/v2.3.3...v2.4.0
