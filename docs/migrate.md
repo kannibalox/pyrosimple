@@ -87,8 +87,16 @@ available utilities.
 
 ## `pyrotorque`
 
-* All job classes have been moved under the `pyrosimple.job`
+* All job handlers have been moved under the `pyrosimple.job`
   submodule. Specifically, `pyrocore.torrent.watch:QueueManager` is
-  now `pyrocore.job.queue:QueueManager` and
+  now `pyrosimple.job.queue:QueueManager` and
   `pyrocore.torrent.watch:TreeWatch` is now
-  `pyrocore.job.watch:TreeWatch`
+  `pyrosimple.job.watch:TreeWatch`
+* `TreeWatch`: The `queued` setting no longer has any effect. Use the
+  following configuration to achieve the same effect if desired:
+  ```toml
+  [TORQUE.watch]
+  handler = "pyrocore.job.watch:TreeWatch"
+  # ...other settings...
+  cmd_queue = "d.priority.set=0"
+  ```
