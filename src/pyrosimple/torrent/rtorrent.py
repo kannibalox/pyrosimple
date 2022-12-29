@@ -832,7 +832,7 @@ class RtorrentEngine:
                     if pre_filter:
                         # rTorrent 0.9.8+ does not have
                         # sting.contains_i, so we check for it here
-                        self.LOG.info("!!! pre-filter: %s", pre_filter or "N/A")
+                        self.LOG.debug("Created pre-filter: %s", pre_filter or "N/A")
                         if (
                             config.settings.SAFETY_CHECKS_ENABLED
                             and "string.contains_i" in pre_filter
