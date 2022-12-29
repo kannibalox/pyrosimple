@@ -14,8 +14,11 @@ class QueueManager(MatchableJob):
 
     def __init__(self, config=None):
         """Set up queue manager."""
+        # Allow usage of old field names
         if "startable" in config and "matcher" not in config:
             config["matcher"] = config["startable"]
+        if "sort_fields" in config and "sort" not in config:
+            config["sort"] = config["sort_fields"]
         super().__init__(config)
         self.last_start: int = 0
         self.downloading_count: int = 0
