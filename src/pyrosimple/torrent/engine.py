@@ -218,7 +218,6 @@ class FieldDefinition:
         else:
             self._accessor = accessor
 
-
         if name in FIELD_REGISTRY:
             raise RuntimeError("INTERNAL ERROR: Duplicate field definition")
         FIELD_REGISTRY[name] = self

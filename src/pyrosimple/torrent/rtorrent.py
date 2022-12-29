@@ -518,8 +518,7 @@ class RtorrentItem(engine.TorrentProxy):
         remote_proxy.d.start(self.hash)
         if not copy:
             proxy.d.erase(self.hash)
-            for key in self._fields.keys():
-                del self._fields[key]
+            self._fields.clear()
         return True
 
     def delete(self):

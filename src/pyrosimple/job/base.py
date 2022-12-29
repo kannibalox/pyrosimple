@@ -48,7 +48,7 @@ class MatchableJob(BaseJob):
         self.config.setdefault("view", "main")
         sort = self.config.get("sort", "name,hash")
         query_tree = matching.QueryGrammar.parse(self.config["matcher"])
-        sort_keys = [s.strip('- ') for s in sort.split(",")]
+        sort_keys = [s.strip("- ") for s in sort.split(",")]
         self.matcher = matching.create_matcher(self.config["matcher"])
         self.sort_key = rtorrent.validate_sort_fields(sort)
         self.prefetch_fields = [
