@@ -3,11 +3,15 @@
     Copyright (c) 2010 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
+import importlib.resources
 import re
 
 from datetime import datetime
 from pathlib import Path
 from xmlrpc import client as xmlrpclib
+
+from dynaconf.loaders import toml_loader
+from dynaconf.utils.boxing import DynaBox
 
 import pyrosimple
 
@@ -33,6 +37,16 @@ class AdminTool(ScriptBaseWithConfig):
         )
         config_parser.add_argument(
             "--dump-rc", help="Print out the full rTorrent config", action="store_true"
+        )
+        config_parser.add_argument(
+            "--create-config",
+            help="Create config.toml in the default location if it does not exist",
+            action="store_true",
+        )
+        config_parser.add_argument(
+            "--create-rtorrent-rc",
+            help="Create a rtorrent.rc in the default location if it does not exist",
+            action="store_true",
         )
         backfill_parser = subparsers.add_parser(
             "backfill", help="Backfill missing custom fields from available data"
@@ -224,10 +238,46 @@ class AdminTool(ScriptBaseWithConfig):
             except Exception as e:
                 self.LOG.error("Could not set tm_loaded for %s: %s", i.hash, e)
 
+    def create_config(self):
+        """Create a configuration file"""
+        config_path = Path("~/.config/pyrosimple/config.toml").expanduser()
+        if config_path.exists():
+            self.LOG.info(
+                "Pyrosimple config path %s already exists, not overwriting", config_path
+            )
+        else:
+            self.LOG.info("Creating pyrosimple config file '%s'", config_path)
+            toml_loader.write(
+                str(config_path),
+                DynaBox(pyrosimple.config.settings.as_dict()).to_dict(),
+                merge=True,
+            )
+
+    def create_rtorrent_rc(self):
+        """Create a rtorrent.rc file"""
+        rtorrent_rc_path = Path(pyrosimple.config.settings.RTORRENT_RC).expanduser()
+        if rtorrent_rc_path.exists():
+            self.LOG.info(
+                "rtorrent.rc path %s already exists, not overwriting", rtorrent_rc_path
+            )
+        else:
+            self.LOG.info("Creating rtorrent.rc at '%s'", rtorrent_rc_path)
+            home = str(Path("~").expanduser())
+            with rtorrent_rc_path.open("w", encoding="utf-8") as fh:
+                fh.write(
+                    importlib.resources.open_text("pyrosimple.data", "full-example.rc")
+                    .read()
+                    .replace("/home/USERNAME/", home)
+                )
+
     def config(self):
         """Handle the config subcommand"""
         if self.args.dump_rc:
             self.dump_rc()
+        if self.args.create_config:
+            self.create_config()
+        if self.args.create_rtorrent_rc:
+            self.create_rtorrent_rc()
         if self.args.check:
             try:
                 config.autoload_scgi_url()

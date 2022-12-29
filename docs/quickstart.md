@@ -18,10 +18,12 @@ pip install pyrosimple
 # pip install 'pyrosimple[torque]' # Optional dependencies for using pyrotorque
 ```
 
-With pyrosimple installed and rTorrent running, let's see if the
-configuration can be auto-detected:
+With pyrosimple installed and rTorrent running, let's create an basic
+configuration and see if the connection to rTorrent can be
+auto-detected:
 
 ```bash
+pyroadmin config --create-config
 pyroadmin config --check && echo "All good!"
 ```
 

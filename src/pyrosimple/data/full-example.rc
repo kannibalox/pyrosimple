@@ -1,6 +1,7 @@
 # -*- mode: conf -*-
 # Based on https://github.com/rakshasa/rtorrent/wiki/CONFIG-Template
-# and https://github.com/pyroscope/pyrocore/tree/master/src/pyrocore/data/config/rtorrent.d/, modified to be less rTorrent-PS specific and more daemon-mode friendly
+# and https://github.com/pyroscope/pyrocore/tree/master/src/pyrocore/data/config/rtorrent.d/
+# Modified to be less rTorrent-PS specific and more daemon-mode friendly
 ### Fundamentals ############################################################
 
 

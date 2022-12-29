@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+- `pyroadmin config`: Add `--create-config` and `--create-rtorrent-rc`
+  flags for setting up default config
+
 ### Fixed
 - `rtcontrol`: Fix `--prio`
 - `rtcontrol`: Allow spaces in regexes (e.g. `rtcontrol "message=/(not
