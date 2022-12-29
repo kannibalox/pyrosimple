@@ -108,10 +108,6 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             help="Open an interactive prompt to run commands",
         )
 
-        # TODO: Template with "result" object in namespace
-        # self.add_value_option("-O", "--output-template", "FORMAT",
-        #    help="pass result to a template for formatting")
-
     def open(self):
         """Open connection and return proxy."""
         if not self.proxies:

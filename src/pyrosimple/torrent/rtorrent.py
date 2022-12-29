@@ -450,9 +450,6 @@ class RtorrentItem(engine.TorrentProxy):
     def move_to_host(self, remote_url: str, copy: bool = False):
         """Migrate an item to a remote host"""
 
-        # TODO allow skipping fast resume (which requires local access to FS)
-        # FIXME invalidate all self-cached items after sending
-
         # TODO Generalize this overriding of query parameters
         parsed_url = urllib.parse.urlsplit(remote_url)
         queries = urllib.parse.parse_qs(parsed_url.query)
@@ -461,6 +458,7 @@ class RtorrentItem(engine.TorrentProxy):
         proxy = self._engine.open()
         self._engine.LOG.debug("Attempting to move %s to %s", self.hash, remote_url)
         extra_cmds: List[str] = []
+        # Check if hash already exists remotely
         try:
             remote_proxy.d.hash(self.hash)
         except rpc.HashNotFound:
@@ -469,7 +467,8 @@ class RtorrentItem(engine.TorrentProxy):
             raise error.EngineError(
                 f"Hash {self.hash} already exists remotely on {remote_url}"
             )
-        # This might be brittle for systems that have a low network.xmlrpc.size_limit but large torrents.
+        # This might be brittle for systems that have a low
+        # network.xmlrpc.size_limit but large torrents.
         torrent_path = Path(proxy.session.path(), f"{self.hash}.torrent")
         torrent = metafile.Metafile(
             bencode.decode(
@@ -506,9 +505,9 @@ class RtorrentItem(engine.TorrentProxy):
         # After 5 seconds, let the exception happen
         remote_proxy.d.hash(self.hash)
 
-        # Keep custom values
-        # Trying to load these in during the load.raw tends to cause either the load to fail
-        # or the values to get corrupted, even for simple values.
+        # Keep custom values. Trying to load these in during the
+        # load.raw tends to cause either the load to fail or the
+        # values to get corrupted, even for simple values.
         for k, v in self.custom_items().items():
             remote_proxy.d.custom.set(self.hash, k, v)
         for key in range(1, 5):
@@ -519,6 +518,8 @@ class RtorrentItem(engine.TorrentProxy):
         remote_proxy.d.start(self.hash)
         if not copy:
             proxy.d.erase(self.hash)
+            for key in self._fields.keys():
+                del self._fields[key]
         return True
 
     def delete(self):
