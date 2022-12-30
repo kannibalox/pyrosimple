@@ -47,6 +47,7 @@ class TreeWatch(BaseJob):
         for key, val in self.config.items():
             if key.startswith("cmd_"):
                 self.custom_cmds[key] = val
+        self.engine.open()
         if self.config["start_immediately"]:
             self.run()
 
