@@ -216,7 +216,7 @@ class TreeWatch(BaseJob):
                     self.log.info("%r", event)
                 # InotifyTrees subscribes to more events than we care
                 # about, so we re-filter here.
-                if header.mask & self.mask != 0:
+                if (header.mask & self.mask) == 0:
                     continue
                 metapath = Path(path, filename)
                 self.load_metafile(metapath)
