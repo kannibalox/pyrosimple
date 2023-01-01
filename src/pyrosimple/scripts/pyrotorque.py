@@ -134,10 +134,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         """
         for _, cls in self.classes.items():
-            if (
-                hasattr(cls, "cleanup")
-                and callable(cls.cleanup)
-            ):
+            if hasattr(cls, "cleanup") and callable(cls.cleanup):
                 cls.cleanup()
 
     def reload_jobs(self):

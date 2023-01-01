@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- `pyrotorque`: For `RtorrentExporter`, scrape on the job schedule
+  instead of the actual http call. This helps prevent both slow scrapes
+  from stacking up, and duplicate RPC calls when being scraped by
+  multiple prometheuses.
+  
 ## [2.5.3] - 2022-12-29
 
 ### Fixed
