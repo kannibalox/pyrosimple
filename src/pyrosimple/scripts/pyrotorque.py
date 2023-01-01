@@ -35,6 +35,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
     RUNTIME_DIR = os.getenv("XDG_RUNTIME_DIR") or "~/.pyrosimple/run/"
 
+    def __init__(self, *args, **kwargs):
+        self.classes = {}
+        super().__init__(*args, **kwargs)
+
     def add_options(self):
         """Add program options."""
         super().add_options()
@@ -101,7 +105,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             if self.options.dry_run:
                 self.jobs[name]["dry_run"] = True
             if params.get("active", True):
-                self.jobs[name]["handler"] = pymagic.import_name(params.handler)
+                self.jobs[name]["__handler"] = pymagic.import_name(params.handler)
             self.jobs[name]["schedule"] = self.parse_schedule(params.get("schedule"))
 
     def add_jobs(self):
@@ -109,13 +113,32 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         for name, params in self.jobs.items():
             if params.get("active", True):
                 params.setdefault("__job_name", name)
+                # Keep track of the instantiated class for cleanup later
+                self.classes[name] = params["__handler"](params)
                 self.sched.add_job(
-                    params["handler"](params).run,
+                    self.classes[name].run,
                     name=name,
                     id=name,
                     trigger="cron",
                     **params["schedule"],
                 )
+                print(self.jobs[name])
+
+    def unload_jobs(self):
+        """Allows jobs classes to clean up any global resources if the
+        cleanup() method exists.
+
+        This should be called only once the jobs have finished
+        running, so that a successive run doesn't re-create the
+        resources.
+
+        """
+        for _, cls in self.classes.items():
+            if (
+                hasattr(cls, "cleanup")
+                and callable(cls.cleanup)
+            ):
+                cls.cleanup()
 
     def reload_jobs(self):
         """Reload the configured jobs gracefully."""
@@ -124,11 +147,16 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             if self.running_config != dict(config.settings.TORQUE):
                 self.LOG.info("Config change detected, reloading jobs")
                 self.validate_config()
+                self.sched.pause()
                 self.sched.remove_all_jobs()
+                self.unload_jobs()
+                self.sched.resume()
                 self.add_jobs()
                 self.running_config = dict(config.settings.TORQUE)
         except (Exception) as exc:  # pylint: disable=broad-except
-            self.LOG.error("Error while checking config: %s", exc)
+            self.LOG.error("Error while reloading config: %s", exc)
+        else:
+            self.sched.resume()
 
     def run_forever(self):
         """Run configured jobs until termination request."""
@@ -140,6 +168,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     self.reload_jobs()
             except KeyboardInterrupt as exc:
                 self.LOG.info("Termination request received (%s)", exc)
+                self.sched.shutdown()
+                self.unload_jobs()
                 break
             except SystemExit as exc:
                 self.return_code = exc.code or 0
@@ -207,8 +237,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             params = self.jobs[self.options.run_once]
             if self.options.dry_run:
                 params["dry_run"] = True
-            params["handler_copy"] = params.get("handler")(params)
-            params["handler_copy"].run()
+            params["__handler_copy"] = params.get("__handler")(params)
+            params["__handler_copy"].run()
             sys.exit(0)
 
         dcontext = DaemonContext(
