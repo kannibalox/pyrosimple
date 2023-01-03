@@ -104,7 +104,7 @@ class RtorrentItem(engine.TorrentProxy):
         except rpc.ERRORS as exc:
             raise error.EngineError(
                 f"While {command} torrent {self._fields['hash']}: {exc}"
-            )
+            ) from exc
 
     def _get_files(self, attrs: Optional[List[str]] = None):
         """Get a list of all files in this download; each entry has the
