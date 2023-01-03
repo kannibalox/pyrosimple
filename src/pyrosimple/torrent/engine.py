@@ -746,7 +746,7 @@ def generate_custom_field(name: str) -> FieldDefinition:
     if len(custom_name) == 1 and custom_name in "12345":
 
         def accessor(obj):  # pylint: disable=function-redefined
-            return obj.rpc_call("d.custom", [custom_name])
+            return obj.rpc_call(f"d.custom{custom_name}")
 
         description = f"custom{custom_name}"
         requires = [f"d.custom{custom_name}"]
