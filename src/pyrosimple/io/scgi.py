@@ -61,8 +61,6 @@ class RTorrentTransport(xmlrpclib.Transport):
 class SSHTransport(RTorrentTransport):
     """Transport via SSH conneection."""
 
-    label = "ssh"
-
     def request(self, host, handler, request_body, verbose=False):
         request_counter.inc()
         request_size_counter.inc(len(request_body))
@@ -106,8 +104,6 @@ class HTTPTransport(RTorrentTransport):
 
 class TCPTransport(RTorrentTransport):
     """Transport via TCP socket."""
-
-    name = "tcp"
 
     def request(self, host, handler, request_body, verbose=False):
         request_counter.inc()
