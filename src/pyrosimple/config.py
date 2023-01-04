@@ -201,7 +201,7 @@ def load_custom_py():
             # pylint: disable=exec-used
             exec(handle.read())
     else:
-        log.debug("Configuration file '%s' not found!", config_file)
+        log.debug("Configuration file '%s' not found.", config_file)
 
 
 def lookup_connection_alias(url: str) -> str:
