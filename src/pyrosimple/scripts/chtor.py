@@ -134,7 +134,6 @@ class MetafileChanger(ScriptBase):
             "URL",
             help="set a new announce URL on ALL given metafiles",
         )
-        self.add_bool_option("--no-ssl", help="force announce URL to 'http'")
         self.add_bool_option(
             "--no-cross-seed",
             help="when using --reannounce-all, do not add a non-standard field to the info dict ensuring unique info hashes",
@@ -155,7 +154,6 @@ class MetafileChanger(ScriptBase):
         if 1 < sum(
             bool(i)
             for i in (
-                self.options.no_ssl,
                 self.options.reannounce,
                 self.options.reannounce_all,
             )
@@ -303,13 +301,6 @@ class MetafileChanger(ScriptBase):
                         torrent["info"]["x_cross_seed"] = hashlib.md5(
                             self.options.reannounce.encode()
                         ).hexdigest()
-                if self.options.no_ssl:
-                    # We're assuming here the same (default) port is used
-                    torrent["announce"] = (
-                        torrent["announce"]
-                        .replace("https://", "http://")
-                        .replace(":443/", ":80/")
-                    )
 
                 # Change comment or creation date?
                 if self.options.comment is not None:
