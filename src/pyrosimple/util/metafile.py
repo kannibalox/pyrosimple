@@ -21,6 +21,7 @@ from typing import (
     Generator,
     List,
     Optional,
+    Pattern,
     Sequence,
     Set,
     Tuple,
@@ -74,7 +75,7 @@ class PieceLogger:
     """Holds some state to display useful error messages
     if pieces fail to hash check"""
 
-    def __init__(self, meta, logger=None):
+    def __init__(self, meta: Dict, logger=None):
         self.piece_index = 0
         self.meta = meta
         if logger is None:
@@ -154,7 +155,7 @@ class Metafile(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log = pymagic.get_class_logger(self)
-        self.ignore = []
+        self.ignore: List[Pattern] = []
 
     def check_info(self) -> None:
         """Validate info dict.
@@ -234,8 +235,9 @@ class Metafile(dict):
         """Return info hash as a string."""
         return hashlib.sha1(bencode.encode(self["info"])).hexdigest().upper()
 
-    def walk(self, datapath: Path) -> Generator[Path, None, None]:
+    def walk(self, datapath: os.PathLike) -> Generator[Path, None, None]:
         """Generate paths from "datapath", ignoring files/dirs as necessary"""
+        datapath = Path(datapath)
         if datapath.is_dir():
             # Walk the directory tree. `path.rglob` is not suitable
             # here due to how the blacklisting happens
@@ -253,9 +255,9 @@ class Metafile(dict):
             if not any(pattern.match(str(datapath)) for pattern in self.ignore):
                 yield Path(datapath)
 
-    def _calc_size(self, datapath) -> int:
+    def _calc_size(self, datapath: os.PathLike) -> int:
         """Get total size of a path."""
-        return sum(os.path.getsize(filename) for filename in self.walk(datapath))
+        return sum(os.path.getsize(filename) for filename in self.walk(Path(datapath)))
 
     def _make_info(
         self,
@@ -427,9 +429,10 @@ class Metafile(dict):
                 else:
                     namespace[keypath[-1]] = val
 
-    def add_fast_resume(self, datapath: Path) -> None:
+    def add_fast_resume(self, datapath: os.PathLike) -> None:
         """Add fast resume data to a metafile dict."""
         # Get list of files
+        datapath = Path(datapath)
         files = self["info"].get("files", None)
         if not self.is_multi_file:
             if datapath.is_dir():
@@ -491,16 +494,17 @@ class Metafile(dict):
 
     def _make_meta(
         self,
-        datapath: Path,
+        datapath: os.PathLike,
         tracker_url: str,
-        root_name: str,
         private: bool,
+        root_name: Optional[str] = None,
         progress: Optional[Callable[[int, int], None]] = None,
         piece_size: int = 0,
         piece_size_min: int = 2**15,
         piece_size_max: int = 2**24,
     ) -> Tuple[Dict, int]:
         """Create torrent dictionary from a file path."""
+        datapath = Path(datapath)
         if piece_size <= 0:
             # Calculate a good size for the data
             piece_size_exp = int(math.log(self._calc_size(datapath)) / math.log(2)) - 9
@@ -565,15 +569,15 @@ class Metafile(dict):
 
     @staticmethod
     def from_path(
-        datapath,
-        tracker_url,
-        comment=None,
-        root_name=None,
-        created_by=None,
+        datapath: os.PathLike,
+        tracker_url: str,
+        comment: Optional[str] = None,
+        root_name: Optional[str] = None,
+        created_by: Optional[str] = None,
         private: bool = False,
         no_date: bool = False,
-        progress=None,
-        ignore=None,
+        progress: Optional[Callable] = None,
+        ignore: Optional[List[Pattern]] = None,
         piece_size: int = 0,
         piece_size_min: int = 2**15,
         piece_size_max: int = 2**24,
@@ -582,15 +586,16 @@ class Metafile(dict):
         Returns the last metafile dict that was written (as an object, not bencoded).
         """
         # Lookup announce URLs from config file
+        datapath = Path(datapath)
         torrent = Metafile()
         if ignore:
             torrent.ignore = ignore
         try:
             if urllib.parse.urlparse(tracker_url).scheme:
-                tracker_alias = (
+                tracker_split = (
                     urllib.parse.urlparse(tracker_url).netloc.split(":")[0].split(".")
                 )
-                tracker_alias = tracker_alias[-2 if len(tracker_alias) > 1 else 0]
+                tracker_alias = tracker_split[-2 if len(tracker_split) > 1 else 0]
             else:
                 from pyrosimple import config  # pylint: disable=import-outside-toplevel
 
@@ -604,8 +609,8 @@ class Metafile(dict):
         meta, _ = torrent._make_meta(
             datapath,
             tracker_url,
-            root_name,
             private,
+            root_name,
             progress,
             piece_size,
             piece_size_min,
@@ -622,7 +627,10 @@ class Metafile(dict):
         return Metafile(meta)
 
     def hash_check(
-        self, datapath: Path, progress_callback=None, piece_callback=None
+        self,
+        datapath: Path,
+        progress_callback: Optional[Callable] = None,
+        piece_callback: Optional[Callable] = None,
     ) -> bool:
         """Check piece hashes of a metafile against the given datapath."""
 
