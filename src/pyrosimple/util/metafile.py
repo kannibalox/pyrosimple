@@ -591,15 +591,10 @@ class Metafile(dict):
         if ignore:
             torrent.ignore = ignore
         try:
-            if urllib.parse.urlparse(tracker_url).scheme:
-                tracker_split = (
-                    urllib.parse.urlparse(tracker_url).netloc.split(":")[0].split(".")
-                )
-                tracker_alias = tracker_split[-2 if len(tracker_split) > 1 else 0]
-            else:
+            if not urllib.parse.urlparse(tracker_url).scheme:
                 from pyrosimple import config  # pylint: disable=import-outside-toplevel
 
-                tracker_alias, tracker_url = config.lookup_announce_url(tracker_url)
+                _alias, tracker_url = config.lookup_announce_url(tracker_url)
                 tracker_url = tracker_url[0]
         except (KeyError, IndexError) as exc:
             raise error.UserError(
