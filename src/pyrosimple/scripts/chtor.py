@@ -7,6 +7,8 @@
 import copy
 import hashlib
 import os
+import logging
+import sys
 import re
 import time
 import urllib.parse
@@ -120,6 +122,12 @@ class MetafileChanger(ScriptBase):
             "DATAPATH",
             help="add libtorrent fast-resume information (use {} in place of the torrent's name in DATAPATH)",
         )
+        self.add_value_option(
+            "-c",
+            "--check-data",
+            "PATH",
+            help="check the hash against the data in the given path before making any changes",
+        )
         # TODO: chtor --tracker
         ##self.add_value_option("-T", "--tracker", "DOMAIN",
         ##    help="filter given torrents for a tracker domain")
@@ -222,6 +230,34 @@ class MetafileChanger(ScriptBase):
                 # Check metafile integrity
                 try:
                     torrent.check_meta()
+                    if self.options.check_data:
+                        # pylint: disable=import-outside-toplevel
+                        from pyrosimple.util.metafile import PieceLogger
+                        from pyrosimple.util.ui import HashProgressBar
+
+                        with HashProgressBar() as pb:
+                            if (
+                                logging.getLogger().isEnabledFor(logging.WARNING)
+                                and sys.stdout.isatty()
+                            ):
+                                progress_callback = pb().progress_callback
+                            else:
+                                progress_callback = None
+
+                            piece_logger = PieceLogger(torrent, self.LOG)
+
+                            data_correct = torrent.hash_check(
+                                Path(self.options.check_data),
+                                progress_callback=progress_callback,
+                                piece_callback=piece_logger.check_piece,
+                            )
+                        if not data_correct:
+                            self.LOG.error(
+                                "File %s does match data from %s",
+                                filename,
+                                self.options.check_data,
+                            )
+                            sys.exit(error.EX_DATAERR)
                 except ValueError as exc:
                     self.LOG.warning(
                         "Metafile %r failed integrity check: %s",
