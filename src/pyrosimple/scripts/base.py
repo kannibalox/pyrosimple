@@ -14,7 +14,7 @@ import time
 import traceback
 
 from argparse import ArgumentParser
-from typing import Iterator, List
+from typing import List
 
 import shtab
 
@@ -245,28 +245,8 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
         # pylint: enable=import-outside-toplevel
 
         if self.options.url:
-            config.settings["SCGI_URL"] = self.lookup_connection_alias(self.options.url)
+            config.settings["SCGI_URL"] = config.lookup_connection_alias(
+                self.options.url
+            )
         config.load_custom_py()
         self.engine = rtorrent.RtorrentEngine()
-
-    def lookup_connection_alias(self, url: str) -> str:
-        """Convert a connection alias to the actual URL (if set in the config"""
-        from pyrosimple import config  # pylint: disable=import-outside-toplevel
-
-        if url in config.settings["CONNECTIONS"]:
-            return str(config.settings["CONNECTIONS"][url])
-        return url
-
-    def multi_connection_lookup(self, url: str) -> Iterator[str]:
-        """Return a list of host URLs.
-
-        This is separate from lookup_connection_alias due to scripts needing to be written specifically
-        to handle this"""
-        from pyrosimple import config  # pylint: disable=import-outside-toplevel
-
-        val = config.settings["CONNECTIONS"].get(url, [url])
-        if isinstance(val, list):
-            for v in val:
-                yield self.lookup_connection_alias(v)
-        else:
-            yield self.lookup_connection_alias(val)

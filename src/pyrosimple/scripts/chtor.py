@@ -6,10 +6,10 @@
 
 import copy
 import hashlib
-import os
 import logging
-import sys
+import os
 import re
+import sys
 import time
 import urllib.parse
 

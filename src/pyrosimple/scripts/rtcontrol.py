@@ -709,7 +709,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Find matching torrents
         engines = {}
-        for url in self.multi_connection_lookup(
+        for url in config.multi_connection_lookup(
             self.options.url or config.settings["SCGI_URL"]
         ):
             engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
@@ -838,7 +838,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                             continue
                         # Look up aliases when moving to a host
                         if action_name == "move to host":
-                            args[0] = self.lookup_connection_alias(args[0])
+                            args[0] = config.lookup_connection_alias(args[0])
                         getattr(item, action["method"])(*args)
                         if self.options.view_only:
                             show_in_client = functools.partial(
