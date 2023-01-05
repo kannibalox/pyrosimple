@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `chtor`: Added `--check-data` flag to allow checking data before
+  making any changes, e.g. `chtor --check-data <dir> --fast-resume
+  <dir>` to allow fully hash checking a torrent prior to it being
+  added to rTorrent.
+
+### Removed
+- `chtor`: Removed `--no-ssl` flag.
+
 ## [2.5.4]
 
 ### Fixed

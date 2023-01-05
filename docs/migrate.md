@@ -100,3 +100,7 @@ available utilities.
   # ...other settings...
   cmd_queue = "d.priority.set=0"
   ```
+## `chtor`
+
+* The `--no-ssl` flag has been removed. Manually specifying a non-SSL
+  announce still works as expected.
