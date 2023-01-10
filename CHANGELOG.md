@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `rtcontrol`: Allow handling more `d.*` commands with the `d_NAME` fields.
+
 ### Added
 - `chtor`: Added `--check-data` flag to allow checking data before
   making any changes, e.g. `chtor --check-data <dir> --fast-resume

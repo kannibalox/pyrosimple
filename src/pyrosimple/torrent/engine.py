@@ -804,6 +804,20 @@ def generate_guessit_field(name: str) -> Optional[FieldDefinition]:
 def generate_d_call(name: str) -> Optional[FieldDefinition]:
     """Create fields for arbitrary d.* commands"""
     call_name = "d." + name[2:]
+    if call_name in {
+        "d.up_rate",
+        "d.up_total",
+        "d.down_rate",
+        "d.down_total",
+        "d.skip_rate",
+        "d.skip_total",
+        "d.group_name",
+        "d.custom_keys",
+        "d.custom_items",
+        "d.views_has",
+        "d.down_sequential",
+    }:
+        call_name = call_name.replace('_', '.')
     return DynamicField(
         str,
         name,
