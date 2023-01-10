@@ -159,15 +159,9 @@ class MetafileChanger(ScriptBase):
             self.parser.error("No metafiles given, nothing to do!")
             self.parser.exit()
 
-        if 1 < sum(
-            bool(i)
-            for i in (
-                self.options.reannounce,
-                self.options.reannounce_all,
-            )
-        ):
+        if self.options.reannounce and self.options.reannounce_all:
             self.parser.error(
-                "Conflicting options --no-ssl, --reannounce and --reannounce-all!"
+                "Conflicting options --reannounce and --reannounce-all!"
             )
 
         # Set filter criteria for metafiles
