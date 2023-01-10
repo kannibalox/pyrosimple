@@ -4,7 +4,8 @@
 
 ### Changed
 
-- `rtcontrol`: Allow handling more `d.*` commands with the `d_NAME` fields.
+- `rtcontrol`: Allow handling more `d.*` commands with the `d_NAME`
+  fields.
 
 ### Added
 - `chtor`: Added `--check-data` flag to allow checking data before
@@ -51,12 +52,14 @@
 - `rtcontrol`: Added `d_<call name>` field for arbitrary rpc calls. As
   an example, to show the
   [`d.creation_date`](https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-creation-date)
-  of all torrent with connected peers (`d.connected_peers`), you can
-  now run `rtcontrol d_peers_connected=1 -o d_creation_date`. Note
-  that the built-in fields are still recommended due to the advanced
-  filtering and output capabilities (currently all `d_<call name>`
-  fields are treated as strings). There are also some commands that
-  will work under the `d_<call name>` system, such as `d.skip.rate`.
+  of all torrent with connected peers
+  ([`d.peers_connected`](https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-peers-connected)),
+  you can now run `rtcontrol d_peers_connected=1 -o
+  d_creation_date`. Note that the built-in fields are still
+  recommended due to the advanced filtering and output capabilities
+  (currently all `d_<call name>` fields are treated as strings). There
+  are also some commands that will work under the `d_<call name>`
+  system, such as `d.skip.rate`.
 
 ### Fixed
 - Dynamically generate timestamps during the filtering process. For
