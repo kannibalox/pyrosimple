@@ -270,3 +270,12 @@ def rpc_result_to_string(result) -> str:
             i if isinstance(i, str) else pformat(i, width=240) for i in result
         )
     return repr(result)
+
+
+class BencodeJSONEncoder(json.JSONEncoder):
+    """Small helper class to translate bytes"""
+
+    def default(self, o):
+        if isinstance(o, bytes):
+            return o.hex().upper()
+        return super().default(o)

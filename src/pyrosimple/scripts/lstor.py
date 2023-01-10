@@ -4,7 +4,6 @@
 """
 
 import hashlib
-import json
 import logging
 import sys
 
@@ -117,20 +116,16 @@ class MetafileLister(ScriptBase):
                 listing = None
 
                 if self.options.raw:
+                    from pyrosimple.util.fmt import (  # pylint: disable=import-outside-toplevel
+                        BencodeJSONEncoder,
+                    )
+
                     if not self.options.reveal and "info" in torrent:
                         # Shorten useless binary piece hashes
                         torrent["info"]["pieces"] = "<%d piece hashes>" % (
                             len(torrent["info"]["pieces"])
                             / len(hashlib.sha1().digest())
                         )
-
-                    class BencodeJSONEncoder(json.JSONEncoder):
-                        """Small helper class to translate bytes"""
-
-                        def default(self, o):
-                            if isinstance(o, bytes):
-                                return o.hex().upper()
-                            return super().default(o)
 
                     listing = BencodeJSONEncoder(indent=2).encode(torrent)
                 elif self.options.output:

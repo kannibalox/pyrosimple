@@ -7,7 +7,6 @@
 import copy
 import difflib
 import hashlib
-import json
 import logging
 import os
 import re
@@ -54,13 +53,9 @@ def diff_metafiles(
 ) -> List[str]:
     """Return a git-style diff between two metafiles"""
 
-    class BencodeJSONEncoder(json.JSONEncoder):
-        """Small helper class to translate bytes"""
-
-        def default(self, o):
-            if isinstance(o, bytes):
-                return o.hex().upper()
-            return super().default(o)
+    from pyrosimple.util.fmt import (  # pylint: disable=import-outside-toplevel
+        BencodeJSONEncoder,
+    )
 
     def encode_meta(meta: metafile.Metafile) -> List[str]:
         """Sanitize and modify meta for better diffing"""
