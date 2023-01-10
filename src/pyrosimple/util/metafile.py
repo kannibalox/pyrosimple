@@ -125,8 +125,9 @@ class Metafile(dict):
     """A torrent metafile, representing structure and operations for a .torrent file."""
 
     @staticmethod
-    def from_file(filename: Path):
+    def from_file(filename: os.PathLike):
         """Load a metafile directly from a file."""
+        filename = Path(filename)
         with filename.open("rb") as handle:
             raw_data = handle.read()
         return Metafile(bencode.decode(raw_data))

@@ -817,7 +817,7 @@ def generate_d_call(name: str) -> Optional[FieldDefinition]:
         "d.views_has",
         "d.down_sequential",
     }:
-        call_name = call_name.replace('_', '.')
+        call_name = call_name.replace("_", ".")
     return DynamicField(
         str,
         name,

@@ -6,12 +6,15 @@
 
 - `rtcontrol`: Allow handling more `d.*` commands with the `d_NAME`
   fields.
+- `chtor`: Only modify existing files if changes have been made
 
 ### Added
 - `chtor`: Added `--check-data` flag to allow checking data before
   making any changes, e.g. `chtor --check-data <dir> --fast-resume
   <dir>` to allow fully hash checking a torrent prior to it being
   added to rTorrent.
+- `chtor`: Added `--diff` flag to show any changes being made. It can
+  also be combined with `--dry-run` to preview changes.
 
 ### Removed
 - `chtor`: Removed `--no-ssl` flag.

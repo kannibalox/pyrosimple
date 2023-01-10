@@ -5,7 +5,9 @@
 
 
 import copy
+import difflib
 import hashlib
+import json
 import logging
 import os
 import re
@@ -14,7 +16,7 @@ import time
 import urllib.parse
 
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional, cast
 
 import bencode  # typing: ignore
 
@@ -44,6 +46,39 @@ def replace_fields(meta, patterns):
     return meta
 
 
+def diff_metafiles(
+    meta1: metafile.Metafile,
+    meta2: metafile.Metafile,
+    meta1_name="old",
+    meta2_name="new",
+) -> List[str]:
+    """Return a git-style diff between two metafiles"""
+
+    class BencodeJSONEncoder(json.JSONEncoder):
+        """Small helper class to translate bytes"""
+
+        def default(self, o):
+            if isinstance(o, bytes):
+                return o.hex().upper()
+            return super().default(o)
+
+    def encode_meta(meta: metafile.Metafile) -> List[str]:
+        """Sanitize and modify meta for better diffing"""
+        meta_dict = meta.dict_copy()
+        if "info" in meta_dict and "pieces" in meta_dict["info"]:
+            meta_dict["info"][
+                "pieces"
+            ] = f'{len(meta_dict["info"]["pieces"])//20} pieces, md5 hash {hashlib.md5(meta_dict["info"]["pieces"]).hexdigest()}'
+
+        return [
+            l + "\n" for l in BencodeJSONEncoder(indent=2).encode(meta_dict).split("\n")
+        ]
+
+    meta1_out = encode_meta(meta1)
+    meta2_out = encode_meta(meta2)
+    return list(difflib.unified_diff(meta1_out, meta2_out, meta1_name, meta2_name))
+
+
 class MetafileChanger(ScriptBase):
     """Change attributes of a bittorrent metafile."""
 
@@ -61,6 +96,10 @@ class MetafileChanger(ScriptBase):
             "-n",
             "--dry-run",
             help="don't write changes to disk, just tell what would happen",
+        )
+        self.add_bool_option(
+            "--diff",
+            help="display a diff for each change being made",
         )
         self.add_bool_option(
             "-V",
@@ -160,9 +199,7 @@ class MetafileChanger(ScriptBase):
             self.parser.exit()
 
         if self.options.reannounce and self.options.reannounce_all:
-            self.parser.error(
-                "Conflicting options --reannounce and --reannounce-all!"
-            )
+            self.parser.error("Conflicting options --reannounce and --reannounce-all!")
 
         # Set filter criteria for metafiles
         filter_url_prefix: Optional[str] = None
@@ -227,14 +264,19 @@ class MetafileChanger(ScriptBase):
                     if self.options.check_data:
                         # pylint: disable=import-outside-toplevel
                         from pyrosimple.util.metafile import PieceLogger
-                        from pyrosimple.util.ui import HashProgressBar
+                        from pyrosimple.util.ui import (
+                            HashProgressBar,
+                            HashProgressBarCounter,
+                        )
 
                         with HashProgressBar() as pb:
                             if (
                                 logging.getLogger().isEnabledFor(logging.WARNING)
                                 and sys.stdout.isatty()
                             ):
-                                progress_callback = pb().progress_callback
+                                progress_callback = cast(
+                                    HashProgressBarCounter, pb()
+                                ).progress_callback
                             else:
                                 progress_callback = None
 
@@ -378,6 +420,13 @@ class MetafileChanger(ScriptBase):
                             self.LOG.info("Writing '%s'...", filename)
                             bencode.bwrite(torrent, filename)
                 else:
+                    current_torrent = metafile.Metafile.from_file(filename)
+                    diff = diff_metafiles(current_torrent, torrent, filename)
+                    if self.options.diff:
+                        sys.stdout.writelines(diff)
+                    if not diff:
+                        self.LOG.info("No change to file %r", filename)
+                        continue
                     self.LOG.info("Changing %r...", filename)
 
                     if not self.options.dry_run:
