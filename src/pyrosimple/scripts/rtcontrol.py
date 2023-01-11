@@ -28,12 +28,16 @@ def print_help_fields():
 
     # Mock entries, so they fulfill the expectations towards a field definition
     def custom_manifold():
-        "named rTorrent custom attribute, e.g. 'custom_completion_target'"
+        "rTorrent custom value from KEY, e.g. 'custom_completion_target'"
         return ("custom_KEY", custom_manifold)
 
     def kind_manifold():
-        "file types that contribute at least N% to the item's total size"
+        "file types that contribute at least N% to the item's total size, e.g. 'kind_50'"
         return ("kind_N", kind_manifold)
+
+    def d_manifold():
+        "call an arbiratry item method, e.g. 'd_session_file'"
+        return ("d_METHOD", d_manifold)
 
     print("")
     print("Fields are:")
@@ -46,6 +50,7 @@ def print_help_fields():
                     + [
                         custom_manifold(),
                         kind_manifold(),
+                        d_manifold(),
                     ]
                 )
             ]
