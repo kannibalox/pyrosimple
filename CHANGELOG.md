@@ -7,6 +7,8 @@
 - `rtcontrol`: Allow handling more `d.*` commands with the `d_NAME`
   fields.
 - `chtor`: Only modify existing files if changes have been made
+- `chtor`: `--reannounce` now matches based on aliases/TLDs (which
+  matches `--tracker`'s behavior)
 
 ### Added
 - `chtor`: Added `--check-data` flag to allow checking data before
@@ -15,6 +17,9 @@
   added to rTorrent.
 - `chtor`: Added `--diff` flag to show any changes being made. It can
   also be combined with `--dry-run` to preview changes.
+- `chtor`: Added `--tracker/-T` flag to enable filtering by
+  tracker. This also works with
+  [aliases](https://kannibalox.github.io/pyrosimple/configuration/#aliases).
 
 ### Removed
 - `chtor`: Removed `--no-ssl` flag.

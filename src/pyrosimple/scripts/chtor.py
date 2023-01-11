@@ -162,9 +162,12 @@ class MetafileChanger(ScriptBase):
             "PATH",
             help="check the hash against the data in the given path before making any changes",
         )
-        # TODO: chtor --tracker
-        ##self.add_value_option("-T", "--tracker", "DOMAIN",
-        ##    help="filter given torrents for a tracker domain")
+        self.add_value_option(
+            "-T",
+            "--tracker",
+            "DOMAIN",
+            help="filter given torrents for a tracker domain",
+        )
         self.add_value_option(
             "-a",
             "--reannounce",
@@ -199,24 +202,17 @@ class MetafileChanger(ScriptBase):
         # Set filter criteria for metafiles
         filter_url_prefix: Optional[str] = None
         if self.options.reannounce:
-            # <scheme>://<netloc>/<path>?<query>
-            split_url = urllib.parse.urlsplit(
-                self.options.reannounce, allow_fragments=False
-            )
-            filter_url_prefix = urllib.parse.urlunsplit(
-                (
-                    split_url.scheme,
-                    split_url.netloc,
-                    "/",
-                    "",
-                    "",
-                )
-            )
+            filter_url_prefix = config.map_announce2alias(self.options.reannounce)
             self.LOG.info(
-                "Filtering for metafiles with announce URL prefix %r...",
+                "Filtering for metafiles with announce URL %r...",
                 filter_url_prefix,
             )
-
+        elif self.options.tracker:
+            filter_url_prefix = config.map_announce2alias(self.options.tracker)
+            self.LOG.info(
+                "Filtering for metafiles with tracker %r...",
+                filter_url_prefix,
+            )
         if self.options.reannounce_all:
             self.options.reannounce = self.options.reannounce_all
         else:
@@ -299,8 +295,10 @@ class MetafileChanger(ScriptBase):
                         continue
 
                 # Skip any metafiles that don't meet the pre-conditions
-                if filter_url_prefix and not torrent["announce"].startswith(
+                if (
                     filter_url_prefix
+                    and config.map_announce2alias(torrent["announce"])
+                    != filter_url_prefix
                 ):
                     self.LOG.info(
                         "Skipping metafile %r: not tracked by %r!",
