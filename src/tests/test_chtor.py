@@ -3,9 +3,9 @@ from pathlib import Path
 import pytest
 
 from pyrosimple.scripts.base import ScriptBase
+from pyrosimple.scripts.chtor import MetafileChanger
 from pyrosimple.scripts.lstor import MetafileLister
 from pyrosimple.scripts.mktor import MetafileCreator
-from pyrosimple.scripts.chtor import MetafileChanger
 from pyrosimple.util.metafile import Metafile
 
 
@@ -30,6 +30,16 @@ from pyrosimple.util.metafile import Metafile
             ["--reannounce-all", "http://example.org/announce.php/new_test"],
             ["announce"],
             "http://example.org/announce.php/new_test",
+        ),
+        (
+            ["-s", "test=foo", "-T", "http://example.com"],
+            ["test"],
+            "foo",
+        ),
+        (
+            ["-s", "test=foo", "-T", "http://example.org"],
+            ["test"],
+            None,
         ),
     ],
 )
