@@ -105,6 +105,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
                 headers = [("CONTENT_TYPE", "application/json")]
             elif self.__rpc_codec == "xml":
                 codec = xmlrpclib
+                headers = [("CONTENT_TYPE", "text/xml")]
             handler = scgi.transport_from_url(url)
             transport = handler(
                 url=self.__url,

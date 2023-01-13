@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Properly set content-type headers for HTTP handler
+
 ### Changed
 
 - `rtcontrol`: Allow handling more `d.*` commands with the `d_NAME`
