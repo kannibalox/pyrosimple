@@ -13,6 +13,7 @@
 - `chtor`: Only modify existing files if changes have been made
 - `chtor`: `--reannounce` now matches based on aliases/TLDs (which
   matches `--tracker`'s behavior)
+- `rtcontrol`: Add `--erase` alias for `--delete`
 
 ### Added
 - `chtor`: Added `--check-data` flag to allow checking data before

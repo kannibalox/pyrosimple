@@ -436,6 +436,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         )
         action_group.add_argument(
             "--delete",
+            "--erase",
             action=RtorrentInteractiveAction,
             nargs=0,
             help="remove torrent (but not the data) (implies -i)",
