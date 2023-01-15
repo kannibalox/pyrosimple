@@ -492,7 +492,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                 self.options.output_format_template, item, defaults
             )
         except (NameError, ValueError, TypeError) as exc:
-            if self.LOG.isEnabledFor(logging.DEBUG):
+            if self.log.isEnabledFor(logging.DEBUG):
                 raise
             self.fatal(
                 "Trouble with formatting item %r\n\n  FORMAT = %r\n\n  REASON ="
@@ -531,7 +531,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             if callable(to_log):
                 to_log(item_text)
             else:
-                self.LOG.info(item_text)
+                self.log.info(item_text)
         elif self.options.nul:
             print(item_text, end="\0")
         else:
@@ -589,7 +589,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         result = []
         for name in rtorrent.get_fields_from_template(self.options.output_format):
             if name not in engine.FIELD_REGISTRY:
-                self.LOG.warning(
+                self.log.warning(
                     "Omitted unknown name '%s' from statistics and output format sorting",
                     name,
                 )
@@ -630,7 +630,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             sourceview.size(),
             sourceview.matcher,
         )
-        self.LOG.info("%s%s rTorrent view %r.", msg, action_name, targetname)
+        self.log.info("%s%s rTorrent view %r.", msg, action_name, targetname)
         self.engine.log(msg)
 
     def mainloop(self):
@@ -688,7 +688,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Use validate_sort_fields to pre-validate key names
         rtorrent.validate_sort_fields(",".join(key_names))
         matcher = matching.MatcherBuilder().visit(query_tree)
-        self.LOG.debug("Matcher is: %s", matcher)
+        self.log.debug("Matcher is: %s", matcher)
 
         # View handling
         if self.options.modify_view:
@@ -777,7 +777,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
             # Run actions?
             if actions:
-                self.LOG.info(
+                self.log.info(
                     "%s perform actions [%s] on %d out of %d torrents.",
                     "Would" if self.options.dry_run else "About to",
                     ",".join([a["method"] for a in actions]),
@@ -819,7 +819,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                         if answer.lower() in ["n", "no"]:
                             continue
                         if answer.lower() in ["q", "quit"]:
-                            self.LOG.warning("Qutting due to user choice!")
+                            self.log.warning("Qutting due to user choice!")
                             sys.exit(error.EX_TEMPFAIL)
                         if answer.lower() in ["a", "all"]:
                             self.options.yes = True
@@ -831,15 +831,15 @@ class RtorrentControl(ScriptBaseWithConfig):
                         self.emit(item, defaults)
 
                     if self.options.dry_run:
-                        self.LOG.debug("Would call action %s%r", action["method"], args)
+                        self.log.debug("Would call action %s%r", action["method"], args)
                     else:
                         if action_name == "call":
-                            self.LOG.debug("Calling '%s' with a shell", args[0])
+                            self.log.debug("Calling '%s' with a shell", args[0])
                             subprocess.run(args[0], check=True, shell=True)
                             continue
                         if action_name == "spawn":
                             args = shlex.split(args[0])
-                            self.LOG.debug("Spawning '%s'", args)
+                            self.log.debug("Spawning '%s'", args)
                             subprocess.run(args, check=True, shell=False)
                             continue
                         # Look up aliases when moving to a host
@@ -929,19 +929,19 @@ class RtorrentControl(ScriptBaseWithConfig):
                         summary.total, item_formatter=lambda i: "SUM:\t" + i.rstrip()
                     )
 
-                self.LOG.info(
+                self.log.info(
                     "Displayed %d out of %d torrents.",
                     len(matches),
                     view.size(),
                 )
             else:
-                self.LOG.info(
+                self.log.info(
                     "Filtered %d out of %d torrents.",
                     len(matches),
                     view.size(),
                 )
 
-            self.LOG.debug("RPC stats: %s", self.rpc_stats())
+            self.log.debug("RPC stats: %s", self.rpc_stats())
         if dcontext is not None:
             dcontext.close()
 

@@ -631,7 +631,7 @@ class RtorrentEngine:
 
     def __init__(self, url=None, auto_open=False):
         """Initialize proxy."""
-        self.LOG = pymagic.get_class_logger(self)
+        self.logger = pymagic.get_class_logger(self)
         self.engine_id = "N/A"  # ID of the instance we're connecting to
         self.engine_software = "rTorrent"  # Name and version of software
         self.startup = time.time()
@@ -730,7 +730,7 @@ class RtorrentEngine:
 
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
-            self.LOG.warning(
+            self.logger.warning(
                 "Unsupported xmlrpc-c version (64 bit integer support missing,"
                 " %r returned instead)",
                 type(time_usec),
@@ -745,7 +745,7 @@ class RtorrentEngine:
             self.startup = int(time.time())
 
         # Return connection
-        self.LOG.debug("%s", repr(self))
+        self.logger.debug("%s", repr(self))
         return self.rpc
 
     def multicall(self, viewname: str, fields: List[str]) -> List[Bunch]:
@@ -822,7 +822,7 @@ class RtorrentEngine:
                     if config.settings.SAFETY_CHECKS_ENABLED and not self.has_method(
                         "d.multicall.filtered"
                     ):
-                        self.LOG.warning(
+                        self.logger.warning(
                             "Fast query enabled but host does not support 'd.multicall.filtered', disabling fast query."
                         )
                     else:
@@ -832,13 +832,13 @@ class RtorrentEngine:
                     if pre_filter:
                         # rTorrent 0.9.8+ does not have
                         # sting.contains_i, so we check for it here
-                        self.LOG.debug("Created pre-filter: %s", pre_filter or "N/A")
+                        self.logger.debug("Created pre-filter: %s", pre_filter or "N/A")
                         if (
                             config.settings.SAFETY_CHECKS_ENABLED
                             and "string.contains_i" in pre_filter
                             and not self.has_method("string.contains_i")
                         ):
-                            self.LOG.warning(
+                            self.logger.warning(
                                 "Method 'strings.contains_i' does not exist!"
                                 "Fast query %r would return an empty list, disabling fast query.",
                                 pre_filter,
@@ -848,7 +848,7 @@ class RtorrentEngine:
                             multi_args.insert(2, pre_filter)
                 raw_items = multi_call(*tuple(multi_args))
 
-            self.LOG.debug(
+            self.logger.debug(
                 "Got %d items with %d attributes",
                 len(raw_items),
                 len(prefetch),

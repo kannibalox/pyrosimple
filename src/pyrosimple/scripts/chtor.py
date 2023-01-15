@@ -203,13 +203,13 @@ class MetafileChanger(ScriptBase):
         filter_url_prefix: Optional[str] = None
         if self.options.reannounce:
             filter_url_prefix = config.map_announce2alias(self.options.reannounce)
-            self.LOG.info(
+            self.log.info(
                 "Filtering for metafiles with announce URL %r...",
                 filter_url_prefix,
             )
         elif self.options.tracker:
             filter_url_prefix = config.map_announce2alias(self.options.tracker)
-            self.LOG.info(
+            self.log.info(
                 "Filtering for metafiles with tracker %r...",
                 filter_url_prefix,
             )
@@ -241,7 +241,7 @@ class MetafileChanger(ScriptBase):
                 # Read and remember current content
                 torrent: metafile.Metafile = metafile.Metafile.from_file(Path(filename))
             except (OSError, KeyError, bencode.BencodeDecodeError) as exc:
-                self.LOG.warning(
+                self.log.warning(
                     "Skipping bad metafile %r (%s: %s)",
                     filename,
                     type(exc).__name__,
@@ -271,7 +271,7 @@ class MetafileChanger(ScriptBase):
                             else:
                                 progress_callback = None
 
-                            piece_logger = PieceLogger(torrent, self.LOG)
+                            piece_logger = PieceLogger(torrent, self.log)
 
                             data_correct = torrent.hash_check(
                                 Path(self.options.check_data),
@@ -279,14 +279,14 @@ class MetafileChanger(ScriptBase):
                                 piece_callback=piece_logger.check_piece,
                             )
                         if not data_correct:
-                            self.LOG.error(
+                            self.log.error(
                                 "File %s does match data from %s",
                                 filename,
                                 self.options.check_data,
                             )
                             sys.exit(error.EX_DATAERR)
                 except ValueError as exc:
-                    self.LOG.warning(
+                    self.log.warning(
                         "Metafile %r failed integrity check: %s",
                         filename,
                         exc,
@@ -300,7 +300,7 @@ class MetafileChanger(ScriptBase):
                     and config.map_announce2alias(torrent["announce"])
                     != filter_url_prefix
                 ):
-                    self.LOG.info(
+                    self.log.info(
                         "Skipping metafile %r: not tracked by %r!",
                         filename,
                         filter_url_prefix,
@@ -323,10 +323,10 @@ class MetafileChanger(ScriptBase):
 
                 # Change private flag?
                 if self.options.make_private and not torrent["info"].get("private", 0):
-                    self.LOG.info("Setting private flag...")
+                    self.log.info("Setting private flag...")
                     torrent["info"]["private"] = 1
                 if self.options.make_public and torrent["info"].get("private", 0):
-                    self.LOG.info("Clearing private flag...")
+                    self.log.info("Clearing private flag...")
                     del torrent["info"]["private"]
 
                 # Remove non-standard keys?
@@ -342,17 +342,17 @@ class MetafileChanger(ScriptBase):
                 # Restore resume info?
                 if self.options.clean_xseed:
                     if libtorrent_resume:
-                        self.LOG.info("Restoring key 'libtorrent_resume'...")
+                        self.log.info("Restoring key 'libtorrent_resume'...")
                         torrent.setdefault("libtorrent_resume", {})
                         torrent["libtorrent_resume"].update(libtorrent_resume)
                     else:
-                        self.LOG.warning("No resume information found!")
+                        self.log.warning("No resume information found!")
 
                 # Clean rTorrent data?
                 if self.options.clean_rtorrent:
                     for key in self.RT_RESUME_KEYS:
                         if key in torrent:
-                            self.LOG.info("Removing key %r...", key)
+                            self.log.info("Removing key %r...", key)
                             del torrent[key]
 
                 # Change announce URL?
@@ -399,7 +399,7 @@ class MetafileChanger(ScriptBase):
                     filename = os.path.join(
                         self.options.output_directory, os.path.basename(filename)
                     )
-                    self.LOG.info("Will write %r...", filename)
+                    self.log.info("Will write %r...", filename)
 
                     if not self.options.dry_run:
                         with open(filename, "wb") as fh:
@@ -410,7 +410,7 @@ class MetafileChanger(ScriptBase):
                                 ".torrent", "-no-resume.torrent"
                             )
                             del torrent["libtorrent_resume"]
-                            self.LOG.info("Writing '%s'...", filename)
+                            self.log.info("Writing '%s'...", filename)
                             bencode.bwrite(torrent, filename)
                 else:
                     current_torrent = metafile.Metafile.from_file(filename)
@@ -418,9 +418,9 @@ class MetafileChanger(ScriptBase):
                     if self.options.diff:
                         sys.stdout.writelines(diff)
                     if not diff:
-                        self.LOG.info("No change to file %r", filename)
+                        self.log.info("No change to file %r", filename)
                         continue
-                    self.LOG.info("Changing %r...", filename)
+                    self.log.info("Changing %r...", filename)
 
                     if not self.options.dry_run:
                         # Write to temporary file
@@ -428,11 +428,11 @@ class MetafileChanger(ScriptBase):
                             os.path.dirname(filename),
                             "." + os.path.basename(filename),
                         )
-                        self.LOG.debug("Writing temporary file '%s'...", tempname)
+                        self.log.debug("Writing temporary file '%s'...", tempname)
                         torrent.save(Path(tempname))
 
                         try:
-                            self.LOG.debug("Replacing file '%s'...", filename)
+                            self.log.debug("Replacing file '%s'...", filename)
                             os.replace(tempname, filename)
                         except OSError as exc:
                             # TODO: Try to write directly, keeping a backup!
@@ -445,13 +445,13 @@ class MetafileChanger(ScriptBase):
 
         # Print summary
         if changed:
-            self.LOG.info(
+            self.log.info(
                 "%s %d metafile(s).",
                 "Would've changed" if self.options.dry_run else "Changed",
                 changed,
             )
         if bad:
-            self.LOG.warning("Skipped %d bad metafile(s)!", bad)
+            self.log.warning("Skipped %d bad metafile(s)!", bad)
 
 
 def run():  # pragma: no cover

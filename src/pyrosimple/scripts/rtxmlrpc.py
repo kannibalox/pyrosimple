@@ -114,7 +114,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             if not config.settings["SCGI_URL"]:
                 config.autoload_scgi_url()
             if not config.settings["SCGI_URL"]:
-                self.LOG.error(
+                self.log.error(
                     "You need to configure a RPC connection, read"
                     " https://pyrosimple.readthedocs.io/en/latest/setup.html"
                 )
@@ -132,7 +132,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 try:
                     arg = int(arg, 10)
                 except (ValueError, TypeError) as exc:
-                    self.LOG.warning("Not a valid number: %r (%s)", arg, exc)
+                    self.log.warning("Not a valid number: %r (%s)", arg, exc)
             elif arg.startswith("[["):  # escaping, not a list
                 arg = arg[1:]
             elif arg == "[]":
@@ -152,7 +152,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         try:
             result = getattr(proxy, method)(*tuple(args))
         except rpc.ERRORS as exc:
-            self.LOG.error(
+            self.log.error(
                 "While calling %s(%s): %s",
                 method,
                 ", ".join(repr(i) for i in args),
@@ -177,7 +177,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             else:
                 self.return_code = error.EX_DATAERR
         else:
-            if self.LOG.isEnabledFor(
+            if self.log.isEnabledFor(
                 logging.WARNING
             ):  # Hack to hide output when `-q` is in effect
                 if self.options.output_format == "repr":
@@ -301,7 +301,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             self.do_command()
 
         # RPC stats
-        self.LOG.debug("RPC stats: %s", self.rpc_stats())
+        self.log.debug("RPC stats: %s", self.rpc_stats())
 
 
 def run():  # pragma: no cover

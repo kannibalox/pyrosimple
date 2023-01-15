@@ -142,7 +142,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         try:
             config.settings.configure()
             if self.running_config != dict(config.settings.TORQUE):
-                self.LOG.info("Config change detected, reloading jobs")
+                self.log.info("Config change detected, reloading jobs")
                 self.validate_config()
                 self.sched.pause()
                 self.sched.remove_all_jobs()
@@ -151,7 +151,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.add_jobs()
                 self.running_config = dict(config.settings.TORQUE)
         except (Exception) as exc:  # pylint: disable=broad-except
-            self.LOG.error("Error while reloading config: %s", exc)
+            self.log.error("Error while reloading config: %s", exc)
         else:
             self.sched.resume()
 
@@ -164,13 +164,13 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 if config.settings.TORQUE.get("autoreload", False):
                     self.reload_jobs()
             except KeyboardInterrupt as exc:
-                self.LOG.info("Termination request received (%s)", exc)
+                self.log.info("Termination request received (%s)", exc)
                 self.sched.shutdown()
                 self.unload_jobs()
                 break
             except SystemExit as exc:
                 self.return_code = exc.code or 0
-                self.LOG.info("System exit (RC=%r)", self.return_code)
+                self.log.info("System exit (RC=%r)", self.return_code)
                 break
 
     def mainloop(self):
@@ -195,16 +195,16 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
             if self.options.status:
                 if running:
-                    self.LOG.info("Pyrotorque is running (PID %d).", pid)
+                    self.log.info("Pyrotorque is running (PID %d).", pid)
                     sys.exit(0)
                 else:
-                    self.LOG.error("No pyrotorque process found.")
+                    self.log.error("No pyrotorque process found.")
                     sys.exit(1)
 
             if self.options.stop or self.options.restart:
                 if running:
                     os.kill(pid, signal.SIGTERM)
-                    self.LOG.debug("Process %d sent SIGTERM.", pid)
+                    self.log.debug("Process %d sent SIGTERM.", pid)
 
                     # Wait for termination (max. 10 secs)
                     for _ in range(100):
@@ -213,15 +213,15 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                             break
                         time.sleep(0.1)
 
-                    self.LOG.info("Process %d stopped.", pid)
+                    self.log.info("Process %d stopped.", pid)
                 elif pid:
-                    self.LOG.info("Process %d NOT running anymore.", pid)
+                    self.log.info("Process %d NOT running anymore.", pid)
                 else:
-                    self.LOG.info(
+                    self.log.info(
                         "No pid file '%s'", (self.options.pid_file or "<N/A>")
                     )
             else:
-                self.LOG.info(
+                self.log.info(
                     "Process %d %s running.", pid, "UP and" if running else "NOT"
                 )
 
@@ -251,10 +251,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             dcontext.stderr = logutil.get_logfile()
             dcontext.stdout = logutil.get_logfile()
             dcontext.pidfile = self.options.pid_file
-            self.LOG.info(
+            self.log.info(
                 "Writing pid to %s and detaching process...", self.options.pid_file
             )
-            self.LOG.info("Logging stderr/stdout to %s", logutil.get_logfile())
+            self.log.info("Logging stderr/stdout to %s", logutil.get_logfile())
 
         # Change logging format
         logging.basicConfig(

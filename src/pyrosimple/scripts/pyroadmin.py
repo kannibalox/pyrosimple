@@ -155,7 +155,7 @@ class AdminTool(ScriptBaseWithConfig):
                 elif objtype is int:
                     definition = "{:d}".format(value)
                 else:
-                    self.LOG.error(
+                    self.log.error(
                         "Cannot handle {!r} definition of method {}".format(
                             objtype, name
                         )
@@ -195,7 +195,7 @@ class AdminTool(ScriptBaseWithConfig):
                 mtime = int(Path(i.metafile).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    self.LOG.info(
+                    self.log.info(
                         "Would set %s tm_loaded to %s from metafile %s",
                         i.hash,
                         dt,
@@ -205,20 +205,20 @@ class AdminTool(ScriptBaseWithConfig):
                     i.rpc_call("d.custom.set", ["tm_loaded", str(mtime)])
                     i.flush()
             except Exception as e:
-                self.LOG.error("Could not set tm_loaded for %s: %s", i.hash, e)
+                self.log.error("Could not set tm_loaded for %s: %s", i.hash, e)
         for i in engine.view("main", matching.create_matcher("loaded=0 path=/.+/")):
             try:
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    self.LOG.info(
+                    self.log.info(
                         "Would set %s tm_loaded to %s from path %s", i.hash, dt, i.path
                     )
                 else:
                     i.rpc_call("d.custom.set", ["tm_loaded", str(mtime)])
                     i.flush()
             except Exception as e:
-                self.LOG.error("Could not set tm_loaded for %s: %s", i.hash, e)
+                self.log.error("Could not set tm_loaded for %s: %s", i.hash, e)
         for i in engine.view(
             "main", matching.create_matcher("completed=0 is_complete=yes path=/.+/")
         ):
@@ -226,7 +226,7 @@ class AdminTool(ScriptBaseWithConfig):
                 mtime = int(Path(i.path).stat().st_mtime)
                 if self.args.dry_run:
                     dt = datetime.fromtimestamp(mtime)
-                    self.LOG.info(
+                    self.log.info(
                         "Would set %s tm_completed to %s from path %s",
                         i.hash,
                         dt,
@@ -236,17 +236,17 @@ class AdminTool(ScriptBaseWithConfig):
                     i.rpc_call("d.custom.set", ["tm_completed", str(mtime)])
                     i.flush()
             except Exception as e:
-                self.LOG.error("Could not set tm_loaded for %s: %s", i.hash, e)
+                self.log.error("Could not set tm_loaded for %s: %s", i.hash, e)
 
     def create_config(self):
         """Create a configuration file"""
         config_path = Path("~/.config/pyrosimple/config.toml").expanduser()
         if config_path.exists():
-            self.LOG.info(
+            self.log.info(
                 "Pyrosimple config path %s already exists, not overwriting", config_path
             )
         else:
-            self.LOG.info("Creating pyrosimple config file '%s'", config_path)
+            self.log.info("Creating pyrosimple config file '%s'", config_path)
             toml_loader.write(
                 str(config_path),
                 DynaBox(pyrosimple.config.settings.as_dict()).to_dict(),
@@ -257,11 +257,11 @@ class AdminTool(ScriptBaseWithConfig):
         """Create a rtorrent.rc file"""
         rtorrent_rc_path = Path(pyrosimple.config.settings.RTORRENT_RC).expanduser()
         if rtorrent_rc_path.exists():
-            self.LOG.info(
+            self.log.info(
                 "rtorrent.rc path %s already exists, not overwriting", rtorrent_rc_path
             )
         else:
-            self.LOG.info("Creating rtorrent.rc at '%s'", rtorrent_rc_path)
+            self.log.info("Creating rtorrent.rc at '%s'", rtorrent_rc_path)
             home = str(Path("~").expanduser())
             with rtorrent_rc_path.open("w", encoding="utf-8") as fh:
                 fh.write(
@@ -282,20 +282,20 @@ class AdminTool(ScriptBaseWithConfig):
             try:
                 config.autoload_scgi_url()
             except Exception:
-                self.LOG.error("Error loading SCGI URL:")
+                self.log.error("Error loading SCGI URL:")
                 raise
             else:
-                self.LOG.debug("Loaded SCGI URL successfully")
+                self.log.debug("Loaded SCGI URL successfully")
             try:
                 pyrosimple.connect().open()
             except ConnectionRefusedError:
-                self.LOG.error(
+                self.log.error(
                     "SCGI URL '%s' found, but rTorrent may not be running!",
                     config.autoload_scgi_url(),
                 )
                 raise
             else:
-                self.LOG.info("Connected to rTorrent successfully")
+                self.log.info("Connected to rTorrent successfully")
 
     def mainloop(self):
         self.args = self.parser.parse_args()

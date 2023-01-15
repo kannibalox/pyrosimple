@@ -40,7 +40,8 @@ class ScriptBase:
     def __init__(self):
         """Initialize CLI."""
         self.startup = time.time()
-        self.LOG = pymagic.get_class_logger(self)
+        # self.LOG exists only for backwards compatibility
+        self.LOG = self.log = pymagic.get_class_logger(self)
 
         self.args = None
         self.options = None
@@ -153,7 +154,7 @@ class ScriptBase:
         if self.options.log_level:
             logging.getLogger("pyrosimple").setLevel(self.options.log_level)
 
-        self.LOG.debug(
+        self.log.debug(
             "Options: %s",
             ", ".join("%s=%r" % i for i in sorted(vars(self.options).items())),
         )
@@ -161,11 +162,11 @@ class ScriptBase:
     def fatal(self, msg, exc=None):
         """Exit on a fatal error."""
         if exc is not None:
-            self.LOG.fatal("%s (%s)", msg, exc)
+            self.log.fatal("%s (%s)", msg, exc)
             if logging.getLogger().isEnabledFor(logging.DEBUG):
                 return  # let the caller re-raise it
         else:
-            self.LOG.fatal(msg)
+            self.log.fatal(msg)
         sys.exit(error.EX_SOFTWARE)
 
     def run(self, args=None):
@@ -183,7 +184,7 @@ class ScriptBase:
                 sys.exit(error.EX_SOFTWARE)
             except KeyboardInterrupt:
                 print()
-                self.LOG.critical("Aborted by CTRL-C!\n")
+                self.log.critical("Aborted by CTRL-C!\n")
                 signal.signal(signal.SIGINT, signal.SIG_DFL)
                 os.kill(os.getpid(), signal.SIGINT)
             except OSError as exc:
@@ -197,7 +198,7 @@ class ScriptBase:
             # Shut down
             if self.options:  ## No time logging on --version and such
                 running_time = time.time() - self.startup
-                self.LOG.log(
+                self.log.log(
                     self.STD_LOG_LEVEL, "Total time: %.3f seconds.", running_time
                 )
             logging.shutdown()

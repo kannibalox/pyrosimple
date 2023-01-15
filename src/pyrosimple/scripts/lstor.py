@@ -99,7 +99,7 @@ class MetafileLister(ScriptBase):
                         else:
                             progress_callback = None
 
-                        piece_logger = PieceLogger(torrent, self.LOG)
+                        piece_logger = PieceLogger(torrent, self.log)
 
                         data_correct = torrent.hash_check(
                             Path(self.options.check_data),
@@ -107,7 +107,7 @@ class MetafileLister(ScriptBase):
                             piece_callback=piece_logger.check_piece,
                         )
                     if not data_correct:
-                        self.LOG.error(
+                        self.log.error(
                             "File %s does match data from %s",
                             filename,
                             self.options.check_data,
@@ -151,7 +151,7 @@ class MetafileLister(ScriptBase):
                                 for key in field.split("."):
                                     val = val[key]
                         except KeyError:
-                            self.LOG.error("%s: Field %r not found", filename, field)
+                            self.log.error("%s: Field %r not found", filename, field)
                             break
                         else:
                             values.append(str(val))
@@ -160,7 +160,7 @@ class MetafileLister(ScriptBase):
                 else:
                     listing = "\n".join(torrent.listing(masked=not self.options.reveal))
             except (ValueError, KeyError, bencode.BencodeDecodeError) as exc:
-                self.LOG.error(
+                self.log.error(
                     "Bad metafile %r (%s: %s)", filename, type(exc).__name__, exc
                 )
                 raise
