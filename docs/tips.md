@@ -13,7 +13,7 @@ issue. To view/filter on ruTorrent's labels, use the `custom_1` field:
 rtcontrol custom_1=TV -o alias,name
 ```
 
-## Repairing Stuck Items
+## Repairing stuck items
 
 Sometimes items will get stuck in a state where they are unable to
 start correctly, even after a hash check. Check that rTorrent has the
@@ -50,7 +50,7 @@ rtcontrol --from-view=to-move // --start
 rtcontrol -M=to-move --alter=remove //
 ```
 
-## Instance Statistics
+## Instance statistics
 
 ```bash
 #!/bin/bash
@@ -96,11 +96,12 @@ print(f"of {proxy.convert.xb('', str(proxy.throttle.global_up.max_rate()))}/s")
 
 ## Find orphaned files
 
-Since Jinja2 is more sandboxed than the original Tempita templating
-system, the `orphans.txt` template file from pyrocore no longer
-works. However, we can replicate the functionality with a little fancy
-scripting. The following command will list the orphan files along with
-their sizes:
+Since Jinja2 is more
+[sandboxed](https://jinja.palletsprojects.com/en/3.1.x/sandbox/) than
+the original Tempita templating system, the `orphans.txt` template
+file from pyrocore no longer works. However, we can replicate the
+functionality with a little fancy scripting. The following command
+will list the orphan files along with their sizes:
 
 ```bash
 target_dir=/mnt/test
@@ -119,4 +120,28 @@ comm -13 \
   <(rtcontrol -o filelist "path=${target_dir}*" | sort) \
   <(find "$target_dir" -type f | sort) \
   | tr '\n' '\0' | xargs -0 echo rm
+```
+
+## Dumping items as a JSON array
+
+If you want to access rTorrent item data in machine readable form via rtcontrol, you can use its --json option and feed the output into another script parsing the JSON data for further processing.
+
+Here’s an example:
+
+```
+$ rtcontrol --json -qo name,is_ghost,directory,fno ubuntu-22.04.iso
+[
+  {
+    "directory": "/var/torrent/load/foo",
+    "fno": 1,
+    "is_ghost": false,
+    "name": "ubuntu-22.04.iso"
+  }
+]
+```
+
+rtxmlrpc is also capable of producing JSON output:
+```
+$ rtxmlrpc -o json d.multicall2 '' main d.name= d.directory= d.size_files=
+[["ubuntu-22.04.iso", "/var/torrent/load/foo", 1]]
 ```
