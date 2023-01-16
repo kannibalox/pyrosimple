@@ -27,10 +27,21 @@ from pyrosimple.util.metafile import Metafile
             "http://example.com/announce.php/test",
         ),
         (
+            ["--reannounce", "https://example.com/announce.php/test"],
+            ["announce"],
+            "https://example.com/announce.php/test",
+        ),
+        (
+            ["--reannounce", "https://example.org/announce.php/test"],
+            ["announce"],
+            "http://example.com/announce.php/test",
+        ),
+        (
             ["--reannounce-all", "http://example.org/announce.php/new_test"],
             ["announce"],
             "http://example.org/announce.php/new_test",
         ),
+        # Other
         (
             ["-s", "test=foo", "-T", "http://example.com"],
             ["test"],
