@@ -25,9 +25,6 @@ except ImportError:
 
 from xmlrpc import client as xmlrpc_client
 
-from prompt_toolkit import PromptSession
-from prompt_toolkit.completion import WordCompleter
-
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import fmt, rpc
@@ -258,6 +255,12 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def do_repl(self):
         """Run a simple REPL loop"""
         self.open()
+        # pylint: disable=import-outside-toplevel
+        from prompt_toolkit import PromptSession
+        from prompt_toolkit.completion import WordCompleter
+
+        # pylint: enable=import-outside-toplevel
+
         session = PromptSession(
             completer=WordCompleter(
                 self.proxies[0].system.listMethods()
