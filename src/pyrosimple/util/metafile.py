@@ -256,10 +256,6 @@ class Metafile(dict):
             if not any(pattern.match(str(datapath)) for pattern in self.ignore):
                 yield Path(datapath)
 
-    def _calc_size(self, datapath: os.PathLike) -> int:
-        """Get total size of a path."""
-        return sum(os.path.getsize(filename) for filename in self.walk(Path(datapath)))
-
     def _make_info(
         self,
         files: Sequence[os.PathLike],
@@ -503,12 +499,20 @@ class Metafile(dict):
         piece_size: int = 0,
         piece_size_min: int = 2**15,
         piece_size_max: int = 2**24,
+        file_generator: Optional[
+            Callable[[os.PathLike], Generator[Path, None, None]]
+        ] = None,
     ) -> Tuple[Dict, int]:
         """Create torrent dictionary from a file path."""
+        if file_generator is None:
+            file_generator = self.walk
         datapath = Path(datapath)
         if piece_size <= 0:
             # Calculate a good size for the data
-            piece_size_exp = int(math.log(self._calc_size(datapath)) / math.log(2)) - 9
+            total_size = sum(
+                os.path.getsize(filename) for filename in file_generator(Path(datapath))
+            )
+            piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
             # Limit it to the min and max
             piece_size = min(piece_size_max, max(piece_size_min, 2**piece_size_exp))
         # Round to the nearest power of two for all use cases
@@ -516,7 +520,7 @@ class Metafile(dict):
 
         # Build info hash
         info, totalhashed = self._make_info(
-            sorted(self.walk(datapath)),
+            sorted(file_generator(datapath)),
             piece_size,
             progress_callback=progress,
             datapath=datapath,
@@ -579,6 +583,9 @@ class Metafile(dict):
         no_date: bool = False,
         progress: Optional[Callable] = None,
         ignore: Optional[List[Pattern]] = None,
+        file_generator: Optional[
+            Callable[[os.PathLike], Generator[Path, None, None]]
+        ] = None,
         piece_size: int = 0,
         piece_size_min: int = 2**15,
         piece_size_max: int = 2**24,
@@ -589,8 +596,10 @@ class Metafile(dict):
         # Lookup announce URLs from config file
         datapath = Path(datapath)
         torrent = Metafile()
-        if ignore:
+        if ignore is not None:
             torrent.ignore = ignore
+        if file_generator is None:
+            file_generator = torrent.walk
         try:
             if not urllib.parse.urlparse(tracker_url).scheme:
                 from pyrosimple import config  # pylint: disable=import-outside-toplevel
@@ -611,6 +620,7 @@ class Metafile(dict):
             piece_size,
             piece_size_min,
             piece_size_max,
+            file_generator,
         )
 
         # Add optional fields
