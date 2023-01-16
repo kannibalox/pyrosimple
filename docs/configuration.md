@@ -150,12 +150,6 @@ remote_scgi = "scgi://example.com:9000"
 remote_https = "https://example.com/RPC2"
 ```
 
-!!! Note
-    For HTTP(S) connections, it's important to either explicitly
-    provide the path (e.g. `https://example.com/RPC2`) or leave it off
-    entirely (e.g. `https://example.com`). `https://example.com/` will
-    not work for most setups.
-
 `rtmlxrpc`, `rtcontrol` and `pyrotorque` accept a `-U`/`--url` flag to
 provide the `scgi_url` directly when working with remote machines:
 ```bash
