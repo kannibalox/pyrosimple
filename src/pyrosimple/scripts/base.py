@@ -226,7 +226,7 @@ class ScriptBase:
             list(io.scgi.response_time_summary._child_samples())[1].value, 3
         )
         resp_sz = fmt.human_size(io.scgi.response_size_counter._value.get())
-        return f"{req_num} requests ({req_sz}) in {req_time}s (repsonse {resp_sz})"
+        return f"{req_num} requests ({req_sz}) in {req_time}s (response {resp_sz})"
 
 
 class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
