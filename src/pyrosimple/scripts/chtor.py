@@ -77,9 +77,6 @@ def diff_metafiles(
 class MetafileChanger(ScriptBase):
     """Change attributes of a bittorrent metafile."""
 
-    # argument description for the usage information
-    ARGS_HELP = "<metafile>..."
-
     # Keys of rTorrent session data
     RT_RESUME_KEYS = ("libtorrent_resume", "log_callback", "err_callback", "rtorrent")
 
@@ -87,6 +84,7 @@ class MetafileChanger(ScriptBase):
         """Add program options."""
         super().add_options()
 
+        self.parser.add_argument("metafile", nargs="+", help="Torrent files to modify")
         self.add_bool_option(
             "-n",
             "--dry-run",
@@ -191,6 +189,7 @@ class MetafileChanger(ScriptBase):
 
     def mainloop(self) -> None:
         """The main loop."""
+        self.args = self.options.metafile
         if not self.args:
             self.parser.print_help()
             self.parser.error("No metafiles given, nothing to do!")
@@ -236,7 +235,7 @@ class MetafileChanger(ScriptBase):
         # go through given files
         bad = 0
         changed = 0
-        for filename in self.args:
+        for filename in self.options.metafile:
             try:
                 # Read and remember current content
                 torrent: metafile.Metafile = metafile.Metafile.from_file(Path(filename))

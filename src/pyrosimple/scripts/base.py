@@ -13,8 +13,8 @@ import textwrap
 import time
 import traceback
 
-from argparse import ArgumentParser
-from typing import List
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from typing import List, Optional
 
 import shtab
 
@@ -25,17 +25,8 @@ from pyrosimple.util import pymagic
 class ScriptBase:
     """Base class for command line interfaces."""
 
-    # log level for user-visible standard logging
-    STD_LOG_LEVEL = logging.INFO
-
-    # argument description for the usage information
-    ARGS_HELP = "<log-base>..."
-
     # additonal stuff appended after the command handler's docstring
     ADDITIONAL_HELP: List[str] = []
-
-    # Can be empty or None in derived classes
-    COPYRIGHT = ""
 
     def __init__(self):
         """Initialize CLI."""
@@ -59,25 +50,26 @@ class ScriptBase:
             )
         except ImportError:
             version = "unknown"
-        version_info = f"{version} on Python {sys.version.split()[0]}"
+        implementation = sys.implementation.name
+        if implementation == "cpython":
+            implementation = "Python"
+        version_info = f"{version} on {implementation} {sys.version.split()[0]}"
 
         self.parser = ArgumentParser(
-            usage="%(prog)s [options] " + self.ARGS_HELP + "\n\n"
-            "%(prog)s "
+            formatter_class=RawDescriptionHelpFormatter,
+            description="%(prog)s "
             + version_info
-            + ("\n" + self.COPYRIGHT if self.COPYRIGHT else "")
             + "\n\n"
             + textwrap.dedent(self.__doc__.rstrip()).lstrip("\n")
             + "\n".join(self.ADDITIONAL_HELP)
             + "\n\nFor more details, see the full documentation at"
-            + "\n\n    https://kannibalox.github.io/pyrosimple/",
+            + "\n    https://kannibalox.github.io/pyrosimple/",
         )
         shtab.add_argument_to(self.parser, ["--print-completion"])
 
         self.parser.add_argument(
             "--version", action="version", version=f"%(prog)s {version_info}"
         )
-        self.parser.add_argument("args", nargs="*")
 
     def add_bool_option(self, *args, **kwargs):
         """Add a boolean option.
@@ -149,7 +141,7 @@ class ScriptBase:
             self.options = self.parser.parse_intermixed_args(self.args)
         else:
             self.options = self.parser.parse_args(self.args)
-        self.args = self.options.args
+        self.args: Optional[List] = getattr(self.options, "args", None)
 
         if self.options.log_level:
             logging.getLogger("pyrosimple").setLevel(self.options.log_level)
@@ -198,9 +190,7 @@ class ScriptBase:
             # Shut down
             if self.options:  ## No time logging on --version and such
                 running_time = time.time() - self.startup
-                self.log.log(
-                    self.STD_LOG_LEVEL, "Total time: %.3f seconds.", running_time
-                )
+                self.log.info("Total time: %.3f seconds.", running_time)
             logging.shutdown()
 
         # Special exit code?

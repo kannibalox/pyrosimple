@@ -242,6 +242,11 @@ class RtorrentControl(ScriptBaseWithConfig):
         super().add_options()
 
         # basic options
+        self.parser.add_argument(
+            "filter",
+            nargs="*",
+            help='A filter expression of the form "<field>=<value>"',
+        )
         self.add_bool_option(
             "--help-fields", help="show available fields and their description"
         )
@@ -647,7 +652,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # pylint: enable=import-outside-toplevel
         # Print usage if no conditions are provided
-        if not self.args:
+        if not self.options.filter:
             self.parser.error("No filter conditions given!")
 
         # Check special action options
@@ -682,7 +687,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         sort_key = self.validate_sort_fields()
         # Get key names from the query
         query_tree = matching.QueryGrammar.parse(
-            matching.cli_args_to_match_str(self.args)
+            matching.cli_args_to_match_str(self.options.filter)
         )
         key_names = matching.KeyNameVisitor().visit(query_tree)
         # Use validate_sort_fields to pre-validate key names

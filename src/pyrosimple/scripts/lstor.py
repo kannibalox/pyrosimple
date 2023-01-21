@@ -23,6 +23,7 @@ class MetafileLister(ScriptBase):
 
     def add_options(self):
         """Add program options."""
+        self.parser.add_argument("metafile", nargs="+", help="Torrent files to display")
         self.add_bool_option(
             "--reveal",
             help="show full announce URL including keys, as well as full piece information",
@@ -57,6 +58,7 @@ class MetafileLister(ScriptBase):
         """The main loop."""
         from pyrosimple.util import metafile  # pylint: disable=import-outside-toplevel
 
+        self.args = self.options.metafile
         if not self.args:
             self.parser.print_help()
             self.parser.error("No metafiles given, nothing to do!")

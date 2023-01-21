@@ -55,24 +55,12 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     ### Keep things wrapped to fit under this comment... ##############################
     """
     Perform raw rTorrent RPC calls, like "rtxmlrpc throttle.global_up.max_rate".
-    To enter a RPC REPL, pass no arguments at all.
 
     Start arguments with "+" or "-" to indicate they're numbers (type i4 or i8).
     Use "[1,2,..." for arrays. Use "@" to indicate binary data, which can be
     followed by a file path (e.g. "@/path/to/file"), a URL (https, http, ftp,
     and file are supported), or '-' to read from stdin.
     """
-
-    # log level for user-visible standard logging
-    STD_LOG_LEVEL = logging.DEBUG
-
-    # argument description for the usage information
-    ARGS_HELP = (
-        "<method> <args>..."
-        " |\n           -i <commands>... | -i @<filename> | -i @-"
-        " |\n           --session <session-file>... | --session <directory>"
-        " |\n           --session @<filename-list> | --session @-"
-    )
 
     def __init__(self):
         super().__init__()
@@ -83,6 +71,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         super().add_options()
 
         # basic options
+        self.parser.add_argument("method", nargs="?", help="method name")
+        self.parser.add_argument("args", nargs="*", help="arguments to method")
         self.parser.add_argument(
             "-o",
             "--output-format",
@@ -188,6 +178,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
     def do_import(self):
         """Handle import files or streams passed with '-i'."""
         tmp_import = None
+        # Concatenate arguments
+        self.args = [self.options.method] + self.args
         try:
             if self.args[0].startswith("@") and self.args[0] != "@-":
                 import_file = os.path.expanduser(self.args[0][1:])
@@ -214,15 +206,15 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
     def do_command(self):
         """Call a single command with arguments."""
-        if not self.args:
+        if not self.options.method:
             self.parser.print_help()
             print(
                 "No method name given! Try `rtxmlrpc system.listMethods` to see a list of available methods."
             )
             sys.exit(error.EX_USAGE)
-        method = self.args[0]
+        method = self.options.method
 
-        raw_args = self.args[1:]
+        raw_args = self.args
         if "=" in method:
             if raw_args:
                 self.parser.error(
@@ -286,7 +278,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                     self.proxies = []
                     self.open()
                     continue
-                self.args = shlex.split(text)
+                self.options.method, *self.args = shlex.split(text)
                 self.do_command()
             except KeyboardInterrupt:
                 continue  # Control-C pressed. Try again.

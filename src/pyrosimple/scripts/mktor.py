@@ -24,15 +24,7 @@ from pyrosimple.scripts.base import ScriptBase
 class MetafileCreator(ScriptBase):
     """
     Create a bittorrent metafile.
-
-    If passed a magnet URL as the only argument, a metafile is created
-    in the directory specified via the configuration value 'magnet_watch',
-    loadable by rTorrent. Which means you can register 'mktor' as a magnet:
-    URL handler in Firefox.
     """
-
-    # argument description for the usage information
-    ARGS_HELP = "<dir-or-file> <tracker-url-or-alias>... | <magnet-url>"
 
     def add_options(self):
         """Add program options."""
@@ -40,6 +32,14 @@ class MetafileCreator(ScriptBase):
         # pylint: disable=import-outside-toplevel
         from pyrosimple.util.fmt import bytes_from_human
 
+        self.parser.add_argument(
+            "dir_or_file", help="Directory or file to create the torrent from"
+        )
+        self.parser.add_argument(
+            "tracker_url_or_alias",
+            nargs="*",
+            help="A URL or tracker alias to set the announce to.",
+        )
         self.add_bool_option("-p", "--private", help="disallow DHT and PEX")
         self.add_bool_option("--no-date", help="leave out creation date")
         self.add_value_option(
@@ -153,10 +153,11 @@ class MetafileCreator(ScriptBase):
 
         # pylint: enable=import-outside-toplevel
 
-        if len(self.args) == 1 and "=urn:btih:" in self.args[0]:
+        if "=urn:btih:" in self.options.dir_or_file:
             # Handle magnet link
-            self.make_magnet_meta(self.args[0])
+            self.make_magnet_meta(self.options.dir_or_file)
             return
+        self.args = [self.options.dir_or_file] + self.options.tracker_url_or_alias
 
         if not self.args:
             self.parser.print_help()

@@ -28,21 +28,18 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
     rTorrent queue manager & daemon.
     """
 
-    # argument description for the usage information
-    ARGS_HELP = ""
-
     POLL_TIMEOUT = 1.0
 
     RUNTIME_DIR = os.getenv("XDG_RUNTIME_DIR") or "~/.pyrosimple/run/"
 
     def __init__(self, *args, **kwargs):
-        self.classes = {}
         super().__init__(*args, **kwargs)
+        self.classes = {}
+        self.jobs: Dict = {}
 
     def add_options(self):
         """Add program options."""
         super().add_options()
-        self.jobs: Dict = {}
 
         # basic options
         self.add_bool_option(
