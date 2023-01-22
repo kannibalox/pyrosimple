@@ -47,10 +47,7 @@ class QueueManager(MatchableJob):
 
     def run(self):
         # Check intermission delay
-        now = time.time()
-        if now < self.last_start:
-            # Compensate for DST and other oddities
-            self.last_start = now
+        now = time.monotonic()
         delayed = int(self.last_start + self.config["intermission"] - now)
         if delayed > 0:
             self.log.debug(
@@ -113,4 +110,4 @@ class QueueManager(MatchableJob):
                 )
         self.downloading_count += 1
         self.allowed_start_count -= 1
-        self.last_start = time.time()
+        self.last_start = time.monotonic()
