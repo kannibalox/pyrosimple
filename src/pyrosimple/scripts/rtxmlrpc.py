@@ -15,14 +15,6 @@ import textwrap
 
 from pprint import pformat
 
-
-try:
-    import requests
-
-    requests_found = True
-except ImportError:
-    requests_found = False
-
 from xmlrpc import client as xmlrpc_client
 
 from pyrosimple import config, error
@@ -36,11 +28,9 @@ def read_blob(arg: str) -> bytes:
         return sys.stdin.buffer.read()
 
     if any(arg.startswith(f"@{x}://") for x in ["http", "https", "ftp", "file"]):
-        if not requests_found:
-            raise error.UserError(
-                "You must 'pip install requests' to support @URL arguments."
-            )
         try:
+            import requests
+
             response = requests.get(arg[1:], timeout=60)
             response.raise_for_status()
             return response.content
