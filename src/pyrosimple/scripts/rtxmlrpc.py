@@ -29,7 +29,7 @@ def read_blob(arg: str) -> bytes:
 
     if any(arg.startswith(f"@{x}://") for x in ["http", "https", "ftp", "file"]):
         try:
-            import requests
+            import requests # pylint: disable=import-outside-toplevel
 
             response = requests.get(arg[1:], timeout=60)
             response.raise_for_status()

@@ -26,6 +26,7 @@ settings = Dynaconf(
         # Top-level settings
         Validator("RTORRENT_RC", default="~/.rtorrent.rc"),
         Validator("CONFIG_PY", default="~/.config/pyrosimple/config.py"),
+        Validator("CONFIG_PY_LOADED", default=False),
         Validator("SORT_FIELDS", default="name,hash"),
         Validator("FAST_QUERY", gte=0, lte=2, default=0),
         Validator("ITEM_CACHE_EXPIRATION", default=5.0),
@@ -184,25 +185,22 @@ def map_announce2alias(url: str) -> str:
         return parts.netloc
 
 
-CUSTOM_PY_LOADED = False
-
-
 def load_custom_py():
     """Load custom python configuration.
 
     This only gets called when CLI tools are called to prevent some weird code injection"""
-    if CUSTOM_PY_LOADED:
-        return
     log = logging.getLogger(__name__)
     if not settings.CONFIG_PY:
         log.debug("Custom code loading is disabled")
+    if settings.CONFIG_PY_LOADED:
+        log.debug("Custom code has already been loaded")
     config_file = Path(settings.CONFIG_PY).expanduser()
     if config_file.exists():
         log.debug("Loading '%s'...", config_file)
         with open(config_file, "rb") as handle:
             # pylint: disable=exec-used
             exec(handle.read())
-        CUSTOM_PY_LOADED = True
+        settings.CONFIG_PY_LOADED = True
     else:
         log.debug("Configuration file '%s' not found.", config_file)
 
