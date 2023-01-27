@@ -14,7 +14,6 @@ import tempfile
 import textwrap
 
 from pprint import pformat
-
 from xmlrpc import client as xmlrpc_client
 
 from pyrosimple import config, error
@@ -29,7 +28,7 @@ def read_blob(arg: str) -> bytes:
 
     if any(arg.startswith(f"@{x}://") for x in ["http", "https", "ftp", "file"]):
         try:
-            import requests # pylint: disable=import-outside-toplevel
+            import requests  # pylint: disable=import-outside-toplevel
 
             response = requests.get(arg[1:], timeout=60)
             response.raise_for_status()

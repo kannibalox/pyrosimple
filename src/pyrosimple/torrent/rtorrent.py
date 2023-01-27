@@ -90,7 +90,7 @@ class RtorrentItem(engine.TorrentProxy):
         """Perform some error-checked RPC calls."""
         args = (self._fields["hash"],) + args
         try:
-            self._engine.LOG.debug(
+            self._engine.logger.debug(
                 "%s%s torrent %s",
                 command[0].upper(),
                 command[1:],
@@ -135,7 +135,7 @@ class RtorrentItem(engine.TorrentProxy):
                 f"While getting files for torrent #{self._fields['hash']}: {exc}"
             )
         else:
-            # self._engine.LOG.debug("files result: %r" % rpc_result)
+            # self._engine.logger.debug("files result: %r" % rpc_result)
 
             # Return results
             result = [
@@ -327,7 +327,7 @@ class RtorrentItem(engine.TorrentProxy):
             self._engine.known_throttle_names.add(name)
 
         if (name or "NONE") == self.rpc_call("d.throttle_name"):
-            self._engine.LOG.debug(
+            self._engine.logger.debug(
                 "Keeping throttle %r on torrent #%s",
                 self.rpc_call("d.throttle_name"),
                 self._fields["hash"],
@@ -336,13 +336,13 @@ class RtorrentItem(engine.TorrentProxy):
 
         active = self.rpc_call("d.is_active")
         if active:
-            self._engine.LOG.debug(
+            self._engine.logger.debug(
                 "Torrent #%s stopped for throttling", self._fields["hash"]
             )
             self.stop()
         self._make_it_so(f"setting throttle {name!r} on", ["d.throttle_name.set"], name)
         if active:
-            self._engine.LOG.debug(
+            self._engine.logger.debug(
                 "Torrent #%s restarted after throttling",
                 self._fields["hash"],
             )
@@ -456,7 +456,7 @@ class RtorrentItem(engine.TorrentProxy):
         rpc_protocol = queries.get("rpc", ["xml"])[0]
         remote_proxy = RtorrentEngine(remote_url).open()
         proxy = self._engine.open()
-        self._engine.LOG.debug("Attempting to move %s to %s", self.hash, remote_url)
+        self._engine.logger.debug("Attempting to move %s to %s", self.hash, remote_url)
         extra_cmds: List[str] = []
         # Check if hash already exists remotely
         try:
@@ -484,14 +484,14 @@ class RtorrentItem(engine.TorrentProxy):
         try:
             torrent.add_fast_resume(Path(proxy.d.directory_base(self.hash)))
         except (FileNotFoundError, OSError) as e:
-            self._engine.LOG.error("Could not add fast resume data: %s", e)
+            self._engine.logger.error("Could not add fast resume data: %s", e)
         # Do some basic escaping, nothing else should be necessary.
         base_dir = proxy.d.directory_base(self.hash).replace('"', r"\"")
         extra_cmds.insert(0, f'd.directory_base.set="{base_dir}"')
         rpc_metafile = xmlrpclib.Binary(bencode.bencode(dict(torrent)))
         if not copy:
             proxy.d.stop(self.hash)
-        self._engine.LOG.debug("Running extra commands on load: %s", extra_cmds)
+        self._engine.logger.debug("Running extra commands on load: %s", extra_cmds)
         if rpc_protocol == "json":
             remote_proxy.load.verbose("", rpc_metafile, *extra_cmds)
         else:
@@ -568,7 +568,7 @@ class RtorrentItem(engine.TorrentProxy):
                 continue
             fullpath = Path(path, file_data.path)
             if fullpath.is_file() or fullpath.is_symlink():
-                self._engine.LOG.debug("Deleting '%s'", fullpath)
+                self._engine.logger.debug("Deleting '%s'", fullpath)
                 dirs_to_clean_up.add(fullpath.parent)
                 if not dry_run:
                     fullpath.unlink()
