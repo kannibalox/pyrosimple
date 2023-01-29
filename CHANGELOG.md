@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `rtcontrol`: Add `f_METHOD`, `p_METHOD` and `t_METHOD` dynamic
+  fields
+
 ## [2.6.1] - 2023-01-26
 
 ### Fixed

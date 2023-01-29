@@ -828,6 +828,26 @@ def generate_d_call(name: str) -> Optional[FieldDefinition]:
     )
 
 
+def generate_sub_multicall(prefix: str) -> Callable[[str], Optional[FieldDefinition]]:
+    """This method allows templating out the f.multicall,
+    p.multicall and t.multicall generators from a single method"""
+
+    def generate_call(name: str) -> Optional[FieldDefinition]:
+        call_name = f"{prefix}.{name[2:]}="
+        return DynamicField(
+            list,
+            name,
+            f"Dynamic rpc call for {prefix}.multicall={call_name}",
+            accessor=lambda o: [
+                i[0] for i in o.rpc_call(f"{prefix}.multicall", ["", call_name])
+            ],
+            matcher=matching.PatternFilter,
+            requires=[f"{prefix}.multicall=,{call_name}"],
+        )
+
+    return generate_call
+
+
 class TorrentProxy:
     """A single download item."""
 
@@ -871,6 +891,9 @@ class TorrentProxy:
             "kind_": generate_kind_field,
             "guessit_": generate_guessit_field,
             "d_": generate_d_call,
+            "f_": generate_sub_multicall("f"),
+            "p_": generate_sub_multicall("p"),
+            "t_": generate_sub_multicall("t"),
         }.items():
             cls.add_field_generator(prefix, generator)
 
