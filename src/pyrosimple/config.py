@@ -63,14 +63,20 @@ DEFAULT_SETTINGS = Box(
 )
 
 
-def load_settings():
+def load_settings() -> Box:
+    """Load settings from (in order of precedenc): the defaults, a
+    TOML config file, environment variables
+    """
     settings_box = DEFAULT_SETTINGS.copy()
     settings_file = Path(
         os.getenv(ENVVAR, "~/.config/pyrosimple/config.toml")
     ).expanduser()
     if settings_file.exists():
         settings_file_box = Box(
-            {k.upper(): v for k, v in tomllib.loads(settings_file.read_text()).items()}
+            {
+                k.upper(): v
+                for k, v in tomllib.loads(settings_file.read_text("utf-8")).items()
+            }
         )
         settings_box.merge_update(settings_file_box)
     env_settings = {}
