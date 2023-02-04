@@ -5,7 +5,7 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
-
+import os
 import functools
 import logging
 import urllib
@@ -13,63 +13,76 @@ import urllib
 from pathlib import Path
 from typing import Iterator, Optional, Union
 
-from dynaconf import Dynaconf, Validator
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
+
+from box.box import Box
 
 from pyrosimple import error
 
+ENVVAR = "PYRO_CONF"
+ENVVAR_PREFIX = "PYRO"
+SETTINGS_FILE = Path("~/.config/pyrosimple/config.toml").expanduser()
 
-settings = Dynaconf(
-    settings_files=[Path("~/.config/pyrosimple/config.toml").expanduser()],
-    envvar="PYRO_CONF",
-    envvar_prefix="PYRO",
-    validators=[
-        # Top-level settings
-        Validator("RTORRENT_RC", default="~/.rtorrent.rc"),
-        Validator("CONFIG_PY", default="~/.config/pyrosimple/config.py"),
-        Validator("CONFIG_PY_LOADED", default=False),
-        Validator("SORT_FIELDS", default="name,hash"),
-        Validator("FAST_QUERY", gte=0, lte=2, default=0),
-        Validator("ITEM_CACHE_EXPIRATION", default=5.0),
-        Validator("SAFETY_CHECKS_ENABLED", default=True),
-        Validator(
-            "MKTOR_IGNORE",
-            default=[
-                "core",
-                "CVS",
-                ".*",
-                "*~",
-                "*.swp",
-                "*.tmp",
-                "*.bak",
-                "[Tt]humbs.db",
-                "[Dd]esktop.ini",
-                "ehthumbs_vista.db",
-            ],
-        ),
-        Validator("SCGI_URL", default=""),
+DEFAULT_SETTINGS = Box(
+    {
+        "SCGI_URL": "",
+        "RTORRENT_RC": "~/.rtorrent.rc",
+        "CONFIG_PY": "~/.config/pyrosimple/config.py",
+        "CONFIG_PY_LOADED": False,
+        "SORT_FIELDS": "name,hash",
+        "FAST_QUERY": 0,
+        "ITEM_CACHE_EXPIRATION": 5.0,
+        "SAFETY_CHECKS_ENABLED": True,
+        "MKTOR_IGNORE": [
+            "core",
+            "CVS",
+            ".*",
+            "*~",
+            "*.swp",
+            "*.tmp",
+            "*.bak",
+            "[Tt]humbs.db",
+            "[Dd]esktop.ini",
+            "ehthumbs_vista.db",
+        ],
         # TOML sections
-        Validator("ALIASES", default={}),
-        Validator("ALIAS_TRAITS", default={}),
-        Validator("CONNECTIONS", default={}),
+        "ALIASES": {},
+        "ALIAS_TRAITS": {},
+        "CONNECTIONS": {},
         # Allow individual overrides in FORMATS section
-        Validator(
-            "FORMATS__default",
-            default='{{d.name}} \t[{{d.alias}}]\n  {{d.is_private|fmt("is_private")}} {{d.is_open|fmt("is_open")}} {{d.is_active|fmt("is_active")}} P{{d.prio|int}} {%if d.is_complete %}     done{%else%}{{"%8.2f"|format(d.done)}}%{%endif%}\t{{d.size|sz}} U:{{d.up|sz}}/s  D:{{d.down|sz}}/s T:{{d.throttle|fmt("throttle")}}',
-        ),
-        Validator(
-            "FORMATS__short",
-            default='{%set ESC = "\x1B" %}{%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{%if d.is_open%}O{%else%} {%endif%}{%if  d.is_active%}A{%else%} {%endif%}{%if not d.is_complete%}{{ESC+"[36m"}}{{ "{:>3}".format(d.done | round | int) }}{{ESC+"[0m"}}{%else%}  D{%endif%} {{"{:>10}".format(d.size | filesizeformat(True))}} {%if d.message%}{{ESC+"[31m"}}{%endif%} {{d.alias.rjust(3)}}{{ESC+"[0m"}} {%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{{d.name}}{{ESC+"[0m"}}',
-        ),
-        Validator(
-            "FORMATS__filelist",
-            default="{% for f in d.files %}{{d.realpath}}{% if d.is_multi_file %}/{{f.path}}{% endif %}{% if loop.index != loop.length %}\n{% endif %}{% endfor %}",
-        ),
-        Validator(
-            "FORMATS__action",
-            default="{{now()|iso}} {{action}}\t {{d.name}} [{{d.alias}}]",
-        ),
-    ],
+        "FORMATS": {
+            "default": '{{d.name}} \t[{{d.alias}}]\n  {{d.is_private|fmt("is_private")}} {{d.is_open|fmt("is_open")}} {{d.is_active|fmt("is_active")}} P{{d.prio|int}} {%if d.is_complete %}     done{%else%}{{"%8.2f"|format(d.done)}}%{%endif%}\t{{d.size|sz}} U:{{d.up|sz}}/s  D:{{d.down|sz}}/s T:{{d.throttle|fmt("throttle")}}',
+            "short": '{%set ESC = "\x1B" %}{%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{%if d.is_open%}O{%else%} {%endif%}{%if  d.is_active%}A{%else%} {%endif%}{%if not d.is_complete%}{{ESC+"[36m"}}{{ "{:>3}".format(d.done | round | int) }}{{ESC+"[0m"}}{%else%}  D{%endif%} {{"{:>10}".format(d.size | filesizeformat(True))}} {%if d.message%}{{ESC+"[31m"}}{%endif%} {{d.alias.rjust(3)}}{{ESC+"[0m"}} {%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{{d.name}}{{ESC+"[0m"}}',
+            "filelist": "{% for f in d.files %}{{d.realpath}}{% if d.is_multi_file %}/{{f.path}}{% endif %}{% if loop.index != loop.length %}\n{% endif %}{% endfor %}",
+            "action": "{{now()|iso}} {{action}}\t {{d.name}} [{{d.alias}}]",
+        },
+    }
 )
+
+
+def load_settings():
+    settings_box = DEFAULT_SETTINGS.copy()
+    settings_file = Path(
+        os.getenv(ENVVAR, "~/.config/pyrosimple/config.toml")
+    ).expanduser()
+    if settings_file.exists():
+        settings_file_box = Box(
+            {k.upper(): v for k, v in tomllib.loads(settings_file.read_text()).items()}
+        )
+        settings_box.merge_update(settings_file_box)
+    env_settings = {}
+    for k, v in os.environ.items():
+        if k.startswith(f"{ENVVAR_PREFIX}_"):
+            key = k[len(ENVVAR_PREFIX) + 1 :]
+            env_settings[key] = v
+    settings_box.merge_update(Box(env_settings))
+    return settings_box
+
+
+settings = load_settings()
 
 
 def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:

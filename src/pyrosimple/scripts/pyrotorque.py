@@ -16,7 +16,7 @@ from typing import Dict
 from apscheduler.schedulers.background import BackgroundScheduler
 from daemon import DaemonContext
 from daemon.pidfile import TimeoutPIDLockFile
-from dynaconf.utils.boxing import DynaBox
+from box.box import Box
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
@@ -91,7 +91,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         for name, params in config.settings.TORQUE.items():
             # Skip non-dictionary keys
-            if not isinstance(params, DynaBox):
+            if not isinstance(params, Box):
                 continue
             for key in ("handler", "schedule"):
                 if key not in params:
