@@ -222,9 +222,9 @@ class RtorrentControl(ScriptBaseWithConfig):
     ]
 
     # additional values for output formatting
-    FORMATTER_DEFAULTS = dict(
-        now=time.time,
-    )
+    FORMATTER_DEFAULTS = {
+        "now": time.time,
+    }
 
     # choices for --ignore
     IGNORE_OPTIONS = ("0", "1")
@@ -820,7 +820,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                             rtorrent.format_item(
                                 rtorrent.env.from_string(i),
                                 item,
-                                defaults=dict(item=item),
+                                defaults={"item": item},
                             )
                             for i in template_args
                         )
@@ -909,14 +909,14 @@ class RtorrentControl(ScriptBaseWithConfig):
 
             # Show via template?
             elif self.options.output_template:
-                full_ns = dict(
-                    version=None,
-                    proxy=r_engine.open(),
-                    view=view,
-                    query=matcher,
-                    matches=matches,
-                    summary=summary,
-                )
+                full_ns = {
+                    "version": None,
+                    "proxy": r_engine.open(),
+                    "view": view,
+                    "query": matcher,
+                    "matches": matches,
+                    "summary": summary,
+                }
 
                 output_template = self.options.output_template
                 sys.stdout.write(rtorrent.expand_template(output_template, full_ns))

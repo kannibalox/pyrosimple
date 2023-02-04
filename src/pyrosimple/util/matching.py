@@ -484,9 +484,9 @@ def prefilter_field_lookup(name: str) -> Optional[str]:
 class FloatFilter(NumericFilterBase):
     """Filter float values."""
 
-    FIELD_SCALE = dict(
-        ratio=1000,
-    )
+    FIELD_SCALE = {
+        "ratio": 1000,
+    }
 
     def pre_filter(self):
         """Prefilter a float value.
@@ -523,15 +523,15 @@ class FloatFilter(NumericFilterBase):
 class TimeFilter(NumericFilterBase):
     """Filter UNIX timestamp values."""
 
-    TIMEDELTA_UNITS = dict(
-        y=lambda t, d: t - d * 365 * 86400,
-        M=lambda t, d: t - d * 30 * 86400,
-        w=lambda t, d: t - d * 7 * 86400,
-        d=lambda t, d: t - d * 86400,
-        h=lambda t, d: t - d * 3600,
-        m=lambda t, d: t - d * 60,
-        s=lambda t, d: t - d,
-    )
+    TIMEDELTA_UNITS = {
+        "y": lambda t, d: t - d * 365 * 86400,
+        "M": lambda t, d: t - d * 30 * 86400,
+        "w": lambda t, d: t - d * 7 * 86400,
+        "d": lambda t, d: t - d * 86400,
+        "h": lambda t, d: t - d * 3600,
+        "m": lambda t, d: t - d * 60,
+        "s": lambda t, d: t - d,
+    }
     TIMEDELTA_RE = re.compile(
         "^" + "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms") + "$"
     )
@@ -669,7 +669,7 @@ class DurationFilter(TimeFilter):
 class ByteSizeFilter(NumericFilterBase):
     """Filter size and bandwidth values."""
 
-    UNITS = dict(b=1, k=1024, m=1024**2, g=1024**3)
+    UNITS = {"b": 1, "k": 1024, "m": 1024**2, "g": 1024**3}
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""

@@ -63,7 +63,9 @@ class RtorrentExporter(BaseJob):
         system_info = self.add_metric(
             "info", Info, self.prefix.rstrip("_"), "rTorrent platform information"
         )
-        info_call = [dict(methodName=method, params=[]) for method in self.info_methods]
+        info_call = [
+            {"methodName": method, "params": []} for method in self.info_methods
+        ]
         info_results = [r[0] for r in self.proxy.system.multicall(info_call)]
         system_info.info(
             dict(zip([m.replace(".", "_") for m in self.info_methods], info_results))
@@ -220,9 +222,9 @@ class RtorrentExporter(BaseJob):
     def collect_system(self) -> None:
         """Collect system metrics"""
         # Get data via multicall
-        calls = [dict(methodName=method, params=[]) for method in self.system_stats] + [
-            dict(methodName="view.size", params=["", view]) for view in self.views
-        ]
+        calls = [
+            {"methodName": method, "params": []} for method in self.system_stats
+        ] + [{"methodName": "view.size", "params": ["", view]} for view in self.views]
 
         result = [r[0] for r in self.proxy.system.multicall(calls)]
 

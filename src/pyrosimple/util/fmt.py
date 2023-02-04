@@ -178,7 +178,7 @@ def iso_datetime_optional(timestamp) -> str:
 def bytes_from_human(val: str) -> int:
     """Convert a human string to integer bytes. Follows the same logic
     as rtcontrol's byte filter"""
-    units = dict(b=1, k=1024, m=1024**2, g=1024**3)
+    units = {"b": 1, "k": 1024, "m": 1024**2, "g": 1024**3}
     lower_val = str(val).lower()
     if any(lower_val.endswith(i) for i in units):
         scale = units[lower_val[-1]]

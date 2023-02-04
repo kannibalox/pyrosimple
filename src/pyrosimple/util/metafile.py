@@ -467,13 +467,13 @@ class Metafile(dict):
 
             # Add resume data for this file
             resume["files"].append(
-                dict(
-                    priority=1,
-                    mtime=int(os.path.getmtime(filepath)),
-                    completed=(offset + fileinfo["length"] + piece_length - 1)
+                {
+                    "priority": 1,
+                    "mtime": int(os.path.getmtime(filepath)),
+                    "completed": (offset + fileinfo["length"] + piece_length - 1)
                     // piece_length
                     - offset // piece_length,
-                )
+                }
             )
             offset += fileinfo["length"]
         self["libtorrent_resume"] = resume

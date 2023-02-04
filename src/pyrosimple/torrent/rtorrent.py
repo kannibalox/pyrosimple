@@ -800,11 +800,11 @@ class RtorrentEngine:
             if infohash:
                 multi_call = self.open().system.multicall
                 multi_args = [
-                    dict(
-                        methodName=field.rsplit("=", 1)[0],
-                        params=[infohash]
+                    {
+                        "methodName": field.rsplit("=", 1)[0],
+                        "params": [infohash]
                         + (field.rsplit("=", 1)[1].split(",") if "=" in field else []),
-                    )
+                    }
                     for field in args
                 ]
                 raw_items = [[i[0] for i in multi_call(multi_args)]]

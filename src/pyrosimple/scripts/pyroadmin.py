@@ -155,9 +155,7 @@ class AdminTool(ScriptBaseWithConfig):
                 definition = "{:d}".format(value)
             else:
                 self.log.error(
-                    "Cannot handle {!r} definition of method {}".format(
-                        objtype, name
-                    )
+                    "Cannot handle {!r} definition of method {}".format(objtype, name)
                 )
                 continue
 
@@ -171,14 +169,10 @@ class AdminTool(ScriptBaseWithConfig):
                         const = None
                     if len(definition) > RC_CONTINUATION_THRESHOLD:
                         definition = "\\\n    " + definition
-                    definition = definition.replace(
-                        " ;     ", " ;\\\n     "
-                    ).replace(",    ", ",\\\n    ")
-                    print(
-                        "method.insert = {}, {}, {}".format(
-                            name, rctype, definition
-                        )
+                    definition = definition.replace(" ;     ", " ;\\\n     ").replace(
+                        ",    ", ",\\\n    "
                     )
+                    print("method.insert = {}, {}, {}".format(name, rctype, definition))
             if const:
                 print("method.const.enable = {}".format(name))
 
