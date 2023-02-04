@@ -5,13 +5,14 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
-import os
 import functools
 import logging
+import os
 import urllib
 
 from pathlib import Path
 from typing import Iterator, Optional, Union
+
 
 try:
     import tomllib
@@ -21,6 +22,7 @@ except ModuleNotFoundError:
 from box.box import Box
 
 from pyrosimple import error
+
 
 ENVVAR = "PYRO_CONF"
 ENVVAR_PREFIX = "PYRO"

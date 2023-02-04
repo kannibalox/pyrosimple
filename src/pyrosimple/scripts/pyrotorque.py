@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Dict
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from box.box import Box
 from daemon import DaemonContext
 from daemon.pidfile import TimeoutPIDLockFile
-from box.box import Box
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
