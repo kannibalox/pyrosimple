@@ -134,28 +134,25 @@ class RtorrentItem(engine.TorrentProxy):
             raise error.EngineError(
                 f"While getting files for torrent #{self._fields['hash']}: {exc}"
             )
-        else:
-            # self._engine.logger.debug("files result: %r" % rpc_result)
+        # Return results
+        result = [
+            Bunch(
+                path=i[0],
+                size=i[1],
+                mtime=i[2] / 1000000.0,
+                prio=i[3],
+                created=i[4],
+                opened=i[5],
+            )
+            for i in rpc_result
+        ]
 
-            # Return results
-            result = [
-                Bunch(
-                    path=i[0],
-                    size=i[1],
-                    mtime=i[2] / 1000000.0,
-                    prio=i[3],
-                    created=i[4],
-                    opened=i[5],
-                )
-                for i in rpc_result
-            ]
+        if attrs:
+            for idx, attr in enumerate(attrs):
+                for item, rpc_item in zip(result, rpc_result):
+                    item[attr] = rpc_item[6 + idx]
 
-            if attrs:
-                for idx, attr in enumerate(attrs):
-                    for item, rpc_item in zip(result, rpc_result):
-                        item[attr] = rpc_item[6 + idx]
-
-            return result
+        return result
 
     def memoize(self, name: str, getter: Callable, *args, **kwargs):
         """Cache a stable expensive-to-get item value for later

@@ -81,8 +81,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 raise error.ConfigurationError(
                     f"Bad param '{param}' in job schedule '{schedule}'"
                 ) from exc
-            else:
-                result[key] = val
+            result[key] = val
 
         return result
 

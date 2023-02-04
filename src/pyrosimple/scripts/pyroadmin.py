@@ -130,58 +130,57 @@ class AdminTool(ScriptBaseWithConfig):
                 if "Key not found" in exc.faultString:
                     continue
                 raise
-            else:
-                group, old_group = name.split(".", 1)[0], group
-                if group == "event":
-                    group = name
-                if group != old_group:
-                    print("")
+            group, old_group = name.split(".", 1)[0], group
+            if group == "event":
+                group = name
+            if group != old_group:
+                print("")
 
-                definition = None
-                objtype = type(value)
-                if objtype is list:
-                    value = [rc_quoted(x) for x in value]
-                    wrap_fmt = "((%s))" if value and is_method(value[0]) else "{%s}"
-                    definition = wrap_fmt % ", ".join(value)
-                elif objtype is dict:
-                    print("method.insert = {}, multi|rlookup|static".format(name))
-                    for key, val in sorted(value.items()):
-                        val = rc_quoted(val)
-                        if len(val) > RC_CONTINUATION_THRESHOLD:
-                            val = "\\\n    " + val
-                        print('method.set_key = {}, "{}", {}'.format(name, key, val))
-                elif objtype is str:
-                    definition = rc_quoted(value)
-                elif objtype is int:
-                    definition = "{:d}".format(value)
+            definition = None
+            objtype = type(value)
+            if objtype is list:
+                value = [rc_quoted(x) for x in value]
+                wrap_fmt = "((%s))" if value and is_method(value[0]) else "{%s}"
+                definition = wrap_fmt % ", ".join(value)
+            elif objtype is dict:
+                print("method.insert = {}, multi|rlookup|static".format(name))
+                for key, val in sorted(value.items()):
+                    val = rc_quoted(val)
+                    if len(val) > RC_CONTINUATION_THRESHOLD:
+                        val = "\\\n    " + val
+                    print('method.set_key = {}, "{}", {}'.format(name, key, val))
+            elif objtype is str:
+                definition = rc_quoted(value)
+            elif objtype is int:
+                definition = "{:d}".format(value)
+            else:
+                self.log.error(
+                    "Cannot handle {!r} definition of method {}".format(
+                        objtype, name
+                    )
+                )
+                continue
+
+            if definition:
+                if name in builtins:
+                    print("{}.set = {}".format(name, definition))
                 else:
-                    self.log.error(
-                        "Cannot handle {!r} definition of method {}".format(
-                            objtype, name
+                    rctype = {str: "string", int: "value"}.get(objtype, "simple")
+                    if const:
+                        rctype += "|const"
+                        const = None
+                    if len(definition) > RC_CONTINUATION_THRESHOLD:
+                        definition = "\\\n    " + definition
+                    definition = definition.replace(
+                        " ;     ", " ;\\\n     "
+                    ).replace(",    ", ",\\\n    ")
+                    print(
+                        "method.insert = {}, {}, {}".format(
+                            name, rctype, definition
                         )
                     )
-                    continue
-
-                if definition:
-                    if name in builtins:
-                        print("{}.set = {}".format(name, definition))
-                    else:
-                        rctype = {str: "string", int: "value"}.get(objtype, "simple")
-                        if const:
-                            rctype += "|const"
-                            const = None
-                        if len(definition) > RC_CONTINUATION_THRESHOLD:
-                            definition = "\\\n    " + definition
-                        definition = definition.replace(
-                            " ;     ", " ;\\\n     "
-                        ).replace(",    ", ",\\\n    ")
-                        print(
-                            "method.insert = {}, {}, {}".format(
-                                name, rctype, definition
-                            )
-                        )
-                if const:
-                    print("method.const.enable = {}".format(name))
+            if const:
+                print("method.const.enable = {}".format(name))
 
     def backfill(self):
         """Backfill missing any missing metadata from available sources.
@@ -284,8 +283,7 @@ class AdminTool(ScriptBaseWithConfig):
             except Exception:
                 self.log.error("Error loading SCGI URL:")
                 raise
-            else:
-                self.log.debug("Loaded SCGI URL successfully")
+            self.log.debug("Loaded SCGI URL successfully")
             try:
                 pyrosimple.connect().open()
             except ConnectionRefusedError:
@@ -294,8 +292,7 @@ class AdminTool(ScriptBaseWithConfig):
                     config.autoload_scgi_url(),
                 )
                 raise
-            else:
-                self.log.info("Connected to rTorrent successfully")
+            self.log.info("Connected to rTorrent successfully")
 
     def mainloop(self):
         self.args = self.parser.parse_args()

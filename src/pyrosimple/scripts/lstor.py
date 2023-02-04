@@ -69,6 +69,7 @@ class MetafileLister(ScriptBase):
                 print()
                 print("~" * 79)
 
+            listing = None
             try:
                 # Read and check metafile
                 try:
@@ -115,7 +116,6 @@ class MetafileLister(ScriptBase):
                             self.options.check_data,
                         )
                         sys.exit(EX_DATAERR)
-                listing = None
 
                 if self.options.raw:
                     from pyrosimple.util.fmt import (  # pylint: disable=import-outside-toplevel
@@ -166,9 +166,8 @@ class MetafileLister(ScriptBase):
                     "Bad metafile %r (%s: %s)", filename, type(exc).__name__, exc
                 )
                 raise
-            else:
-                if listing is not None:
-                    print(listing)
+            if listing is not None:
+                print(listing)
 
 
 def run():  # pragma: no cover

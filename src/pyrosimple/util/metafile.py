@@ -420,11 +420,10 @@ class Metafile(dict):
                 raise error.UserError(
                     f"Bad assignment {assignment!r} ({exc})!"
                 ) from exc
+            if val is None:
+                del namespace[keypath[-1]]
             else:
-                if val is None:
-                    del namespace[keypath[-1]]
-                else:
-                    namespace[keypath[-1]] = val
+                namespace[keypath[-1]] = val
 
     def add_fast_resume(self, datapath: os.PathLike) -> None:
         """Add fast resume data to a metafile dict."""
