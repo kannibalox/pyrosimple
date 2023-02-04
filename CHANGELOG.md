@@ -6,6 +6,10 @@
 - `rtcontrol`: Add `f_METHOD`, `p_METHOD` and `t_METHOD` dynamic
   fields
 
+### Changed
+- Move from settings `DynaConf` to `Box`. This should not have any
+  impact on the documented usage, but will decrease CLI cold start times.
+
 ## [2.6.1] - 2023-01-26
 
 ### Fixed
