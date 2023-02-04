@@ -10,8 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from xmlrpc import client as xmlrpclib
 
-from dynaconf.loaders import toml_loader
-from dynaconf.utils.boxing import DynaBox
+import tomli_w
 
 import pyrosimple
 
@@ -240,11 +239,8 @@ class AdminTool(ScriptBaseWithConfig):
             )
         else:
             self.log.info("Creating pyrosimple config file '%s'", config_path)
-            toml_loader.write(
-                str(config_path),
-                DynaBox(pyrosimple.config.settings.as_dict()).to_dict(),
-                merge=True,
-            )
+            with config_path.open("wb") as fh:
+                tomli_w.dump(pyrosimple.config.settings.to_dict(), fh)
 
     def create_rtorrent_rc(self):
         """Create a rtorrent.rc file"""

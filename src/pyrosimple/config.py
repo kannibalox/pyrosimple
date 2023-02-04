@@ -17,7 +17,7 @@ from typing import Iterator, Optional, Union
 try:
     import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore
 
 from box.box import Box
 
@@ -69,7 +69,7 @@ def load_settings() -> Box:
     """Load settings from (in order of precedenc): the defaults, a
     TOML config file, environment variables
     """
-    settings_box = DEFAULT_SETTINGS.copy()
+    settings_box: Box = DEFAULT_SETTINGS.copy()
     settings_file = Path(
         os.getenv(ENVVAR, "~/.config/pyrosimple/config.toml")
     ).expanduser()
@@ -90,7 +90,7 @@ def load_settings() -> Box:
     return settings_box
 
 
-settings = load_settings()
+settings: Box = load_settings()
 
 
 def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
@@ -145,7 +145,7 @@ def autoload_scgi_url() -> str:
         raise error.UserError(f"rTorrent RC file '{rcfile}' doesn't exist!")
     scgi_url = scgi_url_from_rtorrentrc(rcfile)
 
-    settings.set("SCGI_URL", scgi_url)
+    settings["SCGI_URL"] = scgi_url
 
     return str(settings.SCGI_URL)
 

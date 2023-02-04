@@ -43,6 +43,7 @@ shtab = "^1.5.5"
 inotify = {version = "^0.2.10", optional = true}
 python-box = "^7.0.0"
 tomli = { version = "^2.0.1",  python = "<3.11" }
+tomli-w = "^1.0.0"
 
 [tool.poetry.extras]
 torque = ["APScheduler", "inotify"]

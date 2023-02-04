@@ -5,6 +5,7 @@ import shutil
 
 from pathlib import Path
 
+from pyrosimple.error import ConfigurationError
 from pyrosimple.job import base
 from pyrosimple.torrent import rtorrent
 
@@ -25,7 +26,7 @@ class PathMover(base.MatchableJob):
         """Set up statistics logger."""
         super().__init__(config)
         if not self.config["target"]:
-            raise Exception("'target' not defined!")
+            raise ConfigurationError("'target' not defined!")
 
     def run_item(self, item: rtorrent.RtorrentItem):
         """Conditionally move data"""
