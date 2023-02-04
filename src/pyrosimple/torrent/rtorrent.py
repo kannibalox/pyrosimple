@@ -20,11 +20,12 @@ from xmlrpc import client as xmlrpclib
 import bencode
 import jinja2
 
+from box.box import Box
+
 from pyrosimple import config, error
 from pyrosimple.torrent import engine
 from pyrosimple.util import fmt, matching, metafile, pymagic, rpc, traits
 from pyrosimple.util.cache import ExpiringCache
-from pyrosimple.util.parts import Bunch
 
 
 # Prepare the jinja template environment at the module level
@@ -136,7 +137,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
         # Return results
         result = [
-            Bunch(
+            Box(
                 path=i[0],
                 size=i[1],
                 mtime=i[2] / 1000000.0,
@@ -745,7 +746,7 @@ class RtorrentEngine:
         self.logger.debug("%s", repr(self))
         return self.rpc
 
-    def multicall(self, viewname: str, fields: List[str]) -> List[Bunch]:
+    def multicall(self, viewname: str, fields: List[str]) -> List[Box]:
         """Query the given fields of items in the given view.
 
         The result list contains named tuples,
@@ -754,7 +755,7 @@ class RtorrentEngine:
         commands = tuple(f"d.{x}=" for x in fields)
         items = self.open().d.multicall2("", viewname, *commands)
         return [
-            Bunch(dict(zip([x.replace(".", "_") for x in fields], item)))
+            Box(dict(zip([x.replace(".", "_") for x in fields], item)))
             for item in items
         ]
 

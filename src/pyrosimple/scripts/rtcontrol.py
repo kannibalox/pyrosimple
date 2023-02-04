@@ -16,10 +16,11 @@ import time
 from multiprocessing.pool import ThreadPool
 from typing import Callable, List, Union
 
+from box.box import Box
+
 from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import fmt, pymagic, rpc
-from pyrosimple.util.parts import DefaultBunch
 
 
 def print_help_fields():
@@ -92,10 +93,10 @@ class FieldStatistics:
     def __init__(self):
         "Initialize accumulator"
         self.size = 0
-        self.errors = DefaultBunch(int)
-        self.total = DefaultBunch(int)
-        self.min = DefaultBunch(int)
-        self.max = DefaultBunch(int)
+        self.errors = Box(default_box=True, default_box_attr=0)
+        self.total = Box(default_box=True, default_box_attr=0)
+        self.min = Box(default_box=True, default_box_attr=0)
+        self.max = Box(default_box=True, default_box_attr=0)
         self._basetime = time.time()
         self.intermixed_args = True
 
@@ -128,7 +129,7 @@ class FieldStatistics:
     @property
     def average(self):
         "Calculate average"
-        result = DefaultBunch(str)
+        result = Box(default_box=True, default_box_attr="")
 
         # Calculate average if possible
         if self.size:

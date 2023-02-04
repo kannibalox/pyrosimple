@@ -31,9 +31,10 @@ from typing import (
 
 import bencode  # typing: ignore
 
+from box.box import Box
+
 from pyrosimple import error
 from pyrosimple.util import fmt, pymagic
-from pyrosimple.util.parts import Bunch
 
 
 ALLOWED_ROOT_NAME = re.compile(
@@ -434,7 +435,7 @@ class Metafile(dict):
             if datapath.is_dir():
                 datapath = datapath.joinpath(self["info"]["name"])
             files = [
-                Bunch(
+                Box(
                     path=[os.path.abspath(datapath)],
                     length=self["info"]["length"],
                 )

@@ -7,11 +7,12 @@ import unittest
 
 import pytest
 
+from box.box import Box
+
 import pyrosimple
 
 from pyrosimple import error
 from pyrosimple.torrent import rtorrent
-from pyrosimple.util.parts import Bunch
 from pyrosimple.util.rpc import RTorrentProxy
 
 
@@ -66,7 +67,7 @@ class MockProxy:
                 return i["d.name="]
 
     def __init__(self):
-        self.d = Bunch(
+        self.d = Box(
             multicall2=self.d_multicall2,
             name=self.d_name,
         )
