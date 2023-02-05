@@ -181,6 +181,10 @@ class AdminTool(ScriptBase):
         Safe to run multiple times.
         """
         # pylint: disable=broad-except
+        if self.options.url:
+            config.settings["SCGI_URL"] = config.lookup_connection_alias(
+                self.options.url
+            )
         engine = pyrosimple.connect()
         engine.open()
         for i in engine.view("main", matching.create_matcher("loaded=0 metafile=/.+/")):
