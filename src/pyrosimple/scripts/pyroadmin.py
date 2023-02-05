@@ -15,11 +15,11 @@ import tomli_w
 import pyrosimple
 
 from pyrosimple import config
-from pyrosimple.scripts.base import ScriptBaseWithConfig
+from pyrosimple.scripts.base import ScriptBase
 from pyrosimple.util import matching
 
 
-class AdminTool(ScriptBaseWithConfig):
+class AdminTool(ScriptBase):
     """Support for administrative tasks."""
 
     # TODO: config create, dump, set, get
@@ -27,6 +27,7 @@ class AdminTool(ScriptBaseWithConfig):
 
     def add_options(self):
         super().add_options()
+        self.parser.add_argument("-U", "--url", help="URL to rtorrent instance")
         self.parser.set_defaults(func=None)
         subparsers = self.parser.add_subparsers()
         config_parser = subparsers.add_parser("config", help="Validate configuration")
