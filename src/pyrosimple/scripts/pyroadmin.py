@@ -257,7 +257,7 @@ class AdminTool(ScriptBase):
                 fh.write(
                     importlib.resources.open_text("pyrosimple.data", "full-example.rc")
                     .read()
-                    .replace("/home/USERNAME/", home)
+                    .replace("/home/USERNAME", home)
                 )
 
     def config(self):
