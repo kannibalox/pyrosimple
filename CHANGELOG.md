@@ -10,6 +10,11 @@
 - Move from settings `DynaConf` to `Box`. This should not have any
   impact on the documented usage, but will decrease CLI cold start times.
 
+### Fixed
+- Fix `pyroadmin config --create-rtorrent-rc` when the config files do
+  not exist. (https://github.com/kannibalox/pyrosimple/pull/27 by
+  @vamega)
+
 ## [2.6.1] - 2023-01-26
 
 ### Fixed
