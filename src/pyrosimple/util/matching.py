@@ -550,6 +550,8 @@ class TimeFilter(NumericFilterBase):
         """Return rTorrent condition to speed up data transfer."""
         pf = prefilter_field_lookup(self._name)
         if pf is not None:
+            if not self._duration:
+                return ""
             # Adding a day of fuzz to avoid any possible timezone problems
             if self._op.name == "gt":
                 timestamp = float(self._value) + 86400
