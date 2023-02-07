@@ -152,7 +152,7 @@ def test_conditions_prefilter(cond, expected):
         # Datetimes
         ("leechtime==0", Box(leechtime=None)),
         ("leechtime>1h", Box(leechtime=60 * 60 * 2)),
-        ("completed>2h", Box(completed=time.time() - (60 * 60 * 2))),
+        ("completed>2h", Box(completed=time.time() - (60 * 60 * 2) - 5)),
         ("completed<1h", Box(completed=time.time() - 1)),
         ("tagged=test", Box(tagged=["test", "notest"])),
         ("completed>09/21/1990", Box(completed=time.time())),
