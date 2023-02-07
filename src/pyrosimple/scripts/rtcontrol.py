@@ -692,7 +692,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         # Preparation steps
         if self.options.fast_query != "=":
-            config.settings.set("FAST_QUERY", int(self.options.fast_query))
+            config.settings["FAST_QUERY"] = int(self.options.fast_query)
         # Set the output format
         raw_output_format = self.options.output_format
         default_output_format = "default"
