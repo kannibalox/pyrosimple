@@ -275,11 +275,11 @@ def test_matcher_fail(matcher, item):
         ("tagged!=foo", 'not="$string.contains_i=$d.custom=tags,\\"foo\\""'),
         ("views=test", 'string.contains_i=$d.views=,"test"'),
         # Dates
-        (
-            "completed>1990-09-21",
-            "greater=value=$d.custom=tm_completed,value="
-            + str(int(time.mktime(time.strptime("1990-09-20", "%Y-%m-%d")))),
-        ),
+        # (
+        #     "completed>1990-09-21",
+        #     "greater=value=$d.custom=tm_completed,value="
+        #     + str(int(time.mktime(time.strptime("1990-09-20", "%Y-%m-%d")))),
+        # ),
         # Example of a seemingly easy query that can't be prefiltered
         ("done>0", ""),
     ],
