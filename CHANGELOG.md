@@ -14,6 +14,8 @@
 - Fix `pyroadmin config --create-rtorrent-rc` when the config files do
   not exist. (https://github.com/kannibalox/pyrosimple/pull/27 by
   @vamega)
+- Fix inconsistent matching on TimeFilter fields (e.g. `completed`)
+  (https://github.com/kannibalox/pyrosimple/issues/28)
 
 ## [2.6.1] - 2023-01-26
 

@@ -524,13 +524,13 @@ class TimeFilter(NumericFilterBase):
     """Filter UNIX timestamp values."""
 
     TIMEDELTA_UNITS = {
-        "y": lambda t, d: t - d * 365 * 86400,
-        "M": lambda t, d: t - d * 30 * 86400,
-        "w": lambda t, d: t - d * 7 * 86400,
-        "d": lambda t, d: t - d * 86400,
-        "h": lambda t, d: t - d * 3600,
-        "m": lambda t, d: t - d * 60,
-        "s": lambda t, d: t - d,
+        "y": lambda d: d * 365 * 86400,
+        "M": lambda d: d * 30 * 86400,
+        "w": lambda d: d * 7 * 86400,
+        "d": lambda d: d * 86400,
+        "h": lambda d: d * 3600,
+        "m": lambda d: d * 60,
+        "s": lambda d: d,
     }
     TIMEDELTA_RE = re.compile(
         "^" + "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms") + "$"
@@ -544,6 +544,7 @@ class TimeFilter(NumericFilterBase):
         self._condition = value
         self._op: FilterOperator = op
         self._duration = False
+        self._flipped = False
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
@@ -591,23 +592,28 @@ class TimeFilter(NumericFilterBase):
                 # Time delta
                 for unit, val in delta.groupdict().items():
                     if val:
-                        timestamp = self.TIMEDELTA_UNITS[unit](timestamp, int(val, 10))
+                        delta_val = self.TIMEDELTA_UNITS[unit](int(val, 10))
 
                 if self._duration:
-                    timestamp = now - timestamp
-                # Invert the value for more intuitive matching (in
-                # line with original code too) e.g. 'completed<1d'
-                # should return things completed less than one day
-                # *ago*
+                    timestamp = delta_val
                 else:
-                    if self._op.name == "gt":
-                        self._op = Operators["le"]
-                    elif self._op.name == "ge":
-                        self._op = Operators["lt"]
-                    elif self._op.name == "lt":
-                        self._op = Operators["ge"]
-                    elif self._op.name == "le":
-                        self._op = Operators["gt"]
+                    # Invert the value for more intuitive matching (in
+                    # line with original code too) e.g. 'completed<1d'
+                    # should return things completed less than one day
+                    # *ago*. It needs to be guarded like this since
+                    # the property will be called multiple times
+                    # during the course of a run.
+                    if not self._flipped:
+                        if self._op.name == "gt":
+                            self._op = Operators["le"]
+                        elif self._op.name == "ge":
+                            self._op = Operators["lt"]
+                        elif self._op.name == "lt":
+                            self._op = Operators["ge"]
+                        elif self._op.name == "le":
+                            self._op = Operators["gt"]
+                        self._flipped = True
+                    timestamp = now - delta_val
             else:
                 # Assume it's an absolute date
                 if "/" in self._condition:
