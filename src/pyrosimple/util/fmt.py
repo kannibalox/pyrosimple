@@ -118,7 +118,8 @@ def fmt_pathname(val: str) -> str:
 
 
 def fmt_raw(val):
-    """A little magic to allow showing the raw value of a field in rtcontrol"""
+    """Show the raw value of the field."""
+    # A little magic to allow showing the raw value of a field in rtcontrol
     return val
 
 
