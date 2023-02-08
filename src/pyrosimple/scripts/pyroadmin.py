@@ -185,6 +185,7 @@ class AdminTool(ScriptBase):
             config.settings["SCGI_URL"] = config.lookup_connection_alias(
                 self.options.url
             )
+        config.settings["FAST_QUERY"] = 0
         engine = pyrosimple.connect()
         engine.open()
         for i in engine.view("main", matching.create_matcher("loaded=0 metafile=/.+/")):
