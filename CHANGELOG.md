@@ -1,10 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [2.7.0] - 2023-02-11
 
 ### Added
 - `rtcontrol`: Add `f_METHOD`, `p_METHOD` and `t_METHOD` dynamic
-  fields
+  fields.
 
 ### Changed
 - Move from settings `DynaConf` to `Box`. This should not have any
@@ -296,8 +296,9 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.6.1...HEAD
-[2.6.0]: https://github.com/kannibalox/pyrosimple/compare/v2.6.0...v2.6.1
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/kannibalox/pyrosimple/compare/v2.6.1...v2.7.0
+[2.6.1]: https://github.com/kannibalox/pyrosimple/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/kannibalox/pyrosimple/compare/v2.5.4...v2.6.0
 [2.5.4]: https://github.com/kannibalox/pyrosimple/compare/v2.5.3...v2.5.4
 [2.5.3]: https://github.com/kannibalox/pyrosimple/compare/v2.5.2...v2.5.3
