@@ -16,7 +16,7 @@ import pyrosimple
 
 from pyrosimple import config
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import matching
+from pyrosimple.util import matching, rpc
 
 
 class AdminTool(ScriptBase):
@@ -274,6 +274,10 @@ class AdminTool(ScriptBase):
         if self.args.create_rtorrent_rc:
             self.create_rtorrent_rc()
         if self.args.check:
+            if self.options.url:
+                config.settings["SCGI_URL"] = config.lookup_connection_alias(
+                    self.options.url
+                )
             try:
                 config.autoload_scgi_url()
             except Exception:
@@ -289,6 +293,50 @@ class AdminTool(ScriptBase):
                 )
                 raise
             self.log.info("Connected to rTorrent successfully")
+            self.config_check_timestamps()
+
+    def config_check_timestamps(self):
+        """Confirm usual methods for timestamps exist"""
+        proxy = pyrosimple.connect().open()
+        event_field_map = {
+            "event.download.resumed": "started",
+            "event.download.finished": "completed",
+            "event.download.inserted_new": "loaded",
+        }
+        print_timestamp_help = False
+        for event, field in event_field_map.items():
+            if "!time_stamp" not in proxy.method.get("", event):
+                self.log.warning(
+                    "Method '!time_stamp' not found in '%s', field '%s' may not function correctly",
+                    event,
+                    field,
+                )
+                print_timestamp_help = True
+        try:
+            proxy.method.get("", "pyro.last_xfer.min_rate")
+        except rpc.RpcError as exc:
+            if exc.faultCode in [-32602, -503]:
+                self.log.warning(
+                    "Method 'pyro.last_xfer.min_rate' not found, field 'last_xfer' may not function correctly"
+                )
+                print_timestamp_help = True
+            else:
+                raise
+        try:
+            proxy.method.get("", "d.timestamp.last_active")
+        except rpc.RpcError as exc:
+            if exc.faultCode in [-32602, -503]:
+                self.log.warning(
+                    "Method 'd.timestamp.last_active' not found, field 'last_active' may not function correctly"
+                )
+                print_timestamp_help = True
+            else:
+                raise
+
+        if print_timestamp_help:
+            self.log.warning(
+                "To configure timestamp fields, see https://kannibalox.github.io/pyrosimple/rtorrent-config/#timestamps"
+            )
 
     def mainloop(self):
         self.args = self.parser.parse_args()

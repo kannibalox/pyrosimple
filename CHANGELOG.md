@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- `pyroadmin`: `config --check` now looks to see if the method
+  necessary for timestamp fields exist.
+
 ## [2.7.0] - 2023-02-11
 
 ### Added
