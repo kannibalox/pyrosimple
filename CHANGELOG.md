@@ -3,8 +3,8 @@
 ## [Unreleased]
 
 ### Changed
-- `pyroadmin`: `config --check` now looks to see if the method
-  necessary for timestamp fields exist.
+- `pyroadmin`: `config --check` now alos checks if the methods
+  necessary for timestamp fields (e.g. `completed`) exist.
 
 ## [2.7.0] - 2023-02-11
 
