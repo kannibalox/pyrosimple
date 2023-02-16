@@ -133,9 +133,12 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if self.__verbose:
             logger.info("req: %s", request)
 
-        response = self.__transport.request(
-            self.__host, self.__handler, request, verbose=self.__verbose
-        )
+        try:
+            response = self.__transport.request(
+                self.__host, self.__handler, request, verbose=self.__verbose
+            )
+        except xmlrpclib.Fault as exc:
+            raise RpcError(exc.faultString, exc.faultCode) from exc
 
         if len(response) == 1:
             return response[0]
