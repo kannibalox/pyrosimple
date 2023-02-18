@@ -797,7 +797,7 @@ class RtorrentEngine:
             args = sorted(prefetch)
 
             # Check if view is in the format of a single hash
-            infohash = view._check_hash_view()
+            infohash = view.check_hash_view()
             if infohash:
                 multi_call = self.open().system.multicall
                 multi_args = [

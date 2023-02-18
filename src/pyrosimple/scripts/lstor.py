@@ -97,8 +97,7 @@ class MetafileLister(ScriptBase):
                             logging.getLogger().isEnabledFor(logging.WARNING)
                             and sys.stdout.isatty()
                         ):
-                            c = pb()
-                            progress_callback = c.progress_callback
+                            progress_callback = pb().progress_callback
                         else:
                             progress_callback = None
 

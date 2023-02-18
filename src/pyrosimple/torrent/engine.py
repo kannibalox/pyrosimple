@@ -955,7 +955,7 @@ class TorrentView:
 
         return self._items
 
-    def _check_hash_view(self) -> Optional[str]:
+    def check_hash_view(self) -> Optional[str]:
         """Return infohash if view name refers to a single item, else None."""
         infohash = None
         if self.viewname.startswith("#"):
@@ -971,7 +971,7 @@ class TorrentView:
 
     def size(self) -> int:
         """Total unfiltered size of view."""
-        if self._check_hash_view():
+        if self.check_hash_view():
             return 1
         return int(self.engine.open().view.size(rpc.NOHASH, self.viewname))
 

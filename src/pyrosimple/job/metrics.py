@@ -110,9 +110,7 @@ class RtorrentExporter(BaseJob):
         self.httpd = exposition.make_server(
             addr, port, app, TmpServer, handler_class=exposition._SilentHandler
         )
-        t = Thread(target=self.httpd.serve_forever)
-        t.daemon = True
-        t.start()
+        Thread(target=self.httpd.serve_forever, daemon=True).start()
 
     def init_item(self) -> None:
         """Initialize item metrics"""

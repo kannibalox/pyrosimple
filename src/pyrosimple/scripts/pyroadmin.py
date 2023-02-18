@@ -69,7 +69,7 @@ class AdminTool(ScriptBase):
         builtins = set(methods[: methods.index("view.sort_new") + 1])
         methods = set(methods)
         plain_re = re.compile(r"^[a-zA-Z0-9_.]+$")
-        RC_CONTINUATION_THRESHOLD = 50
+        rc_continuation_threshold = 50
 
         def is_method(name):
             "Helper"
@@ -146,7 +146,7 @@ class AdminTool(ScriptBase):
                 print("method.insert = {}, multi|rlookup|static".format(name))
                 for key, val in sorted(value.items()):
                     val = rc_quoted(val)
-                    if len(val) > RC_CONTINUATION_THRESHOLD:
+                    if len(val) > rc_continuation_threshold:
                         val = "\\\n    " + val
                     print('method.set_key = {}, "{}", {}'.format(name, key, val))
             elif objtype is str:
@@ -167,7 +167,7 @@ class AdminTool(ScriptBase):
                     if const:
                         rctype += "|const"
                         const = None
-                    if len(definition) > RC_CONTINUATION_THRESHOLD:
+                    if len(definition) > rc_continuation_threshold:
                         definition = "\\\n    " + definition
                     definition = definition.replace(" ;     ", " ;\\\n     ").replace(
                         ",    ", ",\\\n    "

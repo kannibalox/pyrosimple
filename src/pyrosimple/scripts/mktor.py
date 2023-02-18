@@ -216,7 +216,7 @@ class MetafileCreator(ScriptBase):
                 progress = pb_tracker
             else:
                 progress = None
-            # Create and metafile with the first announce as a placeholder
+            # Create a metafile with the first announce as a placeholder
             torrent = metafile.Metafile.from_path(
                 datapath,
                 self.args[1],
@@ -238,13 +238,13 @@ class MetafileCreator(ScriptBase):
         if not self.options.no_date:
             torrent["creation date"] = int(time.time())
 
-        # If only one announce, just save to file
         for alias, announce in tracker_urls.items():
             torrent["announce"] = announce
             torrent["info"]["source"] = alias
             torrent["info"]["x_cross_seed"] = hashlib.md5(announce.encode()).hexdigest()
             torrent.assign_fields(self.options.set)
             if len(self.args) == 2:
+                # If only one announce, just save to file
                 save_metapath = metapath
             else:
                 save_metapath = Path(f"{alias}_{metapath}")
