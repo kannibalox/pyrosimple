@@ -15,7 +15,7 @@ rTorrent, but instead disables the old trackers and inserts the new
 URL directly into the item:
 
 ```bash
-rcontrol "tracker=http://example.com/announce/old" \
+rtcontrol "tracker=http://example.com/announce/old" \
   --exec 't.multicall=0,t.disable= ; d.tracker.insert=0,"http://example.com/announce/new" ; d.save_full_session='
 ```
 
