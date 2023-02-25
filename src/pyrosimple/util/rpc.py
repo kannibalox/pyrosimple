@@ -173,6 +173,10 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         def sort_key(i: Dict) -> int:
             return int(i["id"])
 
+        if any(["error" in r for r in response]):
+            raise RpcError(
+                f"Errors in JSON-RPC batch call: {set([str(r['error']) for r in response if 'error' in r])}"
+            )
         result = [[r["result"]] for r in sorted(response, key=sort_key)]
         return result
 

@@ -808,7 +808,13 @@ class RtorrentEngine:
                     }
                     for field in args
                 ]
-                raw_items = [[i[0] for i in multi_call(multi_args)]]
+                print(multi_call(multi_args))
+                multi_resp = multi_call(multi_args)
+                if any(["faultCode" in r for r in multi_resp]):
+                    raise rpc.RpcError(
+                        f"Errors in system.multicall: {set([str(r) for r in multi_resp if 'faultCode' in r])}"
+                    )
+                raw_items = [[i[0] for i in multi_resp]]
             # Otherwise prepare a multicall as expected
             else:
                 multi_call = self.open().d.multicall2

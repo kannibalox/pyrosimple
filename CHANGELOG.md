@@ -6,6 +6,10 @@
 - `pyroadmin`: `config --check` now alos checks if the methods
   necessary for timestamp fields (e.g. `completed`) exist.
 
+### Fixed
+- `rtcontrol`: Show a more useful error message when using `--from=<hash>`
+  with a hash that doesn't exist
+
 ## [2.7.0] - 2023-02-11
 
 ### Added
