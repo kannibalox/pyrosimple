@@ -191,7 +191,7 @@ class AdminTool(ScriptBase):
         for i in engine.view("main", matching.create_matcher("loaded=0 metafile=/.+/")):
             try:
                 mtime = int(Path(i.metafile).stat().st_mtime)
-                if self.args.dry_run:
+                if self.options.dry_run:
                     dt = datetime.fromtimestamp(mtime)
                     self.log.info(
                         "Would set %s tm_loaded to %s from metafile %s",
@@ -207,7 +207,7 @@ class AdminTool(ScriptBase):
         for i in engine.view("main", matching.create_matcher("loaded=0 path=/.+/")):
             try:
                 mtime = int(Path(i.path).stat().st_mtime)
-                if self.args.dry_run:
+                if self.options.dry_run:
                     dt = datetime.fromtimestamp(mtime)
                     self.log.info(
                         "Would set %s tm_loaded to %s from path %s", i.hash, dt, i.path
@@ -222,7 +222,7 @@ class AdminTool(ScriptBase):
         ):
             try:
                 mtime = int(Path(i.path).stat().st_mtime)
-                if self.args.dry_run:
+                if self.options.dry_run:
                     dt = datetime.fromtimestamp(mtime)
                     self.log.info(
                         "Would set %s tm_completed to %s from path %s",
@@ -267,13 +267,13 @@ class AdminTool(ScriptBase):
 
     def config(self):
         """Handle the config subcommand"""
-        if self.args.dump_rc:
+        if self.options.dump_rc:
             self.dump_rc()
-        if self.args.create_config:
+        if self.options.create_config:
             self.create_config()
-        if self.args.create_rtorrent_rc:
+        if self.options.create_rtorrent_rc:
             self.create_rtorrent_rc()
-        if self.args.check:
+        if self.options.check:
             if self.options.url:
                 config.settings["SCGI_URL"] = config.lookup_connection_alias(
                     self.options.url
@@ -339,11 +339,10 @@ class AdminTool(ScriptBase):
             )
 
     def mainloop(self):
-        self.args = self.parser.parse_args()
-        if self.args.func is None:
+        if self.options.func is None:
             self.parser.print_help()
             return
-        self.args.func()
+        self.options.func()
 
 
 def run():  # pragma: no cover
