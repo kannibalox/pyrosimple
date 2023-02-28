@@ -238,13 +238,14 @@ class AdminTool(ScriptBase):
 
     def create_config(self):
         """Create a configuration file"""
-        config_path = Path("~/.config/pyrosimple/config.toml").expanduser()
+        config_path = Path(config.settings.CONFIG)
         if config_path.exists():
             self.log.info(
                 "Pyrosimple config path %s already exists, not overwriting", config_path
             )
         else:
             self.log.info("Creating pyrosimple config file '%s'", config_path)
+            config_path.parent.mkdir(parents=True, exist_ok=True)
             with config_path.open("wb") as fh:
                 tomli_w.dump(pyrosimple.config.settings.to_dict(), fh)
 
