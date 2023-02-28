@@ -259,6 +259,7 @@ class AdminTool(ScriptBase):
         else:
             self.log.info("Creating rtorrent.rc at '%s'", rtorrent_rc_path)
             home = str(Path("~").expanduser())
+            rtorrent_rc_path.parent.mkdir(parents=True, exist_ok=True)
             with rtorrent_rc_path.open("w", encoding="utf-8") as fh:
                 fh.write(
                     importlib.resources.open_text("pyrosimple.data", "full-example.rc")
