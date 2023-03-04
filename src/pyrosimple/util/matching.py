@@ -81,6 +81,20 @@ def truth(val, context="statement") -> bool:
     )
 
 
+TIMEDELTA_UNITS = {
+    "y": lambda d: d * 365 * 86400,
+    "M": lambda d: d * 30 * 86400,
+    "w": lambda d: d * 7 * 86400,
+    "d": lambda d: d * 86400,
+    "h": lambda d: d * 3600,
+    "m": lambda d: d * 60,
+    "s": lambda d: d,
+}
+TIMEDELTA_RE = re.compile(
+    "^" + "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms") + "$"
+)
+
+
 def unquote_pre_filter(
     pre_filter: str, regex_: re.Pattern = re.compile(r"[\\]+")
 ) -> str:
@@ -538,13 +552,11 @@ class TimeFilter(NumericFilterBase):
 
     # pylint: disable=super-init-not-called
     def __init__(self, name: str, op: FilterOperator, value: str):
-        self.children = []
-        self._name = name
-        self.not_null = False
-        self._condition = value
-        self._op: FilterOperator = op
-        self._duration = False
-        self._flipped = False
+        # During validate(), one of these two must be set to something
+        # non-None
+        self._timestamp_offset = None
+        self._timestamp = None
+        super().__init__(name, op, value)
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
@@ -553,104 +565,102 @@ class TimeFilter(NumericFilterBase):
         if self._value == 0:
             return ""
         pf = prefilter_field_lookup(self._name)
-        if pf is not None:
-            if not self._duration:
-                return ""
-            # Adding a day of fuzz to avoid any possible timezone problems
-            if self._op.name == "gt":
-                timestamp = float(self._value) + 86400
-                cmp_ = "greater"
-            elif self._op.name == "lt":
-                timestamp = float(self._value) - 86400
-                cmp_ = "less"
-            elif self._op.name == "eq":
-                timestamp = 0
-                cmp_ = "equal"
-            else:
-                return ""
-            timestamp = float(self._value) + (
-                -86400
-                if self._op.name == "gt"
-                else 86400
-                if self._op.name == "lt"
-                else 0
-            )
+        # Add a day of wiggle room to avoid any possible timezone problems
+        time_fuzz = 60 * 60 * 24
+        timestamp = 0
+        cmp_ = ""
+        if pf is None:
+            return ""
+        if self._op.name in ["gt", "ge"]:
+            timestamp = self._value - time_fuzz
+            cmp_ = "greater"
+        elif self._op.name in ["lt", "le"]:
+            timestamp = self._value + time_fuzz
+            cmp_ = "less"
 
+        if timestamp and cmp_:
             return '"{}=value=${},value={}"'.format(cmp_, pf, int(timestamp))
         return ""
 
+    def validate(self):
+        # 0 is a special case
+        delta = self._parse_delta()
+        if delta is not None:
+            self._timestamp_offset = delta
+            # Invert the operators to be more intuitive, i.e. <3d
+            # should match for values of less than 3 days *ago*.
+            self._invert_operator()
+            return
+        self._timestamp = self._parse_absolute_timestamp()
+        if self._timestamp is None:
+            raise ValueError(f"Could not parse timestamp {self._condition!r}")
+
     @property
     def _value(self):
-        timestamp = now = time.time()
+        if self._timestamp_offset is not None:
+            return time.time() - self._timestamp_offset
+        elif self._timestamp is not None:
+            return self._timestamp
+        raise ValueError(f"Unset time value from condition {self._condition!r}")
 
+    @_value.setter
+    def _value(self, _):
+        """Discard attempts to set the value, primarily because the
+        grandparent FieldFilter tries to do it in __init__()"""
+        return None
+
+    def _invert_operator(self):
+        if self._op.name == "gt":
+            self._op = Operators["le"]
+        elif self._op.name == "ge":
+            self._op = Operators["lt"]
+        elif self._op.name == "lt":
+            self._op = Operators["ge"]
+        elif self._op.name == "le":
+            self._op = Operators["gt"]
+
+    def _parse_delta(self) -> Optional[int]:
+        match = self.TIMEDELTA_RE.match(self._condition)
+        if not match:
+            return None
+        delta_val = 0
+        for unit, val in match.groupdict().items():
+            if val:
+                delta_val = self.TIMEDELTA_UNITS[unit](int(val, 10))
+        return delta_val
+
+    def _parse_absolute_timestamp(self) -> Optional[int]:
         if str(self._condition).isdigit():
             # Literal UNIX timestamp
             try:
-                timestamp = float(self._condition)
+                return int(self._condition)
             except (ValueError, TypeError) as exc:
                 raise FilterError(
-                    f"Bad timestamp value {self._condition!r} in {self._condition!r}"
+                    f"Bad UNIX timestamp value {self._condition!r}"
                 ) from exc
+        # Assume it's an absolute date
+        if "/" in self._condition:
+            # U.S.
+            dtfmt = "%m/%d/%Y"
+        elif "." in self._condition:
+            # European
+            dtfmt = "%d.%m.%Y"
         else:
-            # Something human readable
-            delta = self.TIMEDELTA_RE.match(self._condition)
-            if delta:
-                # Time delta
-                for unit, val in delta.groupdict().items():
-                    if val:
-                        delta_val = self.TIMEDELTA_UNITS[unit](int(val, 10))
+            # Fall back to ISO
+            dtfmt = "%Y-%m-%d"
 
-                if self._duration:
-                    timestamp = delta_val
-                else:
-                    # Invert the value for more intuitive matching (in
-                    # line with original code too) e.g. 'completed<1d'
-                    # should return things completed less than one day
-                    # *ago*. It needs to be guarded like this since
-                    # the property will be called multiple times
-                    # during the course of a run.
-                    if not self._flipped:
-                        if self._op.name == "gt":
-                            self._op = Operators["le"]
-                        elif self._op.name == "ge":
-                            self._op = Operators["lt"]
-                        elif self._op.name == "lt":
-                            self._op = Operators["ge"]
-                        elif self._op.name == "le":
-                            self._op = Operators["gt"]
-                        self._flipped = True
-                    timestamp = now - delta_val
-            else:
-                # Assume it's an absolute date
-                if "/" in self._condition:
-                    # U.S.
-                    dtfmt = "%m/%d/%Y"
-                elif "." in self._condition:
-                    # European
-                    dtfmt = "%d.%m.%Y"
-                else:
-                    # Fall back to ISO
-                    dtfmt = "%Y-%m-%d"
+        val = str(self._condition).upper().replace(" ", "T")
+        if "T" in val:
+            # Time also given
+            dtfmt += "T%H:%M:%S"[: 3 + 3 * val.count(":")]
 
-                val = str(self._condition).upper().replace(" ", "T")
-                if "T" in val:
-                    # Time also given
-                    dtfmt += "T%H:%M:%S"[: 3 + 3 * val.count(":")]
-
-                try:
-                    timestamp = time.mktime(tuple(time.strptime(val, dtfmt)))
-                except (ValueError) as exc:
-                    raise FilterError(
-                        f"Bad timestamp value {self._condition!r} in {self._condition!r} ({exc})"
-                    ) from exc
-
-                if self._duration:
-                    timestamp -= now
-        return timestamp
-
-    def validate(self):
-        """Validate filter condition (template method)."""
-        self._value  # pylint: disable=pointless-statement
+        try:
+            timestamp = time.mktime(time.strptime(val, dtfmt))
+        except ValueError as exc:
+            raise FilterError(
+                f"Could not parse timestamp {self._condition!r} with format {dtfmt!r}"
+            ) from exc
+        return int(timestamp)
 
 
 class TimeFilterNotNull(TimeFilter):
@@ -659,7 +669,6 @@ class TimeFilterNotNull(TimeFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.not_null = True
-        self._duration = False
 
 
 class DurationFilter(TimeFilter):
@@ -668,7 +677,34 @@ class DurationFilter(TimeFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.not_null = True
-        self._duration = True
+
+    @property
+    def _value(self):
+        if self._condition == "0":
+            return 0
+        if self._timestamp_offset is not None:
+            return self._timestamp_offset
+        elif self._timestamp is not None:
+            return time.time() - self._timestamp
+        raise ValueError(f"Unset time value from condition {self._condition!r}")
+
+    @_value.setter
+    def _value(self, _):
+        """Discard attempts to set the value, primarily because the
+        grandparent FieldFilter tries to do it in __init__()"""
+        return None
+
+    def validate(self):
+        # 0 is a special case
+        if self._condition == "0":
+            return
+        delta = self._parse_delta()
+        if delta is not None:
+            self._timestamp_offset = delta
+            return
+        self._timestamp = self._parse_absolute_timestamp()
+        if self._timestamp is None:
+            raise ValueError(f"Could not parse timestamp {self._condition!r}")
 
     def match(self, item) -> bool:
         """Return True if filter matches item."""
@@ -676,6 +712,31 @@ class DurationFilter(TimeFilter):
             # Never match "N/A" items, except when "-0" was specified
             return not bool(self._value)
         return super().match(item)
+
+    def pre_filter(self) -> str:
+        """Return rTorrent condition to speed up data transfer."""
+        # A "0" might indicate just that, or possibly an empty
+        # custom value.
+        if self._value == 0:
+            return ""
+        pf = prefilter_field_lookup(self._name)
+        time_fuzz = (
+            60 * 60 * 24
+        )  # Add a day of wiggle room to avoid any possible timezone problems
+        timestamp = 0
+        cmp_ = ""
+        if pf is None:
+            return ""
+        if self._op.name in ["gt", "ge"]:
+            timestamp = self._value + time_fuzz
+            cmp_ = "greater"
+        elif self._op.name in ["lt", "le"]:
+            timestamp = self._value - time_fuzz
+            cmp_ = "less"
+
+        if timestamp and cmp_:
+            return '"{}=value=${},value={}"'.format(cmp_, pf, int(timestamp))
+        return ""
 
 
 class ByteSizeFilter(NumericFilterBase):

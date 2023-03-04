@@ -147,35 +147,39 @@ def test_conditions_prefilter(cond, expected):
         # Numbers
         ("ratio>2", Box(ratio=5.0)),
         ("ratio>2 ratio<6.0", Box(ratio=5.0)),
+        # Byte numbers
         ("size>1G", Box(size=2 * (1024**3))),
-        ("size>1G", Box(size=2 * (1024**3))),
-        # Datetimes
+        ("size>1000", Box(size=50000)),
+        # Datetimes - duration
         ("leechtime==0", Box(leechtime=None)),
         ("leechtime>1h", Box(leechtime=60 * 60 * 2)),
+        ("leechtime<1h", Box(leechtime=60 * 30)),
+        # Datetimes - regular
         ("completed>2h", Box(completed=time.time() - (60 * 60 * 2) - 5)),
         ("completed<1h", Box(completed=time.time() - 1)),
-        ("tagged=test", Box(tagged=["test", "notest"])),
         ("completed>09/21/1990", Box(completed=time.time())),
         ("completed>21.09.1990", Box(completed=time.time())),
         ("completed>1990-09-21", Box(completed=time.time())),
         ("completed>1990-09-21T12:00", Box(completed=time.time())),
         ("completed>1990-09-21T12:00:00", Box(completed=time.time())),
         # Tags
+        ("tagged=test", Box(tagged=["test", "notest"])),
         ("tagged=notest", Box(tagged=["test", "notest"])),
         ("tagged=:", Box(tagged=[])),
         ('tagged=""', Box(tagged=[])),
         ('tagged!=""', Box(tagged=["foo"])),
         ("tagged!=:", Box(tagged=["bar", "foo"])),
         ("tagged!=notest", Box(tagged=["bar", "foo"])),
-        (
-            "tagged!=notest is_complete=no",
-            Box(tagged=["bar", "foo"], is_complete=False),
-        ),
+        # Files
         (
             "files=test*",
             Box(files=[Box(path="test/test.mkv"), Box(path="test.nfo")]),
         ),
         # Multi-type
+        (
+            "tagged!=notest is_complete=no",
+            Box(tagged=["bar", "foo"], is_complete=False),
+        ),
         (
             "[ ratio<1 OR seedtime<1 ] custom_1=TV",
             Box(custom_1="TV", ratio=0.5, seedtime=5),
@@ -275,11 +279,11 @@ def test_matcher_fail(matcher, item):
         ("tagged!=foo", 'not="$string.contains_i=$d.custom=tags,\\"foo\\""'),
         ("views=test", 'string.contains_i=$d.views=,"test"'),
         # Dates
-        # (
-        #     "completed>1990-09-21",
-        #     "greater=value=$d.custom=tm_completed,value="
-        #     + str(int(time.mktime(time.strptime("1990-09-20", "%Y-%m-%d")))),
-        # ),
+        (
+            "completed>1990-09-21",
+            "greater=value=$d.custom=tm_completed,value="
+            + str(int(time.mktime(time.strptime("1990-09-20", "%Y-%m-%d")))),
+        ),
         # Example of a seemingly easy query that can't be prefiltered
         ("done>0", ""),
     ],
