@@ -209,7 +209,8 @@ def map_announce2alias(url: str) -> str:
 def load_custom_py():
     """Load custom python configuration.
 
-    This only gets called when CLI tools are called to prevent some weird code injection"""
+    This only gets called when CLI tools are called to prevent some weird code injection
+    """
     log = logging.getLogger(__name__)
     if not settings.CONFIG_PY:
         log.debug("Custom code loading is disabled")

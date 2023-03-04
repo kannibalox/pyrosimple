@@ -61,7 +61,8 @@ class AdminTool(ScriptBase):
     def dump_rc(self):
         """Print a representative .rtorrent.rc as gleaned from a running instance.
 
-        This is neat but somewhat brittle, and behaves differently between XMLRPC and JSON-RPC."""
+        This is neat but somewhat brittle, and behaves differently between XMLRPC and JSON-RPC.
+        """
 
         proxy = pyrosimple.connect().open()
         methods = proxy.system.listMethods()

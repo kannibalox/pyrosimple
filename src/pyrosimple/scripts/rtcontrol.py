@@ -154,7 +154,8 @@ class RtorrentAction(argparse.Action):
     """This class is used by the argparse action parameter for adding rtcontrol actions to a master list in the namespace.
 
     There is a rather unfortunate name collision between argparse's actions and rtcontrol's actions.
-    'const' is used as the method name to call, with the arguments being pulled from the value"""
+    'const' is used as the method name to call, with the arguments being pulled from the value
+    """
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         """Build the action, default to 1 narg since that's the most common"""

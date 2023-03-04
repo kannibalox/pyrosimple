@@ -146,7 +146,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.sched.resume()
                 self.add_jobs()
                 self.running_config = dict(config.settings.TORQUE)
-        except (Exception) as exc:  # pylint: disable=broad-except
+        except Exception as exc:  # pylint: disable=broad-except
             self.log.error("Error while reloading config: %s", exc)
         else:
             self.sched.resume()
@@ -173,7 +173,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         """The main loop."""
         try:
             self.validate_config()
-        except (error.ConfigurationError) as exc:
+        except error.ConfigurationError as exc:
             self.fatal(exc)
 
         # Defaults for process control paths

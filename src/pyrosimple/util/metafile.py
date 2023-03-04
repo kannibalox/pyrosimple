@@ -70,6 +70,7 @@ METAFILE_STD_KEYS = [
     ["info", "files", "path"],
 ]
 
+
 # PieceLogger and PieceFailer are both utility classes for passing
 # into Metafile.make_info()'s piece_callback.
 class PieceLogger:
