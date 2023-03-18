@@ -16,7 +16,6 @@ log.debug("module loaded")
 
 
 class IntervalTest(unittest.TestCase):
-
     INTERVAL_DATA = [
         ("R1377390013R1377390082", dict(end=1377390084), 2),
         ("R1353618135P1353618151", dict(start=1353618141), 10),
@@ -29,6 +28,8 @@ class IntervalTest(unittest.TestCase):
 
 
 EXAMPLE_HASH = "BAE3666F5C14AEC4BF6DE49C752E3D148216B0DE"
+
+
 # Very basic field testing
 @pytest.mark.parametrize(
     ("field", "data", "expected"),
