@@ -118,7 +118,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     trigger="cron",
                     **params["schedule"],
                 )
-                print(self.jobs[name])
 
     def unload_jobs(self):
         """Allows jobs classes to clean up any global resources if the
