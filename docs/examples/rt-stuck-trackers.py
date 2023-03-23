@@ -115,7 +115,7 @@ class StuckTrackers(base.ScriptBaseWithConfig):
 
         if sum(stuck.values()):
             if self.options.to_tagged:
-                proxy.ui.current_view.set(view)
+                proxy.ui.current_view.set(rpc.NOHASH, view)
             self.LOG.info(
                 "Stuck items: TOTAL=%s, %s",
                 sum(stuck.values()),
