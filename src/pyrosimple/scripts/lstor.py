@@ -110,9 +110,9 @@ class MetafileLister(ScriptBase):
                         )
                     if not data_correct:
                         self.log.error(
-                            "File %s does match data from %s",
+                            "File %s does not match data in %s",
                             filename,
-                            self.options.check_data,
+                            Path(self.options.check_data).absolute(),
                         )
                         sys.exit(EX_DATAERR)
 
