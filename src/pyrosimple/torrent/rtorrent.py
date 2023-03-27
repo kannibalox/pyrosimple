@@ -651,20 +651,12 @@ class RtorrentEngine:
 
     def __repr__(self):
         """Return a representation of internal state."""
+        name = self.__class__.__name__
         if self.rpc:
             # Connected state
-            return "{} connected to {} [{}, up {}] via {!r}".format(
-                self.__class__.__name__,
-                self.engine_id,
-                self.engine_software,
-                fmt.human_duration(self.uptime, 0, 2, True).strip(),
-                self.url,
-            )
+            return f"{name} connected to {self.engine_id} [{self.engine_software}] via {self.url!r}"
         # Unconnected state
-        return "{} connectable via {!r}".format(
-            self.__class__.__name__,
-            self.url,
-        )
+        return f"{self.__class__.__name__} connectable via {self.url!r}"
 
     @property
     def uptime(self):

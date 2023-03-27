@@ -377,7 +377,7 @@ class PatternFilter(FieldFilter):
             except UnicodeEncodeError:
                 return ""
             needle = needle.replace('"', r"\\\"")
-            return r'"string.contains_i=${},\"{}\""'.format(pf, needle)
+            return rf'"string.contains_i=${pf},\"{needle}\""'
 
         return ""
 
@@ -418,9 +418,8 @@ class TaggedAsFilter(FieldFilter):
                 return f'"equal={pf},cat="'
             if not self._value:
                 return f'"not=${pf}"'
-            return r'"string.contains_i=${},\"{}\""'.format(
-                pf, self._value.replace('"', r"\\\"")
-            )
+            needle = self._value.replace('"', r"\\\"")
+            return rf'"string.contains_i=${pf},\"{needle}\""'
         return ""
 
     def validate(self):
@@ -599,7 +598,7 @@ class TimeFilter(NumericFilterBase):
     def _value(self):
         if self._timestamp_offset is not None:
             return time.time() - self._timestamp_offset
-        elif self._timestamp is not None:
+        if self._timestamp is not None:
             return self._timestamp
         raise ValueError(f"Unset time value from condition {self._condition!r}")
 
@@ -684,7 +683,7 @@ class DurationFilter(TimeFilter):
             return 0
         if self._timestamp_offset is not None:
             return self._timestamp_offset
-        elif self._timestamp is not None:
+        if self._timestamp is not None:
             return time.time() - self._timestamp
         raise ValueError(f"Unset time value from condition {self._condition!r}")
 

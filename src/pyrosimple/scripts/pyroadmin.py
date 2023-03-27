@@ -115,12 +115,11 @@ class AdminTool(ScriptBase):
                     [rc_quoted(x, in_brace=(wrap_fmt[0] == "{")) for x in text]
                 )
                 return text.replace("))))", ")) ))")
-            elif isinstance(text, int):
+            if isinstance(text, int):
                 return "(value, {:d})".format(text)
-            elif plain_re.match(text) or is_method(text):
+            if plain_re.match(text) or is_method(text):
                 return text
-            else:
-                return '"{}"'.format(text.replace("\\", "\\\\").replace('"', '\\"'))
+            return '"{}"'.format(text.replace("\\", "\\\\").replace('"', '\\"'))
 
         group = None
         for name in sorted(methods):
