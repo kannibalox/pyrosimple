@@ -109,7 +109,6 @@ class MetafileCreator(ScriptBase):
 
     # TODO: Optionally pass torrent directly to rTorrent (--load / --start)
     # TODO: Optionally limit disk I/O bandwidth used (incl. a config default!)
-    # TODO: Set "encoding" correctly
     # TODO: Support multi-tracker extension ("announce-list" field)
     # TODO: DHT "nodes" field?! [[str IP, int port], ...]
     # TODO: Web-seeding http://www.getright.com/seedtorrent.html
