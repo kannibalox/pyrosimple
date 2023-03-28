@@ -116,7 +116,7 @@ class TCPTransport(RTorrentTransport):
                 host, port = target.netloc.split(":")
                 sock.connect((host, int(port)))
                 sock.sendall(_encode_payload(request_body, self._headers))
-                with sock.makefile("rb") as handle:
+                with sock.makefile(mode="rb") as handle:
                     response = _parse_response(handle.read())[0]
         response_size_counter.inc(len(response))
         return self.parse_response(io.BytesIO(response))
@@ -134,7 +134,7 @@ class UnixTransport(RTorrentTransport):
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
                 sock.connect(target)
                 sock.sendall(_encode_payload(request_body))
-                with sock.makefile("b") as handle:
+                with sock.makefile(mode="rb") as handle:
                     response = _parse_response(handle.read())[0]
         response_size_counter.inc(len(response))
         return self.parse_response(io.BytesIO(response))
