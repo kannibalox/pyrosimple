@@ -224,10 +224,6 @@ class TreeWatch(BaseJob):
                 self.log.error("Could not load metafile from event %s: %s", event, exc)
 
 
-if __name__ == "__main__":
-    main()
-
-
 def main():
     """Show available templating values for a file"""
     # pylint: disable=import-outside-toplevel
@@ -250,3 +246,7 @@ def main():
         "Available variables: %s",
         pprint.pformat(job.build_metafile_variables(path, None)),
     )
+
+
+if __name__ == "__main__":
+    main()
