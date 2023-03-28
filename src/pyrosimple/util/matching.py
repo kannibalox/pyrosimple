@@ -61,7 +61,7 @@ Operators = {
 }
 
 
-def truth(val, context="statement") -> bool:
+def truth(val: Any, context="statement") -> bool:
     """Convert truth value in "val" to a boolean."""
     # Try coercing it to an int then a bool
     try:
@@ -327,15 +327,17 @@ class PatternFilter(FieldFilter):
                 regex = re.compile(value[1:-1], self._flags)
                 self._matcher = lambda val, _: bool(regex.search(val))
         elif self._value.startswith("{{") or self._value.endswith("}}"):
-
-            def _template_globber(val, item):
-                """Helper method to allow templating a glob."""
-                pattern = torrent.rtorrent.format_item(
-                    torrent.rtorrent.env.from_string(self._template), item
-                )
-                return fnmatch.fnmatchcase(val, pattern)
-
             self._template = self._value
+
+            def _template_globber(val, item) -> bool:
+                """Helper method to allow templating a glob."""
+                if self._template is not None:
+                    pattern = torrent.rtorrent.format_item(
+                        torrent.rtorrent.env.from_string(self._template), item
+                    )
+                    return fnmatch.fnmatchcase(val, pattern)
+                return False
+
             self._matcher = _template_globber
         else:
             # Pick out a glob that can be simplified
@@ -892,10 +894,12 @@ class MatcherBuilder(NodeVisitor):
         return pared
 
     def visit_cond(self, node, visited_children):
-        if len(visited_children) == 1 and isinstance(
-            visited_children[0], (str, re.Pattern)
-        ):
-            return create_filter("name", Operators["eq"], visited_children[0])
+        if len(visited_children) == 1:
+            child = visited_children[0]
+            if isinstance(child, str):
+                return create_filter("name", Operators["eq"], child)
+            if isinstance(child, re.Pattern):
+                return create_filter("name", Operators["eq"], child.pattern)
         return self.generic_visit(node, visited_children)
 
     def visit_query(self, node, visited_children):

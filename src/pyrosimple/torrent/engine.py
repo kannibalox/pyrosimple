@@ -13,6 +13,7 @@ from typing import Callable, Dict, Optional, Set, cast
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
+from pyrosimple.util.cache import ExpiringCache
 
 
 logger = logging.getLogger(__name__)
@@ -899,7 +900,7 @@ class TorrentProxy:
 
     def __init__(self):
         """Initialize object."""
-        self._fields = {}
+        self._fields = ExpiringCache()
 
     def __hash__(self):
         """Make item hashable for Python."""

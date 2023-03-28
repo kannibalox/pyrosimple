@@ -13,7 +13,7 @@ import textwrap
 import time
 import traceback
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 from typing import List, Optional
 
 import shtab
@@ -28,14 +28,14 @@ class ScriptBase:
     # additonal stuff appended after the command handler's docstring
     ADDITIONAL_HELP: List[str] = []
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize CLI."""
         self.startup = time.time()
         # self.LOG exists only for backwards compatibility
         self.LOG = self.log = pymagic.get_class_logger(self)
 
-        self.args = None
-        self.options = None
+        self.args: Optional[List] = None
+        self.options = Namespace()
         self.return_code = 0
         self.engine = None
         self.intermixed_args = False
@@ -54,6 +54,9 @@ class ScriptBase:
         if implementation == "cpython":
             implementation = "Python"
         version_info = f"{version} on {implementation} {sys.version.split()[0]}"
+
+        if getattr(self, "__doc__", None) is None:
+            self.__doc__ = ""
 
         self.parser = ArgumentParser(
             formatter_class=RawDescriptionHelpFormatter,
@@ -141,7 +144,7 @@ class ScriptBase:
             self.options = self.parser.parse_intermixed_args(self.args)
         else:
             self.options = self.parser.parse_args(self.args)
-        self.args: Optional[List] = getattr(self.options, "args", None)
+        self.args = getattr(self.options, "args", None)
 
         if self.options.log_level:
             logging.getLogger("pyrosimple").setLevel(self.options.log_level)
@@ -161,9 +164,10 @@ class ScriptBase:
             self.log.fatal(msg)
         sys.exit(error.EX_SOFTWARE)
 
-    def run(self, args=None):
+    def run(self, args: Optional[List[str]] = None):
         """The main program skeleton."""
-        self.args = args
+        if args is not None:
+            self.args = args
         try:
             try:
                 # Preparation steps
