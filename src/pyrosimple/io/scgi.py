@@ -5,7 +5,7 @@ import socket
 import subprocess
 import sys
 
-from typing import Dict, List, Tuple, Type, Optional
+from typing import Dict, List, Optional, Tuple, Type
 from urllib import parse as urlparse
 from urllib.error import URLError
 from xmlrpc import client as xmlrpclib

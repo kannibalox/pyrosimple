@@ -419,6 +419,8 @@ class RtorrentItem(engine.TorrentProxy):
             return custom_fields
         proxy.d.save_full_session(self.hash)
         info_file = Path(proxy.session.path(), f"{self.hash}.torrent.rtorrent")
+        if info_file.exists():
+            return dict(bencode.decode(info_file.read_bytes())["custom"])
         return dict(
             bencode.decode(proxy.execute.capture(rpc.NOHASH, "cat", info_file))[
                 "custom"
@@ -519,7 +521,7 @@ class RtorrentItem(engine.TorrentProxy):
             self._fields.clear()
         return True
 
-    def delete(self):
+    def delete(self) -> None:
         """Remove torrent from client."""
         self.stop()
         tied_file = self.rpc_call("d.tied_to_file")
@@ -531,7 +533,7 @@ class RtorrentItem(engine.TorrentProxy):
     # Set priority of selected files
     # NOTE: need to call d.update_priorities after f.priority.set!
 
-    def purge(self):
+    def purge(self) -> None:
         """Delete PARTIAL data files and remove torrent from client."""
 
         def partial_file(item):
@@ -584,7 +586,7 @@ class RtorrentItem(engine.TorrentProxy):
         if not dry_run:
             self.delete()
 
-    def flush(self):
+    def flush(self) -> None:
         """Write volatile data to disk."""
         self._make_it_so("saving session data of", ["d.save_resume"])
 
@@ -629,13 +631,13 @@ class RtorrentEngine:
         "d.up.total",
     }
 
-    def __init__(self, url=None, auto_open=False):
+    def __init__(self, url: Optional[str] = None, auto_open: bool = False):
         """Initialize proxy."""
         self.logger = pymagic.get_class_logger(self)
         self.engine_id = "N/A"  # ID of the instance we're connecting to
         self.engine_software = "rTorrent"  # Name and version of software
         self.startup = time.time()
-        self.properties = {}
+        self.properties: Dict[str, str] = {}
         self.known_throttle_names = {"", "NULL"}
         self.url: str
         if url is None:
@@ -697,7 +699,7 @@ class RtorrentEngine:
             return True
         return False
 
-    def open(self):
+    def open(self) -> rpc.RTorrentProxy:
         """Open connection."""
         # Avoid scraping properties twice
         if self.properties:
@@ -717,7 +719,7 @@ class RtorrentEngine:
             }
         )
         self.engine_id = self.properties["session.name"]
-        time_usec = self.properties["system.time_usec"]
+        time_usec = float(self.properties["system.time_usec"])
 
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
@@ -930,7 +932,7 @@ def expand_template(template_path: str, namespace: Dict) -> str:
 
 def format_item_str(
     template_str: str, item: Union[Dict, str, RtorrentItem], defaults=None
-):
+) -> str:
     """Simple helper function to format a string with an item"""
     template = env.from_string(template_str)
     return format_item(template, item, defaults)
