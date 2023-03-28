@@ -66,6 +66,7 @@ pytest = "^7.0.1"
 typing-extensions = "^4.1.1"
 black = "^23.1.0"
 isort = "^5.10.1"
+mypy = "^1.1.1"
 
 [tool.poetry.group.docs]
 optional = true
