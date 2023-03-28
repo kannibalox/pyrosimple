@@ -483,7 +483,7 @@ class NumericFilterBase(FieldFilter):
             return False
         # Grab the function from the native operator module
         op = getattr(operator, self._op.name)
-        return bool(op(float(val), self._value))
+        return bool(op(float(val), float(self._value)))
 
 
 def prefilter_field_lookup(name: str) -> Optional[str]:
@@ -510,7 +510,7 @@ class FloatFilter(NumericFilterBase):
         pf = prefilter_field_lookup(self._name)
         if pf is None:
             return ""
-        val = self._value * self.FIELD_SCALE.get(self._name, 1)
+        val = int(self._value) * self.FIELD_SCALE.get(self._name, 1)
         lookup_table = {
             "eq": ("equal", int(val)),
             "ge": ("greater", math.floor(val - 1)),
@@ -571,10 +571,10 @@ class TimeFilter(NumericFilterBase):
         if pf is None:
             return ""
         if self._op.name in ["gt", "ge"]:
-            timestamp = self._value - time_fuzz
+            timestamp = int(self._value) - time_fuzz
             cmp_ = "greater"
         elif self._op.name in ["lt", "le"]:
-            timestamp = self._value + time_fuzz
+            timestamp = int(self._value) + time_fuzz
             cmp_ = "less"
 
         if timestamp and cmp_:
@@ -595,15 +595,15 @@ class TimeFilter(NumericFilterBase):
             raise ValueError(f"Could not parse timestamp {self._condition!r}")
 
     @property
-    def _value(self):
+    def _value(self) -> str:
         if self._timestamp_offset is not None:
-            return time.time() - self._timestamp_offset
+            return str(time.time() - self._timestamp_offset)
         if self._timestamp is not None:
-            return self._timestamp
+            return str(self._timestamp)
         raise ValueError(f"Unset time value from condition {self._condition!r}")
 
     @_value.setter
-    def _value(self, _):
+    def _value(self, value: str) -> None:
         """Discard attempts to set the value, primarily because the
         grandparent FieldFilter tries to do it in __init__()"""
         return None
