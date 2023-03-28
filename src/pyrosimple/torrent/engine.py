@@ -273,7 +273,7 @@ class MutableField(FieldDefinition):
         formatter=None,
         requires=None,
         prefilter_field=None,
-        setter: Callable = None,
+        setter: Optional[Callable] = None,
     ):
         super().__init__(
             valtype, name, doc, accessor, matcher, formatter, requires, prefilter_field

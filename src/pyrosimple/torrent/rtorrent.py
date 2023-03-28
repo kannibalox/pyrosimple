@@ -540,7 +540,9 @@ class RtorrentItem(engine.TorrentProxy):
 
         self.cull(file_filter=partial_file, attrs=["completed_chunks", "size_chunks"])
 
-    def cull(self, file_filter: Optional[Callable] = None, attrs: List[str] = None):
+    def cull(
+        self, file_filter: Optional[Callable] = None, attrs: Optional[List[str]] = None
+    ):
         """Delete ALL data files and remove torrent from client.
 
         @param file_filter: Optional callable for selecting a subset of all files.
