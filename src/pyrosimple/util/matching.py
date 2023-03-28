@@ -603,7 +603,7 @@ class TimeFilter(NumericFilterBase):
         raise ValueError(f"Unset time value from condition {self._condition!r}")
 
     @_value.setter
-    def _value(self, value: str) -> None:
+    def _value(self, _: str) -> None:
         """Discard attempts to set the value, primarily because the
         grandparent FieldFilter tries to do it in __init__()"""
         return None
