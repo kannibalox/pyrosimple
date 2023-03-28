@@ -299,14 +299,14 @@ class PatternFilter(FieldFilter):
     SPLIT_PRE_VAL_RE = re.compile(r"[^a-zA-Z0-9/_]+")
     SPLIT_PRE_GLOB_RE = re.compile(r"[?*]+")
 
-    def validate(self):
+    def validate(self) -> None:
         """Validate filter condition (template method)."""
 
         super().validate()
         self._value: str = self._value
         self._template = None
         self._flags = 0
-        self._matcher: Callable[Any, Any]
+        self._matcher: Callable[[str, Any], bool]
         if (
             self._value == '""'
         ):  # Replace an empty string with a simple truthiness check
@@ -325,7 +325,7 @@ class PatternFilter(FieldFilter):
                     self._flags = re.IGNORECASE
                     value = self._value.rstrip("i")
                 regex = re.compile(value[1:-1], self._flags)
-                self._matcher = lambda val, _: regex.search(val)
+                self._matcher = lambda val, _: bool(regex.search(val))
         elif self._value.startswith("{{") or self._value.endswith("}}"):
 
             def _template_globber(val, item):

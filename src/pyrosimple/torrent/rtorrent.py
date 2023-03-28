@@ -635,7 +635,6 @@ class RtorrentEngine:
         self.engine_id = "N/A"  # ID of the instance we're connecting to
         self.engine_software = "rTorrent"  # Name and version of software
         self.startup = time.time()
-        self.rpc = None
         self.properties = {}
         self.known_throttle_names = {"", "NULL"}
         self.url: str
@@ -644,6 +643,12 @@ class RtorrentEngine:
             self.url = config.settings.SCGI_URL
         else:
             self.url = url
+        if not self.url:
+            raise error.UserError(
+                "You need to configure a RPC connection, read"
+                " https://kannibalox.github.io/pyrosimple/configuration/#top-level-section"
+            )
+        self.rpc = rpc.RTorrentProxy(self.url)
         if auto_open:
             self.open()
 
@@ -686,7 +691,7 @@ class RtorrentEngine:
         return results
 
     @lru_cache(maxsize=32)
-    def has_method(self, method_name: str):
+    def has_method(self, method_name: str) -> bool:
         """Cached check to see if method exists"""
         if method_name in self.rpc.system.listMethods():
             return True
@@ -694,19 +699,13 @@ class RtorrentEngine:
 
     def open(self):
         """Open connection."""
-        # Only connect once
-        if self.rpc is not None:
+        # Avoid scraping properties twice
+        if self.properties:
             return self.rpc
 
         # Reading abilities are on the downfall, so...
-        if not self.url:
-            raise error.UserError(
-                "You need to configure a RPC connection, read"
-                " https://kannibalox.github.io/pyrosimple/configuration/#top-level-section"
-            )
 
         # Connect and get instance ID (also ensures we're connectable)
-        self.rpc = rpc.RTorrentProxy(self.url)
         self.properties = self.system_multicall(
             {
                 "system.client_version": [],

@@ -82,5 +82,6 @@ class MockProxy:
 def test_rpc():
     e = pyrosimple.connect("localhost:8080")
     e.rpc = MockProxy()
+    e.properties = {"foo": "bar"}
     e.log("test")
     items = list(e.items("default", ["d.name"]))
