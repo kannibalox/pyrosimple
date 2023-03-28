@@ -801,7 +801,6 @@ class RtorrentEngine:
                     }
                     for field in args
                 ]
-                print(multi_call(multi_args))
                 multi_resp = multi_call(multi_args)
                 if any("faultCode" in r for r in multi_resp):
                     uniq_errors = {str(r) for r in multi_resp if "faultCode" in r}
