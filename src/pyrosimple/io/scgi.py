@@ -133,7 +133,7 @@ class UnixTransport(RTorrentTransport):
         with response_time_summary.time():
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
                 sock.connect(target)
-                sock.sendall(_encode_payload(request_body))
+                sock.sendall(_encode_payload(request_body, self._headers))
                 with sock.makefile(mode="rb") as handle:
                     response = _parse_response(handle.read())[0]
         response_size_counter.inc(len(response))
