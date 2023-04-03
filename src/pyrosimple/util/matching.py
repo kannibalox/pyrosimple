@@ -573,10 +573,10 @@ class TimeFilter(NumericFilterBase):
         if pf is None:
             return ""
         if self._op.name in ["gt", "ge"]:
-            timestamp = int(self._value) - time_fuzz
+            timestamp = int(float(self._value)) - time_fuzz
             cmp_ = "greater"
         elif self._op.name in ["lt", "le"]:
-            timestamp = int(self._value) + time_fuzz
+            timestamp = int(float(self._value)) + time_fuzz
             cmp_ = "less"
 
         if timestamp and cmp_:
