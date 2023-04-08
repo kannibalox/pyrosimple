@@ -8,13 +8,17 @@ While no rTorrent configuration is strictly required, some fields will
 only work correctly with configuration, and commands can be assigned
 to rTorrent functions for easy access.
 
+!!! note
+    If you already have an existing `rtorrent-ps`/`rtorrent-ps-ch`
+    configuration set up, you shouldn't need to make any changes to it.
+
 !!! tip
-    To quickly generate a full config, run the following command:
+    To skip all the explanations and quickly generate a full config, run the following command:
     ```
     pyroadmin --create-rtorrent-rc
     ```
 
-The full-featured `rtorrent.rc` referenced above is provided
+The full-featured `rtorrent.rc` used above is provided
 [here](https://github.com/kannibalox/pyrosimple/raw/main/src/pyrosimple/data/full-example.rc). The
 configuration [provided by
 pyrocore](https://github.com/pyroscope/pyrocore/tree/master/src/pyrocore/data/config/rtorrent.d)
