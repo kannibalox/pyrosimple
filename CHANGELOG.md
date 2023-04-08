@@ -10,7 +10,7 @@
 - `rtcontrol`: Show a more useful error message when using `--from=<hash>`
   with a hash that doesn't exist
 - Send assigned SCGI headers over unix sockets
-- `chtor`: Fix `-o/--output-directory`
+- `chtor`: Fix `-o/--output-directory` (https://github.com/kannibalox/pyrosimple/issues/32)
 
 ## [2.7.0] - 2023-02-11
 
