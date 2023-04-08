@@ -395,14 +395,13 @@ class MetafileChanger(ScriptBase):
                 # Write new metafile, if changed
 
                 if self.options.output_directory:
-                    filename = os.path.join(
+                    filename = Path(
                         self.options.output_directory, os.path.basename(filename)
                     )
                     self.log.info("Will write %r...", filename)
 
                     if not self.options.dry_run:
-                        with open(filename, "wb") as fh:
-                            fh.write(bencode.bencode(torrent))
+                        torrent.save(filename)
                         if "libtorrent_resume" in torrent:
                             # Also write clean version
                             filename = filename.replace(
@@ -410,7 +409,7 @@ class MetafileChanger(ScriptBase):
                             )
                             del torrent["libtorrent_resume"]
                             self.log.info("Writing '%s'...", filename)
-                            bencode.bwrite(torrent, filename)
+                            torrent.save(filename)
                 else:
                     current_torrent = metafile.Metafile.from_file(filename)
                     diff = diff_metafiles(current_torrent, torrent, filename)
