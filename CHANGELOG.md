@@ -1,9 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [2.7.1] - 2023-04-09
 
 ### Changed
-- `pyroadmin`: `config --check` now alos checks if the methods
+- `pyroadmin`: `config --check` now also checks if the methods
   necessary for timestamp fields (e.g. `completed`) exist.
 
 ### Fixed
@@ -68,7 +68,7 @@
 
 ### Changed
 - `pyrotorque`: For `RtorrentExporter`, scrape on the job schedule
-  instead of the actual http call. This helps prevent both slow scrapes
+  instead of the actual HTTP call. This helps prevent both slow scrapes
   from stacking up, and duplicate RPC calls when being scraped by
   multiple prometheuses.
   
@@ -94,7 +94,7 @@
 ## [2.5.1] - 2022-12-22
 
 ### Added
-- `rtcontrol`: Added `d_<call name>` field for arbitrary rpc calls. As
+- `rtcontrol`: Added `d_<call name>` field for arbitrary RPC calls. As
   an example, to show the
   [`d.creation_date`](https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-creation-date)
   of all torrent with connected peers
@@ -127,7 +127,7 @@
 - `rtcontrol`: Certain floats will display less precision for better
   output (`<field>.raw` can still be used to get the real value).
 - `rtcontrol`: Correctly detect fields from unnamed conditions
-  combined with named ones (e.g. `// is_compelete=no` would previously
+  combined with named ones (e.g. `// is_complete=no` would previously
   not prefetch `d.name`)
 
 ### Fixed
@@ -308,7 +308,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...HEAD
+[2.7.1]: https://github.com/kannibalox/pyrosimple/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/kannibalox/pyrosimple/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/kannibalox/pyrosimple/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/kannibalox/pyrosimple/compare/v2.5.4...v2.6.0
