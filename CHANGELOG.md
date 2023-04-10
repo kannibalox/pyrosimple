@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Memoization helper function for expensive custom fields
+
 ## [2.7.1] - 2023-04-09
 
 ### Changed

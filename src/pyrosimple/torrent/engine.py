@@ -189,6 +189,28 @@ def detect_traits(item):
     )
 
 
+def memoize(func, custom_key, empty_value="<empty>"):
+    """Store an expensive result in a custom key
+
+    The reason for `empty_value` is that some results might be
+    indistinguishable from the custom key being unset.
+    """
+
+    def wrapper(item):
+        memoized_value = item.rpc_call("d.custom", [custom_key])
+        if memoized_value == empty_value:
+            return ""
+        if not memoized_value:
+            memoized_value = func(item)
+            if memoized_value:
+                item.rpc_call("d.custom.set", [custom_key, memoized_value])
+            else:
+                item.rpc_call("d.custom.set", [custom_key, empty_value])
+        return memoized_value
+
+    return wrapper
+
+
 class FieldDefinition:
     """Download item field."""
 
