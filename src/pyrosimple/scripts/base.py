@@ -55,7 +55,7 @@ class ScriptBase:
             implementation = "Python"
         version_info = f"{version} on {implementation} {sys.version.split()[0]}"
 
-        if self.__doc__ is None:
+        if getattr(self, "__doc__", None) is None:
             self.__doc__ = ""
 
         self.parser = ArgumentParser(
