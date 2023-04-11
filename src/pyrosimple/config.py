@@ -174,7 +174,7 @@ def lookup_announce_url(name: str):
     raise KeyError(f"Unknown alias {name}")
 
 
-@functools.cache
+@functools.lru_cache(maxsize=None)
 def map_announce2alias(url: str) -> str:
     """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
     if url in settings["ALIASES"].items():
