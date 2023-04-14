@@ -244,4 +244,3 @@ class ScriptBaseWithConfig(ScriptBase):  # pylint: disable=abstract-method
                 self.options.url
             )
         config.load_custom_py()
-        self.engine = rtorrent.RtorrentEngine()
