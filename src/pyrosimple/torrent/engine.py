@@ -372,6 +372,7 @@ def core_fields():
         matcher=matching.TaggedAsFilter,
         formatter=lambda v: "/".join(v or ["misc", "other"]),
         accessor=detect_traits,
+        requires=["d.custom=memo_alias", "d.custom=kind"]
     )
 
     # Basic fields
