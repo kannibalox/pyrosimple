@@ -492,7 +492,7 @@ class RtorrentItem(engine.TorrentProxy):
         if not copy:
             proxy.d.stop(self.hash)
         self._engine.logger.debug("Running extra commands on load: %s", extra_cmds)
-        if rpc_protocol == "json":
+        if rpc_protocol == "json" and not os.getenv("PYRO_FORCE_JSONRPC_LOAD_RAW"):
             remote_proxy.load.verbose("", rpc_metafile, *extra_cmds)
         else:
             remote_proxy.load.raw_verbose("", rpc_metafile, *extra_cmds)
