@@ -364,6 +364,7 @@ def core_fields():
         matcher=matching.TaggedAsFilter,
         formatter=_fmt_tags,
         accessor=lambda o: o.kind_0,
+        requires=["d.custom=kind"],
     )
     yield DynamicField(
         list,
