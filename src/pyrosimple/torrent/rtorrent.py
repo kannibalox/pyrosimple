@@ -119,7 +119,6 @@ class RtorrentItem(engine.TorrentProxy):
         """
         try:
             # Get info for all files
-            f_multicall = self._engine.rpc.f.multicall
             if attrs is None:
                 attrs = [
                     "path",
