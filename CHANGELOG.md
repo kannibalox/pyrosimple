@@ -4,6 +4,12 @@
 
 ### Added
 - Memoization helper function for expensive custom fields
+- Add `PYRO_FORCE_JSONRPC_LOAD_RAW` env var to allow override JSON-RPC
+  load behavior
+### Changed
+- Simplify f.multicall setup to reduce size of calls
+- Respect `ITEM_CACHE_EXPIRATION` for RPC calls (previously it was
+  always set to the default of 5 seconds).
 
 ## [2.7.1] - 2023-04-09
 
