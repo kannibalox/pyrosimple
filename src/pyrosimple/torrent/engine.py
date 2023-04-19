@@ -161,9 +161,9 @@ def _fmt_files(filelist) -> str:
                 result.append(f"{base_indent}{' ' * indent}\\ {dirname}")
                 indent += 1
 
-        prio = {0: "off ", 1: "    ", 2: "high"}.get(fileinfo.prio, "????")
+        prio = {0: "off ", 1: "    ", 2: "high"}.get(fileinfo.priority, "????")
         result.append(
-            f"  {prio} {fmt.iso_datetime(fileinfo.mtime)} {fmt.human_size(fileinfo.size)} {' ' * indent}| {name}"
+            f"  {prio} {fmt.iso_datetime(int(fileinfo.last_touched)/1000000.0)} {fmt.human_size(fileinfo.size_bytes)} {' ' * indent}| {name}"
         )
 
         prev_path = path
@@ -171,7 +171,8 @@ def _fmt_files(filelist) -> str:
     while indent > 0:
         indent -= 1
         result.append(f"{base_indent}{' ' * indent}/")
-    result.append(f"{base_indent}= {len(filelist)} file(s)")
+    file_text = "files" if len(filelist) > 1 else "file"
+    result.append(f"{base_indent}= {len(filelist)} {file_text}")
 
     return "\n".join(result)
 

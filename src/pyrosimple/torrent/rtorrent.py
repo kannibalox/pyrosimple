@@ -80,7 +80,7 @@ class RtorrentItem(engine.TorrentProxy):
                 "d.size_bytes",
                 "d.size_chunks",
             },
-            expires=cache_expires
+            expires=cache_expires,
         )
         if rpc_fields is not None:
             self._rpc_cache.update(rpc_fields)
@@ -109,51 +109,36 @@ class RtorrentItem(engine.TorrentProxy):
                 f"While {command} torrent {self._fields['hash']}: {exc}"
             ) from exc
 
-    def _get_files(self, attrs: Optional[List[str]] = None):
-        """Get a list of all files in this download; each entry has the
-        attributes C{path} (relative to root), C{size} (in bytes),
-        C{mtime}, C{prio} (0=off, 1=normal, 2=high), C{created},
-        and C{opened}.
+    def _get_files(
+        self,
+        attrs: Optional[List[str]] = None,
+    ) -> List[Box]:
+        """Get a list of all files in this download.
 
         @param attrs: Optional list of additional attributes to fetch.
         """
         try:
             # Get info for all files
             f_multicall = self._engine.rpc.f.multicall
-            f_params = [
-                self._fields["hash"],
-                rpc.NOHASH,
-                "f.path=",
-                "f.size_bytes=",
-                "f.last_touched=",
-                "f.priority=",
-                "f.is_created=",
-                "f.is_open=",
-            ]
-            for attr in attrs or []:
-                f_params.append(f"f.{attr}=")
-            rpc_result = f_multicall(*tuple(f_params))
+            if attrs is None:
+                attrs = [
+                    "path",
+                    "size_bytes",
+                    "last_touched",
+                    "priority",
+                    "is_created",
+                    "is_open",
+                ]
+
+            rpc_result = self.rpc_call(
+                "f.multicall", [rpc.NOHASH] + [f"f.{attr}=" for attr in attrs]
+            )
         except rpc.ERRORS as exc:
             raise error.EngineError(
                 f"While getting files for torrent #{self._fields['hash']}: {exc}"
             )
         # Return results
-        result = [
-            Box(
-                path=i[0],
-                size=i[1],
-                mtime=i[2] / 1000000.0,
-                prio=i[3],
-                created=i[4],
-                opened=i[5],
-            )
-            for i in rpc_result
-        ]
-
-        if attrs:
-            for idx, attr in enumerate(attrs):
-                for item, rpc_item in zip(result, rpc_result):
-                    item[attr] = rpc_item[6 + idx]
+        result = [Box(**dict(zip(attrs, i))) for i in rpc_result]
 
         return result
 
@@ -188,9 +173,9 @@ class RtorrentItem(engine.TorrentProxy):
         else:
             # Get file types
             histo = traits.get_filetypes(
-                self._get_files(),
+                self._get_files(["path", "size_bytes"]),
                 path=operator.attrgetter("path"),
-                size=operator.attrgetter("size"),
+                size=operator.attrgetter("size_bytes"),
             )
 
             # Set custom cache field with value formatted like "80%_flac 20%_jpg" (sorted by percentage)

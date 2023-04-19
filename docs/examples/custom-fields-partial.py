@@ -15,16 +15,18 @@ def _custom_partial_fields():
             f_attr = [
                 "completed_chunks",
                 "size_chunks",
+                "size_bytes"
                 "range_first",
                 "range_second",
+                "priority"
             ]
             chunk_size = obj.rpc_call("d.chunk_size")
             prev_chunk = -1
             size, completed, chunks = 0, 0, 0
             for f in obj._get_files(f_attr):
-                if f.prio:  # selected?
+                if f.priority:  # selected?
                     shared = int(f.range_first == prev_chunk)
-                    size += f.size
+                    size += f.size_bytes
                     completed += f.completed_chunks - shared
                     chunks += f.size_chunks - shared
                     prev_chunk = f.range_second - 1
