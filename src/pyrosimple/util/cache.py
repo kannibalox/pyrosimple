@@ -24,7 +24,7 @@ class ExpiringCache(abc.MutableMapping):
         self.static_keys = static_keys or set()
         if items:
             for key, val in items:
-                if key in self.static_keys:
+                if key in self.static_keys or expires == 0:
                     expire_at = 0.0
                 else:
                     expire_at = self.expires + time.time()
@@ -36,7 +36,7 @@ class ExpiringCache(abc.MutableMapping):
 
     def __setitem__(self, key: Hashable, val: Any, expire: Optional[float] = None):
         with self.lock:
-            if key in self.static_keys or expire == 0:
+            if key in self.static_keys or expire == 0 or self.expires == 0:
                 expire_at = 0.0
             else:
                 expire_at = (expire or self.expires) + time.time()
@@ -47,7 +47,7 @@ class ExpiringCache(abc.MutableMapping):
     ) -> Union[Tuple[Any, float], Any]:
         with self.lock:
             expires_at, item = self.data[key]
-            if expires_at == 0 or expires_at > time.time():
+            if expires_at == 0 or self.expires == 0 or expires_at > time.time():
                 if with_age:
                     return item, expires_at - time.time()
                 return item
