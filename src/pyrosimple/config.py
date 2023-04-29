@@ -66,13 +66,11 @@ DEFAULT_SETTINGS = Box(
 
 
 def load_settings() -> Box:
-    """Load settings from (in order of precedenc): the defaults, a
+    """Load settings from (in order of precedence): the defaults, a
     TOML config file, environment variables
     """
     settings_box: Box = DEFAULT_SETTINGS.copy()
-    settings_file = Path(
-        os.getenv(ENVVAR, "~/.config/pyrosimple/config.toml")
-    ).expanduser()
+    settings_file = Path(os.getenv(ENVVAR, SETTINGS_FILE)).expanduser()
     if settings_file.exists():
         settings_file_box = Box(
             {
