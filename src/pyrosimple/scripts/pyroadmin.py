@@ -238,7 +238,7 @@ class AdminTool(ScriptBase):
 
     def create_config(self):
         """Create a configuration file"""
-        config_path = Path(config.settings.CONFIG)
+        config_path = Path(config.SETTINGS_FILE)
         if config_path.exists():
             self.log.info(
                 "Pyrosimple config path %s already exists, not overwriting", config_path
