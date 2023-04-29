@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- `pyroadmin`: Fix error when calling `config --create-config`
+  (https://github.com/kannibalox/pyrosimple/pull/33 by @JohnFlowerful)
 ### Added
 - Memoization helper function for expensive custom fields
 - Add `PYRO_FORCE_JSONRPC_LOAD_RAW` env var to allow overriding JSON-RPC
@@ -247,8 +250,8 @@
 
 ### Fixed
 
-- https://github.com/kannibalox/pyrosimple/pull/11 `chtor`: Fix
-  `--reannounce-all` without `--no-cross-seed`
+- `chtor`: Fix `--reannounce-all` without `--no-cross-seed`
+  (https://github.com/kannibalox/pyrosimple/pull/11 by 0xallie)
 
 ### Added
 
