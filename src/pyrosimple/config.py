@@ -70,7 +70,7 @@ def load_settings() -> Box:
     TOML config file, environment variables
     """
     settings_box: Box = DEFAULT_SETTINGS.copy()
-    settings_file = Path(os.getenv(ENVVAR, SETTINGS_FILE)).expanduser()
+    settings_file = Path(os.getenv(ENVVAR, str(SETTINGS_FILE))).expanduser()
     if settings_file.exists():
         settings_file_box = Box(
             {
