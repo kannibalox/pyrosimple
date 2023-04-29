@@ -1,16 +1,18 @@
 # Changelog
 
-## [Unreleased]
+## [2.8.0] - 2023-04-29
 
 ### Fixed
 - `pyroadmin`: Fix error when calling `config --create-config`
   (https://github.com/kannibalox/pyrosimple/pull/33 by @JohnFlowerful)
+
 ### Added
 - Memoization helper function for expensive custom fields
-- Add `PYRO_FORCE_JSONRPC_LOAD_RAW` env var to allow overriding JSON-RPC
-  load behavior.
+- Add `PYRO_FORCE_JSONRPC_LOAD_RAW` env var to allow overriding
+  JSON-RPC load behavior.
+
 ### Changed
-- Simplify f.multicall setup to reduce size of calls
+- Simplify internatl f.multicall setup to reduce size of calls
 - Respect `ITEM_CACHE_EXPIRATION` for RPC calls (previously it was
   always set to the default of 5 seconds).
 
@@ -322,7 +324,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.8.0...HEAD
+[2.7.1]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/kannibalox/pyrosimple/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/kannibalox/pyrosimple/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/kannibalox/pyrosimple/compare/v2.6.0...v2.6.1
