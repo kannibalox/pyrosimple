@@ -16,5 +16,5 @@ def test_pyroadmin_create_config(tmp_path_factory):
     config_path = Path(tmp_path_factory.mktemp("pyroadmin"), ".config", "config.toml")
     config.settings.RTORRENT_RC = "/dev/null"
     config.SETTINGS_FILE = str(config_path)
-    AdminTool().run(["--verbose", "config", "--create-config"])
+    AdminTool().run(["config", "--create-config"])
     assert config_path.stat().st_size > 0
