@@ -496,7 +496,7 @@ class RtorrentItem(engine.TorrentProxy):
         # values to get corrupted, even for simple values.
         for k, v in self.custom_items().items():
             remote_proxy.d.custom.set(self.hash, k, v)
-        for key in range(1, 5):
+        for key in range(1, 6):
             value = getattr(proxy.d, f"custom{key}")(self.hash)
             if value:
                 getattr(remote_proxy.d, f"custom{key}.set")(self.hash, value)
