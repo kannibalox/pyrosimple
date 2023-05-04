@@ -207,12 +207,12 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if self.__verbose:
             logger.info("req: %s", request)
 
-        response: Dict = self.__transport.request(
+        response: Dict = dict(self.__transport.request(
             self.__host,
             self.__handler,
             request,
             verbose=self.__verbose,
-        )
+        ))
 
         if response["id"] != rpc_id:
             raise ValueError(

@@ -551,7 +551,6 @@ class TimeFilter(NumericFilterBase):
         "^" + "".join(r"(?:(?P<{0}>\d+)[{0}{0}])?".format(i) for i in "yMwdhms") + "$"
     )
 
-    # pylint: disable=super-init-not-called
     def __init__(self, name: str, op: FilterOperator, value: str):
         # During validate(), one of these two must be set to something
         # non-None

@@ -70,7 +70,7 @@ class QueueManager(MatchableJob):
                     self.config["downloading_traffic_max"],
                 )
                 return
-        self.allowed_start_count: int = max(
+        self.allowed_start_count = max(
             self.config["start_at_once"],
             self.config["downloading_min"] - len(downloading),
         )
