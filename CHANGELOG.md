@@ -12,7 +12,7 @@
   JSON-RPC load behavior.
 
 ### Changed
-- Simplify internatl f.multicall setup to reduce size of calls
+- Simplify internal f.multicall setup to reduce size of calls
 - Respect `ITEM_CACHE_EXPIRATION` for RPC calls (previously it was
   always set to the default of 5 seconds).
 
