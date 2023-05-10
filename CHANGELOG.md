@@ -325,7 +325,7 @@ new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
 [Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.8.0...HEAD
-[2.7.1]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...v2.8.0
+[2.8.0]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/kannibalox/pyrosimple/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/kannibalox/pyrosimple/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/kannibalox/pyrosimple/compare/v2.6.0...v2.6.1
