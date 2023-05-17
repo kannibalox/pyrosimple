@@ -30,23 +30,23 @@ def test_fields_from_template(template, fields):
     assert sorted(list(rtorrent.get_fields_from_template(template))) == sorted(fields)
 
 
-def test_validate_sort():
+def test_validate_field_list():
     assert rtorrent.validate_field_list("name,size") == ["name", "size"]
     assert rtorrent.validate_field_list("name.center,size.raw", True) == [
-        "name",
-        "size",
+        "name.center",
+        "size.raw",
     ]
-    with pytest.raises(error.UserError):
-        rtorrent.validate_sort_fields("very_fake_field.raw")
-    with pytest.raises(error.UserError):
-        rtorrent.validate_sort_fields("name.very_fake_filter")
 
 
-def test_validate_sort():
+def test_validate_sort_fields():
     rtorrent.validate_sort_fields("name,size")
     rtorrent.validate_sort_fields("name,-size")
     with pytest.raises(error.UserError):
         rtorrent.validate_sort_fields("very_fake_field")
+    with pytest.raises(error.UserError):
+        rtorrent.validate_sort_fields("very_fake_field.raw")
+    with pytest.raises(error.UserError):
+        rtorrent.validate_sort_fields("name.very_fake_filter")
 
 
 class MockProxy:
