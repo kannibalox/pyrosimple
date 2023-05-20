@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+#### Fixed
+- Expand `~` when set in `scgi_url`
+  (https://github.com/kannibalox/pyrosimple/issues/34)
+
 ## [2.8.0] - 2023-04-29
 
 ### Fixed

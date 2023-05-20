@@ -1,4 +1,5 @@
 """Handles RPC methods over various transports"""
+import os
 import io
 import logging
 import socket
@@ -41,7 +42,7 @@ class RTorrentTransport(xmlrpclib.Transport):
         if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
             url = "scgi://" + url
         if url.startswith("/") or url.startswith("~"):
-            url = "scgi+unix://" + url
+            url = "scgi+unix://" + os.path.expanduser(url)
         self.url = url
         self.codec = codec
         self.verbose = False
@@ -164,7 +165,7 @@ def transport_from_url(url: str) -> Type[xmlrpclib.Transport]:
     if "/" not in url and ":" in url and url.rsplit(":")[-1].isdigit():
         url = "scgi://" + url
     if url.startswith("/") or url.startswith("~"):
-        url = "scgi+unix://" + url
+        url = "scgi+unix://" + os.path.expanduser(url)
     parsed_url = urlparse.urlsplit(url, allow_fragments=False)
     try:
         transport = TRANSPORTS[parsed_url.scheme.lower()]
