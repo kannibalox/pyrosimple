@@ -18,7 +18,8 @@ from typing import Callable, List, Union
 
 from box.box import Box
 
-from pyrosimple import error
+from pyrosimple import config, error
+from pyrosimple.torrent import rtorrent
 from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import fmt, pymagic, rpc
 
@@ -634,6 +635,22 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         return rtorrent.validate_sort_fields(self.options.sort_fields)
 
+    def open(self):
+        """Open connections and return engines."""
+        if not self.engines:
+            if not config.settings["SCGI_URL"]:
+                config.autoload_scgi_url()
+            if not config.settings["SCGI_URL"]:
+                self.log.error(
+                    "Unable to automatically detect a RPC connection, see"
+                    " https://kannibalox.github.io/pyrosimple/configuration/#reference"
+                )
+            for url in config.multi_connection_lookup(
+                self.options.url or config.settings["SCGI_URL"]
+            ):
+                self.engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
+        return self.engines
+
     def show_in_view(self, sourceview, matches, targetname=None):
         """Show search result in ncurses view."""
         append = self.options.alter_view == "append"
@@ -736,11 +753,8 @@ class RtorrentControl(ScriptBaseWithConfig):
             dcontext.open()
 
         # Find matching torrents
-        engines = {}
-        for url in config.multi_connection_lookup(
-            self.options.url or config.settings["SCGI_URL"]
-        ):
-            engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
+        self.engines = {}
+        self.open()
 
         # Kick off the result fetcher in a thread pool
         pool = ThreadPool(processes=len(engines))

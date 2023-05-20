@@ -85,7 +85,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         )
 
     def open(self):
-        """Open connection and return proxy."""
+        """Open connections and return proxies."""
         if not self.proxies:
             if not config.settings["SCGI_URL"]:
                 config.autoload_scgi_url()
