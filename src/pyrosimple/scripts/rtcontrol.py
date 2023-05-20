@@ -18,8 +18,7 @@ from typing import Callable, List, Union
 
 from box.box import Box
 
-from pyrosimple import config, error
-from pyrosimple.torrent import rtorrent
+from pyrosimple import error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import fmt, pymagic, rpc
 
@@ -254,6 +253,10 @@ class RtorrentControl(ScriptBaseWithConfig):
         #            help="move data to given target directory (implies -i, can be combined with --delete)")
         # TODO: --copy, and --move/--link across devices
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.engines = {}
 
     def add_options(self):
         """Add program options."""
@@ -637,6 +640,12 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     def open(self):
         """Open connections and return engines."""
+        # pylint: disable=import-outside-toplevel
+        from pyrosimple import config
+        from pyrosimple.torrent import rtorrent
+
+        # pylint: enable=import-outside-toplevel
+
         if not self.engines:
             if not config.settings["SCGI_URL"]:
                 config.autoload_scgi_url()
@@ -649,6 +658,11 @@ class RtorrentControl(ScriptBaseWithConfig):
                 self.options.url or config.settings["SCGI_URL"]
             ):
                 self.engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
+            if not self.engines:
+                raise error.ConfigurationError(
+                    "Received an empty engine list, check the settings in config.toml"
+                )
+
         return self.engines
 
     def show_in_view(self, sourceview, matches, targetname=None):
@@ -757,9 +771,9 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.open()
 
         # Kick off the result fetcher in a thread pool
-        pool = ThreadPool(processes=len(engines))
+        pool = ThreadPool(processes=len(self.engines))
         futures = {}
-        for url, r_engine in engines.items():
+        for url, r_engine in self.engines.items():
 
             def fetch(e):
                 # pylint: disable=import-outside-toplevel
@@ -783,7 +797,7 @@ class RtorrentControl(ScriptBaseWithConfig):
             futures[url] = pool.apply_async(fetch, (r_engine,))
 
         # The rest of the pipeline should still be done in sequence
-        for url, r_engine in engines.items():
+        for url, r_engine in self.engines.items():
             view = r_engine.view(self.options.from_view, matcher)
             matches = futures[url].get()
 
