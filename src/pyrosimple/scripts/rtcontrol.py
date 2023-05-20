@@ -657,7 +657,10 @@ class RtorrentControl(ScriptBaseWithConfig):
             for url in config.multi_connection_lookup(
                 self.options.url or config.settings["SCGI_URL"]
             ):
-                self.engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
+                try:
+                    self.engines[url] = rtorrent.RtorrentEngine(url, auto_open=True)
+                except rpc.ERRORS as e:
+                    raise error.EngineError(f"Could not load engine from url {url!r}: {e}") from e
             if not self.engines:
                 raise error.ConfigurationError(
                     "Received an empty engine list, check the settings in config.toml"
