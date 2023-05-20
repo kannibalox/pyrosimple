@@ -130,9 +130,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
             result = getattr(proxy, method)(*tuple(args))
         except rpc.ERRORS as exc:
             self.log.error(
-                "While calling %s(%s): %s",
+                "While calling %s(%s) via %s: %s",
                 method,
                 ", ".join(repr(i) for i in args),
+                proxy,
                 exc,
             )
             if f"Method '{method}' not defined" in str(
