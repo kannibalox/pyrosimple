@@ -149,7 +149,8 @@ def autoload_scgi_url() -> str:
 
 
 def lookup_announce_alias(name: str):
-    """Get canonical alias name and announce URL list for the given alias."""
+    """Get canonical alias name and announce URL list for the given
+    alias."""
     for alias, urls in settings["ALIASES"].items():
         if alias.lower() == name.lower():
             return alias, urls
@@ -158,9 +159,11 @@ def lookup_announce_alias(name: str):
 
 
 def lookup_announce_url(name: str):
-    """Get canonical alias name and announce URL list for the given alias.
+    """Get canonical alias name and announce URL list for the given
+    alias.
 
-    Unlike lookup_announce_alias, only valid URLs are returned"""
+    Unlike lookup_announce_alias, only valid URLs are returned
+    """
     for alias, urls in settings["ALIASES"].items():
         if alias.lower() == name.lower():
             result = []
@@ -174,7 +177,8 @@ def lookup_announce_url(name: str):
 
 @functools.lru_cache(maxsize=None)
 def map_announce2alias(url: str) -> str:
-    """Get tracker alias for announce URL, and if none is defined, the 2nd level domain."""
+    """Get tracker alias for announce URL, and if none is defined, the
+    2nd level domain."""
     if url in settings["ALIASES"].items():
         return url
     # Try to find an exact alias URL match and return its label
@@ -207,7 +211,8 @@ def map_announce2alias(url: str) -> str:
 def load_custom_py():
     """Load custom python configuration.
 
-    This only gets called when CLI tools are called to prevent some weird code injection
+    This only gets called manually to prevent some weird code
+    injection if pyrosimple is ever used in a library.
     """
     log = logging.getLogger(__name__)
     if not settings.CONFIG_PY:
@@ -226,7 +231,8 @@ def load_custom_py():
 
 
 def lookup_connection_alias(url: str) -> str:
-    """Convert a connection alias to the actual URL (if set in the config"""
+    """Convert a connection alias to the actual URL (if set in the
+    config"""
     if url in settings["CONNECTIONS"]:
         return str(settings["CONNECTIONS"][url])
     return url
@@ -235,8 +241,9 @@ def lookup_connection_alias(url: str) -> str:
 def multi_connection_lookup(url: str) -> Iterator[str]:
     """Return a list of urls.
 
-    This is separate from lookup_connection_alias due to scripts needing to be written specifically
-    to handle this"""
+    This is separate from lookup_connection_alias due to scripts
+    needing to be written specifically to handle this.
+    """
     val = settings["CONNECTIONS"].get(url, [url])
     if isinstance(val, list):
         for v in val:
