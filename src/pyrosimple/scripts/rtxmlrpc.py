@@ -91,7 +91,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
                 config.autoload_scgi_url()
             if not config.settings["SCGI_URL"]:
                 self.log.error(
-                    "You need to configure a RPC connection, read"
+                    "Unable to automatically detect a RPC connection, see"
                     " https://kannibalox.github.io/pyrosimple/configuration/#reference"
                 )
             for url in config.multi_connection_lookup(

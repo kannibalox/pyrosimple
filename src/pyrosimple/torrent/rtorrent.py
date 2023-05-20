@@ -633,7 +633,7 @@ class RtorrentEngine:
             self.url = url
         if not self.url:
             raise error.UserError(
-                "You need to configure a RPC connection, read"
+                "Unable to automatically detect a RPC connection, see"
                 " https://kannibalox.github.io/pyrosimple/configuration/#reference"
             )
         self.rpc = rpc.RTorrentProxy(self.url)
