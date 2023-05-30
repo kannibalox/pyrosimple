@@ -1,7 +1,7 @@
 """Handles RPC methods over various transports"""
-import os
 import io
 import logging
+import os
 import socket
 import subprocess
 import sys

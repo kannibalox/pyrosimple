@@ -50,7 +50,7 @@ def import_name(module_spec, name=None):
 
 def get_class_logger(obj):
     """Get a logger specific for the given object's class."""
-    if obj.__class__.__module__ == '__main__':
+    if obj.__class__.__module__ == "__main__":
         return logging.getLogger("pyrosimple.main." + obj.__class__.__name__)
     return logging.getLogger(obj.__class__.__module__ + "." + obj.__class__.__name__)
 
