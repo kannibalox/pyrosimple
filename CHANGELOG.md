@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+#### Changed
+- `rtcontrol`: Output sub-multicall fields (e.g. `p_client_version`) in JSON format
+
 #### Fixed
 - Expand `~` when set in `scgi_url`
   (https://github.com/kannibalox/pyrosimple/issues/34)

@@ -3,6 +3,7 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
+import json
 import logging
 import os
 import re
@@ -867,6 +868,7 @@ def generate_sub_multicall(prefix: str) -> Callable[[str], Optional[FieldDefinit
             accessor=lambda o: [
                 i[0] for i in o.rpc_call(f"{prefix}.multicall", ["", call_name])
             ],
+            formatter=json.dumps,
             matcher=matching.PatternFilter,
             requires=[f"{prefix}.multicall=,{call_name}"],
         )
