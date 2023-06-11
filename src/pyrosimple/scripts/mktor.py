@@ -136,7 +136,7 @@ class MetafileCreator(ScriptBase):
         meta_path = os.path.join(
             self.options.magnet_watch, f"magnet-{meta_name}.torrent"
         )
-        self.log.debug("Writing magnet-url metafile %r...", meta_path)
+        self.log.debug("Writing magnet-url metafile %r", meta_path)
 
         try:
             bencode.bwrite(meta_path, meta)
@@ -190,11 +190,12 @@ class MetafileCreator(ScriptBase):
         if self.options.output_filename:
             metapath = Path(self.options.output_filename)
             if metapath.is_dir():
-                metapath = metapath.joinpath(os.path.basename(datapath)).with_suffix(
-                    ".torrent"
-                )
+                metapath = metapath.joinpath(datapath.name).with_suffix(".torrent")
         else:
-            metapath = datapath.with_suffix(".torrent")
+            if metapath.is_dir():
+                metapath = Path(str(datapath) + ".torrent")
+            else:
+                metapath = datapath.with_suffix(".torrent")
 
         # Build progress bar
         # pylint: disable=import-outside-toplevel
@@ -247,7 +248,7 @@ class MetafileCreator(ScriptBase):
                 save_metapath = metapath
             else:
                 save_metapath = Path(f"{alias}_{metapath}")
-            self.log.info("Writing metafile %s...", save_metapath)
+            self.log.info("Writing metafile %s", save_metapath)
             torrent.save(save_metapath)
 
             # Create second metafile with fast-resume?
@@ -261,7 +262,7 @@ class MetafileCreator(ScriptBase):
                 hashed_path = Path(
                     re.sub(r"\.torrent$", "", str(save_metapath)) + "-resume.torrent"
                 )
-                self.log.info("Writing fast-resume metafile %s...", hashed_path)
+                self.log.info("Writing fast-resume metafile %s", hashed_path)
                 try:
                     torrent.save(hashed_path)
                 except OSError as exc:

@@ -9,6 +9,7 @@
 - Expand `~` when set in `scgi_url`
   (https://github.com/kannibalox/pyrosimple/issues/34)
 - `rtcontrol`: Under some circumstances, `~/.rtorrent` would not be checked for a connection
+- `mktor`: Don't strip characters after final `.` from auto-generated torrent name for directories
 
 ## [2.8.0] - 2023-04-29
 
