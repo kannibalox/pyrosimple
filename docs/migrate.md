@@ -104,3 +104,13 @@ available utilities.
 
 * The `--no-ssl` flag has been removed. Manually specifying a non-SSL
   announce still works as expected.
+
+## `hashcheck`
+
+* This command has been removed. Use `lstor --check-data <path>` instead.
+
+## `rtmv`
+
+* This command has been temporarily removed. See [this discussion](https://github.com/kannibalox/pyrosimple/discussions/35)
+  for more information, and a way to run the legacy conversion of the
+  command.
