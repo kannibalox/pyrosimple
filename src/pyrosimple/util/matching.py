@@ -297,7 +297,7 @@ class PatternFilter(FieldFilter):
 
     CLEAN_PRE_VAL_RE = re.compile(r"(?:\[.*?\])|(?:\(.*?\))|(?:{.*?})|(?:\\)")
     SPLIT_PRE_VAL_RE = re.compile(r"[^a-zA-Z0-9/_]+")
-    SPLIT_PRE_GLOB_RE = re.compile(r"[?*]+")
+    SPLIT_PRE_GLOB_RE = re.compile(r"[?*[\]]+")
 
     def validate(self) -> None:
         """Validate filter condition (template method)."""
@@ -319,6 +319,7 @@ class PatternFilter(FieldFilter):
                 self._matcher = lambda _, __: True
             elif self._value in ["/.+/", "/.+/i"]:
                 self._matcher = lambda val, __: bool(val)
+            # Otherwise handle it generically
             else:
                 value = self._value
                 if self._value.endswith("/i"):
@@ -344,7 +345,10 @@ class PatternFilter(FieldFilter):
             if self._value == "*":
                 self._matcher = lambda _, __: True
             else:
-                self._matcher = lambda val, _: fnmatch.fnmatchcase(val, self._value)
+                self._matcher = (
+                    lambda val, _: fnmatch.fnmatchcase(val, self._value)
+                    or val == self._value
+                )
 
     def pre_filter_eq(self) -> str:
         """Return rTorrent condition to speed up data transfer."""

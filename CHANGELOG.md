@@ -4,6 +4,10 @@
 
 #### Changed
 - `rtcontrol`: Output sub-multicall fields (e.g. `p_client_version`) in JSON format
+- `rtcontrol`: Exact matches also match in patterns. E.G. previously
+  `name="[ARCH] live.iso"` would not match an item of the exact same
+  name, due to `[` and `]` being special characters in
+  [fnmatch](https://docs.python.org/3/library/fnmatch.html)
 
 #### Fixed
 - Expand `~` when set in `scgi_url`

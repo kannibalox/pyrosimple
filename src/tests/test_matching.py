@@ -122,6 +122,7 @@ def test_conditions_prefilter(cond, expected):
         ("name=/ar.*/i", Box(name="ARCH")),
         (["custom_1=TV", "OR", "custom_1=Movie"], Box(custom_1="TV")),
         ("name=ARCH", Box(name="ARCH")),
+        ('name="[ARCH] 2022.iso"', Box(name="[ARCH] 2022.iso")),
         ("name=rtörrent", Box(name="rtörrent")),
         ("name={{d.alias}}", Box(name="ubuntu", alias="ubuntu")),
         ("name={{d.alias}}*", Box(name="ubuntu-server", alias="ubuntu")),
@@ -240,6 +241,7 @@ def test_matcher_fail(matcher, item):
         ("name=arch", 'string.contains_i=$d.name=,"arch"'),
         ("name=ARCH", 'string.contains_i=$d.name=,"ARCH"'),
         (["name=arch"], 'string.contains_i=$d.name=,"arch"'),
+        (['name="[arch] 2023.iso"'], 'string.contains_i=$d.name=," 2023.iso"'),
         ('name="arch linux"', 'string.contains_i=$d.name=,"arch linux"'),
         # Make sure to not process globs that might look like regexes
         (
