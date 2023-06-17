@@ -5,6 +5,7 @@
 #### Fixed
 - `rtcontrol`: Under some circumstances, `~/.rtorrent` would not be checked for a connection
 - `mktor`: Don't strip characters after final `.` from auto-generated torrent name for directories
+- `rtcontrol`: Allow more than two `OR`  conditions
 
 #### Changed
 - `rtcontrol`: Output sub-multicall fields (e.g. `p_client_version`) in JSON format

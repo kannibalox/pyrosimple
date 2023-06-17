@@ -191,10 +191,10 @@ class OrNode(MatcherNode):
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
-        if int(config.settings.get("FAST_QUERY")) == 1:
-            return ""
         if len(self.children) == 1:
             return str(self.children[0].pre_filter())
+        if int(config.settings.get("FAST_QUERY")) == 1:
+            return ""
         result = [x.pre_filter() for x in self.children]
         result = [x for x in result if x]
         if result:
@@ -792,7 +792,7 @@ QueryGrammar = Grammar(
     r"""
     query = (group / stmt) (ws (group / stmt))*
     stmt = (or_stmt / conds)
-    or_stmt = (group / conds) ws or ws (group / conds)
+    or_stmt = (group / conds) (ws or ws (group / conds))*
     group = (not ws)? lpar ws stmt ws rpar
     conds = cond (ws cond)*
     cond = (&or / &lpar / &rpar / &not / named_cond / unnamed_cond)
@@ -886,7 +886,14 @@ class MatcherBuilder(NodeVisitor):
         return class_(real_children)
 
     def visit_or_stmt(self, node, visited_children):
-        return OrNode([c for c in visited_children if c is not None])
+        children = [visited_children[0]]
+        if visited_children[1] is not None:
+            if isinstance(visited_children[1], list):
+                for c in visited_children[1]:
+                    children.append(c)
+            else:
+                children.append(visited_children[1])
+        return OrNode(children)
 
     def visit_conds(self, node, visited_children):
         if len(visited_children) == 2 and isinstance(visited_children[1], list):
