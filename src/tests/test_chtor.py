@@ -68,6 +68,7 @@ def test_chtor(tmp_path_factory, args, field, expected):
         value = value.get(f, None)
     assert value == expected
 
+
 def test_chtor_output_dir(tmp_path_factory):
     test_file = Path(tmp_path_factory.mktemp("mktor"), "hello.txt")
     torrent_file = test_file.with_suffix(".torrent")
@@ -75,6 +76,8 @@ def test_chtor_output_dir(tmp_path_factory):
     with test_file.open("w") as fh:
         fh.write("Hello world!")
     MetafileCreator().run([str(test_file), "http://example.com/announce.php/test"])
-    MetafileChanger().run(["-RC", "-o", str(target_output_file.parent), str(torrent_file)])
+    MetafileChanger().run(
+        ["-RC", "-o", str(target_output_file.parent), str(torrent_file)]
+    )
     metafile = Metafile.from_file(target_output_file)
     assert metafile.check_meta() is None

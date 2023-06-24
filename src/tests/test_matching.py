@@ -195,7 +195,17 @@ def test_conditions_prefilter(cond, expected):
         ),
         # Multiple ORs
         (
-            ["alias=TEST1", "OR", "alias=TEST2", "OR", "alias=TEST3", "OR", "alias=TEST4", "OR", "alias=TEST5"],
+            [
+                "alias=TEST1",
+                "OR",
+                "alias=TEST2",
+                "OR",
+                "alias=TEST3",
+                "OR",
+                "alias=TEST4",
+                "OR",
+                "alias=TEST5",
+            ],
             Box(alias="TEST2"),
         ),
         (
@@ -236,6 +246,25 @@ def test_matcher(matcher, item):
         (
             ["[", "ratio=+1", "OR", "seedtime=+8d", "]", "custom_1=TV"],
             Box(custom_1="TV", ratio=0.5, seedtime=5),
+        ),
+        # Multiple ORs
+        (
+            [
+                "alias=TEST1",
+                "OR",
+                "alias=TEST2",
+                "OR",
+                "alias=TEST3",
+                "OR",
+                "alias=TEST4",
+                "OR",
+                "alias=TEST5",
+            ],
+            Box(alias="TEST8"),
+        ),
+        (
+            ["name=TEST1", "OR", "alias=TEST2", "OR", "xfer=+5"],
+            Box(alias="TEST8", name="foo", xfer=0),
         ),
     ],
 )
