@@ -20,10 +20,8 @@ method.set_key = event.download.hash_done, !time_stamp,\
 method.insert = d.timestamp.last_active, simple, "if=$d.peers_connected=,$cat=$system.time=,$d.custom=last_active"
 method.insert = d.timestamp.last_active.update, simple|private,\
     "d.custom.set=last_active,$cat=$system.time= ; branch=argument.0=,d.save_resume="
-
 schedule2 = pyro_update_last_active, 24, 42,\
     "d.multicall2=started,\"branch=$d.peers_connected=,d.timestamp.last_active.update=\""
-
 method.set_key = event.download.resumed, !last_active,\
     "branch=\"or={d.peers_connected=,not=$d.custom=last_active}\", d.timestamp.last_active.update=1"
 method.set_key = event.download.finished, !last_active, "d.timestamp.last_active.update=1"
