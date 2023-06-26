@@ -37,7 +37,7 @@ fixes), consider
 
 ### Timestamps
 
-These events record timestamps for `loaded`, `started`, and `completed`.
+This config records timestamps for use by the `loaded`, `started`, `completed`, `last_xfer` and `last_active` fields.
 ```toml
 {% include 'examples/timestamps.rc' %}
 ```
