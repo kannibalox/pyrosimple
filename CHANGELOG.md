@@ -1,14 +1,17 @@
 # Changelog
 
-## [Unreleased]
+## [2.9.0] - 2023-06-02
 
 #### Fixed
-- `rtcontrol`: Under some circumstances, `~/.rtorrent` would not be checked for a connection
-- `mktor`: Don't strip characters after final `.` from auto-generated torrent name for directories
+- `rtcontrol`: Under some circumstances, `~/.rtorrent.rc` would not be
+  checked for a connection
+- `mktor`: Don't strip characters after final `.` from auto-generated
+  torrent name for directories
 - `rtcontrol`: Allow more than two `OR`  conditions
 
 #### Changed
-- `rtcontrol`: Output sub-multicall fields (e.g. `p_client_version`) in JSON format
+- `rtcontrol`: Output sub-multicall fields (e.g. `p_client_version`)
+  in JSON format
 - `rtcontrol`: Exact matches also match in patterns. E.G. previously
   `name="[ARCH] live.iso"` would not match an item of the exact same
   name, due to `[` and `]` being special characters in
@@ -340,7 +343,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.8.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.9.0...HEAD
+[2.9.0]: https://github.com/kannibalox/pyrosimple/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/kannibalox/pyrosimple/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/kannibalox/pyrosimple/compare/v2.6.1...v2.7.0
