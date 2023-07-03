@@ -37,19 +37,19 @@ def print_help_fields():
         return ("kind_N", kind_manifold)
 
     def d_manifold():
-        "call an arbiratry item method, e.g. 'd_session_file'"
+        "call an arbitrary item method, e.g. 'd_session_file'"
         return ("d_METHOD", d_manifold)
 
     def p_manifold():
-        "call an arbiratry p.multicall method, e.g. 'p_is_incoming'"
+        "call an arbitrary p.multicall method, e.g. 'p_is_incoming'"
         return ("p_METHOD", p_manifold)
 
     def f_manifold():
-        "call an arbiratry f.multicall method, e.g. 'f_path'"
+        "call an arbitrary f.multicall method, e.g. 'f_path'"
         return ("f_METHOD", f_manifold)
 
     def t_manifold():
-        "call an arbiratry t.multicall method, e.g. 't_url'"
+        "call an arbitrary t.multicall method, e.g. 't_url'"
         return ("t_METHOD", t_manifold)
 
     print("")
