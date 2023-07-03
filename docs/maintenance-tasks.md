@@ -2,17 +2,23 @@
 title: General maintenance tasks
 ---
 
-This is just to meant to be a section for useful commands that may not merit a full page.
+This is just to meant to be a section for useful commands that may not
+merit a full page.
 
 ### Dumping items as a JSON array
 
-If you want to access rTorrent item data in a machine readable form, you can feed the output of `rtcontrol` with the `--json` option into another script for further processing. By using `-o/--output`, you can also filter the fields being output. The following examples use the [`jq`](https://stedolan.github.io/jq/tutorial/) utility to validate and re-print the JSON data.
+If you want to access rTorrent item data in a machine readable form,
+you can feed the output of `rtcontrol` with the `--json` option into
+another script for further processing. By using `-o/--output`, you can
+also filter the fields being output. The following examples use the
+[`jq`](https://stedolan.github.io/jq/tutorial/) utility to validate
+and re-print the JSON data.
 
 ```bash
-# Process all known fields through jq
-rtcontrol -/1 // | jq .
+# Process all known fields of the first torrent through jq
+rtcontrol --select 1 // | jq .
 # Process only the name and size
-rtcontrol -o name,size -/1 // | jq .
+rtcontrol -o name,size --select 1 // | jq .
 ```
 
 ### Flush all session data to disk
@@ -30,23 +36,31 @@ If you want to flush all the session data, call rtxmlrpc as follows:
 rtxmlrpc session.save
 ```
 
-This is best done before taking any backups, and after making any big changes.
+This is best done before taking any backups, and after making any big
+changes. Note that by default `session.save` is run on 20 minutes schedule.
 
 ### Move data for selected items to a new location
 
-This sequence of commands will stop the selected items, move their data, adapt rTorrent’s metadata (session state), and finally starts everything again, followed by removing the items from the tagged view. The order matters and cannot be changed.
+This sequence of commands will stop the selected items, move their
+data, flush rTorrent’s metadata (session state), and finally starts
+everything again, followed by removing the items from the tagged
+view. The order matters and cannot be changed.
 
 ```
 mkdir -p ~/rtorrent/data/TRK
-rtcontrol --to-view trk-to-move alias=TRK realpath=$HOME/rtorrent/data is_complete=yes
-rtcontrol --from-view trk-to-move // --yes \
+rtcontrol --to-view=trk-to-move alias=TRK realpath=$HOME/rtorrent/data is_complete=yes
+rtcontrol --from-view=trk-to-move // --yes \
   --stop \
   --spawn "mv {{item.path}} $HOME/rtorrent/data/TRK" \
   --exec "directory.set=$HOME/rtorrent/data/TRK" \
-  --flush
-rtcontrol -M trk-to-move --alter=remove realpath=$HOME/rtorrent/data/TRK
+  --flush \
+  --start
+rtcontrol --modify-view=trk-to-move --alter=remove realpath=$HOME/rtorrent/data/TRK
 ```
-By changing the first `rtcontrol` command that populates the tagged view, you can change this to move data for any [criteria](usage-rtcontrol.md#filter-conditions) you can think of.
+
+By changing the first `rtcontrol` command that populates the tagged
+view, you can change this to move data for
+[any criteria](usage-rtcontrol.md#filter-conditions) you can think of.
 
 ## Using tags to control item processing
 
@@ -55,7 +69,7 @@ By using the `--tag` command, it becomes easy to write scripts that will only ru
 ```bash
 #!/usr/bin/env bash
 guard="handled"
-rtcontrol --from-view complete -qohash tagged=\!$guard | \
+rtcontrol --from-view=complete -q -o hash "tagged=!$guard" | \
 while read hash; do
     # Do any processing
     rtxmlrpc d.hash "$hash"

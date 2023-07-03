@@ -150,7 +150,7 @@ rtcontrol has many ways to effect torrent, including but not limited to:
 * `--cull`,`--purge`: remove torrents along with all or partial data
 * `--custom KEY=VALUE`: setting custom values
 * `--call`/`--spawn`: call a OS command/shell
-* `-H`/`--hashcheck`: trigger a hash check on torrents (equivalent to
+* `-H`/`--hash-check`: trigger a hash check on torrents (equivalent to
   pressing `^R` in the UI)
 
 See `rtcontrol --help` for a full list of actions. All action can be
@@ -174,12 +174,13 @@ actions to each item in sequence.
   # Update the mtime on all session files
   rtcontrol --spawn 'touch {{item.metafile}}' //
   ```
-* If you need to use shell features in the command, use ``--call` instead:
+* If you need to use shell features (such as pipes or file
+  redirection) in the command, use ``--call` instead:
   ```bash
   # Append the name of completed items to a file
   rtcontrol --call 'echo {{item.name|shell}} >> /tmp/names.txt' is_complete=yes
   ```
-Most of the time `--spawn` will be enough, `-call` exists as a handy shortcut.
+Most of the time `--spawn` will be enough, but `-call` exists as a handy shortcut.
 
 To call rTorrent's RPC, use the `--exec` flag:
 ```bash
