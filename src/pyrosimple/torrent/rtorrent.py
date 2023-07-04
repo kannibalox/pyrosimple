@@ -562,6 +562,7 @@ class RtorrentItem(engine.TorrentProxy):
                     fullpath.unlink()
         for directory in dirs_to_clean_up:
             try:
+                self._engine.logger.debug("Cleaning up directory '%s'", fullpath)
                 if not dry_run:
                     directory.rmdir()
             except OSError as e:
