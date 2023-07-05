@@ -56,6 +56,7 @@ chtor = "pyrosimple.scripts.chtor:run"
 mktor = "pyrosimple.scripts.mktor:run"
 pyrotorque = "pyrosimple.scripts.pyrotorque:run"
 pyroadmin = "pyrosimple.scripts.pyroadmin:run"
+pyroui = "pyrosimple.scripts.pyroui:run"
 
 [tool.poetry.group.dev]
 optional = true
@@ -67,6 +68,7 @@ typing-extensions = "^4.1.1"
 black = "^23.1.0"
 isort = "^5.10.1"
 mypy = "^1.1.1"
+textual = {extras = ["dev"], version = "^0.28.1"}
 
 [tool.poetry.group.docs]
 optional = true

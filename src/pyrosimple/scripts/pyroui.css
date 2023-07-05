@@ -1,0 +1,28 @@
+#torrent_info_header {
+    content-align: center middle;
+}
+#rtorrent_info {
+    content-align: center middle;
+}
+
+FilterEdit {
+    align: center middle;
+}
+
+#filter_dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: 3 3;
+    padding: 0 1;
+    width: 60;
+    height: 11;
+    border: thick $background 80%;
+    background: $surface;
+}
+
+#filter_input {
+    column-span: 2;
+    height: 1;
+    width: 1fr;
+    content-align: center middle;
+}
