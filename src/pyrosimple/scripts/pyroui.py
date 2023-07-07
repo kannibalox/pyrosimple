@@ -189,10 +189,14 @@ class PyroUIApp(App):
                 if row.value not in hashes:
                     table.remove_row(row)
             for item in items:
-                data = pyrosimple.torrent.rtorrent.format_item(template, item).split("\t")
-                # Add
+                data = list(pyrosimple.torrent.rtorrent.format_item(template, item).split("\t"))
+                # Create
                 if item.hash not in table_hashes:
                     table.add_row(*data, key=item.hash)
+                else:
+                    # Update
+                    for i, c in enumerate(table.columns.keys()):
+                        table.update_cell(item.hash, c.value, data[i])
         else:
             table.disabled = True
             table.clear()
