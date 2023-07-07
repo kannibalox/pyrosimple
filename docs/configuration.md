@@ -7,7 +7,7 @@ title: Configuration
 The configuration file for pyrosimple is lives in
 `$HOME/.config/pyrosimple/config.toml`. If you've
 never used TOML files before, it's worth taking a quick look at the
-[documentation](https://toml.io/),
+[TOML documentation](https://toml.io/),
 but basically each section starts with a `[SECTION_NAME]` followed by
 keys and values.
 

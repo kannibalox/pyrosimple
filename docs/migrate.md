@@ -41,7 +41,17 @@ available utilities.
 
 * Multiple actions flags are allowed, and the order in which they are
   specified is the order in which they are executed. Previously, only
-  some combinations were allowed, and order did not matter.
+  some combinations were allowed, and order did not matter. See `rtcontrol --help`
+  for the list of flags which are considered "actions".
+  ```bash
+  # Old
+  rtcontrol // --stop
+  rtcontrol // --custom foo=bar --flush
+  rtcontrol // --custom baz=hkk --flush
+  rtcontrol // --start
+  # New
+  rtcontrol // --stop --custom foo=bar --custom baz=hkk --flush --start
+  ```
 * The `--anneal` flag has been removed. Use core Linux utilities
   (e.g. `sort` and `uniq`) instead.
 * Matching an empty string with a blank value (e.g. `message=`) will
