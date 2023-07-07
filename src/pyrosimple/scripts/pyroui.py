@@ -117,6 +117,17 @@ class CollapsedTorrentTable(DataTable):
     def on_data_table_row_selected(self, event) -> None:
         self.app.push_screen(TorrentInfoScreen(event.row_key))
 
+class MainScreen(Screen):
+    pass
+
+class DownloadHeader(Static):
+    view = reactive("main")
+    filter = reactive("//")
+
+    def render(self):
+        return f"\[View: {self.view}] [Filter: {self.filter}]"
+
+
 class PyroUIApp(App):
     """A Textual app to manage stopwatches."""
 
@@ -140,7 +151,7 @@ class PyroUIApp(App):
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
         yield Static("rtorrent", id="rtorrent_info")
-        yield Static("\[View: default] [None of None]", id="pyroui_header")
+        yield DownloadHeader("\[View: default] [None of None]", id="pyroui_header")
         yield ScrollableContainer(CollapsedTorrentTable(self.rtorrent_engine))
         yield Footer()
 
@@ -153,7 +164,8 @@ class PyroUIApp(App):
         props = self.rtorrent_engine.properties
         self.query_one("#rtorrent_info").renderable = f"*** rTorrent {props['system.client_version']}/{props['system.library_version']} - {props['session.name']} ***"
         header = self.query_one("#pyroui_header")
-        header.renderable = f"\[View: {self.rtorrent_view}] [Filter: {self.rtorrent_filter}]"
+        header.view = self.rtorrent_view
+        header.filter = self.rtorrent_filter
 
     @work(exclusive=True)
     def load_data(self) -> None:
@@ -191,7 +203,8 @@ class PyroUIApp(App):
             table.disabled = False
         table.focus()
         header = self.query_one("#pyroui_header")
-        header.renderable = f"\[View: {self.rtorrent_view}] [Filter: {self.rtorrent_filter}]"
+        header.view = self.rtorrent_view
+        header.filter = self.rtorrent_filter
 
     def action_show_errors(self) -> None:
         self.rtorrent_filter = "message=/.+/"
