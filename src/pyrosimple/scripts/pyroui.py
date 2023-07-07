@@ -6,6 +6,7 @@ from textual import work, on
 from textual.app import App, ComposeResult
 from textual.containers import ScrollableContainer, Grid
 from textual.reactive import reactive
+from textual.validation import Function, Number, ValidationResult, Validator
 from textual.widgets import Header, Footer, DataTable, Static, TabbedContent, TabPane, Button, Input, Label, Tree, LoadingIndicator
 from textual.screen import Screen, ModalScreen
 
@@ -18,26 +19,48 @@ class PeerTable(DataTable):
     def on_mount(self):
         self.add_columns("IP", "Up", "Down","Peer")
 
+class TrackerTable(DataTable):
+    def __init__(self, key):
+        self.key = key
+        super().__init__()
+        self.cursor_type = "row"
+
+    def on_mount(self):
+        self.add_columns("Tracker")
+
+class FilterValidator(Validator):
+    def validate(self, value: str) -> ValidationResult:
+        """Check a string is equal to its reverse."""
+        try:
+            pyrosimple.util.matching.create_matcher(value)
+        except Exception as e:
+            return self.failure(str(e))
+        return self.success()
+
 class FilterEdit(ModalScreen):
     def compose(self):
         yield Grid(
-            Input(value=self.app.rtorrent_filter, id="filter_input"),
+            Input(value=self.app.rtorrent_filter, id="filter_input", validators=[FilterValidator()]),
             Button("Apply", variant="primary", id="apply"),
             Button("Cancel", variant="error", id="cancel"),
             id="filter_dialog",
         )
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
+        i = self.query_one(Input).value
+        if not event.validation_result.is_valid:
+            return
         self.app.rtorrent_filter = self.query_one(Input).value
         self.app.load_data()
         self.dismiss(False)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "apply":
+            if not self.query_one(Input).validate(self.query_one(Input).value).is_valid:
+                return
             self.app.rtorrent_filter = self.query_one(Input).value
             self.app.load_data()
         self.dismiss(False)
-
 
 class TorrentInfoScreen(ModalScreen):
     BINDINGS = [
@@ -45,21 +68,51 @@ class TorrentInfoScreen(ModalScreen):
     ]
     def __init__(self, key):
         self.key = key
+        self.info_template = """
+        Name:       {{d.name}}
+        Hash:       {{d.hash}}
+        Path:       {{d.path}}
+        Size:       {{d.size}} ({{d.size|sz|trim}})
+        Files:      {%if d.is_multi_file%}{{d.d_size_files}} files{% else %}1 file (single){%endif%}
+        Tied to:    {{d.metafile}}
+        Message:    {{d.message}}
+        
+        Local ID:   {{d.d_local_id}}
+        Loaded:     {{d.loaded|delta|trim}}
+        Priority:   {{d.prio|fmt('prio')}}
+        """
         super().__init__()
 
     def compose(self) -> ComposeResult:
         name = self.app.rtorrent_engine.open().d.name(self.key.value)
         yield Static(f"*** {name} ***", id="torrent_info_header")
         with TabbedContent(id="torrent_info_tabs"):
-            with TabPane("Info"):
-                yield Static(f"hi {self.key.value}: {name}")
+            with TabPane("Info", id="info"):
+                yield Static(f"hi", id="static_info")
             with TabPane("Peers", id="peers"):
                 yield PeerTable(self.key)
             with TabPane("Files", id="files"):
                 yield Label(name)
                 yield Tree("hi")
+            with TabPane("Trackers", id="trackers"):
+                yield TrackerTable(self.key)
         yield Footer()
 
+    @on(TabbedContent.TabActivated, "#torrent_info_tabs", tab="#info")
+    @work(exclusive=True)
+    def load_info_data(self) -> None:
+        fields = []
+        engine = self.app.rtorrent_engine
+        engine.open()
+        text = self.query_one("#static_info")
+        prefetch = []
+        for p in pyrosimple.torrent.rtorrent.get_fields_from_template(self.info_template):
+            prefetch.extend(pyrosimple.torrent.engine.field_lookup(p).requires)
+        view = engine.view(self.key.value)
+        template = pyrosimple.torrent.rtorrent.env.from_string(self.info_template)
+        item = list(engine.items(view, prefetch=prefetch))[0]
+        text.update(pyrosimple.torrent.rtorrent.format_item(template, item))
+        
     @on(TabbedContent.TabActivated, "#torrent_info_tabs", tab="#peers")
     @work(exclusive=True)
     def load_peer_data(self) -> None:
@@ -81,9 +134,7 @@ class TorrentInfoScreen(ModalScreen):
             )
         
     def on_mount(self):
-        #self.load_peer_data()
-        pass
-
+        self.load_info_data()
 
     def action_escape(self):
         self.app.pop_screen()
