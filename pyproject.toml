@@ -68,7 +68,8 @@ typing-extensions = "^4.1.1"
 black = "^23.1.0"
 isort = "^5.10.1"
 mypy = "^1.1.1"
-textual = {extras = ["dev"], version = "^0.28.1"}
+textual = {extras = ["dev"], version = "^0.29.0"}
+textual-dev = "^1.0.1"
 
 [tool.poetry.group.docs]
 optional = true
