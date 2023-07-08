@@ -197,7 +197,6 @@ class PyroUIApp(App):
     def __init__(self):
         self.rtorrent_engine = pyrosimple.connect()
         self.rtorrent_filter = "//"
-        self.previous_prev_filter = "//"
         self.rtorrent_view = "main"
         super().__init__()
 
@@ -233,8 +232,10 @@ class PyroUIApp(App):
         view = self.rtorrent_engine.view(self.rtorrent_view, matcher=matcher)
         template = pyrosimple.torrent.rtorrent.env.from_string(template_str)
         items = list(self.rtorrent_engine.items(view, prefetch=prefetch))
+        header = self.query_one("#pyroui_header")
+        is_refresh = (self.rtorrent_filter == header.filter) and (self.rtorrent_view == header.view)
         # This shouldn't change wildly
-        if self.rtorrent_filter == self.previous_prev_filter:
+        if is_refresh:
             hashes = list([i.hash for i in items])
             table_hashes = list([r.value for r in table.rows])
             # Delete
@@ -256,12 +257,10 @@ class PyroUIApp(App):
             for item in items:
                 data = pyrosimple.torrent.rtorrent.format_item(template, item).split("\t")
                 table.add_row(*data, key=item.hash)
-            self.previous_prev_filter = self.rtorrent_filter
+            header.view = self.rtorrent_view
+            header.filter = self.rtorrent_filter
             table.disabled = False
         table.focus()
-        header = self.query_one("#pyroui_header")
-        header.view = self.rtorrent_view
-        header.filter = self.rtorrent_filter
 
     def action_show_errors(self) -> None:
         self.rtorrent_filter = "message=/.+/"
@@ -288,7 +287,6 @@ def run():
     app = PyroUIApp()
     if sys.argv[1]:
         app.rtorrent_filter = sys.argv[1]
-        app.rtorrent_prev_filter = sys.argv[1]
     app.run()
 
 if __name__ == "__main__":
