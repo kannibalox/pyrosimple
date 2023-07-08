@@ -176,9 +176,10 @@ class MainScreen(Screen):
 class DownloadHeader(Static):
     view = reactive("main")
     filter = reactive("//")
+    sort = reactive("name,hash")
 
     def render(self):
-        return f"\[View: {self.view}] [Filter: {self.filter}]"
+        return f"\[View: {self.view}] [Filter: {self.filter}] [Sort: {self.sort}]"
 
 
 class PyroUIApp(App):
@@ -198,6 +199,7 @@ class PyroUIApp(App):
         self.rtorrent_engine = pyrosimple.connect()
         self.rtorrent_filter = "//"
         self.rtorrent_view = "main"
+        self.rtorrent_sort = "name,hash"
         super().__init__()
 
     def compose(self) -> ComposeResult:
@@ -232,6 +234,8 @@ class PyroUIApp(App):
         view = self.rtorrent_engine.view(self.rtorrent_view, matcher=matcher)
         template = pyrosimple.torrent.rtorrent.env.from_string(template_str)
         items = list(self.rtorrent_engine.items(view, prefetch=prefetch))
+        sort_key = pyrosimple.torrent.rtorrent.validate_sort_fields(self.rtorrent_sort)
+        items.sort(key=sort_key)
         header = self.query_one("#pyroui_header")
         is_refresh = (self.rtorrent_filter == header.filter) and (self.rtorrent_view == header.view)
         # This shouldn't change wildly
