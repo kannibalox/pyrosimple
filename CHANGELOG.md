@@ -1,15 +1,21 @@
 # Changelog
 
-## [2.9.0] - 2023-06-02
+## [2.9.1] - 2023-07-09
 
-#### Fixed
+### Fixed
+
+- `rtcontrol`: `-V` was not working as expected (#40)
+
+## [2.9.0] - 2023-07-02
+
+### Fixed
 - `rtcontrol`: Under some circumstances, `~/.rtorrent.rc` would not be
   checked for a connection
 - `mktor`: Don't strip characters after final `.` from auto-generated
   torrent name for directories
 - `rtcontrol`: Allow more than two `OR`  conditions
 
-#### Changed
+### Changed
 - `rtcontrol`: Output sub-multicall fields (e.g. `p_client_version`)
   in JSON format
 - `rtcontrol`: Exact matches also match in patterns. E.G. previously
