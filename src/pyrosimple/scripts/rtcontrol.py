@@ -677,19 +677,20 @@ class RtorrentControl(ScriptBaseWithConfig):
         action_name = (
             ", appending to" if append else ", removing from" if remove else " into"
         )
-        targetname = self.engine.show(
-            matches,
-            targetname or self.options.to_view or "rtcontrol",
-            append=append,
-            disjoin=remove,
-        )
-        msg = "Filtered %d out of %d torrents using [ %s ]" % (
-            len(matches),
-            sourceview.size(),
-            sourceview.matcher,
-        )
-        self.log.info("%s%s rTorrent view %r.", msg, action_name, targetname)
-        self.engine.log(msg)
+        for engine in self.engines.values():
+            targetname = engine.show(
+                matches,
+                targetname or self.options.to_view or "rtcontrol",
+                append=append,
+                disjoin=remove,
+            )
+            msg = "Filtered %d out of %d torrents using [ %s ]" % (
+                len(matches),
+                sourceview.size(),
+                sourceview.matcher,
+            )
+            self.log.info("%s%s rTorrent view %r.", msg, action_name, targetname)
+            engine.log(msg)
 
     def mainloop(self):
         """The main loop."""
