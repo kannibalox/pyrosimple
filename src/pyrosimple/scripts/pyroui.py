@@ -92,6 +92,7 @@ class TorrentInfoScreen(ModalScreen):
         self.key = key
         self.info_template = """
         Name:       {{d.name}}
+        Status:     {{d.is_open|fmt('is_open')}} / {{d.is_active|fmt('is_active')}}
         Hash:       {{d.hash}}
         Path:       {{d.path}}
         Size:       {{d.size}} ({{d.size|sz|trim}})
@@ -165,7 +166,7 @@ class TorrentInfoScreen(ModalScreen):
         self.load_info_data()
 
     def action_escape(self):
-        self.app.pop_screen()
+        self.dismiss()
 
 
 class CollapsedTorrentTable(DataTable):
@@ -187,13 +188,13 @@ class CollapsedTorrentTable(DataTable):
             {"key": "xfer", "width": 1},
             "{% if d.up and d.down%}⇅{%elif d.up %}↟{%elif d.down %}↡{%endif%}",
         ),
-        ("↡", {"key": "down"}, "{% if d.down != 0%}{{d.down|sz}}/s{%endif%}"),
-        ("↟", {"key": "up"}, "{% if d.up != 0%}{{d.up|sz}}/s{%endif%}"),
+        ("↡", {"key": "down"}, "{% if d.down != 0%}{{d.down|sz_short}}{%endif%}"),
+        ("↟", {"key": "up"}, "{% if d.up != 0%}{{d.up|sz_short}}{%endif%}"),
         ("℞", {"key": "peers_connected"}, "{{d.d_peers_connected}}"),
         (
             "⣿",
             {"key": "progress", "width": 1},
-            "{% if d.is_complete %}❚{%elif d.done == 0%} {%else%}{{ '⠁⠉⠋⠛⠟⠿⡿⣿'[d.done|int//8]}}{%endif%}",
+            "{% if d.is_complete %}❚{%elif d.done == 0%} {%else%}{{ '⠁⠉⠋⠛⠟⠿⡿⣿'[((d.done|int)//8)-1]}}{%endif%}",
         ),
         ("⛁", {"key": "size"}, "{{d.size|sz}}"),
         ("T", {"key": "alias"}, "{{d.alias}}"),
@@ -234,6 +235,9 @@ class DownloadHeader(Static):
         return f"\[View: {self.view}] [Filter: {self.filter}] [Sort: {self.sort}]"
 
 
+class DownloadListScreen(Screen):
+    pass
+
 class PyroUIApp(App):
     """A Textual app to manage stopwatches."""
 
@@ -246,6 +250,12 @@ class PyroUIApp(App):
         ("r", "refresh", "Refresh"),
         ("v", "switch_view", "Edit view"),
     ]
+    MODES = {
+        "default": "main",
+    }
+    SCREENS = {
+        "main": DownloadListScreen()
+    }
 
     def __init__(self):
         self.rtorrent_engine = pyrosimple.connect()

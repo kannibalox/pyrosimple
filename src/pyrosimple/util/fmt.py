@@ -14,7 +14,7 @@ import time
 
 from pathlib import Path
 from pprint import pformat
-from typing import Optional
+from typing import Optional, Tuple
 
 from pyrosimple import torrent
 from pyrosimple.util import pymagic
@@ -23,7 +23,30 @@ from pyrosimple.util import pymagic
 log = logging.getLogger(__name__)
 
 
-def human_size(size: float) -> str:
+def human_size_short(size: float, units: Tuple[str] = ("K", "M", "G", "T", "P")) -> str:
+    """Return a shorter human-readable representation of a byte size.
+
+    @param size: Number of bytes as an integer or string.
+    @return: String of length 10 with the formatted result.
+    """
+    if isinstance(size, str):
+        size = float(size, 10)
+
+    if size < 0:
+        return "-??? bytes"
+
+    if size < 1024:
+        return f"{int(size):4d}B".lstrip()
+
+    rem = float(size)
+    for unit in units:
+        rem /= 1024.0
+        if rem < 1024:
+            return f"{rem:6.1f}{unit}".lstrip()
+
+    return f"{rem:6.1f}P".lstrip()
+
+def human_size(size: float, units: Tuple[str] = ("KiB", "MiB", "GiB", "TiB", "PiB")) -> str:
     """Return a human-readable representation of a byte size.
 
     @param size: Number of bytes as an integer or string.
@@ -39,7 +62,7 @@ def human_size(size: float) -> str:
         return f"{int(size):4d} bytes".lstrip()
 
     rem = float(size)
-    for unit in ("KiB", "MiB", "GiB", "TiB", "PiB"):
+    for unit in units:
         rem /= 1024.0
         if rem < 1024:
             return f"{rem:6.1f} {unit}".lstrip()
@@ -58,6 +81,13 @@ def fmt_sz(intval: int) -> str:
         return human_size(intval).rjust(10)
     except (ValueError, TypeError):
         return "N/A".rjust(10)
+
+def fmt_sz_short(intval: int) -> str:
+    """Format a byte sized value."""
+    try:
+        return human_size_short(intval)
+    except (ValueError, TypeError):
+        return "N/A"
 
 
 def fmt_iso(timestamp: float) -> str:
