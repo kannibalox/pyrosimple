@@ -1,5 +1,15 @@
 # Changelog
 
+### Unreleased
+
+### Added
+- `pyrotorue`: Add the `--log-file` flag to allow controlling where
+  the stdout/stdout are sent after detaching
+
+### Fixed
+- `pyrotorque`: Check if pidfile can be successfully locked prior to
+  forking
+
 ## [2.9.1] - 2023-07-09
 
 ### Fixed
