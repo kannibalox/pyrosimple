@@ -17,6 +17,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from box.box import Box
 from daemon import DaemonContext
 from daemon.pidfile import TimeoutPIDLockFile
+from lockfile.pidlockfile import AlreadyLocked, LockFailed
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
@@ -65,6 +66,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "--pid-file",
             "PATH",
             help="file holding the process ID of the daemon, when running in background",
+            default=Path(self.RUNTIME_DIR, "pyrotorque.pid"),
         )
 
     def parse_schedule(self, schedule):
@@ -176,10 +178,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.fatal(exc)
 
         # Defaults for process control paths
-        if not self.options.pid_file:
-            self.options.pid_file = TimeoutPIDLockFile(
-                Path(self.RUNTIME_DIR, "pyrotorque.pid").expanduser()
-            )
+        self.options.pid_file = TimeoutPIDLockFile(
+            Path(self.options.pid_file).expanduser()
+        )
 
         # Process control
         if self.options.status or self.options.stop or self.options.restart:
@@ -246,8 +247,15 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             dcontext.stderr = logutil.get_logfile()
             dcontext.stdout = logutil.get_logfile()
             dcontext.pidfile = self.options.pid_file
+            # Ensure we can lock the pid_file
+            try:
+                with self.options.pid_file:
+                    pass
+            except (AlreadyLocked, LockFailed) as exc:
+                self.log.error("Cannot lock pidfile: %s", exc)
+                sys.exit(1)
             self.log.info(
-                "Writing pid to %s and detaching process...", self.options.pid_file
+                "Writing pid to %s and detaching process...", self.options.pid_file.path
             )
             self.log.info("Logging stderr/stdout to %s", logutil.get_logfile())
 
