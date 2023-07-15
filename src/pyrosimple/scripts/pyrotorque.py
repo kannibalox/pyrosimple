@@ -73,7 +73,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "--log-file",
             "PATH",
             type=Path,
-            help="file for logging stderr/stdout of the forked process (only used with --detach)",
+            help="file for logging stderr/stdout of the forked process (only used when running the daemon in the background)",
         )
 
     def parse_schedule(self, schedule):
