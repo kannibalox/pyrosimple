@@ -267,7 +267,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.log.info(
                 "Writing pid to %s and detaching process...", self.options.pid_file.path
             )
-            self.log.info("Logging stderr/stdout to %s", dcontext.stdout or "/dev/null")
+            self.log.info("Logging stderr/stdout to %r", self.options.log_file or "/dev/null")
 
         # Change logging format
         logging.basicConfig(
