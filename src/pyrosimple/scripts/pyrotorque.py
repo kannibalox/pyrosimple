@@ -21,7 +21,7 @@ from lockfile.pidlockfile import AlreadyLocked, LockFailed
 
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
-from pyrosimple.util import logutil, pymagic
+from pyrosimple.util import pymagic
 
 
 class RtorrentQueueManager(ScriptBaseWithConfig):
@@ -66,7 +66,14 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "--pid-file",
             "PATH",
             help="file holding the process ID of the daemon, when running in background",
+            type=Path,
             default=Path(self.RUNTIME_DIR, "pyrotorque.pid"),
+        )
+        self.add_value_option(
+            "--log-file",
+            "PATH",
+            type=Path,
+            help="file for logging stderr/stdout of the forked process (only used with --detach)",
         )
 
     def parse_schedule(self, schedule):
@@ -242,10 +249,12 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         )
         # Detach, if not disabled via option
         if not self.options.no_fork:
-            dcontext.detach_process = True
             dcontext.stdin = None
-            dcontext.stderr = logutil.get_logfile()
-            dcontext.stdout = logutil.get_logfile()
+            log_file = None
+            if self.options.log_file is not None:
+                log_file = self.options.log_file.open("w")
+            dcontext.stderr = log_file
+            dcontext.stdout = log_file
             dcontext.pidfile = self.options.pid_file
             # Ensure we can lock the pid_file
             try:
@@ -254,10 +263,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             except (AlreadyLocked, LockFailed) as exc:
                 self.log.error("Cannot lock pidfile: %s", exc)
                 sys.exit(1)
+            dcontext.detach_process = True
             self.log.info(
                 "Writing pid to %s and detaching process...", self.options.pid_file.path
             )
-            self.log.info("Logging stderr/stdout to %s", logutil.get_logfile())
+            self.log.info("Logging stderr/stdout to %s", dcontext.stdout or "/dev/null")
 
         # Change logging format
         logging.basicConfig(
