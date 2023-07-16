@@ -32,7 +32,14 @@ class BaseJob:
         self.log = logging.getLogger("pyrosimple.pyrotorque.jobs." + self.name)
         if "log_level" in self.config:
             self.log.setLevel(self.config["log_level"])
-        self.log.debug("%s:%s created with config %r", __name__, self.name, self.config)
+        self.log.debug(
+            "%s:%s created with config %r",
+            __name__,
+            self.name,
+            {  # Hide some internal settings from output
+                k: v for k, v in self.config.items() if not k.startswith("__")
+            },
+        )
 
     def run(self):
         """Let all child classes determine what the action is."""
