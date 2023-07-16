@@ -5,10 +5,17 @@ title: Usage
 # pyrotorque
 
 !!! note
+
     pyrotorque requires additional dependencies. To install them, run
     ```bash
     pip install 'pyrosimple[torque]'
     ```
+
+!!! tip
+
+    See the [pyrotorque tutorial](pyrotorque-tutorial.md) for
+    an introduction to how pyrotorque works by setting up a basic
+    workflow.
 
 The `pyrotorque` command is a daemon that handles background jobs. At
 first, it was just a flexible torrent queue manager for starting items

@@ -4,7 +4,7 @@ Currently the existing pyrotorque documentation ranges from
 [vague](usage-pyrotorque.md) to [very
 detailed](pyrotorque-jobs.md). This will hopefully provide a more
 pleasant introduction to the tool. For this tutorial, we're going to
-focus on a few basic use cases on an example host:
+focus on a few basic use cases:
 
 * Load torrent files from `/var/rtorrent/watch/` without starting them
 * Use QueueManager to start torrents in a controlled manner
@@ -24,7 +24,7 @@ The following configuration allows us to load all torrents under
 `/var/rtorrent/watch/` and any of its subdirectories. The torrents are
 loaded without being started, and every 15 minutes (as per `schedule`)
 the directory is checked for any torrents that haven't been loaded (in
-case they were added while pyrotorque or rTorrent wasn't running. It
+case they were added while pyrotorque or rTorrent wasn't running). It
 also executes two user-defined commands via `cmd_custom_fields` to set
 the `loaded_by` and `tracker_alias` fields. Finally,
 `cmd_download_directory` sets the target directory to
@@ -75,7 +75,7 @@ them. Ignored torrents and any actively transferring data are filtered
 out.
 
 ```toml
-[TORQUE.move]
+[TORQUE.move_complete]
 handler       = "pyrosimple.job.move_path:PathMover"
 schedule      = "minute=*/10"
 matcher       = "is_ignored=no is_complete=yes path=/var/rtorrent/downloading/* xfer=0"
@@ -105,7 +105,7 @@ sort_fields     = "-prio,loaded,name"
 start_at_once   = 1
 downloading     = "is_active=yes is_complete=no down>0"
 downloading_max = 20
-[TORQUE.move]
+[TORQUE.move_complete]
 handler       = "pyrosimple.job.move_path:PathMover"
 schedule      = "minute=*/10"
 matcher       = "is_ignored=no is_complete=yes path=/var/rtorrent/downloading/* xfer=0"
