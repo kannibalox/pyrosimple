@@ -3,8 +3,11 @@
 ### Unreleased
 
 ### Added
-- `pyrotorue`: Add the `--log-file` flag to allow controlling where
+- `pyrotorque`: Add the `--log-file` flag to allow controlling where
   the stdout/stdout are sent after detaching
+- `pyrotorque`: Add dedicated `[TORQUE._settings]` key in
+  `config.toml` to control settings such as the log level, pid file
+  location, autoreload, etc.
 
 ### Fixed
 - `pyrotorque`: Check if pidfile can be successfully locked prior to

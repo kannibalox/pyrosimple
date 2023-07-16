@@ -37,13 +37,27 @@ There are two primary jobs that can be run from pyrotorque:
 
 ## Configuration
 
-The configuration lives in the same `config.toml` with everything
+The base pyrotorque configuration lives in `config.toml`, under the
+`[TORQUE._settings]` key. Here's an example:
+
+```toml
+[TORQUE._settings]
+autoreload = false # false by default
+log_level = "WARNING" # "WARNING" by default
+pid_file = "/var/run/pyrotorque.pid" # "$XDG_RUNTIME_DIR/pyrotorque.pid" or "~/.pyrosimple/run/pyrotorque.pid" by default
+log_file = "/var/log/pyrotorque.log" # Disabled by default
+```
+
+## Job Configuration
+
+The job configuration lives in the same `config.toml` with everything
 else, in the `[TORQUE]` section. Under the section, there are settings
 for pyrotorque itself, and then sub-sections for the individual jobs.
 
 Example:
 ```toml
 [TORQUE]
+[TORQUE._settings]
 autoreload = true # false by default
 [TORQUE.stats]
 handler = "pyrocore.torrent.jobs:EngineStats"

@@ -37,6 +37,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         super().__init__(*args, **kwargs)
         self.classes = {}
         self.jobs: Dict = {}
+        self.running_config = {}
 
     def add_options(self):
         """Add program options."""
@@ -67,7 +68,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "PATH",
             help="file holding the process ID of the daemon, when running in background",
             type=Path,
-            default=Path(self.RUNTIME_DIR, "pyrotorque.pid"),
         )
         self.add_value_option(
             "--log-file",
@@ -99,7 +99,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         for name, params in config.settings.TORQUE.items():
             # Skip non-dictionary keys
-            if not isinstance(params, Box):
+            if not isinstance(params, Box) or name == "_settings":
                 continue
             for key in ("handler", "schedule"):
                 if key not in params:
@@ -135,7 +135,6 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         This should be called only once the jobs have finished
         running, so that a successive run doesn't re-create the
         resources.
-
         """
         for _, cls in self.classes.items():
             if hasattr(cls, "cleanup") and callable(cls.cleanup):
@@ -162,13 +161,16 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
     def run_forever(self):
         """Run configured jobs until termination request."""
         self.running_config = dict(config.settings.TORQUE)
+        reload_config = config.settings.TORQUE.get(
+            "autoreload", False
+        ) or config.settings.TORQUE._settings.get("autoreload", False)
         while True:
             try:
                 time.sleep(self.POLL_TIMEOUT)
-                if config.settings.TORQUE.get("autoreload", False):
+                if reload_config:
                     self.reload_jobs()
             except KeyboardInterrupt as exc:
-                self.log.info("Termination request received (%s)", exc)
+                self.log.info("Termination request received (%r)", exc)
                 self.sched.shutdown()
                 self.unload_jobs()
                 break
@@ -188,14 +190,26 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.fatal(exc)
 
         # Defaults for process control paths
-        self.options.pid_file = TimeoutPIDLockFile(
-            Path(self.options.pid_file).expanduser()
+        pid_file = TimeoutPIDLockFile(
+            Path(
+                self.options.pid_file
+                or config.settings.TORQUE._settings.get(
+                    "pid_file", Path(self.RUNTIME_DIR, "pyrotorque.pid")
+                )
+            )
+        )
+        log_file = self.options.log_file or config.settings.TORQUE._settings.get(
+            "log_file", None
+        )
+        log_level = (
+            config.settings.TORQUE._settings.get("log_level", None)
+            or self.options.log_level
         )
 
         # Process control
         if self.options.status or self.options.stop or self.options.restart:
-            if self.options.pid_file.is_locked():
-                running, pid = True, self.options.pid_file.read_pid()
+            if pid_file.is_locked():
+                running, pid = True, pid_file.read_pid()
             else:
                 running, pid = False, 0
 
@@ -214,7 +228,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
                     # Wait for termination (max. 10 secs)
                     for _ in range(100):
-                        if not self.options.pid_file.is_locked():
+                        if not pid_file.is_locked():
                             running = False
                             break
                         time.sleep(0.1)
@@ -223,9 +237,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 elif pid:
                     self.log.info("Process %d NOT running anymore.", pid)
                 else:
-                    self.log.info(
-                        "No pid file '%s'", (self.options.pid_file or "<N/A>")
-                    )
+                    self.log.info("No pid file '%s'", (pid_file.path or "<N/A>"))
             else:
                 self.log.info(
                     "Process %d %s running.", pid, "UP and" if running else "NOT"
@@ -240,6 +252,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             params = self.jobs[self.options.run_once]
             if self.options.dry_run:
                 params["dry_run"] = True
+            # Make a copy here to prevent the original handler from
+            # getting overwritten
             params["__handler_copy"] = params.get("__handler")(params)
             params["__handler_copy"].run()
             sys.exit(0)
@@ -253,31 +267,32 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         # Detach, if not disabled via option
         if not self.options.no_fork:
             dcontext.stdin = None
-            log_file = None
-            if self.options.log_file is not None:
-                log_file = self.options.log_file.open("w")
-            dcontext.stderr = log_file
-            dcontext.stdout = log_file
-            dcontext.pidfile = self.options.pid_file
+            if log_file is not None:
+                log_file_handle = open(  # pylint: disable=consider-using-with
+                    log_file, "w", encoding="utf-8"
+                )
+            dcontext.stderr = log_file_handle
+            dcontext.stdout = log_file_handle
+            dcontext.pidfile = pid_file
             # Ensure we can lock the pid_file
             try:
-                with self.options.pid_file:
+                with pid_file:
                     pass
             except (AlreadyLocked, LockFailed) as exc:
                 self.log.error("Cannot lock pidfile: %s", exc)
                 sys.exit(1)
             dcontext.detach_process = True
-            self.log.info(
-                "Writing pid to %s and detaching process...", self.options.pid_file.path
-            )
-            self.log.info(
-                "Logging stderr/stdout to %r", self.options.log_file or "/dev/null"
-            )
+            self.log.info("Writing pid to %s and detaching process...", pid_file.path)
+            self.log.info("Logging stderr/stdout to %r", log_file or "/dev/null")
 
         # Change logging format
         logging.basicConfig(
-            force=True, format="%(asctime)s %(levelname)5s %(name)s: %(message)s"
+            force=True,
+            format=config.settings.TORQUE._settings.get(
+                "log_level", "%(asctime)s %(levelname)5s %(name)s: %(message)s"
+            ),
         )
+        self.log.setLevel(log_level)
 
         with dcontext:
             # Set up services
