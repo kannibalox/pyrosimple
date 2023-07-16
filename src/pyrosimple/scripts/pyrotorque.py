@@ -264,7 +264,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             stdout=sys.stdout,
             stderr=sys.stderr,
         )
-        # Detach, if not disabled via option
+        # Set up for forking into the background, if not disabled via
+        # the flag
         if not self.options.no_fork:
             dcontext.stdin = None
             if log_file is not None:
@@ -274,7 +275,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             dcontext.stderr = log_file_handle
             dcontext.stdout = log_file_handle
             dcontext.pidfile = pid_file
-            # Ensure we can lock the pid_file
+            # Ensure we can lock the pid_file ahead of time
             try:
                 with pid_file:
                     pass
@@ -285,11 +286,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             self.log.info("Writing pid to %s and detaching process...", pid_file.path)
             self.log.info("Logging stderr/stdout to %r", log_file or "/dev/null")
 
-        # Change logging format
+        # Change logging format to something more daemon-like
         logging.basicConfig(
             force=True,
             format=config.settings.TORQUE._settings.get(
-                "log_level", "%(asctime)s %(levelname)5s %(name)s: %(message)s"
+                "log_format", "%(asctime)s %(levelname)5s %(name)s: %(message)s"
             ),
         )
         self.log.setLevel(log_level)
