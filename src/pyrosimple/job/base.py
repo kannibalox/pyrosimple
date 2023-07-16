@@ -74,8 +74,9 @@ class MatchableJob(BaseJob):
         that still needs to happen in run_item()"""
         try:
             self.engine.open()
-            prefetch = [engine.FIELD_REGISTRY[f].requires for f in self.prefetch_fields]
-            prefetch = [item for sublist in prefetch for item in sublist]
+            prefetch = []
+            for f in self.prefetch_fields:
+                prefetch.extend(engine.FIELD_REGISTRY[f].requires)
             view = self.engine.view(self.config["view"], self.matcher)
             matches = list(self.engine.items(view=view, prefetch=prefetch))
             matches.sort(key=self.sort_key)
