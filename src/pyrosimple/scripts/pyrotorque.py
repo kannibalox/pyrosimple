@@ -289,7 +289,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.add_jobs()
                 self.run_forever()
             finally:
-                self.sched.shutdown()
+                if self.sched.running:
+                    self.log.info("Shutting down scheduler...")
+                    self.sched.shutdown()
 
 
 def run():  # pragma: no cover
