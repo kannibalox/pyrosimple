@@ -173,7 +173,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 self.unload_jobs()
                 break
             except SystemExit as exc:
-                self.return_code = exc.code or 0
+                if isinstance(exc.code, int):
+                    self.return_code = exc.code
+                else:
+                    self.return_code = 0
                 self.log.info("System exit (RC=%r)", self.return_code)
                 break
 
