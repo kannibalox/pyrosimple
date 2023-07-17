@@ -845,7 +845,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
                     args = action["args"]
                     # Templatetize arguments for some commands
-                    if action_name in ["call", "spawn", "execute"]:
+                    if action_name in ["call", "spawn", "execute", "move"]:
                         template_args = [
                             ("{##}" + i if "{{" in i else i) for i in action["args"]
                         ]

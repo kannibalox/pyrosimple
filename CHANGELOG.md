@@ -1,6 +1,6 @@
 # Changelog
 
-### Unreleased
+## Unreleased
 
 ### Added
 - `pyrotorque`: Add the `--log-file` flag to allow controlling where
@@ -12,6 +12,9 @@
 ### Fixed
 - `pyrotorque`: Check if pidfile can be successfully locked prior to
   forking
+
+### Changed
+- `rtcontrol`: Allow templating the `--move` flag
 
 ## [2.9.1] - 2023-07-09
 
@@ -125,7 +128,7 @@
   instead of the actual HTTP call. This helps prevent both slow scrapes
   from stacking up, and duplicate RPC calls when being scraped by
   multiple prometheuses.
-  
+
 ## [2.5.3] - 2022-12-29
 
 ### Fixed
