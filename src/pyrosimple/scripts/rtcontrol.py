@@ -237,22 +237,19 @@ class RtorrentControl(ScriptBaseWithConfig):
     # choices for --alter
     ALTER_MODES = ("append", "remove")
 
-    # action options that perform some change on selected items
-    ACTION_MODES = (
-        # TODO: --pause, --resume?
-        # TODO: implement --clean-partial
-        # self.add_bool_option("--clean-partial",
-        #    help="remove partially downloaded 'off'ed files (also stops downloads)")
-        # TODO: --move / --link output_format / the formatted result is the target path
-        #           if the target contains a '//' in place of a '/', directories
-        #           after that are auto-created
-        #           "--move tracker_dated", with a custom output format
-        #           like "tracker_dated = ~/done//$(alias)s/$(completed).7s",
-        #           will move to ~/done/OBT/2010-08 for example
-        #        self.add_value_option("--move", "TARGET",
-        #            help="move data to given target directory (implies -i, can be combined with --delete)")
-        # TODO: --copy, and --move/--link across devices
-    )
+    # TODO: --pause, --resume?
+    # TODO: implement --clean-partial
+    # self.add_bool_option("--clean-partial",
+    #    help="remove partially downloaded 'off'ed files (also stops downloads)")
+    # TODO: --move / --link output_format / the formatted result is the target path
+    #           if the target contains a '//' in place of a '/', directories
+    #           after that are auto-created
+    #           "--move tracker_dated", with a custom output format
+    #           like "tracker_dated = ~/done//$(alias)s/$(completed).7s",
+    #           will move to ~/done/OBT/2010-08 for example
+    #        self.add_value_option("--move", "TARGET",
+    #            help="move data to given target directory (implies -i, can be combined with --delete)")
+    # TODO: --copy, and --move/--link across devices
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
