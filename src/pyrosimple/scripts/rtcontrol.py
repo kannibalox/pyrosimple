@@ -7,8 +7,10 @@ import argparse
 import functools
 import json
 import logging
+import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -355,6 +357,19 @@ class RtorrentControl(ScriptBaseWithConfig):
             "--yes", help="positively answer all prompts (e.g. --delete --yes)"
         )
         self.add_value_option(
+            "--move-type",
+            "MODE",
+            type="choice",
+            default="move",
+            choices=["move", "copy", "symlink", "hardlink"],
+            help="control how --move operates",
+        )
+        self.add_value_option(
+            "--move-and-set",
+            help="set directory to target after moving",
+            action="store_true",
+        )
+        self.add_value_option(
             "--alter-view",
             "--alter",
             "MODE",
@@ -533,6 +548,30 @@ class RtorrentControl(ScriptBaseWithConfig):
             )
 
         return item_text
+
+    def move(self, item, target, set_to_target=False, move_type="move"):
+        """Move item's data to target directory. Optionally, set the
+        item's directory to the new location. The 'move' may actually
+        be another operation such as a copy."""
+        was_started = False
+
+        if set_to_target:
+            was_started = item.is_active
+
+            prev_dir = item.datapath()
+            item.close()
+        if move_type == "copy" or move_type == "move":
+            item.move(target, move_func=lambda _, s, d: shutil.copy2(s, d))
+        elif move_type == "hardlink":
+            item.move(target, move_func=lambda _, s, d: os.link(s, d))
+        elif move_type == "symlink":
+            item.move(target, move_func=lambda _, s, d: os.symlink(s, d))
+        if set_to_target:
+            if move_type == "move":
+                item.purge(remove_torrent=False)
+            item.rpc_call("d.directory.set", [target])
+            if was_started:
+                item.start()
 
     def emit(
         self,
@@ -858,6 +897,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                             for i in template_args
                         )
 
+                    # Prompt for user input if enabled
                     if (
                         action["interactive"] or self.options.interactive
                     ) and not self.options.yes:
@@ -887,17 +927,21 @@ class RtorrentControl(ScriptBaseWithConfig):
                         self.log.debug("Would call action %s%r", action["method"], args)
                     else:
                         if action_name == "call":
-                            self.log.debug("Calling '%s' with a shell", args[0])
+                            self.log.debug("Calling %r with a shell", args[0])
                             subprocess.run(args[0], check=True, shell=True)
                             continue
                         if action_name == "spawn":
                             args = shlex.split(args[0])
-                            self.log.debug("Spawning '%s'", args)
+                            self.log.debug("Spawning %r", args)
                             subprocess.run(args, check=True, shell=False)
                             continue
+                        # Handle complex moves separately
+                        if action_name == "move":
+                            self.move(item, args[0], args.move_and_set, args.move_type)
                         # Look up aliases when moving to a host
                         if action_name == "move to host":
                             args[0] = config.lookup_connection_alias(args[0])
+                        # Get the function from RtorrentItem
                         getattr(item, action["method"])(*args)
                         if self.options.view_only:
                             show_in_client = functools.partial(

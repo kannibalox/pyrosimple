@@ -14,7 +14,7 @@ import urllib.parse
 
 from functools import lru_cache, partial
 from pathlib import Path
-from typing import Callable, Dict, Generator, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, Generator, List, Optional, Set, Tuple, Union
 from xmlrpc import client as xmlrpclib
 
 import bencode
@@ -190,7 +190,7 @@ class RtorrentItem(engine.TorrentProxy):
         # Return all non-empty extensions that make up at least <limit>% of total size
         return {ext for val, ext in histo if ext and val >= limit}
 
-    def as_dict(self):
+    def as_dict(self) -> Dict[str, Any]:
         """Return known fields."""
         return dict(self._fields)
 
@@ -529,9 +529,12 @@ class RtorrentItem(engine.TorrentProxy):
         self.cull(file_filter=partial_file, attrs=["completed_chunks", "size_chunks"])
 
     def cull(
-        self, file_filter: Optional[Callable] = None, attrs: Optional[List[str]] = None
-    ):
-        """Delete ALL data files and remove torrent from client.
+        self,
+        file_filter: Optional[Callable] = None,
+        attrs: Optional[List[str]] = None,
+        remove_torrent=True,
+    ) -> None:
+        """Delete ALL data files and optionally remove torrent from client.
 
         @param file_filter: Optional callable for selecting a subset of all files.
             The callable gets a file item as described for RtorrentItem._get_files
@@ -570,7 +573,7 @@ class RtorrentItem(engine.TorrentProxy):
                     raise
 
         # Delete item from engine
-        if not dry_run:
+        if not dry_run and remove_torrent:
             self.delete()
 
     def flush(self) -> None:
