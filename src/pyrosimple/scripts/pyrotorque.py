@@ -272,6 +272,8 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 log_file_handle = open(  # pylint: disable=consider-using-with
                     log_file, "w", encoding="utf-8"
                 )
+            else:
+                log_file_handle = None
             dcontext.stderr = log_file_handle
             dcontext.stdout = log_file_handle
             dcontext.pidfile = pid_file
