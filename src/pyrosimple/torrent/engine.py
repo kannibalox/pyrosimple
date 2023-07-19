@@ -255,7 +255,9 @@ class FieldDefinition:
         if obj is None:
             return self
         return self.valtype(
-            self._accessor(obj) if self._accessor else obj._fields[self.name]
+            self._accessor(obj)
+            if self._accessor is not None
+            else obj._fields[self.name]
         )
 
     def __delete__(self, obj):
@@ -680,12 +682,15 @@ def core_fields():
         prefilter_field="d.custom=tm_loaded",
     )
 
-    def _leechtime_accessor(o):
+    def _leechtime_accessor(o) -> Optional[int]:
         leechtime = _interval_sum(
             o.rpc_call("d.custom", ["activations"]), end=o.completed
         )
         if not leechtime:
-            leechtime = _duration(o.started, o.completed)
+            duration = _duration(o.started, o.completed)
+            if duration is None:
+                return None
+            return int(duration)
         return leechtime
 
     yield DynamicField(
