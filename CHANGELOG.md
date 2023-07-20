@@ -8,6 +8,8 @@
 - `pyrotorque`: Add dedicated `[TORQUE._settings]` key in
   `config.toml` to control settings such as the log level, pid file
   location, autoreload, etc.
+- Allow parsing simple `cat` string replacements when auto-detecting
+  the SCGI URL (e.g. `network.scgi.open_local = (cat, (cfg.rundir), "scgi.socket")`)
 
 ### Fixed
 - `pyrotorque`: Check if pidfile can be successfully locked prior to

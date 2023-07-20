@@ -19,6 +19,11 @@ from pyrosimple import config
         ),
         ("scgi_local = /tmp/rtorrent.sock", "scgi+unix:///tmp/rtorrent.sock"),
         ("scgi_local=/tmp/rtorrent.sock", "scgi+unix:///tmp/rtorrent.sock"),
+        ("""
+        method.insert = cfg.basedir, private|const|string, (cat,"/data/rtorrent/")
+        method.insert = cfg.rundir, private|const|string, (cat,"/var/run/rtorrent/")
+        network.scgi.open_local = (cat, (cfg.rundir), "scgi.socket")
+        """, "scgi+unix:///var/run/rtorrent/scgi.socket")
     ],
 )
 def test_rtorrentrc_parse(lines, want, tmpdir):

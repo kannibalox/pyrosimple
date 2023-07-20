@@ -8,10 +8,12 @@
 import functools
 import logging
 import os
+import re
+import shlex
 import urllib
 
 from pathlib import Path
-from typing import Iterator, Optional, Union
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 
 try:
@@ -91,13 +93,19 @@ def load_settings() -> Box:
 settings: Box = load_settings()
 
 
-def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
-    """Parse a rtorrent.rc file and"""
-    log = logging.getLogger(__name__)
-    log.debug("Loading rtorrent config from '%s'", rcfile)
-    scgi_local: str = ""
-    scgi_port: str = ""
-    rcfile = Path(rcfile)
+class RCLexer(shlex.shlex):
+    """Helper to split argument lists."""
+
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.whitespace += ","
+        self.whitespace_split = True
+        self.commenters = ""
+
+
+def expand_rc(rcfile: Path) -> List[Tuple[str, str]]:
+    data: List[Tuple[str, str]] = []
+    replacements: Dict[str, str] = {}
     with rcfile.open("r", encoding="utf-8") as handle:
         continued = False
         for line in handle.readlines():
@@ -114,14 +122,55 @@ def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
                 log.debug("Ignored invalid line %r in %r!", line, rcfile)
                 continue
             key, val = key.strip(), val.strip()
+            priv_string_match = re.match(
+                r"([.\w]+),\s*private\|const\|string,\s*\(cat,(.*)\)", val
+            )
+            if priv_string_match:
+                str_result = ""
+                for arg in RCLexer(priv_string_match.group(2)):
+                    print(arg)
+                    if arg.startswith("("):
+                        str_result += replacements.get(arg[1:-1], "")
+                    if arg.startswith('"'):
+                        str_result += arg[1:-1]
+                val = str_result
+                replacements[priv_string_match.group(1)] = str_result
+            if key in [
+                "network.scgi.open_local",
+                "scgi_local",
+                "scgi_port",
+                "network.scgi.open_port",
+            ]:
+                simple_cat_match = re.match(r"\(cat,(.*)\)", val)
+                if simple_cat_match:
+                    str_result = ""
+                    for arg in RCLexer(simple_cat_match.group(1)):
+                        if arg.startswith("("):
+                            str_result += replacements.get(arg[1:-1], "")
+                        if arg.startswith('"'):
+                            str_result += arg[1:-1]
+                    val = str_result
+            data.append((key, val))
+            print(key, val)
+            print(replacements)
+        return data
 
-            # Copy values we're interested in
-            if key in ["network.scgi.open_port", "scgi_port"]:
-                log.debug("rtorrent.rc: %s = %s", key, val)
-                scgi_port = val
-            if key in ["network.scgi.open_local", "scgi_local"]:
-                log.debug("rtorrent.rc: %s = %s", key, val)
-                scgi_local = val
+
+def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
+    """Parse a rtorrent.rc file and"""
+    log = logging.getLogger(__name__)
+    log.debug("Loading rtorrent config from '%s'", rcfile)
+    scgi_local: str = ""
+    scgi_port: str = ""
+    rcfile = Path(rcfile)
+    for key, val in expand_rc(rcfile):
+        # Copy values we're interested in
+        if key in ["network.scgi.open_port", "scgi_port"]:
+            log.debug("rtorrent.rc: %s = %s", key, val)
+            scgi_port = val
+        if key in ["network.scgi.open_local", "scgi_local"]:
+            log.debug("rtorrent.rc: %s = %s", key, val)
+            scgi_local = val
 
     # Validate fields
     if scgi_local and not scgi_port.startswith("scgi+unix://"):
