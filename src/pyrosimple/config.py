@@ -56,9 +56,7 @@ DEFAULT_SETTINGS = Box(
         "ALIASES": {},
         "ALIAS_TRAITS": {},
         "CONNECTIONS": {},
-        "TORQUE": Box({
-            "_settings": Box()
-        }),
+        "TORQUE": Box({"_settings": Box()}),
         # Allow individual overrides in FORMATS section
         "FORMATS": {
             "default": '{{d.name}} \t[{{d.alias}}]\n  {{d.is_private|fmt("is_private")}} {{d.is_open|fmt("is_open")}} {{d.is_active|fmt("is_active")}} P{{d.prio|int}} {%if d.is_complete %}     done{%else%}{{"%8.2f"|format(d.done)}}%{%endif%}\t{{d.size|sz}} U:{{d.up|sz}}/s  D:{{d.down|sz}}/s T:{{d.throttle|fmt("throttle")}}',

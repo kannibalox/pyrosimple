@@ -4,6 +4,7 @@
     Copyright (c) 2012 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
+import errno
 import logging
 import os
 import signal
@@ -22,6 +23,25 @@ from lockfile.pidlockfile import AlreadyLocked, LockFailed
 from pyrosimple import config, error
 from pyrosimple.scripts.base import ScriptBaseWithConfig
 from pyrosimple.util import pymagic
+
+
+def pid_exists(pid):
+    """Check whether pid exists in the current process table."""
+    if pid == 0:
+        return True
+    try:
+        os.kill(pid, 0)
+    except OSError as err:
+        if err.errno == errno.ESRCH:
+            # ESRCH == No such process
+            return False
+        elif err.errno == errno.EPERM:
+            # EPERM clearly means there's a process to deny access to
+            return True
+        else:
+            raise err
+    else:
+        return True
 
 
 class RtorrentQueueManager(ScriptBaseWithConfig):
@@ -68,6 +88,10 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             "PATH",
             help="file holding the process ID of the daemon, when running in background",
             type=Path,
+        )
+        self.add_bool_option(
+            "--adopt-stale-pid-file",
+            help="if the pid file exists but appears to be stale, adopt it",
         )
         self.add_value_option(
             "--log-file",
@@ -207,16 +231,21 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
         )
 
         # Process control
+        if pid_file.is_locked():
+            running, pid = True, pid_file.read_pid()
+        else:
+            running, pid = False, 0
         if self.options.status or self.options.stop or self.options.restart:
-            if pid_file.is_locked():
-                running, pid = True, pid_file.read_pid()
-            else:
-                running, pid = False, 0
-
             if self.options.status:
                 if running:
-                    self.log.info("Pyrotorque is running (PID %d).", pid)
-                    sys.exit(0)
+                    if pid_exists(pid):
+                        self.log.info("Pyrotorque is running (PID %d).", pid)
+                        sys.exit(0)
+                    else:
+                        self.log.error(
+                            "PID file exist, but process %d appears stale", pid
+                        )
+                        sys.exit(1)
                 else:
                     self.log.error("No pyrotorque process found.")
                     sys.exit(1)
@@ -277,6 +306,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             dcontext.stderr = log_file_handle
             dcontext.stdout = log_file_handle
             dcontext.pidfile = pid_file
+            if running and self.options.adopt_stale_pid_file and not pid_exists(pid):
+                self.log.debug("Removing stale PID file")
+                os.unlink(pid_file.path)
+                with pid_file:
+                    pass
             # Ensure we can lock the pid_file ahead of time
             try:
                 with pid_file:
