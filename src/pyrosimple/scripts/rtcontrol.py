@@ -557,10 +557,8 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         if set_to_target:
             was_started = item.is_active
-
-            prev_dir = item.datapath()
             item.close()
-        if move_type == "copy" or move_type == "move":
+        if move_type in ["copy", "move"]:
             item.move(target, move_func=lambda _, s, d: shutil.copy2(s, d))
         elif move_type == "hardlink":
             item.move(target, move_func=lambda _, s, d: os.link(s, d))

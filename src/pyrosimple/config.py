@@ -104,6 +104,9 @@ class RCLexer(shlex.shlex):
 
 
 def expand_rc(rcfile: Path) -> List[Tuple[str, str]]:
+    """Return key/val pairs for each line in the rc file, with some
+    very naive string replacement for cat= calls"""
+    log = logging.getLogger(__name__)
     data: List[Tuple[str, str]] = []
     replacements: Dict[str, str] = {}
     with rcfile.open("r", encoding="utf-8") as handle:
