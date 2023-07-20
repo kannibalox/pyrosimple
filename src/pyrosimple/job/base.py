@@ -1,7 +1,7 @@
 """Contains some base jobs to reduce boilerplate across jobs"""
 import logging
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import pyrosimple
 
@@ -74,7 +74,7 @@ class MatchableJob(BaseJob):
         that still needs to happen in run_item()"""
         try:
             self.engine.open()
-            prefetch = []
+            prefetch: List[str] = []
             for f in self.prefetch_fields:
                 prefetch.extend(engine.FIELD_REGISTRY[f].requires)
             view = self.engine.view(self.config["view"], self.matcher)

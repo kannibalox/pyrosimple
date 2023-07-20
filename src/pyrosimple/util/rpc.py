@@ -146,7 +146,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
 
     def __batch_request_json(self, calls: List) -> List:
         """Handle JSON-RPC multicalls in place of XMLRPC's built-in
-        system.multilcall.
+        system.multicall.
         """
         batch_call: List[Dict] = [
             {
@@ -183,8 +183,8 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if not params:
             params = [""]
 
-        # system.multicall isn't defined by the app, but by the xmlrpc
-        # library, so we intercept it and turn it into a batch request
+        # system.multicall isn't defined by rTorrent, but by the XMLRPC
+        # library, so we intercept it and turn it into a batch request.
         if methodname == "system.multicall":
             return self.__batch_request_json(params[0])
 
@@ -237,8 +237,10 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         return response["result"]
 
     def __request(self, methodname, params):
-        """Determines whether or not a request should be cached,
-        then passes it to the appropriate method"""
+        """Determines whether or not a request should be cached, then
+        passes it to the appropriate method
+
+        """
         if methodname in CACHE_METHOD:
             return self.__cached_request(methodname, params)
         return self.__request_switch(methodname, params)
@@ -246,12 +248,16 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     @functools.lru_cache(maxsize=32)
     def __cached_request(self, methodname, params):
         """Simpled cache pass-through method to more easily take
-        advantage of functools.lru_cache"""
+        advantage of functools.lru_cache
+
+        """
         return self.__request_switch(methodname, params)
 
     def __request_switch(self, methodname, params):
-        """Determines whether the request should go through
-        xml or json and calls the appropriate method."""
+        """Determines whether the request should go through XMLRPC or
+        JSON-RPC and calls the appropriate method.
+
+        """
         logger.debug("method '%s', params %s", methodname, params)
         try:
             if self.__rpc_codec == "xml":
@@ -282,6 +288,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
     def __call__(self, attr):
         """A workaround to get special attributes on the ServerProxy
         without interfering with the magic __getattr__
+
         """
         if attr == "close":
             return self.__close

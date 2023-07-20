@@ -20,7 +20,7 @@ class QueueManager(MatchableJob):
         if "sort_fields" in config and "sort" not in config:
             config["sort"] = config["sort_fields"]
         super().__init__(config)
-        self.last_start: int = 0
+        self.last_start: float = 0
         self.downloading_count: int = 0
         self.allowed_start_count: int = 0
 
