@@ -9,7 +9,8 @@
   `config.toml` to control settings such as the log level, pid file
   location, autoreload, etc.
 - Allow parsing simple `cat` string replacements when auto-detecting
-  the SCGI URL (e.g. `network.scgi.open_local = (cat, (cfg.rundir), "scgi.socket")`)
+  the SCGI URL (e.g. `network.scgi.open_local=(cat,(cfg.rundir),"scgi.socket")`)
+- `pyrotorque`: Allow adopting stale PID files
 
 ### Fixed
 - `pyrotorque`: Check if pidfile can be successfully locked prior to
@@ -22,7 +23,8 @@
 
 ### Fixed
 
-- `rtcontrol`: `-V` was not working as expected (#40)
+- `rtcontrol`: `-V` was not working as expected
+  (https://github.com/kannibalox/pyrosimple/issues/40)
 
 ## [2.9.0] - 2023-07-02
 
