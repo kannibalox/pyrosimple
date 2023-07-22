@@ -15,7 +15,7 @@ to rTorrent functions for easy access.
 !!! tip
     To skip all the explanations and quickly generate a full config, run the following command:
     ```
-    pyroadmin --create-rtorrent-rc
+    pyroadmin config --create-rtorrent-rc
     ```
 
 The full-featured `rtorrent.rc` used above is provided

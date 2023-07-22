@@ -10,7 +10,8 @@
   location, autoreload, etc.
 - Allow parsing simple `cat` string replacements when auto-detecting
   the SCGI URL (e.g. `network.scgi.open_local=(cat,(cfg.rundir),"scgi.socket")`)
-- `pyrotorque`: Allow adopting stale PID files
+- `pyrotorque`: Allow adopting stale PID files (with the
+  `--adopt-stale-pid-file` flag)
 
 ### Fixed
 - `pyrotorque`: Check if pidfile can be successfully locked prior to
