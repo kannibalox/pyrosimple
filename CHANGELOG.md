@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [Unreleased]
 
 ### Added
 - `pyrotorque`: Add the `--log-file` flag to allow controlling where
@@ -370,7 +370,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.9.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.9.1...HEAD
+[2.9.1]: https://github.com/kannibalox/pyrosimple/compare/v2.9.0...v2.9.1
 [2.9.0]: https://github.com/kannibalox/pyrosimple/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/kannibalox/pyrosimple/compare/v2.7.0...v2.7.1
