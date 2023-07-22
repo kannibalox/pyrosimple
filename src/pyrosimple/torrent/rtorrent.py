@@ -31,7 +31,7 @@ from pyrosimple.util.cache import ExpiringCache
 # Prepare the jinja template environment at the module level
 env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(
-        [Path("~/.config/pyrosimple/templates/").expanduser()]
+        [Path("~/.config/pyrosimple/templates/").expanduser(), Path(".").absolute()]
     ),
 )
 # Load filter methods from fmt submodule
