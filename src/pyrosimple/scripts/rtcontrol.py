@@ -366,10 +366,9 @@ class RtorrentControl(ScriptBaseWithConfig):
             choices=["move", "copy", "symlink", "hardlink"],
             help="control how --move operates",
         )
-        self.add_value_option(
+        self.add_bool_option(
             "--move-and-set",
             help="set directory to target after moving",
-            action="store_true",
         )
         self.add_value_option(
             "--alter-view",
