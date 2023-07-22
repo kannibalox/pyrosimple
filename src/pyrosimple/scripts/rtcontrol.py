@@ -135,10 +135,12 @@ class FieldStatistics:
 
         # Calculate average if possible
         if self.size:
-            result.update(
-                (key, "" if isinstance(val, str) else val / self.size)
-                for key, val in list(self.total.items())
-            )
+            for key, val in self.total.items():
+                if isinstance(val, str):
+                    avg = ""
+                else:
+                    avg = val / self.size
+            result.update(key, avg)
 
         # Handle time fields
         # for key, fielddef in  engine.FIELD_REGISTRY.items():
