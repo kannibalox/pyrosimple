@@ -177,7 +177,7 @@ def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
             scgi_local = val
 
     # Validate fields
-    if scgi_local and not scgi_port.startswith("scgi+unix://"):
+    if scgi_local and not scgi_local.startswith("scgi+unix://"):
         scgi_local = "scgi+unix://" + str(Path(scgi_local).expanduser())
     if scgi_port and not scgi_port.startswith("scgi://"):
         scgi_port = "scgi://" + scgi_port
