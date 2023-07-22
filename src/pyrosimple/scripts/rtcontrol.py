@@ -140,7 +140,7 @@ class FieldStatistics:
                     avg = ""
                 else:
                     avg = val / self.size
-            result.update(key, avg)
+                result.update(key, avg)
 
         # Handle time fields
         # for key, fielddef in  engine.FIELD_REGISTRY.items():
