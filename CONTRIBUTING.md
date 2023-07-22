@@ -24,6 +24,6 @@ poetry install --with dev
 poetry run black src/
 poetry run isort src/
 # Unit test and lint
-poetry run 
+poetry run pytest
 poetry run pylint src/pyrosimple/
 ```
