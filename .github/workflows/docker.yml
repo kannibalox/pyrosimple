@@ -17,13 +17,14 @@ jobs:
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
-        images: |
-          kannibalox/pyrosimple
-        tags: |
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
-          type=sha
+        with:
+          images: |
+            kannibalox/pyrosimple
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to DockerHub
