@@ -1,6 +1,7 @@
+---
 name: Documentation
 
-on:
+"on":
   push:
     paths:
       - 'docs/**'
@@ -24,7 +25,7 @@ jobs:
           pip install poetry
           poetry export --only docs > ${REQUIREMENTS}
       - name: Deploy MkDocs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@1.25
+        uses: mhausenblas/mkdocs-deploy-gh-pages@1.26
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EXTRA_PACKAGES: build-base
