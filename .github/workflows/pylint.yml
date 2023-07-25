@@ -1,12 +1,13 @@
-name: Pylint
+---
+name: Test
 
-on:
+"on":
   push:
     paths-ignore:
       - 'docs/**'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
