@@ -1,8 +1,10 @@
 # pyrosimple
 
 [![GitHub Workflow Status](http://img.shields.io/github/actions/workflow/status/kannibalox/pyrosimple/pylint.yml?branch=main)](https://github.com/kannibalox/pyrosimple/actions/workflows/pylint.yml)
-[![PyPI](https://img.shields.io/pypi/v/pyrosimple)](https://pypi.org/project/pyrosimple/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyrosimple)
+[![PyPI](https://img.shields.io/pypi/v/pyrosimple)](https://pypi.org/project/pyrosimple/)
+![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/kannibalox/pyrosimple/2)
+
 
 A overhauled Python 3 fork of the [pyrocore
 tools](https://github.com/pyroscope/pyrocore), for working with the
