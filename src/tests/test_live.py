@@ -1,5 +1,7 @@
 """Holds some tests that will only work """
 import os
+import xmlrpc.client
+from pathlib import Path
 
 import pytest
 
@@ -26,3 +28,15 @@ def test_pyroadmin():
 
     AdminTool().run(["config", "--check"])
     AdminTool().run(["config", "--dump-rc"])
+
+
+@live_only
+def test_load_tor():
+    engine = pyrosimple.connect()
+    proxy = engine.open()
+    metapath = Path(Path(__file__).parent, "single.torrent")
+    metafile = pyrosimple.util.metafile.Metafile.from_file(metapath)
+    with metapath.open("rb") as fh:
+        proxy.load.raw("", xmlrpc.client.Binary(fh.read()))
+    assert proxy.d.name(metafile.info_hash()) == metafile["info"]["name"]
+    proxy.d.erase(metafile.info_hash())
