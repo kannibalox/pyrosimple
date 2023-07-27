@@ -827,6 +827,8 @@ class RtorrentEngine:
                         ):
                             self.logger.warning(
                                 "Method 'strings.contains_i' does not exist!"
+                            )
+                            self.logger.warning(
                                 "Fast query %r would return an empty list, disabling fast query.",
                                 pre_filter,
                             )
