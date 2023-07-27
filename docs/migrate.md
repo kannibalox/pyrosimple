@@ -55,8 +55,13 @@ available utilities.
 * The `--anneal` flag has been removed. Use core Linux utilities
   (e.g. `sort` and `uniq`) instead.
 * Matching an empty string with a blank value (e.g. `message=`) will
-  no longer work as expected. Use escaped quotes instead:
-  `message=\"\"`.
+  no longer work as expected. Use an empty quoted string instead:
+  ```bash
+  # Old
+  rtcontrol message=
+  # New
+  rtcontrol message=\"\"
+  ```
 * String matching is now case-sensitive by default. To use
   case-insensitive matching, use a regex with the `i` flag,
   e.g. `name=/UbUnTu.*/i`
