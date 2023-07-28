@@ -969,7 +969,7 @@ class RtorrentControl(ScriptBaseWithConfig):
                     )
 
                     json_data = [
-                        {name: getattr(i, name) for name in engine.FIELD_REGISTRY}
+                        {name: getattr(i, name) for name in list(engine.FIELD_REGISTRY)}
                         for i in matches
                     ]
                 json.dump(
