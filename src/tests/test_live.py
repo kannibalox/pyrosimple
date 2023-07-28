@@ -1,4 +1,4 @@
-"""Holds some tests that will only work """
+"""Holds some tests that will only work on a live rTorrent instance"""
 import os
 import xmlrpc.client
 
@@ -29,7 +29,6 @@ def test_pyroadmin():
     from pyrosimple.scripts.pyroadmin import AdminTool
 
     AdminTool().run(["config", "--check"])
-    AdminTool().run(["config", "--dump-rc"])
 
 
 @live_only
@@ -39,6 +38,7 @@ def test_load_tor():
     metapath = Path(Path(__file__).parent, "single.torrent")
     metafile = pyrosimple.util.metafile.Metafile.from_file(metapath)
     with metapath.open("rb") as fh:
-        proxy.load.raw("", xmlrpc.client.Binary(fh.read()))
+        proxy.load.raw("", xmlrpc.client.Binary(fh.read()), "d.custom1.set=foobar")
     assert proxy.d.name(metafile.info_hash()) == metafile["info"]["name"]
+    assert proxy.d.custom1(metafile.info_hash()) == "foobar"
     proxy.d.erase(metafile.info_hash())
