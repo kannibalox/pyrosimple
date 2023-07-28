@@ -1,11 +1,13 @@
 """Holds some tests that will only work """
 import os
 import xmlrpc.client
+
 from pathlib import Path
 
 import pytest
 
 import pyrosimple
+
 
 live_only = pytest.mark.skipif(
     os.getenv("PYTEST_PYRO_LIVE", "false").lower() != "true",
