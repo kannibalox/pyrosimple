@@ -49,7 +49,10 @@ class ScriptBase:
                 "pyrosimple"
             )
         except ImportError:
-            version = "unknown"
+            import importlib_metadata
+            version = importlib_metadata.version(  # pylint: disable=no-member
+                "pyrosimple"
+            )
         implementation = sys.implementation.name
         if implementation == "cpython":
             implementation = "Python"
