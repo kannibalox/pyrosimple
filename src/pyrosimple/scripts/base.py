@@ -49,7 +49,8 @@ class ScriptBase:
                 "pyrosimple"
             )
         except ImportError:
-            import importlib_metadata
+            import importlib_metadata  # pylint: disable=import-outside-toplevel
+
             version = importlib_metadata.version(  # pylint: disable=no-member
                 "pyrosimple"
             )
