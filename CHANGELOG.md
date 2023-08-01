@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [2.10.1] - 2023-07-28
+## [2.10.2] - 2023-07-31
 
 ### Fixed
 
@@ -384,7 +384,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.10.1...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.10.2...HEAD
+[2.10.2] https://github.com/kannibalox/pyrosimple/compare/v2.10.1...v2.10.2
 [2.10.1] https://github.com/kannibalox/pyrosimple/compare/v2.10.0...v2.10.1
 [2.10.0] https://github.com/kannibalox/pyrosimple/compare/v2.9.1...v2.10.0
 [2.9.1]: https://github.com/kannibalox/pyrosimple/compare/v2.9.0...v2.9.1
