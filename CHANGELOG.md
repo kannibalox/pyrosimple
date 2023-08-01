@@ -6,6 +6,12 @@
 
 ### Fixed
 
+- Remove debugging statements
+
+## [2.10.1] - 2023-07-28
+
+### Fixed
+
 - `rtcontrol`: Fix `--json` error
 
 ## [2.10.0] - 2023-07-24

@@ -132,7 +132,6 @@ def expand_rc(rcfile: Path) -> List[Tuple[str, str]]:
             if priv_string_match:
                 str_result = ""
                 for arg in RCLexer(priv_string_match.group(2)):
-                    print(arg)
                     if arg.startswith("("):
                         str_result += replacements.get(arg[1:-1], "")
                     if arg.startswith('"'):
@@ -155,8 +154,6 @@ def expand_rc(rcfile: Path) -> List[Tuple[str, str]]:
                             str_result += arg[1:-1]
                     val = str_result
             data.append((key, val))
-            print(key, val)
-            print(replacements)
         return data
 
 
