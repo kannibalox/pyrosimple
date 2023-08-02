@@ -333,13 +333,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "dill"
-version = "0.3.6"
-description = "serialize all of python"
+version = "0.3.7"
+description = "serialize all of Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "dill-0.3.6-py3-none-any.whl", hash = "sha256:a07ffd2351b8c678dfc4a856a3005f8067aea51d6ba6c700796a4d9e280f39f0"},
-    {file = "dill-0.3.6.tar.gz", hash = "sha256:e5db55f3687856d8fbdab002ed78544e1c4559a130302693d839dfe8f93f2373"},
+    {file = "dill-0.3.7-py3-none-any.whl", hash = "sha256:76b122c08ef4ce2eedcd4d1abd8e641114bfc6c2867f49f3c41facf65bf19f5e"},
+    {file = "dill-0.3.7.tar.gz", hash = "sha256:cc1c8b182eb3013e24bd475ff2e9295af86c1a38eb1aff128dac8962a9ce3c03"},
 ]
 
 [package.extras]
@@ -553,19 +553,20 @@ files = [
 
 [[package]]
 name = "markdown"
-version = "3.3.7"
-description = "Python implementation of Markdown."
+version = "3.4.4"
+description = "Python implementation of John Gruber's Markdown."
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "Markdown-3.3.7-py3-none-any.whl", hash = "sha256:f5da449a6e1c989a4cea2631aa8ee67caa5a2ef855d551c88f9e309f4634c621"},
-    {file = "Markdown-3.3.7.tar.gz", hash = "sha256:cbb516f16218e643d8e0a95b309f77eb118cb138d39a4f27851e6a63581db874"},
+    {file = "Markdown-3.4.4-py3-none-any.whl", hash = "sha256:a4c1b65c0957b4bd9e7d86ddc7b3c9868fb9670660f6f99f6d1bca8954d5a941"},
+    {file = "Markdown-3.4.4.tar.gz", hash = "sha256:225c6123522495d4119a90b3a3ba31a1e87a70369e03f14799ea9c0d7183a3d6"},
 ]
 
 [package.dependencies]
 importlib-metadata = {version = ">=4.4", markers = "python_version < \"3.10\""}
 
 [package.extras]
+docs = ["mdx-gh-links (>=0.2)", "mkdocs (>=1.0)", "mkdocs-nature (>=0.4)"]
 testing = ["coverage", "pyyaml"]
 
 [[package]]
@@ -651,13 +652,13 @@ files = [
 
 [[package]]
 name = "mkdocs"
-version = "1.4.3"
+version = "1.5.1"
 description = "Project documentation with Markdown."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs-1.4.3-py3-none-any.whl", hash = "sha256:6ee46d309bda331aac915cd24aab882c179a933bd9e77b80ce7d2eaaa3f689dd"},
-    {file = "mkdocs-1.4.3.tar.gz", hash = "sha256:5955093bbd4dd2e9403c5afaf57324ad8b04f16886512a3ee6ef828956481c57"},
+    {file = "mkdocs-1.5.1-py3-none-any.whl", hash = "sha256:67e889f8d8ba1fe5decdfc59f5f8f21d6a8925a129339e93dede303bdea03a98"},
+    {file = "mkdocs-1.5.1.tar.gz", hash = "sha256:f2f323c62fffdf1b71b84849e39aef56d6852b3f0a5571552bca32cefc650209"},
 ]
 
 [package.dependencies]
@@ -666,9 +667,12 @@ colorama = {version = ">=0.4", markers = "platform_system == \"Windows\""}
 ghp-import = ">=1.0"
 importlib-metadata = {version = ">=4.3", markers = "python_version < \"3.10\""}
 jinja2 = ">=2.11.1"
-markdown = ">=3.2.1,<3.4"
+markdown = ">=3.2.1"
+markupsafe = ">=2.0.1"
 mergedeep = ">=1.3.4"
 packaging = ">=20.5"
+pathspec = ">=0.11.1"
+platformdirs = ">=2.2.0"
 pyyaml = ">=5.1"
 pyyaml-env-tag = ">=0.1"
 typing-extensions = {version = ">=3.10", markers = "python_version < \"3.8\""}
@@ -676,7 +680,7 @@ watchdog = ">=2.0"
 
 [package.extras]
 i18n = ["babel (>=2.9.0)"]
-min-versions = ["babel (==2.9.0)", "click (==7.0)", "colorama (==0.4)", "ghp-import (==1.0)", "importlib-metadata (==4.3)", "jinja2 (==2.11.1)", "markdown (==3.2.1)", "markupsafe (==2.0.1)", "mergedeep (==1.3.4)", "packaging (==20.5)", "pyyaml (==5.1)", "pyyaml-env-tag (==0.1)", "typing-extensions (==3.10)", "watchdog (==2.0)"]
+min-versions = ["babel (==2.9.0)", "click (==7.0)", "colorama (==0.4)", "ghp-import (==1.0)", "importlib-metadata (==4.3)", "jinja2 (==2.11.1)", "markdown (==3.2.1)", "markupsafe (==2.0.1)", "mergedeep (==1.3.4)", "packaging (==20.5)", "pathspec (==0.11.1)", "platformdirs (==2.2.0)", "pyyaml (==5.1)", "pyyaml-env-tag (==0.1)", "typing-extensions (==3.10)", "watchdog (==2.0)"]
 
 [[package]]
 name = "mkdocs-include-markdown-plugin"
@@ -695,20 +699,20 @@ test = ["mkdocs (==1.4.0)", "pytest (==7.1.3)", "pytest-cov (==3.0.0)"]
 
 [[package]]
 name = "mkdocs-material"
-version = "9.1.19"
+version = "9.1.21"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs_material-9.1.19-py3-none-any.whl", hash = "sha256:fb0a149294b319aedf36983919d8c40c9e566db21ead16258e20ebd2e6c0961c"},
-    {file = "mkdocs_material-9.1.19.tar.gz", hash = "sha256:73b94b08c765e92a80645aac58d6a741fc5f587deec2b715489c714827b15a6f"},
+    {file = "mkdocs_material-9.1.21-py3-none-any.whl", hash = "sha256:58bb2f11ef240632e176d6f0f7d1cff06be1d11c696a5a1b553b808b4280ed47"},
+    {file = "mkdocs_material-9.1.21.tar.gz", hash = "sha256:71940cdfca84ab296b6362889c25395b1621273fb16c93deda257adb7ff44ec8"},
 ]
 
 [package.dependencies]
 colorama = ">=0.4"
 jinja2 = ">=3.0"
 markdown = ">=3.2"
-mkdocs = ">=1.4.2"
+mkdocs = ">=1.5.0"
 mkdocs-material-extensions = ">=1.1"
 pygments = ">=2.14"
 pymdown-extensions = ">=9.9.1"
@@ -823,32 +827,32 @@ regex = ">=2022.3.15"
 
 [[package]]
 name = "pathspec"
-version = "0.11.1"
+version = "0.11.2"
 description = "Utility library for gitignore style pattern matching of file paths."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pathspec-0.11.1-py3-none-any.whl", hash = "sha256:d8af70af76652554bd134c22b3e8a1cc46ed7d91edcdd721ef1a0c51a84a5293"},
-    {file = "pathspec-0.11.1.tar.gz", hash = "sha256:2798de800fa92780e33acca925945e9a19a133b715067cf165b8866c15a31687"},
+    {file = "pathspec-0.11.2-py3-none-any.whl", hash = "sha256:1d6ed233af05e679efb96b1851550ea95bbb64b7c490b0f5aa52996c11e92a20"},
+    {file = "pathspec-0.11.2.tar.gz", hash = "sha256:e0d8d0ac2f12da61956eb2306b69f9469b42f4deb0f3cb6ed47b9cce9996ced3"},
 ]
 
 [[package]]
 name = "platformdirs"
-version = "3.9.1"
+version = "3.10.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "platformdirs-3.9.1-py3-none-any.whl", hash = "sha256:ad8291ae0ae5072f66c16945166cb11c63394c7a3ad1b1bc9828ca3162da8c2f"},
-    {file = "platformdirs-3.9.1.tar.gz", hash = "sha256:1b42b450ad933e981d56e59f1b97495428c9bd60698baab9f3eb3d00d5822421"},
+    {file = "platformdirs-3.10.0-py3-none-any.whl", hash = "sha256:d7c24979f292f916dc9cbf8648319032f551ea8c49a4c9bf2fb556a02070ec1d"},
+    {file = "platformdirs-3.10.0.tar.gz", hash = "sha256:b45696dab2d7cc691a3226759c0d3b00c47c8b6e293d96f6436f733303f77f6d"},
 ]
 
 [package.dependencies]
-typing-extensions = {version = ">=4.6.3", markers = "python_version < \"3.8\""}
+typing-extensions = {version = ">=4.7.1", markers = "python_version < \"3.8\""}
 
 [package.extras]
-docs = ["furo (>=2023.5.20)", "proselint (>=0.13)", "sphinx (>=7.0.1)", "sphinx-autodoc-typehints (>=1.23,!=1.23.4)"]
-test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.3.1)", "pytest-cov (>=4.1)", "pytest-mock (>=3.10)"]
+docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.1)", "sphinx-autodoc-typehints (>=1.24)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-cov (>=4.1)", "pytest-mock (>=3.11.1)"]
 
 [[package]]
 name = "pluggy"
@@ -912,17 +916,17 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pylint"
-version = "2.17.4"
+version = "2.17.5"
 description = "python code static checker"
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "pylint-2.17.4-py3-none-any.whl", hash = "sha256:7a1145fb08c251bdb5cca11739722ce64a63db479283d10ce718b2460e54123c"},
-    {file = "pylint-2.17.4.tar.gz", hash = "sha256:5dcf1d9e19f41f38e4e85d10f511e5b9c35e1aa74251bf95cdd8cb23584e2db1"},
+    {file = "pylint-2.17.5-py3-none-any.whl", hash = "sha256:73995fb8216d3bed149c8d51bba25b2c52a8251a2c8ac846ec668ce38fab5413"},
+    {file = "pylint-2.17.5.tar.gz", hash = "sha256:f7b601cbc06fef7e62a754e2b41294c2aa31f1cb659624b9a85bcba29eaf8252"},
 ]
 
 [package.dependencies]
-astroid = ">=2.15.4,<=2.17.0-dev0"
+astroid = ">=2.15.6,<=2.17.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = [
     {version = ">=0.2", markers = "python_version < \"3.11\""},
@@ -1255,13 +1259,13 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [[package]]
 name = "shtab"
-version = "1.6.2"
+version = "1.6.4"
 description = "Automagic shell tab completion for Python CLI applications"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "shtab-1.6.2-py3-none-any.whl", hash = "sha256:a1f0b9693c2e3b5c6933783fb356cd8c80896960a97a6acdc258bf2ac31fe11d"},
-    {file = "shtab-1.6.2.tar.gz", hash = "sha256:425d3b3e5d1b4ac59119fab5d40dfb01d4462676698e82dc404c707c6fdcd32c"},
+    {file = "shtab-1.6.4-py3-none-any.whl", hash = "sha256:4be38887a912091a1640e06f5ccbcbd24e176cf2fcb9ef0c2e011ee22d63834f"},
+    {file = "shtab-1.6.4.tar.gz", hash = "sha256:aba9e049bed54ffdb650cb2e02657282d8c0148024b0f500277052df124d47de"},
 ]
 
 [package.extras]
@@ -1302,13 +1306,13 @@ files = [
 
 [[package]]
 name = "tomlkit"
-version = "0.11.8"
+version = "0.12.1"
 description = "Style preserving TOML library"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "tomlkit-0.11.8-py3-none-any.whl", hash = "sha256:8c726c4c202bdb148667835f68d68780b9a003a9ec34167b6c673b38eff2a171"},
-    {file = "tomlkit-0.11.8.tar.gz", hash = "sha256:9330fc7faa1db67b541b28e62018c17d20be733177d290a13b24c62d1614e0c3"},
+    {file = "tomlkit-0.12.1-py3-none-any.whl", hash = "sha256:712cbd236609acc6a3e2e97253dfc52d4c2082982a88f61b640ecf0817eab899"},
+    {file = "tomlkit-0.12.1.tar.gz", hash = "sha256:38e1ff8edb991273ec9f6181244a6a391ac30e9f5098e7535640ea6be97a7c86"},
 ]
 
 [[package]]
