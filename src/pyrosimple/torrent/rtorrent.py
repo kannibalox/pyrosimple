@@ -943,7 +943,7 @@ def format_item(
     """
     if defaults is None:
         defaults = {}
-    return str(template.render(d=item, **defaults))
+    return template.render(d=item, **defaults)
 
 
 def validate_field_list(
