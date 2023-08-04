@@ -226,7 +226,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         rTorrent XMLRPC REPL Help Summary
         =================================
 
-        <Ctrl-D>            Exit the REPL.
+        <Ctrl-d>            Exit the REPL.
+        <Ctrl-c>            Cancel the current command.
         ?                   Show this help text.
         \help               Show this help text.
         \stats              Show current call stats.
