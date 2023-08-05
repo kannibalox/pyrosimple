@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- `rtcontrol`: The average in `--summary` no longer errors out under
+  certain conditions
+
 ## [2.10.2] - 2023-07-31
 
 ### Fixed
