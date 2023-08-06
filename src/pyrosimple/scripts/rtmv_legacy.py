@@ -65,8 +65,8 @@ class RtorrentMove(ScriptBaseWithConfig):
         if not self.options.dry_run:
             try:
                 call(*args)
-            except (EnvironmentError, UnicodeError) as exc:
-                self.fatal("%s(%s) failed [%s]" % (call.__name__, ", ".join(args), exc))
+            except (OSError, UnicodeError) as exc:
+                self.fatal("{}({}) failed [{}]".format(call.__name__, ", ".join(args), exc))
         else:
             self.log.info("%s(%s)", call.__name__, ", ".join(args))
 
@@ -109,7 +109,7 @@ class RtorrentMove(ScriptBaseWithConfig):
             realpath = None
             try:
                 realpath = os.path.realpath(item.path)
-            except (EnvironmentError, UnicodeError) as exc:
+            except (OSError, UnicodeError) as exc:
                 self.log.warning("Cannot realpath %r (%s)", item.path, exc)
 
             # Look if item matches a source path
@@ -196,7 +196,7 @@ class RtorrentMove(ScriptBaseWithConfig):
                     src1, src2 = os.path.join(
                         download_path, os.path.basename(item.path)
                     ), os.path.realpath(path)
-                    assert src1 == src2, "Item path %r should match %r!" % (src1, src2)
+                    assert src1 == src2, f"Item path {src1!r} should match {src2!r}!"
                     self.guarded(os.rename, item.path, dst)
                     self.guarded(os.symlink, os.path.abspath(dst), item.path)
 

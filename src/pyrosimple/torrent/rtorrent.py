@@ -553,7 +553,7 @@ class RtorrentItem(engine.TorrentProxy):
         if not path.exists():
             return
 
-        dirs_to_clean_up = set([path])
+        dirs_to_clean_up = {path}
         for file_data in self._get_files(attrs=attrs):
             if file_filter is not None and not file_filter(file_data):
                 continue

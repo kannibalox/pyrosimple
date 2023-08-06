@@ -457,7 +457,7 @@ class BoolFilter(FieldFilter):
         """Return rTorrent condition to speed up data transfer."""
         pf = prefilter_field_lookup(self._name)
         if pf is not None:
-            return '"equal={},value={}"'.format(pf, int(self._value))
+            return f'"equal={pf},value={int(self._value)}"'
         return ""
 
     def validate(self):
@@ -583,7 +583,7 @@ class TimeFilter(NumericFilterBase):
             cmp_ = "less"
 
         if timestamp and cmp_:
-            return '"{}=value=${},value={}"'.format(cmp_, pf, int(timestamp))
+            return f'"{cmp_}=value=${pf},value={int(timestamp)}"'
         return ""
 
     def validate(self):
@@ -739,7 +739,7 @@ class DurationFilter(TimeFilter):
             cmp_ = "less"
 
         if timestamp and cmp_:
-            return '"{}=value=${},value={}"'.format(cmp_, pf, int(timestamp))
+            return f'"{cmp_}=value=${pf},value={int(timestamp)}"'
         return ""
 
 
