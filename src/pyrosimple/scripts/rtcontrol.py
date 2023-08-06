@@ -170,9 +170,7 @@ class RtorrentAction(argparse.Action):
         self.interactive = False
         super().__init__(option_strings, dest, nargs, **kwargs)
 
-    def __call__(
-        self, parser, namespace, values, option_string=None
-    ):
+    def __call__(self, parser, namespace, values, option_string=None):
         """Add any action to the namespace in order"""
         actions = getattr(namespace, "actions", [])
         actions.append(
@@ -183,6 +181,7 @@ class RtorrentAction(argparse.Action):
 
 class RtorrentInteractiveAction(RtorrentAction):
     """Simple class to mark commands as interactive"""
+
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         super().__init__(option_strings, dest, nargs, **kwargs)
         self.interactive = True

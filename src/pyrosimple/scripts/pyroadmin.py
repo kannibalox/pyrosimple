@@ -155,7 +155,7 @@ class AdminTool(ScriptBase):
                 definition = f"{value:d}"
             else:
                 self.log.error(
-                    f"Cannot handle {objtype!r} definition of method {name}"
+                    "Cannot handle %r definition of method %s", objtype, name
                 )
                 continue
 
