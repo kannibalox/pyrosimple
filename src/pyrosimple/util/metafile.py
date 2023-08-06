@@ -12,7 +12,7 @@ import math
 import os
 import re
 import time
-import urllib
+import urllib.parse
 
 from pathlib import Path, PurePath
 from typing import (
