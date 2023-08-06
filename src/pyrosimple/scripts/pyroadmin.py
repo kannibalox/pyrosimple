@@ -116,7 +116,7 @@ class AdminTool(ScriptBase):
                 )
                 return text.replace("))))", ")) ))")
             if isinstance(text, int):
-                return "(value, {:d})".format(text)
+                return f"(value, {text:d})"
             if plain_re.match(text) or is_method(text):
                 return text
             return '"{}"'.format(text.replace("\\", "\\\\").replace('"', '\\"'))
@@ -143,25 +143,25 @@ class AdminTool(ScriptBase):
                 wrap_fmt = "((%s))" if value and is_method(value[0]) else "{%s}"
                 definition = wrap_fmt % ", ".join(value)
             elif objtype is dict:
-                print("method.insert = {}, multi|rlookup|static".format(name))
+                print(f"method.insert = {name}, multi|rlookup|static")
                 for key, val in sorted(value.items()):
                     val = rc_quoted(val)
                     if len(val) > rc_continuation_threshold:
                         val = "\\\n    " + val
-                    print('method.set_key = {}, "{}", {}'.format(name, key, val))
+                    print(f'method.set_key = {name}, "{key}", {val}')
             elif objtype is str:
                 definition = rc_quoted(value)
             elif objtype is int:
-                definition = "{:d}".format(value)
+                definition = f"{value:d}"
             else:
                 self.log.error(
-                    "Cannot handle {!r} definition of method {}".format(objtype, name)
+                    f"Cannot handle {objtype!r} definition of method {name}"
                 )
                 continue
 
             if definition:
                 if name in builtins:
-                    print("{}.set = {}".format(name, definition))
+                    print(f"{name}.set = {definition}")
                 else:
                     rctype = {str: "string", int: "value"}.get(objtype, "simple")
                     if const:
@@ -172,9 +172,9 @@ class AdminTool(ScriptBase):
                     definition = definition.replace(" ;     ", " ;\\\n     ").replace(
                         ",    ", ",\\\n    "
                     )
-                    print("method.insert = {}, {}, {}".format(name, rctype, definition))
+                    print(f"method.insert = {name}, {rctype}, {definition}")
             if const:
-                print("method.const.enable = {}".format(name))
+                print(f"method.const.enable = {name}")
 
     def backfill(self):
         """Backfill missing any missing metadata from available sources.
