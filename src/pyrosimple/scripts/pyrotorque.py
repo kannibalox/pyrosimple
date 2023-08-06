@@ -38,8 +38,7 @@ def pid_exists(pid):
         elif err.errno == errno.EPERM:
             # EPERM clearly means there's a process to deny access to
             return True
-        else:
-            raise err
+        raise
     else:
         return True
 
