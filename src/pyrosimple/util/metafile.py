@@ -92,7 +92,7 @@ class PieceLogger:
             != self.meta["info"]["pieces"][self.piece_index : self.piece_index + 20]
         ):
             self.log.warning(
-                f"Piece #{self.piece_index // 20}: Hashes differ in file {filename!r}",
+                "Piece #%d: Hashes differ in file %r", self.piece_index // 20, filename
             )
         self.piece_index += 20
 
@@ -350,30 +350,27 @@ class Metafile(dict):
         # Return validated info dict
         return metainfo, totalhashed
 
-    def sanitize(self) -> Tuple[Set, Set]:
+    def sanitize(self) -> Dict[str, str]:
         """Try to fix common problems. In particular, try to transcode
         non-standard string encodings.
         """
-        bad_encodings, bad_fields = set(), set()
+        bad_encodings: Dict[str, str] = {}
 
-        def sane_encoding(field, text) -> bytes:
+        def sane_encoding(field: str, text: Union[str, bytes]) -> str:
             "Transcoding helper."
             if isinstance(text, str):
-                return text.encode("utf-8")
-            for encoding in ("utf-8", self.get("encoding", None), "cp1252"):
+                return text
+            for encoding in (self.get("encoding", None), "cp1252", "latin1"):
                 if encoding:
                     try:
-                        u8_text: bytes = text.decode(encoding).encode("utf-8")
-                        if encoding != "utf-8":
-                            bad_encodings.add(encoding)
-                            bad_fields.add(field)
+                        u8_text: str = text.decode(encoding)
+                        bad_encodings[field] = encoding
                         return u8_text
                     except UnicodeError:
                         continue
             # Broken beyond anything reasonable
-            bad_encodings.add("UNKNOWN/EXOTIC")
-            bad_fields.add(field)
-            return str(text, "utf-8", "replace").replace("\ufffd", "_").encode("utf-8")
+            bad_encodings[field] = "UNKNOWN/EXOTIC"
+            return str(text, "utf-8", "replace").replace("\ufffd", "_")
 
         # Go through all string fields and check them
         for field in ("comment", "created by"):
@@ -383,9 +380,11 @@ class Metafile(dict):
         self["info"]["name"] = sane_encoding("info name", self["info"]["name"])
 
         for entry in self["info"].get("files", []):
-            entry["path"] = [sane_encoding("file path", i) for i in entry["path"]]
+            entry["path"] = [
+                sane_encoding(f"file path {entry['path']!r}", i) for i in entry["path"]
+            ]
 
-        return bad_encodings, bad_fields
+        return bad_encodings
 
     def assign_fields(self, assignments: List[str]) -> None:
         """Takes a list of C{key=value} strings and assigns them to the
@@ -656,8 +655,6 @@ class Metafile(dict):
     def listing(self, masked=True) -> List[str]:
         """List torrent info & contents in human-readable format. Returns a list of formatted lines."""
         # Assemble data
-        bad_encodings: List[str] = []
-        bad_fields: List[str] = []
         announce = str(self["announce"])
         if masked:
             announce = mask_keys(announce)
@@ -744,16 +741,5 @@ class Metafile(dict):
                         fmt.human_size(entry["length"]),
                     )
                 )
-
-        if bad_encodings:
-            result.extend(
-                [
-                    "",
-                    "WARNING: Bad encoding(s) {} in these fields: {}".format(
-                        ", ".join(sorted(bad_encodings)), ", ".join(sorted(bad_fields))
-                    ),
-                    "Use the --raw option to inspect these encoding issues.",
-                ]
-            )
 
         return result
