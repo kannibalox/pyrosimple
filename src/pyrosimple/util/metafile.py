@@ -92,9 +92,7 @@ class PieceLogger:
             != self.meta["info"]["pieces"][self.piece_index : self.piece_index + 20]
         ):
             self.log.warning(
-                "Piece #%d: Hashes differ in file %s",
-                self.piece_index // 20,
-                filename,
+                f"Piece #{self.piece_index // 20}: Hashes differ in file {filename!r}",
             )
         self.piece_index += 20
 
@@ -110,7 +108,7 @@ class PieceFailer(PieceLogger):
             != self.meta["info"]["pieces"][self.piece_index : self.piece_index + 20]
         ):
             raise OSError(
-                f"Piece #{self.piece_index // 20}: Hashes differ in file '{filename}'"
+                f"Piece #{self.piece_index // 20}: Hashes differ in file {filename!r}"
             )
         self.piece_index += 20
 
@@ -700,7 +698,7 @@ class Metafile(dict):
                 if info.get("private")
                 else "NO (DHT/PEX enabled)"
             ),
-            "TIME %s" % creation_date,
+            f"TIME {creation_date}",
         ]
 
         for label, key in (("BY  ", "created by"), ("REM ", "comment")):
