@@ -39,8 +39,7 @@ def pid_exists(pid):
             # EPERM clearly means there's a process to deny access to
             return True
         raise
-    else:
-        return True
+    return True
 
 
 class RtorrentQueueManager(ScriptBaseWithConfig):
