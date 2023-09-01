@@ -655,7 +655,7 @@ class RtorrentEngine:
             # Connected state
             return f"{name} connected to {self.engine_id} [{self.engine_software}] via {self.url!r}"
         # Unconnected state
-        return f"{self.__class__.__name__} connectable via {self.url!r}"
+        return f"{name} connectable via {self.url!r}"
 
     @property
     def uptime(self):
@@ -663,7 +663,7 @@ class RtorrentEngine:
         return time.time() - self.startup
 
     def _resolve_viewname(self, viewname: str) -> str:
-        """Check for special view names and return existing rTorrent one."""
+        """Check for special view names and return an existing rTorrent one."""
         if viewname == "-":
             try:
                 viewname = self.open().ui.current_view()
