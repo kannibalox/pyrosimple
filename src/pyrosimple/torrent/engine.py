@@ -836,22 +836,30 @@ def generate_guessit_field(name: str) -> Optional[FieldDefinition]:
 def generate_d_call(name: str) -> Optional[FieldDefinition]:
     """Create fields for arbitrary d.* commands"""
     call_name = "d." + name[2:]
+    # Translate names for some known methods
     if call_name in {
-        "d.up_rate",
-        "d.up_total",
+        "d.custom_items",
+        "d.custom_keys",
         "d.down_rate",
+        "d.down_sequential",
         "d.down_total",
+        "d.group_name",
         "d.skip_rate",
         "d.skip_total",
-        "d.group_name",
-        "d.custom_keys",
-        "d.custom_items",
+        "d.up_rate",
+        "d.up_total",
         "d.views_has",
-        "d.down_sequential",
     }:
         call_name = call_name.replace("_", ".")
+    # Set the call type for some known methods
+    call_type = str
+    if call_name in {
+        "d.size_files",
+        "d.size_bytes",
+    }:
+        call_type = int
     return DynamicField(
-        str,
+        call_type,
         name,
         f"Dynamic rpc call for {call_name}",
         accessor=lambda o: o.rpc_call(call_name),
