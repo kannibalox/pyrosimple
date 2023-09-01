@@ -59,8 +59,11 @@ available utilities.
   ```bash
   # Old
   rtcontrol message=
+  rtcontrol custom_1=\!
   # New
   rtcontrol message=\"\"
+  rtcontrol custom_1\!=\"\"
+  rtcontrol 'custom_1!=""' # The entire filter can also be single quoted
   ```
 * String matching is now case-sensitive by default. To use
   case-insensitive matching, use a regex with the `i` flag,
