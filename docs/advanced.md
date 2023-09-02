@@ -82,7 +82,7 @@ Let's start with an easy example of using `--exec`, where no templating
 is needed:
 
 ``` bash
-rtcontrol --exec 'stop= ; close= ; f.multicall=,f.set_create_queued=0,f.set_resize_queued=0 ; check_hash=' \
+rtcontrol --exec 'd.stop= ; d.close= ; f.multicall=,f.set_create_queued=0,f.set_resize_queued=0 ; d.check_hash=' \
           --from stopped // -/1
 ```
 
