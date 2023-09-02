@@ -247,7 +247,7 @@ rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/download
 
 * `alias=obt`:
     Torrents tracked by `openbittorrent.com` (see
-    [configuration](/configuration/#aliases) on how to add aliases for
+    [configuration](configuration.md#aliases) on how to add aliases for
     trackers)
 
 * `ratio=+1 realpath\!=/mnt/\*`:
