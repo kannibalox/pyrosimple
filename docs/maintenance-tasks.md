@@ -71,9 +71,9 @@ By using the `--tag` command, it becomes easy to write scripts that will only ru
 guard="handled"
 rtcontrol --from-view=complete -q -o hash "tagged=!$guard" | \
 while read hash; do
-    # Do any processing
-    rtxmlrpc d.hash "$hash"
-    # Mark item as handled
-    rtcontrol -q "hash=$hash" // --tag "$guard" --flush --yes
+  # Do any processing
+  rtxmlrpc d.hash "$hash"
+  # Mark item as handled
+  rtcontrol -q "hash=$hash" // --tag "$guard" --flush --yes
 done
 ```
