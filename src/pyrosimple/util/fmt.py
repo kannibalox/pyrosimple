@@ -273,6 +273,30 @@ def rpc_result_to_string(result) -> str:
     return repr(result)
 
 
+def keys_string(d):
+    """Recursive convert any dictionary keys from bytes to hex strings"""
+    rval = {}
+    if not isinstance(d, dict):
+        if isinstance(d, (tuple, list, set)):
+            v = [keys_string(x) for x in d]
+            return v
+        else:
+            return d
+
+    for k, v in d.items():
+        if isinstance(k, bytes):
+            try:
+                k = k.decode()
+            except UnicodeDecodeError:
+                k = k.hex().upper()
+        if isinstance(v, dict):
+            v = keys_string(v)
+        elif isinstance(v, (tuple, list, set)):
+            v = [keys_string(x) for x in v]
+        rval[k] = v
+    return rval
+
+
 class BencodeJSONEncoder(json.JSONEncoder):
     """Small helper class to translate bytes"""
 
@@ -280,3 +304,8 @@ class BencodeJSONEncoder(json.JSONEncoder):
         if isinstance(o, bytes):
             return o.hex().upper()
         return super().default(o)
+
+    def encode(self, o):
+        if isinstance(o, dict):
+            o = keys_string(o)
+        return super().encode(o)

@@ -30,6 +30,7 @@ from typing import (
 )
 
 import bencode  # typing: ignore
+from bencodepy import BencodeDecoder
 
 from box.box import Box
 
@@ -130,7 +131,8 @@ class Metafile(dict):
         filename = Path(filename)
         with filename.open("rb") as handle:
             raw_data = handle.read()
-        return Metafile(bencode.decode(raw_data))
+        bd = BencodeDecoder(encoding="utf-8", encoding_fallback="all")
+        return Metafile(bd.decode(raw_data))
 
     @property
     def is_multi_file(self) -> bool:
