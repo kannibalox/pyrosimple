@@ -66,7 +66,9 @@ class RtorrentMove(ScriptBaseWithConfig):
             try:
                 call(*args)
             except (OSError, UnicodeError) as exc:
-                self.fatal("{}({}) failed [{}]".format(call.__name__, ", ".join(args), exc))
+                self.fatal(
+                    "{}({}) failed [{}]".format(call.__name__, ", ".join(args), exc)
+                )
         else:
             self.log.info("%s(%s)", call.__name__, ", ".join(args))
 

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support displaying hybrid v2 .torrent files. `rTorrent` doesn't
+  support padding files yet, so this is mostly theoretical.
+
 ### Fixed
 
 - `rtcontrol`: The average in `--summary` no longer errors out under
