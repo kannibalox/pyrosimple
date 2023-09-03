@@ -9,6 +9,8 @@ rTorrent. With pyrosimple, you can do everything ranging from making
 low-level RPC calls, to running a full-fledged daemon that will manage
 rTorrent according to user-defined rules.
 
+<script async id="asciicast-606109" src="https://asciinema.org/a/606109.js"></script>
+
 ## Installation
 
 ```bash
@@ -23,6 +25,6 @@ running quickly.
 
 ## Acknowledgements
 
-Almost all programs stand on the shoulders of giants, and the giant
-for this one is the great [pyrocore toolset](https://github.com/pyroscope/pyrocore). 
+All programs stand on the shoulders of giants, and the giant
+for this one is the great [pyrocore toolset](https://github.com/pyroscope/pyrocore).
 Much of the code has been refactored, but the base structure and concepts are the same.
