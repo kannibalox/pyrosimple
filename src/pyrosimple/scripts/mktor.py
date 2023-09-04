@@ -3,6 +3,7 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
+import argparse
 import fnmatch
 import hashlib
 import logging
@@ -42,6 +43,7 @@ class MetafileCreator(ScriptBase):
         )
         self.add_bool_option("-p", "--private", help="disallow DHT and PEX")
         self.add_bool_option("--no-date", help="leave out creation date")
+        self.add_bool_option("--add-padding", help=argparse.SUPPRESS)
         self.add_value_option(
             "-o",
             "--output-filename",
@@ -231,6 +233,7 @@ class MetafileCreator(ScriptBase):
                 piece_size=self.options.piece_size,
                 piece_size_min=self.options.piece_size_min,
                 piece_size_max=self.options.piece_size_max,
+                add_padding=self.options.add_padding,
             )
         torrent["created by"] = "PyroSimple"
         if self.options.comment:

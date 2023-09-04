@@ -129,7 +129,9 @@ class MetafileLister(ScriptBase):
                         )
                         if "piece layers" in torrent:
                             for l, p in torrent["piece layers"].items():
-                                torrent["piece layers"][l] = "<%d piece hashes>" % (len(p) / 16*1024*1024)
+                                torrent["piece layers"][l] = "<%d piece hashes>" % (
+                                    len(p) / 16 * 1024 * 1024
+                                )
 
                     listing = BencodeJSONEncoder(indent=2).encode(torrent)
                 elif self.options.output:

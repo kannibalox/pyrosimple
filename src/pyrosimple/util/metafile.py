@@ -30,8 +30,8 @@ from typing import (
 )
 
 import bencode  # typing: ignore
-from bencodepy import BencodeDecoder
 
+from bencodepy import BencodeDecoder
 from box.box import Box
 
 from pyrosimple import error
@@ -265,6 +265,7 @@ class Metafile(dict):
         progress_callback: Optional[Callable[[int, int], None]] = None,
         piece_callback: Optional[Callable[[os.PathLike, bytes], None]] = None,
         datapath: Optional[Path] = None,
+        add_padding=False,
     ) -> Tuple[Dict, int]:
         """Create info dict from a list of files."""
         # These collect the file descriptions and piece hashes
@@ -302,7 +303,23 @@ class Metafile(dict):
             with filepath.open("rb") as handle:
                 while fileoffset < filesize:
                     # Read rest of piece or file, whatever is smaller
-                    chunk = handle.read(min(filesize - fileoffset, piece_size - done))
+                    chunk_size = min(filesize - fileoffset, piece_size - done)
+                    chunk = handle.read(chunk_size)
+                    if len(chunk) != chunk_size:
+                        raise OSError(
+                            f"Could not read not full chunk size {chunk_size}, received {len(chunk)}"
+                        )
+                    if chunk_size < piece_size and add_padding:
+                        padding_length = piece_size - chunk_size
+                        file_list.append(
+                            {
+                                "length": padding_length,
+                                "path": [".pad", str(padding_length)],
+                                "attr": "p",
+                            }
+                        )
+                        chunk += b"\x00" * padding_length
+
                     sha1sum.update(chunk)
                     done += len(chunk)
                     fileoffset += len(chunk)
@@ -312,7 +329,7 @@ class Metafile(dict):
                     if done == piece_size:
                         pieces.append(sha1sum.digest())
                         if piece_callback:
-                            piece_callback(filename, pieces[-1])
+                            piece_callback(filename, sha1sum.digest())
 
                         # Start a new piece
                         sha1sum = hashlib.sha1()
@@ -502,6 +519,7 @@ class Metafile(dict):
         file_generator: Optional[
             Callable[[os.PathLike], Generator[Path, None, None]]
         ] = None,
+        add_padding=False,
     ) -> Tuple[Dict, int]:
         """Create torrent dictionary from a file path."""
         if file_generator is None:
@@ -524,6 +542,7 @@ class Metafile(dict):
             piece_size,
             progress_callback=progress,
             datapath=datapath,
+            add_padding=add_padding
         )
 
         # Set private flag
@@ -538,8 +557,6 @@ class Metafile(dict):
         self["info"] = info
         self["announce"] = tracker_url.strip()
 
-        # Return validated meta dict
-        self.check_meta()
         return self, totalhashed
 
     def clean_meta(self, including_info: bool = False) -> Set[str]:
@@ -589,6 +606,7 @@ class Metafile(dict):
         piece_size: int = 0,
         piece_size_min: int = 2**15,
         piece_size_max: int = 2**24,
+        add_padding: bool = False,
     ):
         """Create a metafile with the path given on object creation.
         Returns the last metafile dict that was written (as an object, not bencoded).
@@ -621,6 +639,7 @@ class Metafile(dict):
             piece_size_min,
             piece_size_max,
             file_generator,
+            add_padding,
         )
 
         # Add optional fields
