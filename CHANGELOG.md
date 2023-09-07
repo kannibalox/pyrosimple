@@ -2,26 +2,26 @@
 
 ## [Unreleased]
 
-### Added
+### Changed
+- `chtor`: Improve handling of improper metafiles when `-V` is
+  specified
 
-- Support displaying hybrid v2 .torrent files. `rTorrent` doesn't
-  support padding files yet, so this is mostly theoretical.
+### Added
+- `lstor`: Support displaying hybrid v2 .torrent files. `rTorrent`
+  doesn't support padding files yet, so this is mostly theoretical.
 
 ### Fixed
-
 - `rtcontrol`: The average in `--summary` no longer errors out under
   certain conditions
 
 ## [2.10.2] - 2023-07-31
 
 ### Fixed
-
 - Remove debugging statements
 
 ## [2.10.1] - 2023-07-28
 
 ### Fixed
-
 - `rtcontrol`: Fix `--json` error
 
 ## [2.10.0] - 2023-07-24

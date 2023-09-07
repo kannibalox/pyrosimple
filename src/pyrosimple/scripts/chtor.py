@@ -96,8 +96,9 @@ class MetafileChanger(ScriptBase):
         )
         self.add_bool_option(
             "-V",
+            "--no-validation",
             "--no-skip",
-            help="do not skip broken metafiles that fail the integrity check",
+            help="do not validate metafiles before and after change",
         )
         self.add_value_option(
             "-o",
@@ -240,206 +241,215 @@ class MetafileChanger(ScriptBase):
                 # Read and remember current content
                 torrent: metafile.Metafile = metafile.Metafile.from_file(Path(filename))
             except (OSError, KeyError, bencode.BencodeDecodeError) as exc:
+                # There is no way to recover from this
                 self.log.warning(
-                    "Skipping bad metafile %r (%s: %s)",
+                    "Skipping bad bencode file %r (%s: %s)",
                     filename,
                     type(exc).__name__,
                     exc,
                 )
                 bad += 1
-            else:
-                # Check metafile integrity
+                continue
+
+            # Check metafile integrity
+            if not self.options.no_validation:
                 try:
                     torrent.check_meta()
-                    if self.options.check_data:
-                        # pylint: disable=import-outside-toplevel
-                        from pyrosimple.util.metafile import PieceLogger
-                        from pyrosimple.util.ui import (
-                            HashProgressBar,
-                            HashProgressBarCounter,
-                        )
-
-                        with HashProgressBar() as pb:
-                            if (
-                                logging.getLogger().isEnabledFor(logging.WARNING)
-                                and sys.stdout.isatty()
-                            ):
-                                progress_callback = cast(
-                                    HashProgressBarCounter, pb()
-                                ).progress_callback
-                            else:
-                                progress_callback = None
-
-                            piece_logger = PieceLogger(torrent, self.log)
-
-                            data_correct = torrent.hash_check(
-                                Path(self.options.check_data),
-                                progress_callback=progress_callback,
-                                piece_callback=piece_logger.check_piece,
-                            )
-                        if not data_correct:
-                            self.log.error(
-                                "File %s does match data from %s",
-                                filename,
-                                self.options.check_data,
-                            )
-                            sys.exit(error.EX_DATAERR)
                 except ValueError as exc:
                     self.log.warning(
-                        "Metafile %r failed integrity check: %s",
+                        "Metafile %r failed pre-change integrity check: %s",
                         filename,
                         exc,
                     )
-                    if not self.options.no_skip:
-                        continue
-
-                # Skip any metafiles that don't meet the pre-conditions
-                if (
-                    filter_url_prefix
-                    and config.map_announce2alias(torrent["announce"])
-                    != filter_url_prefix
-                ):
-                    self.log.info(
-                        "Skipping metafile %r: not tracked by %r!",
-                        filename,
-                        filter_url_prefix,
-                    )
+                    bad += 1
                     continue
 
-                # Keep resume info safe
-                libtorrent_resume = {}
-                if "libtorrent_resume" in torrent:
-                    try:
-                        libtorrent_resume["bitfield"] = torrent["libtorrent_resume"][
-                            "bitfield"
-                        ]
-                    except KeyError:
-                        pass  # nothing to remember
+            if self.options.check_data:
+                # pylint: disable=import-outside-toplevel
+                from pyrosimple.util.metafile import PieceLogger
+                from pyrosimple.util.ui import (
+                    HashProgressBar,
+                    HashProgressBarCounter,
+                )
 
-                    libtorrent_resume["files"] = copy.deepcopy(
-                        torrent["libtorrent_resume"]["files"]
-                    )
-
-                # Change private flag?
-                if self.options.make_private and not torrent["info"].get("private", 0):
-                    self.log.info("Setting private flag...")
-                    torrent["info"]["private"] = 1
-                if self.options.make_public and torrent["info"].get("private", 0):
-                    self.log.info("Clearing private flag...")
-                    del torrent["info"]["private"]
-
-                # Remove non-standard keys?
-                if (
-                    self.options.clean
-                    or self.options.clean_all
-                    or self.options.clean_xseed
-                ):
-                    torrent.clean_meta(
-                        including_info=not self.options.clean,
-                    )
-
-                # Restore resume info?
-                if self.options.clean_xseed:
-                    if libtorrent_resume:
-                        self.log.info("Restoring key 'libtorrent_resume'...")
-                        torrent.setdefault("libtorrent_resume", {})
-                        torrent["libtorrent_resume"].update(libtorrent_resume)
+                with HashProgressBar() as pb:
+                    if (
+                        logging.getLogger().isEnabledFor(logging.WARNING)
+                        and sys.stdout.isatty()
+                    ):
+                        progress_callback = cast(
+                            HashProgressBarCounter, pb()
+                        ).progress_callback
                     else:
-                        self.log.warning("No resume information found!")
+                        progress_callback = None
 
-                # Clean rTorrent data?
-                if self.options.clean_rtorrent:
-                    for key in self.RT_RESUME_KEYS:
-                        if key in torrent:
-                            self.log.info("Removing key %r...", key)
-                            del torrent[key]
+                    piece_logger = PieceLogger(torrent, self.log)
 
-                # Change announce URL?
-                if self.options.reannounce:
-                    torrent["announce"] = self.options.reannounce
-                    if "announce-list" in torrent:
-                        del torrent["announce-list"]
-
-                    if not self.options.no_cross_seed:
-                        # Enforce unique hash per tracker
-                        torrent["info"]["x_cross_seed"] = hashlib.md5(
-                            self.options.reannounce.encode()
-                        ).hexdigest()
-
-                # Change comment or creation date?
-                if self.options.comment is not None:
-                    if self.options.comment:
-                        torrent["comment"] = self.options.comment
-                    elif "comment" in torrent:
-                        del torrent["comment"]
-                if self.options.bump_date:
-                    torrent["creation date"] = int(time.time())
-                if self.options.no_date and "creation date" in torrent:
-                    del torrent["creation date"]
-
-                # Add fast-resume data?
-                if self.options.hashed:
-                    datadir: str = self.options.hashed
-                    if "{}" in datadir and not os.path.exists(datadir):
-                        datadir = datadir.replace("{}", torrent["info"]["name"])
-                    try:
-                        torrent.add_fast_resume(Path(datadir))
-                    except OSError as exc:
-                        self.fatal("Error making fast-resume data (%s)", exc)
-                        raise
-
-                # Set specific keys?
-                torrent.assign_fields(self.options.set)
-                replace_fields(torrent, self.options.regex)
-
-                # Write new metafile, if changed
-
-                if self.options.output_directory:
-                    filename = Path(
-                        self.options.output_directory, os.path.basename(filename)
+                    data_correct = torrent.hash_check(
+                        Path(self.options.check_data),
+                        progress_callback=progress_callback,
+                        piece_callback=piece_logger.check_piece,
                     )
-                    self.log.info("Will write %r...", filename)
+                if not data_correct:
+                    self.log.error(
+                        "File %s does match data from %s",
+                        filename,
+                        self.options.check_data,
+                    )
+                    sys.exit(error.EX_DATAERR)
 
-                    if not self.options.dry_run:
-                        torrent.save(filename)
-                        if "libtorrent_resume" in torrent:
-                            # Also write clean version
-                            filename = filename.replace(
-                                ".torrent", "-no-resume.torrent"
-                            )
-                            del torrent["libtorrent_resume"]
-                            self.log.info("Writing '%s'...", filename)
-                            torrent.save(filename)
+            # Skip any metafiles that don't meet the pre-conditions
+            if (
+                filter_url_prefix
+                and config.map_announce2alias(torrent["announce"]) != filter_url_prefix
+            ):
+                self.log.info(
+                    "Skipping metafile %r: not tracked by %r!",
+                    filename,
+                    filter_url_prefix,
+                )
+                continue
+
+            # Keep resume info safe
+            libtorrent_resume = {}
+            if "libtorrent_resume" in torrent:
+                try:
+                    libtorrent_resume["bitfield"] = torrent["libtorrent_resume"][
+                        "bitfield"
+                    ]
+                except KeyError:
+                    pass  # nothing to remember
+
+                libtorrent_resume["files"] = copy.deepcopy(
+                    torrent["libtorrent_resume"]["files"]
+                )
+
+            # Change private flag?
+            if self.options.make_private and not torrent["info"].get("private", 0):
+                self.log.info("Setting private flag...")
+                torrent["info"]["private"] = 1
+            if self.options.make_public and torrent["info"].get("private", 0):
+                self.log.info("Clearing private flag...")
+                del torrent["info"]["private"]
+
+            # Remove non-standard keys?
+            if self.options.clean or self.options.clean_all or self.options.clean_xseed:
+                torrent.clean_meta(
+                    including_info=not self.options.clean,
+                )
+
+            # Restore resume info?
+            if self.options.clean_xseed:
+                if libtorrent_resume:
+                    self.log.info("Restoring key 'libtorrent_resume'...")
+                    torrent.setdefault("libtorrent_resume", {})
+                    torrent["libtorrent_resume"].update(libtorrent_resume)
                 else:
-                    current_torrent = metafile.Metafile.from_file(filename)
-                    diff = diff_metafiles(current_torrent, torrent, filename)
-                    if self.options.diff:
-                        sys.stdout.writelines(diff)
-                    if not diff:
-                        self.log.info("No change to file %r", filename)
-                        continue
-                    self.log.info("Changing %r...", filename)
+                    self.log.warning("No resume information found!")
 
-                    if not self.options.dry_run:
-                        # Write to temporary file
-                        tempname = os.path.join(
-                            os.path.dirname(filename),
-                            "." + os.path.basename(filename),
+            # Clean rTorrent data?
+            if self.options.clean_rtorrent:
+                for key in self.RT_RESUME_KEYS:
+                    if key in torrent:
+                        self.log.info("Removing key %r...", key)
+                        del torrent[key]
+
+            # Change announce URL?
+            if self.options.reannounce:
+                torrent["announce"] = self.options.reannounce
+                if "announce-list" in torrent:
+                    del torrent["announce-list"]
+
+                if not self.options.no_cross_seed:
+                    # Enforce unique hash per tracker
+                    torrent["info"]["x_cross_seed"] = hashlib.md5(
+                        self.options.reannounce.encode()
+                    ).hexdigest()
+
+            # Change comment or creation date?
+            if self.options.comment is not None:
+                if self.options.comment:
+                    torrent["comment"] = self.options.comment
+                elif "comment" in torrent:
+                    del torrent["comment"]
+            if self.options.bump_date:
+                torrent["creation date"] = int(time.time())
+            if self.options.no_date and "creation date" in torrent:
+                del torrent["creation date"]
+
+            # Add fast-resume data?
+            if self.options.hashed:
+                datadir: str = self.options.hashed
+                if "{}" in datadir and not os.path.exists(datadir):
+                    datadir = datadir.replace("{}", torrent["info"]["name"])
+                try:
+                    torrent.add_fast_resume(Path(datadir))
+                except OSError as exc:
+                    self.fatal("Error making fast-resume data (%s)", exc)
+                    raise
+
+            # Set specific keys?
+            torrent.assign_fields(self.options.set)
+            replace_fields(torrent, self.options.regex)
+
+            # Validate the new data
+            if not self.options.no_validation:
+                try:
+                    torrent.check_meta()
+                except ValueError as exc:
+                    self.log.warning(
+                        "Metafile %r failed post-change integrity check: %s",
+                        filename,
+                        exc,
+                    )
+                    bad += 1
+                    continue
+
+            # Write new metafile, if changed
+            if self.options.output_directory:
+                filename = Path(
+                    self.options.output_directory, os.path.basename(filename)
+                )
+                self.log.info("Will write %r...", filename)
+
+                if not self.options.dry_run:
+                    torrent.save(filename)
+                    if "libtorrent_resume" in torrent:
+                        # Also write clean version
+                        filename = filename.replace(".torrent", "-no-resume.torrent")
+                        del torrent["libtorrent_resume"]
+                        self.log.info("Writing '%s'...", filename)
+                        torrent.save(filename)
+            else:
+                current_torrent = metafile.Metafile.from_file(filename)
+                diff = diff_metafiles(current_torrent, torrent, filename)
+                if self.options.diff:
+                    sys.stdout.writelines(diff)
+                if not diff:
+                    self.log.info("No change to file %r", filename)
+                    continue
+                self.log.info("Changing %r...", filename)
+
+                if not self.options.dry_run:
+                    # Write to temporary file
+                    tempname = os.path.join(
+                        os.path.dirname(filename),
+                        "." + os.path.basename(filename),
+                    )
+                    self.log.debug("Writing temporary file '%s'...", tempname)
+                    torrent.save(Path(tempname))
+
+                    try:
+                        self.log.debug("Replacing file '%s'...", filename)
+                        os.replace(tempname, filename)
+                    except OSError as exc:
+                        # TODO: Try to write directly, keeping a backup!
+                        raise error.LoggableError(
+                            "Can't rename tempfile %r to %r (%s)"
+                            % (tempname, filename, exc)
                         )
-                        self.log.debug("Writing temporary file '%s'...", tempname)
-                        torrent.save(Path(tempname))
 
-                        try:
-                            self.log.debug("Replacing file '%s'...", filename)
-                            os.replace(tempname, filename)
-                        except OSError as exc:
-                            # TODO: Try to write directly, keeping a backup!
-                            raise error.LoggableError(
-                                "Can't rename tempfile %r to %r (%s)"
-                                % (tempname, filename, exc)
-                            )
-
-                changed += 1
+            changed += 1
 
         # Print summary
         if changed:
