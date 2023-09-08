@@ -10,7 +10,7 @@ import re
 import time
 import warnings
 
-from typing import Callable, Dict, Optional, Set, cast
+from typing import Callable, Dict, Optional, Set, cast, Type
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
@@ -852,7 +852,7 @@ def generate_d_call(name: str) -> Optional[FieldDefinition]:
     }:
         call_name = call_name.replace("_", ".")
     # Set the call type for some known methods
-    call_type = str
+    call_type: Type = str
     if call_name in {
         "d.size_files",
         "d.size_bytes",

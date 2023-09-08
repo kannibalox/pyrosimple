@@ -542,7 +542,7 @@ class Metafile(dict):
             piece_size,
             progress_callback=progress,
             datapath=datapath,
-            add_padding=add_padding
+            add_padding=add_padding,
         )
 
         # Set private flag

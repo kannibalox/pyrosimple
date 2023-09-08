@@ -59,15 +59,12 @@ class ScriptBase:
             implementation = "Python"
         version_info = f"{version} on {implementation} {sys.version.split()[0]}"
 
-        if getattr(self, "__doc__", None) is None:
-            self.__doc__ = ""
-
         self.parser = ArgumentParser(
             formatter_class=RawDescriptionHelpFormatter,
             description="%(prog)s "
             + version_info
             + "\n\n"
-            + textwrap.dedent(self.__doc__.rstrip()).lstrip("\n")
+            + textwrap.dedent((self.__doc__ or "").rstrip()).lstrip("\n")
             + "\n".join(self.ADDITIONAL_HELP)
             + "\n\nFor more details, see the full documentation at"
             + "\n    https://kannibalox.github.io/pyrosimple/",
