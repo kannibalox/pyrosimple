@@ -9,6 +9,7 @@
 ### Added
 - `lstor`: Support displaying hybrid v2 .torrent files. `rTorrent`
   doesn't support padding files yet, so this is mostly theoretical.
+- `rtcontrol`: Add `label` and `custom1` as aliases for `custom_1`
 
 ### Fixed
 - `rtcontrol`: The average in `--summary` no longer errors out under

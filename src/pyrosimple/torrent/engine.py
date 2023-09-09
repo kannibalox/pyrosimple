@@ -763,11 +763,24 @@ def core_fields():
         formatter=fmt.iso_datetime_optional,
         requires=["d.custom=activations"],
     )
+    yield DynamicField(
+        str,
+        "label",
+        "ruTorrent label (alias for custom_1)",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: o.rpc_call(f"d.custom1"),
+        requires=["d.custom1"],
+    )
 
 
 def generate_custom_field(name: str) -> FieldDefinition:
     """Create fields from custom keys"""
-    custom_name = name.split("_", 1)[1]
+    if name[6] in "12345":
+        custom_name = name[6]
+    elif name[6] == '_':
+        custom_name = name.split("_", 1)[1]
+    else:
+        return None
 
     def accessor(obj):
         return obj.rpc_call("d.custom", [custom_name])
@@ -928,7 +941,7 @@ class TorrentProxy:
         for field in core_fields():
             cls.add_field(field)
         for prefix, generator in {
-            "custom_": generate_custom_field,
+            "custom": generate_custom_field,
             "kind_": generate_kind_field,
             "guessit_": generate_guessit_field,
             "d_": generate_d_call,
