@@ -768,7 +768,7 @@ def core_fields():
         "label",
         "ruTorrent label (alias for custom_1)",
         matcher=matching.PatternFilter,
-        accessor=lambda o: o.rpc_call(f"d.custom1"),
+        accessor=lambda o: o.rpc_call("d.custom1"),
         requires=["d.custom1"],
     )
 
