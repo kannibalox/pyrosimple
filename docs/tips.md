@@ -13,6 +13,12 @@ issue. To view/filter on ruTorrent's labels, use the `custom_1` field:
 rtcontrol custom_1=TV -o alias,name
 ```
 
+For convience, the same value is available under the `label` field:
+
+```bash
+rtcontrol label=TV -o alias,name
+```
+
 ## Repairing stuck items
 
 Sometimes items will get stuck in a state where they are unable to
