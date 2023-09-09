@@ -244,7 +244,7 @@ class FieldDefinition:
             self._accessor = accessor
 
         if name in FIELD_REGISTRY:
-            raise RuntimeError(f"INTERNAL ERROR: Duplicate field definition for {name}")
+            raise RuntimeError(f"Duplicate engine field definition for {name}")
         FIELD_REGISTRY[name] = self
 
     def __repr__(self):
