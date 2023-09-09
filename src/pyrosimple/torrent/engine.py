@@ -10,7 +10,7 @@ import re
 import time
 import warnings
 
-from typing import Callable, Dict, Optional, Set, cast, Type
+from typing import Callable, Dict, Optional, Set, Type, cast
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
@@ -777,7 +777,7 @@ def generate_custom_field(name: str) -> FieldDefinition:
     """Create fields from custom keys"""
     if name[6] in "12345":
         custom_name = name[6]
-    elif name[6] == '_':
+    elif name[6] == "_":
         custom_name = name.split("_", 1)[1]
     else:
         return None

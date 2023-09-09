@@ -239,6 +239,8 @@ class RtorrentControl(ScriptBaseWithConfig):
     # choices for --alter
     ALTER_MODES = ("append", "remove")
 
+    MOVE_TYPES = ("move", "copy", "symlink", "hardlink")
+
     # TODO: --pause, --resume?
     # TODO: implement --clean-partial
     # self.add_bool_option("--clean-partial",
@@ -356,17 +358,11 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.add_bool_option(
             "--yes", help="positively answer all prompts (e.g. --delete --yes)"
         )
-        self.add_value_option(
+        self.parser.add_argument(
             "--move-type",
-            "MODE",
-            type="choice",
             default="move",
             choices=["move", "copy", "symlink", "hardlink"],
             help="control how --move operates",
-        )
-        self.add_bool_option(
-            "--move-and-set",
-            help="set directory to target after moving",
         )
         self.add_value_option(
             "--alter-view",
@@ -419,12 +415,19 @@ class RtorrentControl(ScriptBaseWithConfig):
             help="move item to another host (implies -i)",
             metavar="URL",
         )
-        action_group.add_argument(
-            "--move",
-            action=RtorrentInteractiveAction,
-            help="move item to another directory (implies -i)",
-            metavar="PATH",
-        )
+        for m in self.MOVE_TYPES:
+            action_group.add_argument(
+                f"--{m}",
+                action=RtorrentInteractiveAction,
+                help=f"{m} item to another directory (implies -i)",
+                metavar="PATH",
+            )
+            action_group.add_argument(
+                f"--{m}-and-set",
+                action=RtorrentInteractiveAction,
+                help=f"{m} item and set directory (implies -i)",
+                metavar="PATH",
+            )
         action_group.add_argument(
             "--spawn",
             action=RtorrentInteractiveAction,
@@ -548,24 +551,39 @@ class RtorrentControl(ScriptBaseWithConfig):
 
         return item_text
 
-    def move(self, item, target, set_to_target=False, move_type="move"):
+    def move(self, item, target, move_type="move"):
         """Move item's data to target directory. Optionally, set the
         item's directory to the new location. The 'move' may actually
         be another operation such as a copy."""
         was_started = False
-
+        set_to_target = False
+        if move_type.endswith(" and set"):
+            set_to_target = True
+            move_type = move_type[:-7]
         if set_to_target:
             was_started = item.is_active
-            item.close()
+            item.stop()
         if move_type in ["copy", "move"]:
             item.move(target, move_func=lambda _, s, d: shutil.copy2(s, d))
         elif move_type == "hardlink":
-            item.move(target, move_func=lambda _, s, d: os.link(s, d))
+
+            def hardlink(_, s, d):
+                if d.exists() and d.stat().st_ino == s.stat().st_ino:
+                    return
+                os.link(s, d)
+
+            item.move(target, move_func=hardlink)
         elif move_type == "symlink":
-            item.move(target, move_func=lambda _, s, d: os.symlink(s, d))
+
+            def symlink(_, s, d):
+                if d.is_symlink() and d.resolve() == s:
+                    return
+                os.symlink(s, d)
+
+            item.move(target, move_func=symlink)
+        if move_type == "move":
+            item.purge(remove_torrent=False)
         if set_to_target:
-            if move_type == "move":
-                item.purge(remove_torrent=False)
             item.rpc_call("d.directory.set", [target])
             if was_started:
                 item.start()
@@ -881,7 +899,9 @@ class RtorrentControl(ScriptBaseWithConfig):
 
                     args = action["args"]
                     # Templatetize arguments for some commands
-                    if action_name in ["call", "spawn", "execute", "move"]:
+                    if action_name in ["call", "spawn", "execute"] + list(
+                        self.MOVE_TYPES
+                    ) + [f"{m} and set" for m in self.MOVE_TYPES]:
                         template_args = [
                             ("{##}" + i if "{{" in i else i) for i in action["args"]
                         ]
@@ -921,25 +941,29 @@ class RtorrentControl(ScriptBaseWithConfig):
                         self.emit(item, defaults)
 
                     if self.options.dry_run:
-                        self.log.debug("Would call action %s%r", action["method"], args)
+                        arg_str = "(" + ", ".join([f"{a!r}" for a in args]) + ")"
+                        self.log.debug(
+                            "Would call action %s%s", action["method"], arg_str
+                        )
                     else:
                         if action_name == "call":
                             self.log.debug("Calling %r with a shell", args[0])
                             subprocess.run(args[0], check=True, shell=True)
-                            continue
-                        if action_name == "spawn":
+                        elif action_name == "spawn":
                             args = shlex.split(args[0])
                             self.log.debug("Spawning %r", args)
                             subprocess.run(args, check=True, shell=False)
-                            continue
                         # Handle complex moves separately
-                        if action_name == "move":
-                            self.move(item, args[0], args.move_and_set, args.move_type)
-                        # Look up aliases when moving to a host
-                        if action_name == "move to host":
-                            args[0] = config.lookup_connection_alias(args[0])
-                        # Get the function from RtorrentItem
-                        getattr(item, action["method"])(*args)
+                        elif action_name in list(self.MOVE_TYPES) + [
+                            f"{m} and set" for m in self.MOVE_TYPES
+                        ]:
+                            self.move(item, args[0], move_type=action_name)
+                        else:
+                            # Look up aliases when moving to a host
+                            if action_name == "move to host":
+                                args[0] = config.lookup_connection_alias(args[0])
+                            # Get the function from RtorrentItem
+                            getattr(item, action["method"])(*args)
                         if self.options.view_only:
                             show_in_client = functools.partial(
                                 lambda x, e: e.open().log(rpc.NOHASH, x), e=r_engine

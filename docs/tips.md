@@ -30,26 +30,6 @@ The above example only effect 1 torrent from the stopped view. After
 the hash check is complete and the torrent is working again, use
 `--start` to start it again.
 
-## Move data for selected items
-
-This sequence will put all torrents for a specific tracker into a
-dedicated view, then will stop them, move the data, set the directory,
-and restart them. The last command then clears the view.
-
-Note that if the items are not moved to the `d.directory.set` path,
-rTorrent may start trying to download them again.
-
-```bash
-mkdir -p ~/rtorrent/data/TRK
-rtcontrol --to-view=to-move alias=TRK realpath=$HOME/rtorrent/data
-rtcontrol --from-view=to-move // --stop
-rtcontrol --from-view=to-move // \
-  --spawn "mv {{item.path|shell}} $HOME/rtorrent/data/TRK" \
-  --exec "d.directory.set=$HOME/rtorrent/data/TRK" --flush
-rtcontrol --from-view=to-move // --start
-rtcontrol -M=to-move --alter=remove //
-```
-
 ## Instance statistics
 
 ```bash

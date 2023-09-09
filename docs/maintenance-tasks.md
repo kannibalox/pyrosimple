@@ -41,6 +41,14 @@ changes. Note that by default `session.save` is run on 20 minutes schedule.
 
 ### Move data for selected items to a new location
 
+!!! note
+
+    The below commands can be replaced with the much simpler `--move-and-set` action:
+
+    ```bash
+    rtcontrol alias=TRK realpath="$HOME/rtorrent/data" --move-and-set "$HOME/rtorrent/data/TRK"
+    ```
+
 This sequence of commands will stop the selected items, move their
 data, flush rTorrent’s metadata (session state), and finally starts
 everything again, followed by removing the items from the tagged

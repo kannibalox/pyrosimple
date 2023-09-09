@@ -234,6 +234,9 @@ class RtorrentItem(engine.TorrentProxy):
             path = Path(directory)
         else:
             path = Path(directory, self.rpc_call("d.name"))
+        path = path.expanduser()
+        if not path.is_absolute():
+            path = Path(self._engine.properties["system.cwd"], path)
         return path.expanduser()
 
     def announce_urls(self, default=[]):  # pylint: disable=dangerous-default-value
@@ -413,25 +416,36 @@ class RtorrentItem(engine.TorrentProxy):
             ]
         )
 
-    def move(self, dest: os.PathLike, move_func: Optional[Callable] = None):
+    def move(
+        self,
+        dest: os.PathLike,
+        move_func: Optional[Callable[[Any, Path, Path], None]] = None,
+    ):
         """Move files from one path to another. By default it will do
         a simple move of only related files while replicating the same
         directory structure, but `move_func` allows providing custom
         behavior"""
+        dest = Path(dest)
+
         if move_func is None:
 
-            def _default_move(_item, src, dest):
+            def _default_move(_item, src: Path, dest: Path):
                 import shutil  # pylint: disable=import-outside-toplevel
 
                 shutil.move(src, dest)
 
             move_func = _default_move
         if self.rpc_call("d.is_multi_file"):
+            dest = Path(dest, self.datapath().name)
+            dest.mkdir(parents=True, exist_ok=True)
             for f in self._get_files():
                 src = Path(self.datapath(), f.path)
-                move_func(self, src, Path(dest, f.path))
+                if src != Path(dest, f.path):
+                    move_func(self, src, Path(dest, f.path))
         else:
-            move_func(self, self.datapath(), dest)
+            dest.mkdir(parents=True, exist_ok=True)
+            if self.datapath() != Path(dest, self.datapath().name):
+                move_func(self, self.datapath(), Path(dest, self.datapath().name))
 
     def move_to_host(self, remote_url: str, copy: bool = False):
         """Migrate an item to a remote host"""
@@ -519,19 +533,23 @@ class RtorrentItem(engine.TorrentProxy):
     # Set priority of selected files
     # NOTE: need to call d.update_priorities after f.priority.set!
 
-    def purge(self) -> None:
+    def purge(self, remove_torrent=True) -> None:
         """Delete PARTIAL data files and remove torrent from client."""
 
         def partial_file(item):
             "Filter out partial files"
             return item.completed_chunks < item.size_chunks
 
-        self.cull(file_filter=partial_file, attrs=["completed_chunks", "size_chunks"])
+        self.cull(
+            file_filter=partial_file,
+            attrs={"completed_chunks", "size_chunks"},
+            remove_torrent=remove_torrent,
+        )
 
     def cull(
         self,
         file_filter: Optional[Callable] = None,
-        attrs: Optional[List[str]] = None,
+        attrs: Optional[Set[str]] = None,
         remove_torrent=True,
     ) -> None:
         """Delete ALL data files and optionally remove torrent from client.
@@ -554,6 +572,7 @@ class RtorrentItem(engine.TorrentProxy):
             return
 
         dirs_to_clean_up = {path}
+        attrs.add("path")
         for file_data in self._get_files(attrs=attrs):
             if file_filter is not None and not file_filter(file_data):
                 continue
@@ -704,8 +723,8 @@ class RtorrentEngine:
                 "system.library_version": [],
                 "system.time_usec": [],
                 "session.name": [],
-                "directory.default": [],
                 "session.path": [],
+                "system.cwd": [],
             }
         )
         self.engine_id = self.properties["session.name"]

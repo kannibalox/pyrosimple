@@ -83,6 +83,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.pylint]
 [tool.pylint.'message control']
 disable="locally-disabled, no-else-return, too-many-arguments, logging-format-interpolation, too-few-public-methods, protected-access, duplicate-code, consider-using-f-string, fixme, invalid-name, line-too-long, design, too-many-lines, superfluous-parens"
+[tool.pylint.refactoring]
+max-nested-blocks = 10
 
 [tool.black]
 include = '\.py$'

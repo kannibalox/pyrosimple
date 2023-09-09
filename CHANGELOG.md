@@ -10,6 +10,8 @@
 - `lstor`: Support displaying hybrid v2 .torrent files. `rTorrent`
   doesn't support padding files yet, so this is mostly theoretical.
 - `rtcontrol`: Add `label` and `custom1` as aliases for `custom_1`
+- `rtcontrol`: Finalize flags for moving paths and optionally setting
+  the directory: `--move`, `--move-and-set`, `--symlink`, etc...
 
 ### Fixed
 - `rtcontrol`: The average in `--summary` no longer errors out under

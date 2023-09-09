@@ -267,10 +267,7 @@ class MetafileChanger(ScriptBase):
             if self.options.check_data:
                 # pylint: disable=import-outside-toplevel
                 from pyrosimple.util.metafile import PieceLogger
-                from pyrosimple.util.ui import (
-                    HashProgressBar,
-                    HashProgressBarCounter,
-                )
+                from pyrosimple.util.ui import HashProgressBar, HashProgressBarCounter
 
                 with HashProgressBar() as pb:
                     if (

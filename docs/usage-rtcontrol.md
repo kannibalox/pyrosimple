@@ -149,6 +149,9 @@ rtcontrol has many ways to effect torrent, including but not limited to:
 * `--start`/`--stop`/`--delete`: starting/stopping/remove torrents
 * `--cull`,`--purge`: remove torrents along with all or partial data
 * `--custom KEY=VALUE`: setting custom values
+* `--move`/`--move-and-set`: Move, and optionally set the directory
+  after the move (similar flags also exist to copy, symlink, and
+  hardlink)
 * `--call`/`--spawn`: call a OS command/shell
 * `-H`/`--hash-check`: trigger a hash check on torrents (equivalent to
   pressing `^R` in the UI)
