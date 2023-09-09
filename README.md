@@ -32,19 +32,19 @@ The following lists are not exhaustive, and don't cover many of the
 internal improvements and refactoring.
 
 - Only supports python 3 and rTorrent 0.9.6+ (this includes
-  rTorrent-PS and rTorrent-PS-CH)
+  [rTorrent-PS](https://github.com/pyroscope/rtorrent-ps), [rTorrent-PS-CH](https://github.com/chros73/rtorrent-ps-ch/) and [jesec/rtorrent](https://github.com/jesec/rtorrent))
   - pypy is supported, but not as well tested
 - Simpler poetry-based build system, with a single package to install
 - Performance improvements (faster templating and only fetching
   required fields)
+- Replaced Tempita with [Jinja2](https://jinja.palletsprojects.com/en/3.0.x/)
 
 ### New features
 
 - Multi-instance support for rtcontrol/rtxmlrpc
-- Replaced Tempita with Jinja2
-- Support for JSON-RPC (only implemented by
-  https://github.com/jesec/rtorrent)
-- Actions to move torrent between paths, or torrents between hosts
+- Support for JSON-RPC (currently only implemented by
+  [jesec/rtorrent](https://github.com/jesec/rtorrent))
+- Actions to move torrents between paths, or torrents between hosts
 
 See https://kannibalox.github.io/pyrosimple/migrate/ for how to
 migrate scripts to the new features.
