@@ -560,6 +560,8 @@ class RtorrentItem(engine.TorrentProxy):
         @param attrs: Optional list of additional attributes to fetch (for
             file_filter to use).
         """
+        if attrs is None:
+            attrs = set()
         dry_run = False  # set to True for testing
         path = Path(self.rpc_call("d.directory"))
         if not path.is_absolute():
@@ -571,7 +573,10 @@ class RtorrentItem(engine.TorrentProxy):
         if not path.exists():
             return
 
-        dirs_to_clean_up = {path}
+        if self.rpc_call("d.is_multi_file"):
+            dirs_to_clean_up = {path}
+        else:
+            dirs_to_clean_up = set()
         attrs.add("path")
         for file_data in self._get_files(attrs=attrs):
             if file_filter is not None and not file_filter(file_data):
@@ -579,12 +584,13 @@ class RtorrentItem(engine.TorrentProxy):
             fullpath = Path(path, file_data.path)
             if fullpath.is_file() or fullpath.is_symlink():
                 self._engine.logger.debug("Deleting '%s'", fullpath)
-                dirs_to_clean_up.add(fullpath.parent)
+                if not self.rpc_call("d.is_multi_file"):
+                    dirs_to_clean_up.add(fullpath.parent)
                 if not dry_run:
                     fullpath.unlink()
         for directory in dirs_to_clean_up:
             try:
-                self._engine.logger.debug("Cleaning up directory '%s'", fullpath)
+                self._engine.logger.debug("Cleaning up directory '%s'", directory)
                 if not dry_run:
                     directory.rmdir()
             except OSError as e:

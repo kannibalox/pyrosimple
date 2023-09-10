@@ -16,6 +16,8 @@
 ### Fixed
 - `rtcontrol`: The average in `--summary` no longer errors out under
   certain conditions
+- `rtcontrol`: Fix debug logging, and avoid cleaning up parent
+  directories for single file torrents with `--cull`/`--purge`
 
 ## [2.10.2] - 2023-07-31
 
