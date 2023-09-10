@@ -40,9 +40,27 @@ EXAMPLE_HASH = "BAE3666F5C14AEC4BF6DE49C752E3D148216B0DE"
         ("done", {"d.completed_bytes": 12, "d.size_bytes": 144}, (12 / 144) * 100),
         ("is_open", {"d.is_open": 1}, True),
         ("xfer", {"d.up.rate": 5, "d.down.rate": 7}, 12),
-        ("label", {"d.custom1": "foo",}, "foo"),
-        ("custom_1", {"d.custom1": "foo",}, "foo"),
-        ("custom1", {"d.custom1": "foo",}, "foo"),
+        (
+            "label",
+            {
+                "d.custom1": "foo",
+            },
+            "foo",
+        ),
+        (
+            "custom_1",
+            {
+                "d.custom1": "foo",
+            },
+            "foo",
+        ),
+        (
+            "custom1",
+            {
+                "d.custom1": "foo",
+            },
+            "foo",
+        ),
     ],
 )
 def test_fields(field, data, expected):

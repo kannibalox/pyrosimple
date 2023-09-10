@@ -52,11 +52,7 @@ from pyrosimple.util.metafile import Metafile
             ["test"],
             None,
         ),
-        (
-            ["-s", "info.files=+1", "-V"],
-            ["info", "files"],
-            1
-        )
+        (["-s", "info.files=+1", "-V"], ["info", "files"], 1),
     ],
 )
 def test_chtor(tmp_path_factory, args, field, expected):
