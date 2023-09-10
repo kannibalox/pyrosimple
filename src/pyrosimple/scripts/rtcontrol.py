@@ -358,12 +358,6 @@ class RtorrentControl(ScriptBaseWithConfig):
         self.add_bool_option(
             "--yes", help="positively answer all prompts (e.g. --delete --yes)"
         )
-        self.parser.add_argument(
-            "--move-type",
-            default="move",
-            choices=["move", "copy", "symlink", "hardlink"],
-            help="control how --move operates",
-        )
         self.add_value_option(
             "--alter-view",
             "--alter",
