@@ -42,3 +42,26 @@ def test_load_tor():
     assert proxy.d.name(metafile.info_hash()) == metafile["info"]["name"]
     assert proxy.d.custom1(metafile.info_hash()) == "foobar"
     proxy.d.erase(metafile.info_hash())
+
+
+@live_only
+def test_cull_tor(tmpdir):
+    from pyrosimple.scripts.rtcontrol import RtorrentControl
+
+    engine = pyrosimple.connect()
+    proxy = engine.open()
+    metapath = Path(Path(__file__).parent, "single.torrent")
+    metafile = pyrosimple.util.metafile.Metafile.from_file(metapath)
+    dest = tmpdir.mkdir("data")
+    rt = RtorrentControl()
+    # Cull
+    with metapath.open("rb") as fh:
+        proxy.load.raw("", xmlrpc.client.Binary(fh.read()), f"d.directory.set={dest}")
+    assert proxy.d.name(metafile.info_hash()) == metafile["info"]["name"]
+    assert proxy.d.directory(metafile.info_hash()) == dest
+    proxy.d.start(metafile.info_hash())
+    rt.run([f"hash={metafile.info_hash()}", "--cull", "--yes", "-Q0"])
+    with pytest.raises(pyrosimple.util.rpc.HashNotFound):
+        for _ in range(0, 5):
+            print(proxy.d.name(metafile.info_hash()))
+            sleep(0.1)
