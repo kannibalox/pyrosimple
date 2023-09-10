@@ -36,12 +36,6 @@ class JSONRPCEncoder(json.JSONEncoder):
 
 
 CACHE_METHOD = {
-    "d.chunk_size",
-    "d.is_private",
-    "d.name",
-    "d.size_bytes",
-    "d.size_chunks",
-    "d.size_files",
     "system.api_version",
     "system.client_version",
     "system.library_version",
