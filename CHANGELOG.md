@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.11.1] - 2023-09-12
+
 ### Fixed
 - `lstor`/`mktor`/`chtor`: The progress bar no longer appears when
   `-q` is used
@@ -409,7 +411,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.1...HEAD
+[2.11.1] https://github.com/kannibalox/pyrosimple/compare/v2.11.0...v2.11.1
 [2.11.0] https://github.com/kannibalox/pyrosimple/compare/v2.10.2...v2.11.0
 [2.10.2] https://github.com/kannibalox/pyrosimple/compare/v2.10.1...v2.10.2
 [2.10.1] https://github.com/kannibalox/pyrosimple/compare/v2.10.0...v2.10.1
