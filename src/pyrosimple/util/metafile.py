@@ -273,7 +273,7 @@ class Metafile(dict):
         pieces = []
 
         # Initialize progress state
-        hashing_secs = time.time()
+        hashing_secs = time.monotonic()
         totalsize: int = sum(Path(filename).stat().st_size for filename in files)
         totalhashed: int = 0
 
@@ -358,7 +358,11 @@ class Metafile(dict):
         else:
             metainfo["length"] = totalhashed
 
-        hashing_secs = time.time() - hashing_secs
+        hashing_secs = time.monotonic() - hashing_secs
+        # Some systems don't have sub-second precision, so give it a
+        # non-zero value to at least calculate something
+        if hashing_secs == 0:
+            hashing_secs = 0.5
         self.log.debug(
             "Hashing of %s took %.1f secs (%s/s)",
             fmt.human_size(totalhashed).strip(),
