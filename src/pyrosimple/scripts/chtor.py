@@ -271,7 +271,7 @@ class MetafileChanger(ScriptBase):
 
                 with HashProgressBar() as pb:
                     if (
-                        logging.getLogger().isEnabledFor(logging.WARNING)
+                        logging.getLogger(__name__).isEnabledFor(logging.WARNING)
                         and sys.stdout.isatty()
                     ):
                         progress_callback = cast(
