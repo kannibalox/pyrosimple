@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Fixed
+- `lstor`/`mktor`/`chtor`: The progress bar no longer appears when
+  `-q` is used
+- `lstor`: Fix possible `ZeroDivisionError` when hashing small files
+  on Windows
+  ([#53](https://github.com/kannibalox/pyrosimple/issues/53))
+
 ## [2.11.0] - 2023-09-10
 
 ### Changed
@@ -20,6 +27,7 @@
   certain conditions
 - `rtcontrol`: Fix debug logging, and avoid cleaning up parent
   directories for single file torrents with `--cull`/`--purge`
+  ([#52](https://github.com/kannibalox/pyrosimple/issues/52))
 
 ## [2.10.2] - 2023-07-31
 
