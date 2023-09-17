@@ -1004,10 +1004,9 @@ def validate_field_list(
             close_names = get_close_matches(name, engine.FIELD_REGISTRY.keys(), 3)
             if len(close_names) == 0:
                 raise error.UserError(f"Unknown field name {name!r}")
-            else:
-                raise error.UserError(
-                    f"Unknown field name {name!r} (the following similar fields are available: {close_names!r})"
-                )
+            raise error.UserError(
+                f"Unknown field name {name!r} (the following similar fields are available: {close_names!r})"
+            )
 
     return split_fields
 
