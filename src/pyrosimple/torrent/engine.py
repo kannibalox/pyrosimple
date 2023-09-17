@@ -383,6 +383,13 @@ def core_fields():
     # Basic fields
     yield ConstantField(
         str,
+        "hostname",
+        "hostname of the instance running rTorrent",
+        matcher=matching.PatternFilter,
+        accessor=lambda o: o._engine.properties.get("system.hostname", "")
+    )
+    yield ConstantField(
+        str,
         "name",
         "name (file or root directory)",
         matcher=matching.PatternFilter,

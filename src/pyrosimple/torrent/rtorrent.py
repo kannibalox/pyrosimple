@@ -735,6 +735,7 @@ class RtorrentEngine:
         )
         self.engine_id = self.properties["session.name"]
         time_usec = float(self.properties["system.time_usec"])
+        self.properties["system.hostname"] = self.properties["session.name"].split(':')[0]
 
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
