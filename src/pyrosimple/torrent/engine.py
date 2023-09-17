@@ -780,7 +780,7 @@ def core_fields():
     )
 
 
-def generate_custom_field(name: str) -> FieldDefinition:
+def generate_custom_field(name: str) -> Optional[FieldDefinition]:
     """Create fields from custom keys"""
     if name[6] in "12345":
         custom_name = name[6]

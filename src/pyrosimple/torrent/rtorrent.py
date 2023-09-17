@@ -90,7 +90,7 @@ class RtorrentItem(engine.TorrentProxy):
 
     def _make_it_so(
         self, command: str, calls: List[str], *args, observer: Optional[Callable] = None
-    ):
+    ) -> None:
         """Perform some error-checked RPC calls."""
         args = (self._fields["hash"],) + args
         try:
@@ -142,15 +142,15 @@ class RtorrentItem(engine.TorrentProxy):
 
         return result
 
-    def memoize(self, name: str, getter: Callable, *args, **kwargs):
+    def memoize(self, name: str, getter: Callable, *args, **kwargs) -> Optional[str]:
         """Cache a stable expensive-to-get item value for later
         (optimized) retrieval."""
         field = "custom_memo_" + name
         cached = self.rpc_call("d.custom", ["memo_" + name])
         if cached:
-            value = cached
+            value = str(cached)
         else:
-            value = getter(*args, **kwargs)
+            value = str(getter(*args, **kwargs))
             self._make_it_so(
                 f"caching {name}={value!r} for",
                 ["d.custom.set"],
@@ -579,7 +579,7 @@ class RtorrentItem(engine.TorrentProxy):
         else:
             dirs_to_clean_up = set()
         attrs.add("path")
-        for file_data in self._get_files(attrs=attrs):
+        for file_data in self._get_files(attrs=list(attrs)):
             if file_filter is not None and not file_filter(file_data):
                 continue
             fullpath = Path(path, file_data.path)
@@ -895,10 +895,10 @@ class RtorrentEngine:
     def show(
         self,
         items,
-        view: Optional[str] = None,
+        view: str,
         append: bool = False,
         disjoin: bool = False,
-    ):
+    ) -> str:
         """Place a set of items (search result) into a view, and
         return the view name."""
         proxy = self.open()
@@ -1011,7 +1011,7 @@ def validate_field_list(
     return split_fields
 
 
-def validate_sort_fields(sort_fields: str):
+def validate_sort_fields(sort_fields: str) -> Any:
     """Make sure the fields in the given list exist, and return sorting key.
 
     If field names are prefixed with '-', sort order is reversed for that field (descending).
