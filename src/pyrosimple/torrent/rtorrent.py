@@ -846,8 +846,8 @@ class RtorrentEngine:
                             view.matcher.pre_filter()
                         )
                     if pre_filter:
-                        # rTorrent 0.9.8+ does not have
-                        # sting.contains_i, so we check for it here
+                        # rTorrent prior to 0.9.8 does not have
+                        # string.contains_i, so we check for it here
                         self.logger.debug("Created pre-filter: %s", pre_filter or "N/A")
                         if (
                             config.settings.SAFETY_CHECKS_ENABLED
