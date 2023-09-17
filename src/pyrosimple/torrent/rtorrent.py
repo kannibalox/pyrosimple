@@ -12,6 +12,7 @@ import shlex
 import time
 import urllib.parse
 
+from difflib import get_close_matches
 from functools import lru_cache, partial
 from pathlib import Path
 from typing import Any, Callable, Dict, Generator, List, Optional, Set, Tuple, Union
@@ -998,7 +999,11 @@ def validate_field_list(
             name not in engine.FIELD_REGISTRY
             and not engine.TorrentProxy.add_manifold_attribute(name)
         ):
-            raise error.UserError(f"Unknown field name {name!r}")
+            close_names = get_close_matches(name, engine.FIELD_REGISTRY.keys(), 3)
+            if len(close_names) == 0:
+                raise error.UserError(f"Unknown field name {name!r}")
+            else:
+                raise error.UserError(f"Unknown field name {name!r} (the following similar fields are available: {close_names!r})")
 
     return split_fields
 
