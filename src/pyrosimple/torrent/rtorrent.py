@@ -736,7 +736,9 @@ class RtorrentEngine:
         )
         self.engine_id = self.properties["session.name"]
         time_usec = float(self.properties["system.time_usec"])
-        self.properties["system.hostname"] = self.properties["session.name"].split(':')[0]
+        self.properties["system.hostname"] = self.properties["session.name"].split(":")[
+            0
+        ]
 
         # Make sure xmlrpc-c works as expected
         if time_usec < 2**32:
@@ -1003,7 +1005,9 @@ def validate_field_list(
             if len(close_names) == 0:
                 raise error.UserError(f"Unknown field name {name!r}")
             else:
-                raise error.UserError(f"Unknown field name {name!r} (the following similar fields are available: {close_names!r})")
+                raise error.UserError(
+                    f"Unknown field name {name!r} (the following similar fields are available: {close_names!r})"
+                )
 
     return split_fields
 
