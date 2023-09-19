@@ -13,9 +13,11 @@ to rTorrent functions for easy access.
     configuration set up, you shouldn't need to make any changes to it.
 
 !!! tip
-    To skip all the explanations and quickly generate a full config, run the following command:
+    To skip all the explanations and quickly generate a full
+    config, run the following command:
+
     ```
-    pyroadmin config --create-rtorrent-rc
+    pyroadmin -v config --create-rtorrent-rc
     ```
 
 The full-featured `rtorrent.rc` used above is provided
@@ -29,7 +31,7 @@ should still be compatible as well.
 Any version of rTorrent >=0.9.6 is supported, however the efficiency
 improvements and JSON-RPC support that have been added to
 [jesec/rtorrent](https://github.com/jesec/rtorrent) make it highly
-recommended. If you prefer a nice UI (among other quality-of-life
+recommended. If you prefer a nice TUI (among other quality-of-life
 fixes), consider
 [rTorrent-PS](https://github.com/pyroscope/rtorrent-ps) as well.
 
@@ -37,7 +39,9 @@ fixes), consider
 
 ### Timestamps
 
-This config records timestamps for use by the `loaded`, `started`, `completed`, `last_xfer` and `last_active` fields.
+This config records timestamps for use by the `loaded`, `started`,
+`completed`, `last_xfer` and `last_active` fields.
+
 ```toml
 {% include 'examples/timestamps.rc' %}
 ```
