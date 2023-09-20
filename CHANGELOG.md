@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- `rtcontrol`: Make parent directories when moving/copying
+- `rtcontrol`: Fix `-and-set` variants not doing anything
+
 ## [2.11.1] - 2023-09-12
 
 ### Fixed
