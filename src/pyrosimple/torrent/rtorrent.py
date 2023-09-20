@@ -441,8 +441,10 @@ class RtorrentItem(engine.TorrentProxy):
             dest.mkdir(parents=True, exist_ok=True)
             for f in self._get_files():
                 src = Path(self.datapath(), f.path)
-                if src != Path(dest, f.path):
-                    move_func(self, src, Path(dest, f.path))
+                dest_file = Path(dest, f.path)
+                if src != dest_file:
+                    dest_file.mkdir(parents=True, exist_ok=True)
+                    move_func(self, src, dest_file)
         else:
             dest.mkdir(parents=True, exist_ok=True)
             if self.datapath() != Path(dest, self.datapath().name):
