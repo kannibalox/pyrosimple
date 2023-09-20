@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.11.2] - 2023-09-20
+
 ### Fixed
 
 - `rtcontrol`: Make parent directories when moving/copying
@@ -416,7 +418,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.1...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.2...HEAD
+[2.11.2] https://github.com/kannibalox/pyrosimple/compare/v2.11.1...v2.11.2
 [2.11.1] https://github.com/kannibalox/pyrosimple/compare/v2.11.0...v2.11.1
 [2.11.0] https://github.com/kannibalox/pyrosimple/compare/v2.10.2...v2.11.0
 [2.10.2] https://github.com/kannibalox/pyrosimple/compare/v2.10.1...v2.10.2
