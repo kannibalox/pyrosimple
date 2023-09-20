@@ -553,7 +553,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         set_to_target = False
         if move_type.endswith(" and set"):
             set_to_target = True
-            move_type = move_type[:-7]
+            move_type = move_type[:-8]
         if set_to_target:
             was_started = item.is_active
             item.stop()

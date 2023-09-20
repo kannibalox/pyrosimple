@@ -41,7 +41,6 @@ def read_blob(arg: str) -> bytes:
 
 
 class RtorrentXmlRpc(ScriptBaseWithConfig):
-    ### Keep things wrapped to fit under this comment... ##############################
     """
     Perform raw rTorrent RPC calls, like "rtxmlrpc throttle.global_up.max_rate".
 
