@@ -2,10 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+- `pyrotorque`: `QueueManager` now has a default `matcher` setting of `is_complete=no is_ignored=no is_open=no message="" done=0`
+
 ## [2.11.2] - 2023-09-20
 
 ### Fixed
-
 - `rtcontrol`: Make parent directories when moving/copying
 - `rtcontrol`: Fix `-and-set` variants not doing anything
 

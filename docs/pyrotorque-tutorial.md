@@ -8,7 +8,7 @@ focus on a few basic use cases:
 
 * Load torrent files from `/var/rtorrent/watch/` without starting them
 * Use QueueManager to start torrents in a controlled manner
-* Move the data of completed torrents to a `/var/rtorrent/done`
+* Move the data of completed torrents to `/var/rtorrent/done/`
 
 All the configuration provided below should be placed under the
 `[TORQUE]` section in `~/.config/pyrosimple/config.toml`. The full
@@ -51,9 +51,9 @@ fashion. This configuration tells pyrotorque to start torrents one at
 at time every 5 minutes, up to a maximum of 20. However, the maximum
 of 20 is deciding by only considering torrents that are actively
 downloading data, so that the queue doesn't get stuck on dead
-torrents. The `matcher` value is set to only start torrents which have
-the `loaded_by` custom field set to `pyrotorque` (among other
-filters), so that it doesn't interfere with other programs
+torrents. The `matcher` value below is set to only start torrents
+which have the `loaded_by` custom field set to `pyrotorque` (among
+other filters), so that it doesn't interfere with other programs
 (e.g. Radarr). It will also use `sort_fields` so that higher priority
 torrents are started first.
 

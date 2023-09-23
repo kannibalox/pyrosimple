@@ -19,6 +19,7 @@ class QueueManager(MatchableJob):
             config["matcher"] = config["startable"]
         if "sort_fields" in config and "sort" not in config:
             config["sort"] = config["sort_fields"]
+        config.setdefault("matcher", "is_complete=no is_ignored=no is_open=no message=\"\" done=0")
         super().__init__(config)
         self.last_start: float = 0
         self.downloading_count: int = 0
@@ -27,18 +28,19 @@ class QueueManager(MatchableJob):
         self.config.setdefault("viewname", "main")
         self.config.setdefault("start_at_once", 1)
         self.config.setdefault("intermission", 120)
+        self.config.setdefault("downloading", "is_active=1 is_complete=0")
         self.config.setdefault("downloading_min", 0)
         self.config.setdefault("downloading_max", 20)
         self.config.setdefault("downloading_traffic_max", 0)
+        self.config["downloading"] = matching.create_matcher(
+            self.config["downloading"]
+        )
         self.config["log_to_client"] = matching.truth(
             self.config.get("log_to_client", True)
         )
         self.log.info(
             "Startable matcher is: %s",
             self.config["matcher"],
-        )
-        self.config["downloading"] = matching.create_matcher(
-            self.config.get("downloading", "is_active=1 is_complete=0")
         )
         self.log.info(
             "Downloading matcher is: %s",

@@ -82,7 +82,7 @@ changing a few values from the defaults to demonstrate key features:
 [TORQUE.queue]
 handler = "pyrosimple.job.queue:QueueManager"
 schedule = "minute=*"
-sort_fields = "-prio,loaded,name"
+sort = "-prio,loaded,name"
 matcher = "is_open=no tagged=torqued is_ignored=no done=0 message=''"
 downloading_min = 1
 downloading_max = 100
@@ -95,7 +95,11 @@ Arguments:
 
 * `matcher`/`startable`  
   The query to use to determine which torrents are valid candidates to
-  be started.
+  be started. Defaults to `is_complete=no is_ignored=no is_open=no
+  message="" done=0`.
+* `sort`/`sort_fields`  
+  Determines the order in which torrents are started. Defaults to
+  `name,hash`.
 * `start_at_once`  
   The maximum number of items to start during a single run. May be
   overridden by the `downloading_min` settings. Defaults to `1`.
