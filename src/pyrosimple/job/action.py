@@ -1,6 +1,8 @@
 """A simple job to emulate rtcontrol's actions"""
 import subprocess
 
+import jinja2
+
 from pyrosimple import error
 from pyrosimple.job.base import BaseJob, MatchableJob
 from pyrosimple.torrent import rtorrent
@@ -56,14 +58,24 @@ class Action(MatchableJob):
     def __init__(self, config=None):
         super().__init__(config)
         self.action = self.config["action"]
+        self.args = []
         if not hasattr(rtorrent.RtorrentItem, self.action):
             raise error.ConfigurationError(f"Action '{self.action}' not found!")
-        self.args = [rtorrent.env.from_string(a) for a in self.config.get("args", [])]
+        for a in self.config.get("args", []):
+            if isinstance(a, str):
+                self.args.append(ttorrent.env.from_string(a))
+            else:
+                self.args.append(a)
 
     def run_item(self, item):
         """For now, simply call the named methods on the item"""
         action = self.config["action"]
-        processed_args = [rtorrent.format_item(a, item) for a in self.args]
+        processed_args = []
+        for a in self.args:
+            if isinstance(a, jinja2.environment.Template):
+                processed_args.append(rtorrent.format_item(a, item))
+            else:
+                processed_args.append(a)
         if self.config["dry_run"]:
             self.log.info(
                 "Would %s(%s) %s",
