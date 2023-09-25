@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyrosimple"
-version = "2.11.2"
+version = "2.11.3"
 description = "A stripped-down version of the pyrocore tools for working with rTorrent"
 authors = ["kannibalox <kannibalox@gmail.com>"]
 repository = "https://github.com/kannibalox/pyrosimple"

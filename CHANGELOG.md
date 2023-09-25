@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.11.3] - 2023-09-25
+
 ### Changed
 - `pyrotorque`: `QueueManager` now has a default `matcher` setting of `is_complete=no is_ignored=no is_open=no message="" done=0`
 - `pyrotorque`: The `args` paremeter for `pyrosimple.job.action:Action` now accepts non-string values.
@@ -421,7 +423,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.2...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.3...HEAD
+[2.11.3] https://github.com/kannibalox/pyrosimple/compare/v2.11.2...v2.11.3
 [2.11.2] https://github.com/kannibalox/pyrosimple/compare/v2.11.1...v2.11.2
 [2.11.1] https://github.com/kannibalox/pyrosimple/compare/v2.11.0...v2.11.1
 [2.11.0] https://github.com/kannibalox/pyrosimple/compare/v2.10.2...v2.11.0
