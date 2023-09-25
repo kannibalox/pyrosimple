@@ -63,7 +63,7 @@ class Action(MatchableJob):
             raise error.ConfigurationError(f"Action '{self.action}' not found!")
         for a in self.config.get("args", []):
             if isinstance(a, str):
-                self.args.append(ttorrent.env.from_string(a))
+                self.args.append(rtorrent.env.from_string(a))
             else:
                 self.args.append(a)
 
