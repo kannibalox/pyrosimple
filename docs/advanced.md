@@ -54,8 +54,8 @@ categorized by the *ruTorrent* label. Unlabelled items go to the
 target="/tmp/metafiles"
 rm -rf "$target"
 rtcontrol // \
-    --spawn "mkdir -p \"$target/"'{{i.fetch(1) or \"_NOLABEL\"}}"' \
-    --spawn 'cp {{i.sessionfile}} "'"$target"'/{{item.fetch(1) or \"_NOLABEL\"}}/{{item.name}}-{{item.hash[:7]}}.torrent"'
+  --spawn "mkdir -p \"$target/\""'{{d.label or "_NOLABEL" | shell}}' \
+  --spawn 'cp {{d.sessionfile}} "'"$target"'"/{{d.label or "_NOLABEL" | shell}}/{{d.name|shell}}-{{d.hash[:7]}}.torrent'
 ```
 
 The copied metafiles themselves are renamed to the contained name of the
