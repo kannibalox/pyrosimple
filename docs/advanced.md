@@ -14,7 +14,7 @@ title: Advanced Features
 The `--call` and `--spawn` options can be used to call an OS level
 command and feed it with data from the selected items. The argument to
 both options is a template, i.e. you can have things like
-`{{item.hash}}` in them.
+`{{d.hash}}` in them.
 
 When using `--call`, the command is passed to the shell for parsing --
 with obvious implications regarding the quoting of arguments, thus
@@ -24,8 +24,8 @@ features.
 In contrast, the `--spawn` option splits its argument list according to
 shell rules *before* expanding the template placeholders, and then calls
 the resulting sequence of command name and arguments directly. Consider
-`--spawn 'echo "name: {{i.name}}"'` vs.
-`--spawn 'echo name: {{i.name}}'` -- the first form passes one
+`--spawn 'echo "name: {{d.name}}"'` vs.
+`--spawn 'echo name: {{d.name}}'` -- the first form passes one
 argument to `/bin/echo`, the second form two arguments. Note that in
 both cases, spaces or shell meta characters contained in the item name
 are of no relevance, since the argument list is split according to the
@@ -54,7 +54,7 @@ categorized by the *ruTorrent* label. Unlabelled items go to the
 target="/tmp/metafiles"
 rm -rf "$target"
 rtcontrol // \
-  --spawn "mkdir -p \"$target/\""'{{d.label or "_NOLABEL" | shell}}' \
+  --spawn 'mkdir -p "'"$target/"'"'{{d.label or "_NOLABEL" | shell}}' \
   --spawn 'cp {{d.sessionfile}} "'"$target"'"/{{d.label or "_NOLABEL" | shell}}/{{d.name|shell}}-{{d.hash[:7]}}.torrent'
 ```
 
@@ -62,8 +62,8 @@ The copied metafiles themselves are renamed to the contained name of the
 item's data, plus a small part of the infohash to make these names
 unique.
 
-Replace the `i.fetch(1)` by `i.‹fieldname›` to categorize by other
-values, e.g. `i.alias` for 'by tracker'.
+Replace the `d.label` by `d.‹fieldname›` to categorize by other
+values, e.g. `d.alias` for 'by tracker'.
 
 ## Executing XMLRPC commands {#rtcontrol-exec}
 
@@ -103,9 +103,6 @@ in the last 10 minutes:
 ``` bash
 rtcontrol --exec "event.download.finished=" 'loaded<10m' is_complete=y
 ```
-
-The `:` prefix prevents `rtcontrol` from assuming this is a `d.` item
-command.
 
 Make sure that the registered handlers do not have adverse effects when
 called repeatedly, i.e. know what you're doing. The handlers for an
@@ -209,29 +206,6 @@ they appear in the field value (on the right-hand side).
 
 # Using 'rtxmlrpc'
 
-## Querying system information
-
-The `rtuptime` script shows you essential information about your
-*rTorrent* instance:
-
-::: {.literalinclude language="shell"}
-examples/rtuptime
-:::
-
-When called, it prints something like this:
-
-``` console
-$ rtuptime
-rTorrent 0.9.6/0.13.6, up 189:00:28 [315 loaded; U: 177.292 GiB; S: 891.781 GiB],
-D: 27.3 GB @ 0.0 KB/s of 520.0 KB/s, U: 36.8 MB @ 0.0 KB/s of 52.0 KB/s
-```
-
-And yes, doing the same in a `Python script <scripts>`{.interpreted-text
-role="ref"} would be much more CPU efficient. ;)
-
-If you connect via `network.scgi.open_port`, touch a file in `/tmp` in
-your startup script and use that for uptime checking.
-
 ## Load Metafile with a Specific Data Path
 
 The following shows how to load a metafile from any path in `$metafile`,
@@ -245,12 +219,12 @@ rtxmlrpc -q load.normal '' "$metafile" \
 ```
 
 Use `load.start` to start that item immediately. If the metafile has
-fast-resume information and the data is already there, no extra hashing
-is done.
+fast-resume information and the data is already there, no extra
+hashing is done.
 
-And just to show you can add more on-load commands, the priority of the
-new item is set to `low`. Other common on-load commands are those that
-set custom values, e.g. the *ruTorrent* label.
+And just to show you can add more on-load commands, the priority of
+the new item is set to `low`. Other common on-load commands are those
+that set custom values, e.g. the *ruTorrent* label.
 
 ## General maintenance tasks
 
