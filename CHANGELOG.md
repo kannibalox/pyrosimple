@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## Fixed
+- `chtor`: Fixed error when combining `--fast-resume` and `-o`
+
 ## [2.11.3] - 2023-09-25
 
 ### Changed
