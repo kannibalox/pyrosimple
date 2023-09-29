@@ -16,7 +16,7 @@ import pyrosimple
 
 from pyrosimple import config
 from pyrosimple.scripts.base import ScriptBase
-from pyrosimple.util import matching, rpc
+from pyrosimple.util import matching
 
 
 class AdminTool(ScriptBase):
@@ -300,6 +300,7 @@ class AdminTool(ScriptBase):
     def config_check_timestamps(self):
         """Confirm usual methods for timestamps exist"""
         proxy = pyrosimple.connect().open()
+        methods = proxy.system.listMethods()
         event_field_map = {
             "event.download.resumed": "started",
             "event.download.finished": "completed",
@@ -314,27 +315,16 @@ class AdminTool(ScriptBase):
                     field,
                 )
                 print_timestamp_help = True
-        try:
-            proxy.method.get("", "pyro.last_xfer.min_rate")
-        except rpc.RpcError as exc:
-            if exc.faultCode in [-32602, -503]:
-                self.log.warning(
-                    "Method 'pyro.last_xfer.min_rate' not found, field 'last_xfer' may not function correctly"
-                )
-                print_timestamp_help = True
-            else:
-                raise
-        try:
-            proxy.method.get("", "d.timestamp.last_active")
-        except rpc.RpcError as exc:
-            if exc.faultCode in [-32602, -503]:
-                self.log.warning(
-                    "Method 'd.timestamp.last_active' not found, field 'last_active' may not function correctly"
-                )
-                print_timestamp_help = True
-            else:
-                raise
-
+        if "pyro.last_xfer.min_rate" not in methods:
+            self.log.warning(
+                "Method 'pyro.last_xfer.min_rate' not found, field 'last_xfer' may not function correctly"
+            )
+            print_timestamp_help = True
+        if "d.timestamp.last_active" not in methods:
+            self.log.warning(
+                "Method 'd.timestamp.last_active' not found, field 'last_active' may not function correctly"
+            )
+            print_timestamp_help = True
         if print_timestamp_help:
             self.log.warning(
                 "To configure timestamp fields, see https://kannibalox.github.io/pyrosimple/rtorrent-config/#timestamps"

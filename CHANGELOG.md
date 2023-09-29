@@ -3,13 +3,17 @@
 ## [Unreleased]
 
 ## Fixed
-- `chtor`: Fixed error when combining `--fast-resume` and `-o`
+- `chtor`: Fix error when combining `--fast-resume` and `-o`
+- `pyroadmin`: Fix false negative when detecting methods on systems that
+  implemented them in C++
 
 ## [2.11.3] - 2023-09-25
 
 ### Changed
-- `pyrotorque`: `QueueManager` now has a default `matcher` setting of `is_complete=no is_ignored=no is_open=no message="" done=0`
-- `pyrotorque`: The `args` paremeter for `pyrosimple.job.action:Action` now accepts non-string values.
+- `pyrotorque`: `QueueManager` now has a default `matcher` setting of
+  `is_complete=no is_ignored=no is_open=no message="" done=0`
+- `pyrotorque`: The `args` paremeter for
+  `pyrosimple.job.action:Action` now accepts non-string values.
 
 ## [2.11.2] - 2023-09-20
 
