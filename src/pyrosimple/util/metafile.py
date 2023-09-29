@@ -109,7 +109,7 @@ class PieceFailer(PieceLogger):
             != self.meta["info"]["pieces"][self.piece_index : self.piece_index + 20]
         ):
             raise OSError(
-                f"Piece #{self.piece_index // 20}: Hashes differ in file {filename!r}"
+                f"Piece #{self.piece_index // 20}: Hashes differ in file {str(filename)!r}"
             )
         self.piece_index += 20
 
