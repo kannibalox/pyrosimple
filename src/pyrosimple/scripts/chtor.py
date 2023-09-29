@@ -413,7 +413,9 @@ class MetafileChanger(ScriptBase):
                     torrent.save(filename)
                     if "libtorrent_resume" in torrent:
                         # Also write clean version
-                        filename = Path(str(filename).replace(".torrent", "-no-resume.torrent"))
+                        filename = Path(
+                            str(filename).replace(".torrent", "-no-resume.torrent")
+                        )
                         del torrent["libtorrent_resume"]
                         self.log.info("Writing '%s'...", filename)
                         torrent.save(filename)

@@ -667,7 +667,7 @@ def core_fields():
         prefilter_field="d.throttle_name=",
     )
 
-    # Lifestyle
+    # Timestamps
     yield DynamicField(
         int,
         "loaded",
@@ -690,6 +690,12 @@ def core_fields():
     )
 
     def _leechtime_accessor(o) -> Optional[int]:
+        if config.settings.SAFETY_CHECKS_ENABLED and not o._engine.has_method(
+            "pyro._activations.append"
+        ):
+            warnings.warn(
+                "Method 'pyro._activations.append' does not exist! See https://github.com/kannibalox/pyrosimple/blob/main/src/pyrosimple/data/full-example.rc#L157-L161 for an example of a configuration for using activations"
+            )
         leechtime = _interval_sum(
             o.rpc_call("d.custom", ["activations"]), end=o.completed
         )
@@ -713,6 +719,30 @@ def core_fields():
             "d.custom=activations",
         ],
     )
+
+    def _seedtime_accessor(o) -> Optional[int]:
+        if config.settings.SAFETY_CHECKS_ENABLED and not o._engine.has_method(
+            "pyro._activations.append"
+        ):
+            warnings.warn(
+                "Method 'pyro._activations.append' does not exist! See https://github.com/kannibalox/pyrosimple/blob/main/src/pyrosimple/data/full-example.rc#L157-L161 for an example of a configuration for using activations"
+            )
+        if o.rpc_call("d.complete"):
+            return _interval_sum(
+                o.rpc_call("d.custom", ["activations"]), start=o.completed
+            )
+        return None
+
+    yield DynamicField(
+        untyped,
+        "seedtime",
+        "total seeding time after completion",
+        matcher=matching.DurationFilter,
+        accessor=_seedtime_accessor,
+        formatter=_fmt_duration,
+        requires=["d.custom=tm_completed", "d.complete", "d.custom=activations"],
+    )
+
     yield DynamicField(
         int,
         "completed",
@@ -722,19 +752,6 @@ def core_fields():
         formatter=fmt.iso_datetime_optional,
         requires=["d.custom=tm_completed"],
         prefilter_field="d.custom=tm_completed",
-    )
-    yield DynamicField(
-        untyped,
-        "seedtime",
-        "total seeding time after completion",
-        matcher=matching.DurationFilter,
-        accessor=lambda o: _interval_sum(
-            o.rpc_call("d.custom", ["activations"]), start=o.completed
-        )
-        if o.rpc_call("d.complete")
-        else None,
-        formatter=_fmt_duration,
-        requires=["d.custom=tm_completed", "d.complete", "d.custom=activations"],
     )
 
     def _last_active_accessor(o):
