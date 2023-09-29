@@ -89,31 +89,30 @@ class MetafileLister(ScriptBase):
 
                 if self.options.check_data:
                     # pylint: disable=import-outside-toplevel
-                    from pyrosimple.util.metafile import PieceLogger
+                    from pyrosimple.util.metafile import PieceFailer
                     from pyrosimple.util.ui import HashProgressBar
 
-                    with HashProgressBar() as pb:
-                        if (
-                            logging.getLogger(__name__).isEnabledFor(logging.WARNING)
-                            and sys.stdout.isatty()
-                        ):
-                            progress_callback = pb().progress_callback
-                        else:
-                            progress_callback = None
+                    try:
+                        with HashProgressBar() as pb:
+                            if (
+                                logging.getLogger(__name__).isEnabledFor(
+                                    logging.WARNING
+                                )
+                                and sys.stdout.isatty()
+                            ):
+                                progress_callback = pb().progress_callback
+                            else:
+                                progress_callback = None
 
-                        piece_logger = PieceLogger(torrent, self.log)
+                            piece_logger = PieceFailer(torrent, self.log)
 
-                        data_correct = torrent.hash_check(
-                            Path(self.options.check_data),
-                            progress_callback=progress_callback,
-                            piece_callback=piece_logger.check_piece,
-                        )
-                    if not data_correct:
-                        self.log.error(
-                            "File %s does not match data in %s",
-                            filename,
-                            Path(self.options.check_data).absolute(),
-                        )
+                            data_correct = torrent.hash_check(
+                                Path(self.options.check_data),
+                                progress_callback=progress_callback,
+                                piece_callback=piece_logger.check_piece,
+                            )
+                    except OSError as exc:
+                        self.log.error("File %r did not hash check: %s", filename, exc)
                         sys.exit(EX_DATAERR)
 
                 if self.options.raw:
