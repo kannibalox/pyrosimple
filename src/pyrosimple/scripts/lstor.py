@@ -106,7 +106,7 @@ class MetafileLister(ScriptBase):
 
                             piece_logger = PieceFailer(torrent, self.log)
 
-                            data_correct = torrent.hash_check(
+                            torrent.hash_check(
                                 Path(self.options.check_data),
                                 progress_callback=progress_callback,
                                 piece_callback=piece_logger.check_piece,
