@@ -113,6 +113,37 @@ accidentally filling up a disk.
 {% include 'examples/custom-fields-disk-space.py' %}
 ```
 
+#### ruTorrent
+
+Some [ruTorrent](https://github.com/Novik/ruTorrent) plugins add additional custom fields:
+```py
+from pyrosimple.torrent import engine
+
+def _custom_rutorrent_fields():
+    from pyrosimple.torrent import engine
+    yield engine.DynamicField(
+        int,
+        "ru_seedingtime",
+        "total seeding time after completion (ruTorrent variant)",
+        matcher=matching.DurationFilter,
+        accessor=lambda	o: int(o.rpc_call("d.custom",["seedingtime"]) or "0")/1000,
+        formatter=engine._fmt_duration,
+        requires=["d.custom=seedingtime"]
+    )
+    yield engine.DynamicField(
+        int,
+        "ru_addtime",
+        "date added (ruTorrent variant)",
+        matcher=matching.DurationFilter,
+        accessor=lambda o: int(o.rpc_call("d.custom",["addtime"]) or "0")/1000,
+        formatter=engine._fmt_duration,
+        requires=["d.custom=addtime"]
+    )
+
+for field in _custom_rutorrent_fields():
+    engine.TorrentProxy.add_field(field)
+```
+
 ## As a library
 
 The main interface has been designed to be deliberately simple if you
