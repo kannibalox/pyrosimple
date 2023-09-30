@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 
-## Fixed
+### Changed
+- `lstor`: Now fails immediately when a piece mismatch occurs, and
+  outputs the error to standard out instead of logging it.
+
+### Fixed
 - `chtor`: Fix error when combining `--fast-resume` and `-o`
 - `pyroadmin`: Fix false negative when detecting methods on systems that
   implemented them in C++
