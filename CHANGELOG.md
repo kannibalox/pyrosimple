@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.11.4] - 2023-10-07
+
 ### Changed
 - `lstor`: Now fails immediately when a piece mismatch occurs, and
   outputs the error to standard out instead of logging it.
@@ -434,7 +436,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.3...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.4...HEAD
+[2.11.4] https://github.com/kannibalox/pyrosimple/compare/v2.11.3...v2.11.4
 [2.11.3] https://github.com/kannibalox/pyrosimple/compare/v2.11.2...v2.11.3
 [2.11.2] https://github.com/kannibalox/pyrosimple/compare/v2.11.1...v2.11.2
 [2.11.1] https://github.com/kannibalox/pyrosimple/compare/v2.11.0...v2.11.1
