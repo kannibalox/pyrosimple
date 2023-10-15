@@ -75,7 +75,11 @@ class SSHTransport(RTorrentTransport):
         else:
             clean_target = shlex.quote(target)
 
-        cmd = ["ssh", host, "socat", "STDIO", clean_target]
+        port = "22"
+        if ":" in host:
+            host, _, port = host.partition(":")
+
+        cmd = ["ssh", host, "-p", port, "socat", "STDIO", clean_target]
         with response_time_summary.time():
             resp = subprocess.run(
                 cmd,
@@ -84,7 +88,8 @@ class SSHTransport(RTorrentTransport):
                 check=False,
             )
         if resp.returncode > 0:
-            logger.error("SSH command returned non-zero exit code")
+            # TODO: shlex.join when 3.7 support is dropped
+            logger.error("SSH command %r returned non-zero exit code", cmd)
             logger.error("stderr: %s", resp.stderr)
             logger.error("stdout: %s", resp.stdout)
         response_size_counter.inc(len(resp.stdout))
