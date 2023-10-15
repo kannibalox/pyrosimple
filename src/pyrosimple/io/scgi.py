@@ -79,7 +79,18 @@ class SSHTransport(RTorrentTransport):
         if ":" in host:
             host, _, port = host.partition(":")
 
-        cmd = ["ssh", host, "-p", port, "socat", "STDIO", clean_target]
+        cmd = [
+            "ssh",
+            "-T",
+            host,
+            "-p",
+            port,
+            "--",
+            "socat",
+            "-t5",
+            "STDIO",
+            clean_target,
+        ]
         with response_time_summary.time():
             resp = subprocess.run(
                 cmd,
