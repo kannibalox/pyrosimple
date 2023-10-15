@@ -2,9 +2,9 @@
 import io
 import logging
 import os
+import shlex
 import socket
 import subprocess
-import shlex
 import sys
 
 from typing import Dict, List, Optional, Tuple, Type

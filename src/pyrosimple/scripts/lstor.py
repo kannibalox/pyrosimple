@@ -112,7 +112,9 @@ class MetafileLister(ScriptBase):
                                 piece_callback=piece_logger.check_piece,
                             )
                     except OSError as exc:
-                        print(f"ERROR: File {str(filename)!r} did not hash check: {exc}")
+                        print(
+                            f"ERROR: File {str(filename)!r} did not hash check: {exc}"
+                        )
                         sys.exit(EX_DATAERR)
 
                 if self.options.raw:
