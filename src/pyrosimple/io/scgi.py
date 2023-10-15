@@ -4,6 +4,7 @@ import logging
 import os
 import socket
 import subprocess
+import shlex
 import sys
 
 from typing import Dict, List, Optional, Tuple, Type
@@ -67,7 +68,14 @@ class SSHTransport(RTorrentTransport):
         request_size_counter.inc(len(request_body))
         self.verbose = verbose
         target = urlparse.urlparse(self.url).path
-        cmd = ["ssh", host, "socat", "STDIO", target[1:]]
+        if target.startswith("/~/"):
+            clean_target = "~/" + shlex.quote(target[3:])
+        elif target.startswith("/UNIX-CONNECT:") or target.startswith("/TCP:"):
+            clean_target = shlex.quote(target[1:])
+        else:
+            clean_target = shlex.quote(target)
+
+        cmd = ["ssh", host, "socat", "STDIO", clean_target]
         with response_time_summary.time():
             resp = subprocess.run(
                 cmd,
