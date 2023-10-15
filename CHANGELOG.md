@@ -3,8 +3,11 @@
 ## [Unreleased]
 
 ### Changed
-- The SSH transport now behaves more like pyroscope, and allows for
-  non-22 ports.
+- The SSH transport now behaves more like pyroscope:
+  - Allow for non-22 ports
+  - Handle absolute paths similarly
+  - Disable SSH pseudo-terminal allocation
+  - Increase socat timeout to 5 seconds
 
 ## [2.11.4] - 2023-10-07
 
