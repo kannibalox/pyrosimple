@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+- The SSH transport now behaves more like pyroscope, and allows for
+  non-22 ports.
+
 ## [2.11.4] - 2023-10-07
 
 ### Changed
