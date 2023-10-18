@@ -130,6 +130,7 @@ class MetafileLister(ScriptBase):
                                     val = val[key]
                         except KeyError:
                             self.log.error("%s: Field %r not found", filename, field)
+                            output_values.append(None)
                         else:
                             output_values.append(val)
 
@@ -142,7 +143,7 @@ class MetafileLister(ScriptBase):
 
                     print(BencodeJSONEncoder(indent=2).encode(output_values))
                 elif self.options.output:
-                    print("\t".join([str(o) for o in output_values]))
+                    print("\t".join([str(o) if o is not None else "" for o in output_values]))
                 else:
                     print("\n".join(torrent.listing(masked=not self.options.reveal)))
 
