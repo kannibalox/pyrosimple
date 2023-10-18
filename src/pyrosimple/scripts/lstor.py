@@ -4,7 +4,6 @@
 """
 
 import hashlib
-import logging
 import sys
 import traceback
 
@@ -19,8 +18,7 @@ from pyrosimple.scripts.base import ScriptBase
 class MetafileLister(ScriptBase):
     """List contents of a bittorrent metafile."""
 
-    # argument description for the usage information
-    ARGS_HELP = "<metafile>..."
+    ENABLE_PROGRESS = True
 
     def add_options(self):
         """Add program options."""
@@ -53,12 +51,6 @@ class MetafileLister(ScriptBase):
             "--check-data",
             "PATH",
             help="check the hash against the data in the given path",
-        )
-        self.parser.add_argument(
-            "--progress",
-            default="auto",
-            choices=["auto", "on", "off"],
-            help="determines whether the progress should be displayed",
         )
 
     def mainloop(self):
@@ -162,12 +154,6 @@ class MetafileLister(ScriptBase):
                     from pyrosimple.util.ui import HashProgressBar
 
                     try:
-                        if (
-                            self.options.progress == "auto"
-                            and self.log.isEnabledFor(logging.WARNING)
-                            and sys.stdout.isatty()
-                        ):
-                            self.options.progress = "on"
                         with HashProgressBar() as pb:
                             if self.options.progress == "on":
                                 progress_callback = pb().progress_callback

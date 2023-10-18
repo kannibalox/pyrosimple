@@ -214,9 +214,6 @@ class RtorrentControl(ScriptBaseWithConfig):
       - Music                 kind=flac,mp3
     """
 
-    # argument description for the usage information
-    ARGS_HELP = "<filter>..."
-
     # additional stuff appended after the command handler's docstring
     ADDITIONAL_HELP = [
         "",

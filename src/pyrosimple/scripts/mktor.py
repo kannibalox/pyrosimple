@@ -6,10 +6,8 @@
 import argparse
 import fnmatch
 import hashlib
-import logging
 import os
 import re
-import sys
 import time
 
 from pathlib import Path
@@ -26,6 +24,8 @@ class MetafileCreator(ScriptBase):
     """
     Create a bittorrent metafile.
     """
+
+    ENABLE_PROGRESS = True
 
     def add_options(self):
         """Add program options."""
@@ -204,10 +204,7 @@ class MetafileCreator(ScriptBase):
         from pyrosimple.util.ui import HashProgressBar
 
         with HashProgressBar() as pb:
-            if (
-                logging.getLogger(__name__).isEnabledFor(logging.WARNING)
-                and sys.stdout.isatty()
-            ):
+            if self.options.progress == "on":
                 c = pb()
 
                 def pb_tracker(totalhashed, totalsize):

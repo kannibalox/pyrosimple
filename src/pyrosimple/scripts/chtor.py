@@ -7,7 +7,6 @@
 import copy
 import difflib
 import hashlib
-import logging
 import os
 import re
 import sys
@@ -79,6 +78,8 @@ class MetafileChanger(ScriptBase):
 
     # Keys of rTorrent session data
     RT_RESUME_KEYS = ("libtorrent_resume", "log_callback", "err_callback", "rtorrent")
+
+    ENABLE_PROGRESS = True
 
     def add_options(self):
         """Add program options."""
@@ -270,10 +271,7 @@ class MetafileChanger(ScriptBase):
                 from pyrosimple.util.ui import HashProgressBar, HashProgressBarCounter
 
                 with HashProgressBar() as pb:
-                    if (
-                        logging.getLogger(__name__).isEnabledFor(logging.WARNING)
-                        and sys.stdout.isatty()
-                    ):
+                    if self.options.progress == "on":
                         progress_callback = cast(
                             HashProgressBarCounter, pb()
                         ).progress_callback

@@ -28,6 +28,8 @@ class ScriptBase:
     # additonal stuff appended after the command handler's docstring
     ADDITIONAL_HELP: List[str] = []
 
+    ENABLE_PROGRESS = False
+
     def __init__(self) -> None:
         """Initialize CLI."""
         self.startup = time.time()
@@ -137,6 +139,13 @@ class ScriptBase:
             action="store_const",
             const=logging.INFO,
         )
+        if self.ENABLE_PROGRESS:
+            self.parser.add_argument(
+                "--progress",
+                default="auto",
+                choices=["auto", "on", "off"],
+                help="determines whether the progress should be displayed",
+            )
 
         # Template method to add options of derived class
         self.add_options()
@@ -149,6 +158,14 @@ class ScriptBase:
 
         if self.options.log_level:
             logging.getLogger("pyrosimple").setLevel(self.options.log_level)
+
+        if (
+            self.ENABLE_PROGRESS
+            and self.options.progress == "auto"
+            and self.log.isEnabledFor(logging.WARNING)
+            and sys.stdout.isatty()
+        ):
+            self.options.progress = "on"
 
         self.log.debug(
             "Options: %s",
