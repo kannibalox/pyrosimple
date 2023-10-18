@@ -8,6 +8,13 @@
   - Handle absolute paths similarly
   - Disable SSH pseudo-terminal allocation
   - Increase socat timeout to 5 seconds
+- `lstor` refactoring:
+  - `-o` now effects the output of `--raw`
+  - `-o ""` means "do not output any fields"
+  - Data is hash checked *after* printing info
+  - Add `--progress` flag to allow controlling hash check progress bar
+  - Do no halt immediately when validation fails, but set the exit
+    code to `70` (failed hash checks return `65`)
 
 ## [2.11.4] - 2023-10-07
 

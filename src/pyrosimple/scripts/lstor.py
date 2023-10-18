@@ -6,12 +6,13 @@
 import hashlib
 import logging
 import sys
+import traceback
 
 from pathlib import Path
 
 import bencode
 
-from pyrosimple.error import EX_DATAERR
+from pyrosimple.error import EX_DATAERR, EX_SOFTWARE
 from pyrosimple.scripts.base import ScriptBase
 
 
@@ -53,6 +54,12 @@ class MetafileLister(ScriptBase):
             "PATH",
             help="check the hash against the data in the given path",
         )
+        self.parser.add_argument(
+            "--progress",
+            default="auto",
+            choices=["auto", "on", "off"],
+            help="determines whether the progress should be displayed",
+        )
 
     def mainloop(self):
         """The main loop."""
@@ -64,19 +71,24 @@ class MetafileLister(ScriptBase):
             self.parser.error("No metafiles given, nothing to do!")
             self.parser.exit()
 
+        return_code = 0
+
         for idx, filename in enumerate(self.args):
             if idx and not self.options.output and not self.options.raw:
                 print()
                 print("~" * 79)
 
-            listing = None
             try:
                 # Read and check metafile
                 try:
                     filename = Path(filename)
                     torrent = metafile.Metafile.from_file(filename)
                     if not self.options.skip_validation:
-                        torrent.check_meta()
+                        try:
+                            torrent.check_meta()
+                        except ValueError:
+                            return_code = EX_SOFTWARE
+                            raise
                 except OSError as exc:
                     self.fatal(
                         "Can't read '%s' (%s)"
@@ -87,55 +99,24 @@ class MetafileLister(ScriptBase):
                     )
                     raise
 
-                if self.options.check_data:
-                    # pylint: disable=import-outside-toplevel
-                    from pyrosimple.util.metafile import PieceFailer
-                    from pyrosimple.util.ui import HashProgressBar
+                display_nothing = bool(self.options.output == [""])  # i.e `-o ""`
 
-                    try:
-                        with HashProgressBar() as pb:
-                            if (
-                                logging.getLogger(__name__).isEnabledFor(
-                                    logging.WARNING
-                                )
-                                and sys.stdout.isatty()
-                            ):
-                                progress_callback = pb().progress_callback
-                            else:
-                                progress_callback = None
-
-                            piece_logger = PieceFailer(torrent, self.log)
-
-                            torrent.hash_check(
-                                Path(self.options.check_data),
-                                progress_callback=progress_callback,
-                                piece_callback=piece_logger.check_piece,
-                            )
-                    except OSError as exc:
-                        print(
-                            f"ERROR: File {str(filename)!r} did not hash check: {exc}"
+                output_values = torrent.dict_copy()
+                if not self.options.reveal:
+                    # Shorten useless binary piece hashes
+                    if "info" in output_values:
+                        count = len(output_values["info"]["pieces"]) / len(
+                            hashlib.sha1().digest()
                         )
-                        sys.exit(EX_DATAERR)
-
-                if self.options.raw:
-                    from pyrosimple.util.fmt import (  # pylint: disable=import-outside-toplevel
-                        BencodeJSONEncoder,
-                    )
-
-                    if not self.options.reveal and "info" in torrent:
-                        # Shorten useless binary piece hashes
-                        torrent["info"]["pieces"] = "<%d piece hashes>" % (
-                            len(torrent["info"]["pieces"])
-                            / len(hashlib.sha1().digest())
-                        )
-                        if "piece layers" in torrent:
-                            for l, p in torrent["piece layers"].items():
-                                torrent["piece layers"][l] = "<%d piece hashes>" % (
-                                    len(p) / 16 * 1024 * 1024
-                                )
-
-                    listing = BencodeJSONEncoder(indent=2).encode(torrent)
-                elif self.options.output:
+                        output_values["info"]["pieces"] = f"<{count} piece hashes>"
+                    if "piece layers" in output_values:
+                        for layer, pieces in output_values["piece layers"].items():
+                            count = len(pieces) / 16 * 1024 * 1024
+                            output_values["piece layers"][
+                                layer
+                            ] = f"<{count} piece hashes>"
+                if self.options.output and not display_nothing:
+                    output_values = []
 
                     def splitter(fields):
                         "Yield single names for a list of comma-separated strings."
@@ -144,11 +125,11 @@ class MetafileLister(ScriptBase):
                                 yield field.strip()
 
                     data = {}
-                    data["__file__"] = filename
+                    data["__file__"] = str(filename)
                     if "info" in torrent:
                         data["__hash__"] = torrent.info_hash()
                         data["__size__"] = torrent.data_size()
-                    values = []
+
                     for field in splitter(self.options.output):
                         try:
                             if field in data:
@@ -159,20 +140,57 @@ class MetafileLister(ScriptBase):
                                     val = val[key]
                         except KeyError:
                             self.log.error("%s: Field %r not found", filename, field)
-                            break
                         else:
-                            values.append(str(val))
-                    else:
-                        listing = "\t".join(values)
+                            output_values.append(val)
+
+                if display_nothing:
+                    pass
+                elif self.options.raw:
+                    from pyrosimple.util.fmt import (  # pylint: disable=import-outside-toplevel
+                        BencodeJSONEncoder,
+                    )
+
+                    print(BencodeJSONEncoder(indent=2).encode(output_values))
+                elif self.options.output:
+                    print("\t".join([str(o) for o in output_values]))
                 else:
-                    listing = "\n".join(torrent.listing(masked=not self.options.reveal))
+                    print("\n".join(torrent.listing(masked=not self.options.reveal)))
+
+                if self.options.check_data:
+                    # pylint: disable=import-outside-toplevel
+                    from pyrosimple.util.metafile import PieceFailer
+                    from pyrosimple.util.ui import HashProgressBar
+
+                    try:
+                        if (
+                            self.options.progress == "auto"
+                            and self.log.isEnabledFor(logging.WARNING)
+                            and sys.stdout.isatty()
+                        ):
+                            self.options.progress = "on"
+                        with HashProgressBar() as pb:
+                            if self.options.progress == "on":
+                                progress_callback = pb().progress_callback
+                            else:
+                                progress_callback = None
+
+                            piece_logger = PieceFailer(torrent, self.log)
+                            torrent.hash_check(
+                                Path(self.options.check_data),
+                                progress_callback=progress_callback,
+                                piece_callback=piece_logger.check_piece,
+                            )
+                    except OSError as exc:
+                        print(
+                            f"ERROR: File {str(filename)!r} did not hash check: {exc}"
+                        )
+                        sys.exit(EX_DATAERR)
             except (ValueError, KeyError, bencode.BencodeDecodeError) as exc:
                 self.log.error(
-                    "Bad metafile %r (%s: %s)", filename, type(exc).__name__, exc
+                    "Bad metafile %r (%s: %s)", str(filename), type(exc).__name__, exc
                 )
-                raise
-            if listing is not None:
-                print(listing)
+                print(traceback.format_exc(), end="")
+            sys.exit(return_code)
 
 
 def run():  # pragma: no cover
