@@ -190,7 +190,8 @@ class MetafileLister(ScriptBase):
                     "Bad metafile %r (%s: %s)", str(filename), type(exc).__name__, exc
                 )
                 print(traceback.format_exc(), end="")
-            sys.exit(return_code)
+            if return_code >0:
+                sys.exit(return_code)
 
 
 def run():  # pragma: no cover
