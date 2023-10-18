@@ -63,6 +63,8 @@ class MetafileLister(ScriptBase):
             self.parser.error("No metafiles given, nothing to do!")
             self.parser.exit()
 
+        validation_errors = (ValueError, KeyError, bencode.BencodeDecodeError)
+
         for idx, filename in enumerate(self.args):
             if idx and not self.options.output and not self.options.raw:
                 print()
@@ -76,7 +78,7 @@ class MetafileLister(ScriptBase):
                     if not self.options.skip_validation:
                         try:
                             torrent.check_meta()
-                        except ValueError:
+                        except validation_errors:
                             self.return_code = EX_SOFTWARE
                             raise
                 except OSError as exc:
@@ -145,8 +147,15 @@ class MetafileLister(ScriptBase):
                 elif self.options.output:
                     print("\t".join([str(o) if o is not None else "" for o in output_values]))
                 else:
-                    print("\n".join(torrent.listing(masked=not self.options.reveal)))
-
+                    try:
+                        print("\n".join(torrent.listing(masked=not self.options.reveal)))
+                    except validation_errors as exc:
+                        self.log.error(
+                            "Bad metafile %r (%s: %s)", str(filename), type(exc).__name__, exc
+                        )
+                        print(traceback.format_exc(), end="")
+                        if not self.options.skip_validation:
+                            self.return_code = EX_SOFTWARE
                 if self.options.check_data:
                     # pylint: disable=import-outside-toplevel
                     from pyrosimple.util.metafile import PieceFailer
@@ -170,11 +179,13 @@ class MetafileLister(ScriptBase):
                             f"ERROR: File {str(filename)!r} did not hash check: {exc}"
                         )
                         sys.exit(EX_DATAERR)
-            except (ValueError, KeyError, bencode.BencodeDecodeError) as exc:
+            except validation_errors as exc:
                 self.log.error(
                     "Bad metafile %r (%s: %s)", str(filename), type(exc).__name__, exc
                 )
                 print(traceback.format_exc(), end="")
+                if not self.options.skip_validation:
+                    self.return_code = EX_SOFTWARE
 
 
 def run():  # pragma: no cover
