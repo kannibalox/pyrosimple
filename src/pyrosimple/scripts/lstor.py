@@ -145,13 +145,22 @@ class MetafileLister(ScriptBase):
 
                     print(BencodeJSONEncoder(indent=2).encode(output_values))
                 elif self.options.output:
-                    print("\t".join([str(o) if o is not None else "" for o in output_values]))
+                    print(
+                        "\t".join(
+                            [str(o) if o is not None else "" for o in output_values]
+                        )
+                    )
                 else:
                     try:
-                        print("\n".join(torrent.listing(masked=not self.options.reveal)))
+                        print(
+                            "\n".join(torrent.listing(masked=not self.options.reveal))
+                        )
                     except validation_errors as exc:
                         self.log.error(
-                            "Bad metafile %r (%s: %s)", str(filename), type(exc).__name__, exc
+                            "Bad metafile %r (%s: %s)",
+                            str(filename),
+                            type(exc).__name__,
+                            exc,
                         )
                         print(traceback.format_exc(), end="")
                         if not self.options.skip_validation:
