@@ -63,8 +63,6 @@ class MetafileLister(ScriptBase):
             self.parser.error("No metafiles given, nothing to do!")
             self.parser.exit()
 
-        return_code = 0
-
         for idx, filename in enumerate(self.args):
             if idx and not self.options.output and not self.options.raw:
                 print()
@@ -79,7 +77,7 @@ class MetafileLister(ScriptBase):
                         try:
                             torrent.check_meta()
                         except ValueError:
-                            return_code = EX_SOFTWARE
+                            self.return_code = EX_SOFTWARE
                             raise
                 except OSError as exc:
                     self.fatal(
@@ -176,8 +174,6 @@ class MetafileLister(ScriptBase):
                     "Bad metafile %r (%s: %s)", str(filename), type(exc).__name__, exc
                 )
                 print(traceback.format_exc(), end="")
-            if return_code > 0:
-                sys.exit(return_code)
 
 
 def run():  # pragma: no cover
