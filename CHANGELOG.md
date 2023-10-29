@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- `chtor`/`mktor`/`lstor`: `--progress` flag to allow controlling
+  hash check progress bar
 ### Changed
 - The SSH transport now behaves more like pyroscope:
   - Allow for non-22 ports
@@ -12,7 +15,6 @@
   - `-o` now effects the output of `--raw`
   - `-o ""` means "do not output any fields"
   - Data is hash checked *after* printing info
-  - Add `--progress` flag to allow controlling hash check progress bar
   - Do no halt immediately when validation fails, but set the exit
     code to `70` (failed hash checks return `65`)
 
