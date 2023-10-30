@@ -587,11 +587,15 @@ class RtorrentItem(engine.TorrentProxy):
             fullpath = Path(path, file_data.path)
             if fullpath.is_file() or fullpath.is_symlink():
                 self._engine.logger.debug("Deleting '%s'", fullpath)
-                if not self.rpc_call("d.is_multi_file"):
+                if self.rpc_call("d.is_multi_file"):
                     dirs_to_clean_up.add(fullpath.parent)
                 if not dry_run:
                     fullpath.unlink()
-        for directory in dirs_to_clean_up:
+        # Sort marked directories by path depth to ensure they're
+        # deleted from the bottom up.
+        for directory in sorted(
+            dirs_to_clean_up, key=lambda p: len(p.parts), reverse=True
+        ):
             try:
                 self._engine.logger.debug("Cleaning up directory '%s'", directory)
                 if not dry_run:
