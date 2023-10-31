@@ -318,9 +318,9 @@ FIELD_GENERATOR_REGISTRY: Dict[str, Callable] = {}
 
 
 def field_lookup(name: str) -> Optional[FieldDefinition]:
-    """Try to find field C{name}.
+    """Try to find field `name`.
 
-    @return: Field descriptions, see C{matching.ConditionParser} for details.
+    @return: Field description or None if field not found.
     """
     if name not in FIELD_REGISTRY:
         TorrentProxy.add_manifold_attribute(name)
