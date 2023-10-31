@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.12.0] - 2023-10-30
+
 ### Fixed
 - `rtcontrol`: `--cull`/`--purge` now clean up empty directories properly
 
@@ -456,7 +458,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.11.4...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.12.0...HEAD
+[2.12.0] https://github.com/kannibalox/pyrosimple/compare/v2.11.4...v2.12.0
 [2.11.4] https://github.com/kannibalox/pyrosimple/compare/v2.11.3...v2.11.4
 [2.11.3] https://github.com/kannibalox/pyrosimple/compare/v2.11.2...v2.11.3
 [2.11.2] https://github.com/kannibalox/pyrosimple/compare/v2.11.1...v2.11.2
