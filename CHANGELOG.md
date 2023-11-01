@@ -459,15 +459,15 @@ new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
 [Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.12.0...HEAD
-[2.12.0] https://github.com/kannibalox/pyrosimple/compare/v2.11.4...v2.12.0
-[2.11.4] https://github.com/kannibalox/pyrosimple/compare/v2.11.3...v2.11.4
-[2.11.3] https://github.com/kannibalox/pyrosimple/compare/v2.11.2...v2.11.3
-[2.11.2] https://github.com/kannibalox/pyrosimple/compare/v2.11.1...v2.11.2
-[2.11.1] https://github.com/kannibalox/pyrosimple/compare/v2.11.0...v2.11.1
-[2.11.0] https://github.com/kannibalox/pyrosimple/compare/v2.10.2...v2.11.0
-[2.10.2] https://github.com/kannibalox/pyrosimple/compare/v2.10.1...v2.10.2
-[2.10.1] https://github.com/kannibalox/pyrosimple/compare/v2.10.0...v2.10.1
-[2.10.0] https://github.com/kannibalox/pyrosimple/compare/v2.9.1...v2.10.0
+[2.12.0]: https://github.com/kannibalox/pyrosimple/compare/v2.11.4...v2.12.0
+[2.11.4]: https://github.com/kannibalox/pyrosimple/compare/v2.11.3...v2.11.4
+[2.11.3]: https://github.com/kannibalox/pyrosimple/compare/v2.11.2...v2.11.3
+[2.11.2]: https://github.com/kannibalox/pyrosimple/compare/v2.11.1...v2.11.2
+[2.11.1]: https://github.com/kannibalox/pyrosimple/compare/v2.11.0...v2.11.1
+[2.11.0]: https://github.com/kannibalox/pyrosimple/compare/v2.10.2...v2.11.0
+[2.10.2]: https://github.com/kannibalox/pyrosimple/compare/v2.10.1...v2.10.2
+[2.10.1]: https://github.com/kannibalox/pyrosimple/compare/v2.10.0...v2.10.1
+[2.10.0]: https://github.com/kannibalox/pyrosimple/compare/v2.9.1...v2.10.0
 [2.9.1]: https://github.com/kannibalox/pyrosimple/compare/v2.9.0...v2.9.1
 [2.9.0]: https://github.com/kannibalox/pyrosimple/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/kannibalox/pyrosimple/compare/v2.7.1...v2.8.0
