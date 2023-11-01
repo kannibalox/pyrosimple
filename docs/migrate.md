@@ -45,9 +45,9 @@ available utilities.
   for the list of flags which are considered "actions".
   ```bash
   # Old
-  rtcontrol // --stop
-  rtcontrol // --custom foo=bar --flush
-  rtcontrol // --custom baz=hkk --flush
+  rtcontrol // --stop && \
+  rtcontrol // --custom foo=bar --flush && \
+  rtcontrol // --custom baz=hkk --flush && \
   rtcontrol // --start
   # New
   rtcontrol // --stop --custom foo=bar --custom baz=hkk --flush --start
@@ -129,6 +129,6 @@ available utilities.
 
 ## `rtmv`
 
-* This command has been temporarily removed. See [this discussion](https://github.com/kannibalox/pyrosimple/discussions/35)
+* This command has been removed. See [this discussion](https://github.com/kannibalox/pyrosimple/discussions/35)
   for more information, and a way to run the legacy conversion of the
-  command.
+  command. Use `rtcontrol` with the `--symlink` flag instead.

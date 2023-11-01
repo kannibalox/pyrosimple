@@ -31,6 +31,8 @@ of the configuration file:
 ```bash
 PYRO_RTORRENT_RC=/etc/rtorrent/rtorrent.rc PYRO_FAST_QUERY=0 rtcontrol //
 ```
+The equivalent environment variable will be shown in parentheses next
+to the config name below for reference.
 
 ## Reference
 
@@ -39,7 +41,7 @@ PYRO_RTORRENT_RC=/etc/rtorrent/rtorrent.rc PYRO_FAST_QUERY=0 rtcontrol //
 These entries in at the top of the file without a section name
 contain the most basic configuration settings for pyrosimple.
 
-#### `rtorrent_rc`
+#### `rtorrent_rc` (`PYRO_RTORRENT_RC`)
 
 Defaults to `~/.rtorrent.rc`.
 
@@ -47,7 +49,7 @@ This tells pyrosimple where to look for the rTorrent config file. It's
 mainly needed in order to automatically figure out where the SCGI
 port/file is listening, but may have other uses in the future.
 
-####  `scgi_url`
+####  `scgi_url` (`PYRO_SCGI_URL`)
 
 Defaults to being unset.
 
@@ -56,7 +58,7 @@ to do so. When unset, pyrosimple will use the `rtorrent_rc` settings
 to automatically figure it out, but will raise an error if it's unable
 to find any hints.
 
-#### `sort_fields`
+#### `sort_fields` (`PYRO_SORT_FIELDS`)
 
 Defaults to `name,hash`.
 
@@ -69,14 +71,14 @@ Defaults to `["core", "CVS", ".*", "*~", "*.swp", "*.tmp", "*.bak", "[Tt]humbs.d
 This allows overriding the list of temporary/hidden files `mktor` will
 ignore when creating torrents.
 
-#### `fast_query`
+#### `fast_query` (`PYRO_FAST_QUERY`)
 
 Defaults to `0` (disabled).
 
 See [query optimization](experimental.md#query-optimization) for more
 information.
 
-#### `safety_checks_enabled`
+#### `safety_checks_enabled` (`PYRO_SAFETY_CHECKS_ENABLED`)
 
 Defaults to `True`.
 
@@ -86,7 +88,7 @@ no impact other than an extra call to rtorrent's `system.listMethods`,
 but disabling these checks may be useful if you'd like to speed up
 command runs.
 
-#### `item_cache_expiration`
+#### `item_cache_expiration` (`PYRO_ITEM_CACHE_EXPIRATION`)
 
 Defaults to `5.0`.
 
@@ -102,6 +104,8 @@ This section is reserved for `pyrotorque`. See its
 
 ### FORMATS
 
+Allows defining Jinja2 templates for use with `rtcontrol`.
+
 Example:
 ```toml
 [FORMATS]
@@ -109,8 +113,6 @@ default = '{%set ESC = "\x1B" %}{%if d.down > 0%}{{ESC+"[1m"}}{%endif%}{%if d.is
 filelist = '{% for f in d.files%}{{d.realpath}}{% if d.is_multi_file %}/{{f.path}}{% endif %}{% if loop.index != loop.length %}\n{% endif %}{% endfor %}'
 action = '{{now|iso}} {{action}}\t {{d.name}} {{d.alias}}'
 ```
-
-Allows defining Jinja2 templates for use with `rtcontrol`.
 
 ```bash
 rtcontrol is_completed=yes -o filelist

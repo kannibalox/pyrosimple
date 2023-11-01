@@ -161,9 +161,8 @@ dry-run with the `-n`/`--dry-run` flag. Many of the more dangerous
 actions (e.g. `--cull`) will prompt before actually performing the
 action. However, if you wish to enable prompting for all action, the
 `-i`/`--interactive` will set that behavior for all
-commands. Alternatively, if you don't want any prompts at all
-(e.g. when running in a headless script), `--yes` will automatically
-confirm all prompts.
+commands. Alternatively, if you don't want any prompts at all, `--yes`
+will automatically confirm all prompts.
 
 When multiple actions are specified, rtcontrol will apply those
 actions to each item in sequence.
@@ -196,6 +195,24 @@ in the same manner as `--spawn`/`--call`:
 ```bash
 # Set all incomplete downloads to a dedicated directory, based on hash
 rtcontrol is_active=no is_complete=no --exec 'd.directory_base.set=/tmp/downloads/{{item.hash}}'
+```
+
+### Moving data
+
+Moving files around is a common operation when managing a
+client. Similar to how rtcontrol provides a safe way to delete
+torrents with `--cull`/`--purge`, there are also action flags for
+`--move`, `--copy`, `--symlink` and `--hardlink`. For convience, each
+flag also has a `*-and-set` conterpart, which will both perform the
+action and set the download directory to the torrent.
+
+Combine this with the ability to use templates for the move target,
+and you'll have a very powerful tool for managing data:
+```bash
+# Move completed torrents to a different directory
+rtcontrol path=/data/torrent/incomplete/\* --from=complete --move-and-set='/data/torrent/complete/{{item.alias}}'
+# Use guessit to organize media automaticallar (requires guessit: `pip install guessit`)
+rtcontrol custom_organized\!=true --copy="/data/media/{{item.guessit_title}} ({{item.guessit_year}})" --custom=organized=true --flush
 ```
 
 ## Examples
