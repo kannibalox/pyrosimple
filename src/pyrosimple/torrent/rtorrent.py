@@ -630,15 +630,10 @@ class RtorrentEngine:
         "d.size_bytes",
     }
 
-    # rTorrent names of fields that need to be pre-fetched
-    CORE_FIELDS = CONSTANT_FIELDS | {
-        "d.complete",
-        "d.tied_to_file",
-    }
-
-    # rTorrent names of fields that get fetched in multi-call
-    PREFETCH_FIELDS = CORE_FIELDS | {
+    # rTorrent names of fields that get fetched by default in multi-call
+    PREFETCH_FIELDS = CONSTANT_FIELDS | {
         "d.base_path",
+        "d.complete",
         "d.custom=memo_alias",
         "d.custom=tm_completed",
         "d.custom=tm_loaded",
@@ -649,6 +644,7 @@ class RtorrentEngine:
         "d.is_open",
         "d.message",
         "d.ratio",
+        "d.tied_to_file",
         "d.up.rate",
         "d.up.total",
     }
