@@ -891,8 +891,12 @@ def generate_d_call(name: str) -> Optional[FieldDefinition]:
     # Set the call type for some known methods
     call_type: Type = str
     if call_name in {
-        "d.size_files",
+        "d.call.total",
         "d.size_bytes",
+        "d.size_chunks",
+        "d.size_files",
+        "d.size_pex",
+        "d.skip.rate",
     }:
         call_type = int
     return DynamicField(
