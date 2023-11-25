@@ -555,7 +555,7 @@ class RtorrentItem(engine.TorrentProxy):
         attrs: Optional[Set[str]] = None,
         remove_torrent=True,
     ) -> None:
-        """Delete ALL data files and optionally remove torrent from client.
+        """Delete data files and optionally remove torrent from client.
 
         @param file_filter: Optional callable for selecting a subset of all files.
             The callable gets a file item as described for RtorrentItem._get_files

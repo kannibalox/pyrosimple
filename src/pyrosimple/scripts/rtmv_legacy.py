@@ -75,8 +75,6 @@ class RtorrentMove(ScriptBaseWithConfig):
     def mainloop(self):
         """The main loop."""
 
-        # TODO: Add mode to move tied metafiles, without losing the tie
-
         # Target handling
         target = self.options.target
         if "//" in target.rstrip("/"):
@@ -91,8 +89,6 @@ class RtorrentMove(ScriptBaseWithConfig):
                 self.guarded(os.makedirs, target)
 
         # Preparation
-        # TODO: Handle cases where target is the original download path correctly!
-        #       i.e.   rtmv foo/ foo   AND   rtmv foo/ .   (in the download dir)
         proxy = pyrosimple.connect().open()
         download_path = os.path.realpath(
             os.path.expanduser(proxy.directory.default(rpc.NOHASH).rstrip(os.sep))
@@ -115,7 +111,6 @@ class RtorrentMove(ScriptBaseWithConfig):
                 self.log.warning("Cannot realpath %r (%s)", item.path, exc)
 
             # Look if item matches a source path
-            # TODO: Handle download items nested into each other!
             try:
                 path_idx = source_realpaths.index(realpath or item.path)
             except ValueError:
@@ -176,8 +171,6 @@ class RtorrentMove(ScriptBaseWithConfig):
                 # was_active = item.is_active and not self.options.dry_run
                 # if was_active: item.pause()
 
-                # TODO: move across devices
-                # TODO: move using "d.directory.set" instead of symlinks
                 if os.path.islink(item.path):
                     if os.path.abspath(dst) == os.path.abspath(
                         item.path.rstrip(os.sep)

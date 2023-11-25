@@ -235,10 +235,6 @@ def name_trait(name, add_info=False):
                             info[key] = f"{info.get(key) or ''} {val}".strip()
                 break
 
-        # TODO: Split by "dvdrip", year, etc. to get to the title and then
-        # do a imdb / tvdb lookup; cache results, hits for longer, misses
-        # for a day at max.
-
     # Return requested result
     return (kind, info) if add_info else kind
 
