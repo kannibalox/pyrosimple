@@ -336,7 +336,7 @@ class RtorrentItem(engine.TorrentProxy):
             )
             self.start()
 
-    def set_custom(self, key: str, value: Optional[str] = None):
+    def set_custom(self, key: str, value: Optional[str] = None) -> None:
         """Set a custom value. C{key} might have the form "key=value" when value is C{None}."""
         # Split combined key/value
         if value is None:
@@ -364,18 +364,18 @@ class RtorrentItem(engine.TorrentProxy):
         self._make_it_so(f"setting custom_{key} = {value!r} on", [method], *args)
         self._fields["custom_" + key] = value
 
-    def hash_check(self):
+    def hash_check(self) -> None:
         """Hash check a download."""
         self._make_it_so("hash-checking", ["d.check_hash"])
 
-    def __print_result(self, data, method=None, args=None):
+    def __print_result(self, data, method=None, args=None) -> None:
         "Helper to print RPC call results"
         args_list = ""
         if args:
             args_list = '"' + '","'.join(args) + '"'
         print(f"{self._fields['hash']}\t{data}\t{method.lstrip(':')}={args_list}")
 
-    def execute(self, commands):
+    def execute(self, commands) -> None:
         """Execute RPC command(s)."""
         try:
             commands = [i.strip() for i in commands.split(" ; ")]
@@ -421,7 +421,7 @@ class RtorrentItem(engine.TorrentProxy):
         self,
         dest: os.PathLike,
         move_func: Optional[Callable[[Any, Path, Path], None]] = None,
-    ):
+    ) -> None:
         """Move files from one path to another. By default it will do
         a simple move of only related files while replicating the same
         directory structure, but `move_func` allows providing custom
@@ -450,7 +450,7 @@ class RtorrentItem(engine.TorrentProxy):
             if self.datapath() != Path(dest, self.datapath().name):
                 move_func(self, self.datapath(), Path(dest, self.datapath().name))
 
-    def move_to_host(self, remote_url: str, copy: bool = False):
+    def move_to_host(self, remote_url: str, copy: bool = False) -> None:
         """Migrate an item to a remote host"""
 
         # TODO Generalize this overriding of query parameters
