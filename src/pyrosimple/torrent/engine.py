@@ -909,6 +909,36 @@ def generate_d_call(name: str) -> Optional[FieldDefinition]:
     )
 
 
+def generate_metafile_field(name: str) -> Optional[FieldDefinition]:
+    """Dynamically generate fields from the metafile information, as
+    scraped by lstor. `__` is used to separate dictionary keys instead
+    of `.` The scrape field is memoized, given how expensive this
+    operation is.
+
+    """
+    lstor_field = ".".join("__".split(name[9:]))
+    custom_memo_name = "memo_"+name[9:]
+    def _get_field(obj):
+        obj._engine.rpc.execute.capture(
+	   "",
+            "lstor",
+	   "-q",
+            "-V",
+            "-o",
+	   lstor_field,
+	   str(obj.rpc_call("d.session_file")),
+	).strip()
+    yield ConstantField(
+	str,
+        name,
+        f"{lstor_field} of metafile",
+	matcher=matching.PatternFilter,
+	formatter=str,
+	accessor=memoize(_get_field, custom_memo_name),
+	requires=[f"d.custom={custom_memo_name}"],
+    )
+
+
 def generate_sub_multicall(prefix: str) -> Callable[[str], Optional[FieldDefinition]]:
     """This method allows templating out the f.multicall,
     p.multicall and t.multicall generators from a single method"""
@@ -972,6 +1002,7 @@ class TorrentProxy:
             "custom": generate_custom_field,
             "kind_": generate_kind_field,
             "guessit_": generate_guessit_field,
+            "metafile_": generate_metafile_field,
             "d_": generate_d_call,
             "f_": generate_sub_multicall("f"),
             "p_": generate_sub_multicall("p"),

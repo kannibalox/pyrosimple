@@ -32,11 +32,15 @@ def print_help_fields():
     # Mock entries, so they fulfill the expectations towards a field definition
     def custom_manifold():
         "rTorrent custom value from KEY, e.g. 'custom_completion_target'"
-        return ("custom_KEY", custom_manifold)
+        return ("custom_<KEY>", custom_manifold)
 
     def kind_manifold():
         "file types that contribute at least N% to the item's total size, e.g. 'kind_50'"
-        return ("kind_N", kind_manifold)
+        return ("kind_<N>", kind_manifold)
+
+    def metafile_manifold():
+        "field from the original metafile, e.g. 'metafile_comment'"
+        return ("metafile_<N>", metafile_manifold)
 
     def d_manifold():
         "call an arbitrary item method, e.g. 'd_session_file'"
