@@ -69,8 +69,10 @@ name=arch-* OR [ alias=Ubuntu loaded>1w ]
 Many fields allow for special parsing of the value to support more complicated filters:
 
 * strings (e.g. `name`, `alias`)
-    * By default, strings are matched using [shell-style wildcards](https://docs.python.org/3/library/fnmatch.html). This means
-      that to search for a substring instead of an exact match, you should use an expression like `*ubuntu*`.  
+    * By default, strings are matched using [shell-style
+      wildcards](https://docs.python.org/3/library/fnmatch.html). This
+      means that to search for a substring instead of an
+      exact match, you should use an expression like `*ubuntu*`.  
       Example: `arch-linux-*`
     * If the value starts and ends with `/`, the value is treated as a
       [regex](https://docs.python.org/3/library/re.html?highlight=re#regular-expression-syntax),
@@ -99,6 +101,23 @@ Many fields allow for special parsing of the value to support more complicated f
       regexes, and use whitespace as delimiters. For example, if a
       torrent has the tags `active archive new`, the values `n*` and
       `archive` would both match.
+
+There are also some special fields that are "manifold" fields. These
+aren't fields in of themselves, but will generate a field dynamically
+based on the prefix. As an example, the `rtcontrol -o d_name //` gives
+the exact same value as `rtcontrol -o name`, but without having to
+define the field directly. Instead, any field starting with `d_` is
+transformed into its dynamic `d.` equivalent. Besides `d_`, there are
+also manifolds for the prefixes `f_`, `p_`, `metafile_`, among
+others. See `rtcontrol --help-fields` for the full list.
+
+!!! warn
+    Since manifold fields are generated dynamically, the type
+    can't always be inferred correctly, which can cause unexpected
+    behavior during filtering. Using the built-in fields is preferred,
+    and [custom fields](custom-code.md#custom-fields) may still be
+    required for efficiency or proper filtering in some cases.
+
 
 ## Output
 

@@ -79,7 +79,7 @@ def print_help_fields():
 def print_help_filters():
     """Print help about template filters."""
     print("")
-    print("In addition to the filters below, jinja2 has some filters built-in:")
+    print("In addition to the filters below, jinja2 has built-in filters as well:")
     print(
         "  https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-builtin-filters"
     )
