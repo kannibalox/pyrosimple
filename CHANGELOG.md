@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Comparisons on some time fields [#60](https://github.com/kannibalox/pyrosimple/issues/60)
+
 ## [2.12.0] - 2023-10-30
 
 ### Fixed

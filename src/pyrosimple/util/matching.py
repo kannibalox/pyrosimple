@@ -476,11 +476,13 @@ class BoolFilter(FieldFilter):
 class NumericFilterBase(FieldFilter):
     """Base class for numerical value filters."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.not_null = False
+
     def validate(self):
         """Validate filter condition (template method)."""
         super().validate()
-
-        self.not_null = False
 
     def match(self, item) -> bool:
         """Return True if filter matches item."""
@@ -561,6 +563,7 @@ class TimeFilter(NumericFilterBase):
         self._timestamp_offset = None
         self._timestamp = None
         super().__init__(name, op, value)
+        self.not_null = False
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
