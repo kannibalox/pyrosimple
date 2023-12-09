@@ -480,10 +480,6 @@ class NumericFilterBase(FieldFilter):
         super().__init__(*args, **kwargs)
         self.not_null = False
 
-    def validate(self):
-        """Validate filter condition (template method)."""
-        super().validate()
-
     def match(self, item) -> bool:
         """Return True if filter matches item."""
         val = getattr(item, self._name) or 0
