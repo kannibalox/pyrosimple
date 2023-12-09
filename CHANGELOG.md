@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- Add `d.timestamp.last_xfer` as prefetch field for `last_xfer`
+
 ### Fixed
 - Comparisons on some time fields [#60](https://github.com/kannibalox/pyrosimple/issues/60)
 

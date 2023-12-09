@@ -637,6 +637,7 @@ def core_fields():
         matcher=matching.TimeFilter,
         accessor=_last_xfer_accessor,
         formatter=fmt.iso_datetime_optional,
+        requires=["d.timestamp.last_xfer"],
     )
     yield DynamicField(
         int,
