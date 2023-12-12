@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.12.1] - 2023-12-12
+
 ### Changed
 - Add `d.timestamp.last_xfer` as prefetch field for `last_xfer`
 
@@ -464,7 +466,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.12.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.12.1...HEAD
+[2.12.1] https://github.com/kannibalox/pyrosimple/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/kannibalox/pyrosimple/compare/v2.11.4...v2.12.0
 [2.11.4]: https://github.com/kannibalox/pyrosimple/compare/v2.11.3...v2.11.4
 [2.11.3]: https://github.com/kannibalox/pyrosimple/compare/v2.11.2...v2.11.3
