@@ -24,6 +24,7 @@ from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
 
 from pyrosimple import config, error, torrent
+from pyrosimple.util.fmt import human_size
 
 
 TRUE = {
@@ -162,6 +163,12 @@ class GroupNode(MatcherNode):
         prefix = "Not" if self.invert else ""
         return f"{prefix}{type(self).__name__}{[repr(c) for c in self.children]}"
 
+    def to_match_string(self):
+        """Turn the node to a valid query string"""
+        ret_str = "! [ " if self.invert else "[ "
+        child_strings = [c.to_match_string() for c in self.children]
+        return ret_str + " ".join(child_strings) + " ]"
+
 
 class AndNode(MatcherNode):
     """This node performs a logical AND for all of it's children."""
@@ -178,6 +185,13 @@ class AndNode(MatcherNode):
                 return result[0]  # using just one simple expression is safer
             return f'and={",".join(result)}'
         return ""
+
+    def to_match_string(self):
+        """Turn the node to a valid query string"""
+        if len(self.children) == 1:
+            return self.children[0].to_match_string()
+        child_strings = [c.to_match_string() for c in self.children]
+        return " ".join(child_strings)
 
     def __repr__(self):
         return f"{type(self).__name__}{[repr(c) for c in self.children]}"
@@ -200,6 +214,13 @@ class OrNode(MatcherNode):
         if result:
             return f'or={",".join(result)}'
         return ""
+
+    def to_match_string(self):
+        """Turn the node to a valid query string"""
+        if len(self.children) == 1:
+            return self.children[0].to_match_string()
+        child_strings = [c.to_match_string() for c in self.children]
+        return " OR ".join(child_strings)
 
     def __repr__(self):
         return f"{type(self).__name__}{[repr(c) for c in self.children]}"
@@ -290,6 +311,10 @@ class FieldFilter(MatcherNode):
                 [type(self)(self._name, Operators["eq"], self._value)], True
             ).pre_filter()
         return ""
+
+    def to_match_string(self):
+        """Turn the node to a valid query string"""
+        return self._name + self._op.query_repr + str(self._value)
 
 
 class PatternFilter(FieldFilter):
@@ -471,6 +496,11 @@ class BoolFilter(FieldFilter):
         """Return True if filter matches item."""
         val = getattr(item, self._name) or False
         return bool(val) is self._value
+
+    def to_match_string(self):
+        """Turn the node to a valid query string"""
+        val = "yes" if self._value else "no"
+        return self._name + self._op.query_repr + val
 
 
 class NumericFilterBase(FieldFilter):
@@ -785,6 +815,14 @@ class ByteSizeFilter(NumericFilterBase):
 
         # Scale to bytes
         self._value = self._value * scale
+
+    def to_match_string(self):
+        """Turn the node to a valid query string"""
+        return (
+            self._name
+            + self._op.query_repr
+            + human_size(self._value).replace(" ", "").replace("iB", "")
+        )
 
 
 QueryGrammar = Grammar(

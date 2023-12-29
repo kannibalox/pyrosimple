@@ -333,3 +333,17 @@ def test_matcher_prefilter(matcher, item):
         matching.unquote_pre_filter(matching.create_matcher(matcher).pre_filter())
         == item
     )
+
+
+@pytest.mark.parametrize(
+    ("matcher", "string"),
+    [
+        ("name=arch", "name=arch"),
+        ("name<>arch", "name!=arch"),
+        ("size<1G", "size<1.0G"),
+        ("is_complete=no", "is_complete=no"),
+        ("is_complete=no name=arch", "is_complete=no name=arch"),
+    ],
+)
+def test_matcher_representation(matcher, string):
+    assert matching.create_matcher(matcher).to_match_string() == string
