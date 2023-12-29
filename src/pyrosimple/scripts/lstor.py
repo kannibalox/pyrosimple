@@ -28,7 +28,7 @@ class MetafileLister(ScriptBase):
             help="show full announce URL including keys, as well as full piece information",
         )
         self.add_bool_option(
-            "--raw", help="print the metafile's raw content in JSON format"
+            "--raw", "--json", help="print the metafile's raw content in JSON format"
         )
         self.add_bool_option(
             "-V",

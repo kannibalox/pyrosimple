@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## Added
+- `lstor`: Add `--json` as alias for `--raw`
+
 ## [2.12.1] - 2023-12-12
 
 ### Changed
