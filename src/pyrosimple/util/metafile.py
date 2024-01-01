@@ -228,7 +228,7 @@ class Metafile(dict):
 
         Raise ValueError if validation fails.
         """
-        if not isinstance(self.get("announce"), str):
+        if not isinstance(self.get("announce", ""), str):
             raise ValueError("bad announce URL - not a string")
         if not isinstance(self.get("info"), dict):
             raise ValueError("bad info key - not a dictionary")
@@ -680,7 +680,7 @@ class Metafile(dict):
     def listing(self, masked=True) -> List[str]:
         """List torrent info & contents in human-readable format. Returns a list of formatted lines."""
         # Assemble data
-        announce = str(self["announce"])
+        announce = str(self.get("announce", "None"))
         if masked:
             announce = mask_keys(announce)
         info = self["info"]

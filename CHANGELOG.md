@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Changed
+- Torrents without an announce URL are no longer considered invalid,
+  and can be displayed by `lstor`. This is primarily to support the
+  listing of rTorrent's temporary torrent files generated from magnet
+  links. [#61](https://github.com/kannibalox/pyrosimple/issues/61)
+
+### Fixed
+- Magnet files are now created with the correct key for rTorrent to
+  load them
+
 ## Added
 - `lstor`: Add `--json` as alias for `--raw`
 
