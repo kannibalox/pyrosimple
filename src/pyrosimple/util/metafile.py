@@ -443,7 +443,8 @@ class Metafile(dict):
                     f"Bad assignment {assignment!r} ({exc})!"
                 ) from exc
             if val is None:
-                del namespace[keypath[-1]]
+                if keypath[-1] in namespace:
+                    del namespace[keypath[-1]]
             else:
                 namespace[keypath[-1]] = val
 
