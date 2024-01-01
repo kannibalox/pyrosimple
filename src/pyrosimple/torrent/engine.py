@@ -918,25 +918,27 @@ def generate_metafile_field(name: str) -> Optional[FieldDefinition]:
 
     """
     lstor_field = ".".join("__".split(name[9:]))
-    custom_memo_name = "memo_"+name[9:]
+    custom_memo_name = "memo_" + name[9:]
+
     def _get_field(obj):
         obj._engine.rpc.execute.capture(
-	   "",
+            "",
             "lstor",
-	   "-q",
+            "-q",
             "-V",
             "-o",
-	   lstor_field,
-	   str(obj.rpc_call("d.session_file")),
-	).strip()
+            lstor_field,
+            str(obj.rpc_call("d.session_file")),
+        ).strip()
+
     yield ConstantField(
-	str,
+        str,
         name,
         f"{lstor_field} of metafile",
-	matcher=matching.PatternFilter,
-	formatter=str,
-	accessor=memoize(_get_field, custom_memo_name),
-	requires=[f"d.custom={custom_memo_name}"],
+        matcher=matching.PatternFilter,
+        formatter=str,
+        accessor=memoize(_get_field, custom_memo_name),
+        requires=[f"d.custom={custom_memo_name}"],
     )
 
 
