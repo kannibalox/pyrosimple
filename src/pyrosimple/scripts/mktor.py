@@ -121,10 +121,12 @@ class MetafileCreator(ScriptBase):
 
         if magnet_url.startswith("magnet:"):
             magnet_url = magnet_url[7:]
-        meta = {"magnet-url": "magnet:" + magnet_url}
+        meta = {"magnet-uri": "magnet:" + magnet_url}
         magnet_params = parse_qs(magnet_url.lstrip("?"))
 
-        meta_name = magnet_params.get("xt", [hashlib.sha1(magnet_url).hexdigest()])[0]
+        meta_name = magnet_params.get(
+            "xt", [hashlib.sha1(magnet_url.encode()).hexdigest()]
+        )[0]
         if "dn" in magnet_params:
             meta_name = f"{magnet_params['dn'][0]}-{meta_name}"
         meta_name = (
@@ -138,12 +140,12 @@ class MetafileCreator(ScriptBase):
         meta_path = os.path.join(
             self.options.magnet_watch, f"magnet-{meta_name}.torrent"
         )
-        self.log.debug("Writing magnet-url metafile %r", meta_path)
+        self.log.debug("Writing magnet-uri metafile %r", meta_path)
 
         try:
-            bencode.bwrite(meta_path, meta)
+            bencode.bwrite(meta, meta_path)
         except OSError as exc:
-            self.fatal("Error writing magnet-url metafile %r (%s)", (meta_path, exc))
+            self.fatal("Error writing magnet-uri metafile %r (%s)", (meta_path, exc))
             raise
 
     def mainloop(self):
