@@ -15,10 +15,6 @@ from box.box import Box
 from pyrosimple.util import matching
 
 
-log = logging.getLogger(__name__)
-log.debug("module loaded")
-
-
 # Some of these are redundant due to the more comprehensive tests
 # later on, but it can't hurt to have them here
 @pytest.mark.parametrize(
