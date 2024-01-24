@@ -144,17 +144,18 @@ def test_metafile_size(good_metafile):
 
 
 @pytest.mark.parametrize(
-    ("key", "data"),
+    ("key", "expected_path", "data"),
     [
-        (["test"], "a"),
-        (["encoding_std"], "ascii"),
-        (["info", "padding"], "5"),
+        ("test=a", ["test"], "a"),
+        ("info.padding=5", ["info","padding"], "5"),
+        ("info.padding=+5", ["info","padding"], 5),
+        ('info["padding"]=+5', ["info","padding"], 5),
     ],
 )
-def test_metafile_assign(good_metafile, key, data):
+def test_metafile_assign(good_metafile, key, expected_path, data):
     meta = copy.deepcopy(good_metafile)
-    meta.assign_fields([".".join(key) + "=" + str(data)])
-    assert get_from_dict(meta, key) == data
+    meta.assign_fields([key])
+    assert get_from_dict(meta, expected_path) == data
 
 
 def test_metafile_from_path(good_metafile_from_path):

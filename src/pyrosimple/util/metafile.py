@@ -33,6 +33,8 @@ import bencode  # typing: ignore
 
 from bencodepy import BencodeDecoder
 from box.box import Box
+from parsimonious.grammar import Grammar
+from parsimonious.nodes import NodeVisitor
 
 from pyrosimple import error
 from pyrosimple.util import fmt, pymagic
@@ -410,43 +412,79 @@ class Metafile(dict):
         return bad_encodings
 
     def assign_fields(self, assignments: List[str]) -> None:
-        """Takes a list of C{key=value} strings and assigns them to the
-        given metafile. If you want to set nested keys (e.g. "info.source"),
-        you have to use a dot as a separator. For exotic keys *containing*
-        a dot, double that dot ("dotted..key").
+        """Takes a list of C{key=value} strings and assigns them to
+        the given metafile. If you want to set nested keys
+        (e.g. "info.source"), you have to use a dot as a
+        separator. For exotic keys use a quoted string with brackets,
+        (e.g. 'info["padding length"]').
 
         Numeric values starting with "+" or "-" are converted to integers.
 
         If just a key name is given (no '='), the field is removed.
+
         """
+        AssignmentGrammar = Grammar(
+            r"""
+            set_str     = keys (eq value)?
+            keys        = (key / complex_key) ((period key) / complex_key)*
+            key         = (simple_key / complex_key)
+            complex_key = lbracket quoted rbracket
+            value       = (number_value / str_value)
+            str_value   = (word / quoted)
+            number_value = ~"[-+][0-9\\.]"
+            simple_key   = ~"[^.[=]*"
+            quoted       = ~'"[^\"]+"'
+            word         = ~r"[-\w]+"
+            eq       = "="
+            period   = "."
+            lbracket = "["
+            rbracket = "]"
+            """
+        )
+
+        # Simple visitor pattern to build keys and values out of the
+        # assignment grammar
+        # pylint: disable=missing-docstring
+        class AssignmentVisitor(NodeVisitor):
+            def __init__(self):
+                self.keys = []
+                self.value = None
+
+            def visit_simple_key(self, node, _):
+                self.keys.append(node.text)
+
+            def visit_complex_key(self, node, _):
+                self.keys.append(node.text[2:-2])
+
+            def visit_number_value(self, node, _):
+                self.value = int(node.text)
+
+            def visit_str_value(self, node, _):
+                self.value = node.text.strip('"')
+
+            def generic_visit(self, *_):
+                pass
+
+        # pylint: enable=missing-docstring
+
         for assignment in assignments:
-            try:
-                val: Optional[Union[str, int]]
-                if "=" in assignment:
-                    field, val = assignment.split("=", 1)
-                else:
-                    field, val = assignment, None
-
-                if val is not None and val[0] in "+-" and val[1:].isdigit():
-                    val = int(val, 10)
-
-                namespace = self
-                # TODO: Allow numerical indices, and "+" for append
-                keypath = [
-                    i.replace("\0", ".") for i in field.replace("..", "\0").split(".")
-                ]
-                for key in keypath[:-1]:
-                    # Create missing dicts as we go...
-                    namespace = namespace.setdefault(key, {})
-            except (KeyError, IndexError, TypeError, ValueError) as exc:
-                raise error.UserError(
-                    f"Bad assignment {assignment!r} ({exc})!"
-                ) from exc
-            if val is None:
-                if keypath[-1] in namespace:
-                    del namespace[keypath[-1]]
+            visitor = AssignmentVisitor()
+            visitor.visit(AssignmentGrammar.parse(assignment))
+            namespace = self
+            for k in visitor.keys[:-1]:
+                k_value = namespace.get(k)
+                if k_value is None:
+                    if visitor.value is None:
+                        break
+                    if isinstance(k, int):
+                        namespace[k] = []
+                    else:
+                        namespace[k] = {}
+                namespace = namespace[k]
+            if visitor.value is None and visitor.keys[-1] in namespace:
+                del namespace[visitor.keys[-1]]
             else:
-                namespace[keypath[-1]] = val
+                namespace[visitor.keys[-1]] = visitor.value
 
     def add_fast_resume(self, datapath: os.PathLike) -> None:
         """Add fast resume data to a metafile dict."""
@@ -507,6 +545,7 @@ class Metafile(dict):
 
         if not self.is_multi_file:
             # Single file
+
             return int(info["length"])
         # Directory structure
         return sum(f["length"] for f in info["files"])

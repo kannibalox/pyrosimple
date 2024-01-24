@@ -2,11 +2,24 @@
 
 ## [Unreleased]
 
+### *Breaking changes*
+- New assignment syntax to allow more complex keys. This mainly
+  effects mktor and chtor's `-s KEY=VAL` flag. This means the old
+  syntax of `..` to escape periods in key names will no longer
+  work. Use the new bracket syntax instead:
+  ```bash
+  # Old
+  chtor -s info.with..period=foo <file>
+  # New
+  chtor -s 'info["with.period"]=foo' <file>
+  ```
+
 ### Changed
 - Torrents without an announce URL are no longer considered invalid,
   and can be displayed by `lstor`. This is primarily to support the
   listing of rTorrent's temporary torrent files generated from magnet
   links. [#61](https://github.com/kannibalox/pyrosimple/issues/61)
+- Use a proper assignment syntax to allow setting complex keys and array keys
 
 ### Fixed
 - Magnet files are now created with the correct key for rTorrent to
