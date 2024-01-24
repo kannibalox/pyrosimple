@@ -22,8 +22,8 @@
 - Use a proper assignment syntax to allow setting complex keys and array keys
 
 ### Fixed
-- Magnet files are now created with the correct key for rTorrent to
-  load them
+- Magnet files are now created with the correct key (`magnet-uri`) for
+  rTorrent to load them.
 
 ## Added
 - `lstor`: Add `--json` as alias for `--raw`
@@ -39,7 +39,8 @@
 ## [2.12.0] - 2023-10-30
 
 ### Fixed
-- `rtcontrol`: `--cull`/`--purge` now clean up empty directories properly
+- `rtcontrol`: `--cull`/`--purge` now clean up empty directories
+  properly
 
 ### Added
 - `chtor`/`mktor`/`lstor`: `--progress` flag to allow controlling
@@ -66,8 +67,8 @@
 
 ### Fixed
 - `chtor`: Fix error when combining `--fast-resume` and `-o`
-- `pyroadmin`: Fix false negative when detecting methods on systems that
-  implemented them in C++
+- `pyroadmin`: Fix false negative when detecting methods on systems
+  that implemented them in C++
 
 ## [2.11.3] - 2023-09-25
 
@@ -493,7 +494,7 @@ new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
 [Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.12.1...HEAD
-[2.12.1] https://github.com/kannibalox/pyrosimple/compare/v2.12.0...v2.12.1
+[2.12.1]: https://github.com/kannibalox/pyrosimple/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/kannibalox/pyrosimple/compare/v2.11.4...v2.12.0
 [2.11.4]: https://github.com/kannibalox/pyrosimple/compare/v2.11.3...v2.11.4
 [2.11.3]: https://github.com/kannibalox/pyrosimple/compare/v2.11.2...v2.11.3
