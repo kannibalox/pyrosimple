@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.13.0] - 2024-01-29
+
 ### *Breaking changes*
 - New assignment syntax to allow more complex keys. This mainly
   effects mktor and chtor's `-s KEY=VAL` flag. This means the old
@@ -497,7 +499,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.12.1...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.13.0...HEAD
+[2.13.0]: https://github.com/kannibalox/pyrosimple/compare/v2.12.1...v2.13.0
 [2.12.1]: https://github.com/kannibalox/pyrosimple/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/kannibalox/pyrosimple/compare/v2.11.4...v2.12.0
 [2.11.4]: https://github.com/kannibalox/pyrosimple/compare/v2.11.3...v2.11.4
