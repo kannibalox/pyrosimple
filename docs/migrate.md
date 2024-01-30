@@ -8,7 +8,8 @@ title: Migrating from pyroscope
 * The configuration file is located in a new location by default
   (`~/.config/pyrosimple/config.toml`), and uses a new
   format. Although the names have remained mostly the same, it is
-  recommended to manually copy settings over to the new format.
+  recommended to manually copy settings over to the new format. See
+  the [configuration guide](configuration.md) for more information.
 
 ## Common CLI options
 
