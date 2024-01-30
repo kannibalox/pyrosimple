@@ -29,8 +29,9 @@ title: Migrating from pyroscope
 
 * `-x, --xml, -r, --repr` for XML output is no longer available. See
   `--output <format>` for the new options.
-* REPL mode no longer triggers automatically with 0 arguments. To
-  enter it, use the `--repl` flag.
+* [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)
+  mode no longer triggers automatically with 0 arguments. To enter it,
+  use the `--repl` flag.
 
 ## `pyroadmin`
 
