@@ -268,8 +268,16 @@ class RtorrentItem(engine.TorrentProxy):
         self._make_it_so("setting ignore status for", ["d.ignore_commands.set"], flag)
         self._fields["is_ignored"] = flag
 
-    def set_prio(self, prio: int):
+    def set_prio(self, prio: Union[int, str]):
         """Set priority (0-3)."""
+        if isinstance(prio, str):
+            levels = ["off", "low", "normal", "high"]
+            try:
+                prio = levels.index(prio)
+            except ValueError as exc:
+                raise error.EngineError(
+                    f'{prio!r} not recognized as a priority level from: {", ".join(levels)}'
+                ) from exc
         self._make_it_so(
             "setting priority for", ["d.priority.set"], str(max(0, min(int(prio), 3)))
         )

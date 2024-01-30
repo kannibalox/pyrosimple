@@ -235,7 +235,7 @@ class RtorrentControl(ScriptBaseWithConfig):
     IGNORE_OPTIONS = ("0", "1")
 
     # choices for --prio
-    PRIO_OPTIONS = ("0", "1", "2", "3")
+    PRIO_OPTIONS = ("off", "low", "normal", "high")
 
     # choices for --alter
     ALTER_MODES = ("append", "remove")

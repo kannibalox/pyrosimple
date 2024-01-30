@@ -15,11 +15,15 @@
   ```
 
 ### Changed
-- Torrents without an announce URL are no longer considered invalid,
-  and can be displayed by `lstor`. This is primarily to support the
-  listing of rTorrent's temporary torrent files generated from magnet
+- `lstor`: Torrents without an announce URL are no longer considered
+  invalid, and can be displayed by `lstor`. This is primarily to
+  support the listing of rTorrent's temporary torrent files generated
+  from magnet
   links. [#61](https://github.com/kannibalox/pyrosimple/issues/61)
-- Use a proper assignment syntax to allow setting complex keys and array keys
+- `chtor`/`mktor`: Use a proper assignment syntax to allow setting complex keys and
+  array keys
+- `rtcontrol`: `--prio` now accepts strings as well as integers
+  (0=off, 1=low, 2=normal, 3=high)
 
 ### Fixed
 - Magnet files are now created with the correct key (`magnet-uri`) for
