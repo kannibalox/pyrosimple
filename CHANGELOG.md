@@ -31,7 +31,7 @@
 - Magnet files are now created with the correct key (`magnet-uri`) for
   rTorrent to load them.
 
-## Added
+### Added
 - `lstor`: Add `--json` as alias for `--raw`
 
 ## [2.12.1] - 2023-12-12
