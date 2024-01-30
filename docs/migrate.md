@@ -114,7 +114,7 @@ available utilities.
   following configuration to achieve the same effect if desired:
   ```toml
   [TORQUE.watch]
-  handler = "pyrocore.job.watch:TreeWatch"
+  handler = "pyrosimple.job.watch:TreeWatch"
   # ...other settings...
   cmd_queue = "d.priority.set=0"
   ```
