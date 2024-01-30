@@ -458,7 +458,7 @@ class RtorrentItem(engine.TorrentProxy):
             if self.datapath() != Path(dest, self.datapath().name):
                 move_func(self, self.datapath(), Path(dest, self.datapath().name))
 
-    def move_to_host(self, remote_url: str, copy: bool = False) -> None:
+    def move_to_host(self, remote_url: str, copy: bool = False) -> bool:
         """Migrate an item to a remote host"""
 
         # TODO Generalize this overriding of query parameters
