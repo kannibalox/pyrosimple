@@ -16,6 +16,7 @@ import urllib.parse
 
 from pathlib import Path, PurePath
 from typing import (
+    Any,
     Callable,
     Dict,
     Generator,
@@ -72,6 +73,58 @@ METAFILE_STD_KEYS = [
     ["info", "files", "length"],
     ["info", "files", "path"],
 ]
+
+ASSIGNMENT_GRAMMAR = Grammar(
+    r"""
+    set_str     = keys (eq value)?
+    keys        = (key / complex_key) ((period key) / complex_key)*
+    key         = (simple_key / complex_key)
+    complex_key = lbracket quoted rbracket
+    value       = (number_value / str_value)
+    str_value   = (word / quoted)
+    number_value = ~"[-+][0-9\\.]"
+    simple_key   = ~"[^.[=]*"
+    quoted       = ~'"[^\"]+"'
+    word         = ~r"[-\w]+"
+    eq       = "="
+    period   = "."
+    lbracket = "["
+    rbracket = "]"
+    """
+)
+
+
+def parse_assignment_string(assignment: str) -> Tuple[List[str], Union[str, None]]:
+    """Parse an assignment string (similar to jq's syntax), return a
+    list of keys and an optional value"""
+
+    # Simple visitor pattern to build keys and values out of the
+    # assignment grammar
+    # pylint: disable=missing-docstring
+    class AssignmentVisitor(NodeVisitor):
+        def __init__(self):
+            self.keys = []
+            self.value = None
+
+        def visit_simple_key(self, node, _):
+            self.keys.append(node.text)
+
+        def visit_complex_key(self, node, _):
+            self.keys.append(node.text[2:-2])
+
+        def visit_number_value(self, node, _):
+            self.value = int(node.text)
+
+        def visit_str_value(self, node, _):
+            self.value = node.text.strip('"')
+
+        def generic_visit(self, *_):
+            pass
+
+    # pylint: enable=missing-docstring
+    visitor = AssignmentVisitor()
+    visitor.visit(ASSIGNMENT_GRAMMAR.parse(assignment))
+    return visitor.keys, visitor.value
 
 
 # PieceLogger and PieceFailer are both utility classes for passing
@@ -411,6 +464,19 @@ class Metafile(dict):
 
         return bad_encodings
 
+    def fetch_field(self, field: str) -> Optional[Any]:
+        """Takes a string in the same syntax as `assign_fields` and
+        returns the value at the location, or None if it doesn't
+        exist"""
+        keys, _ = parse_assignment_string(field)
+        namespace = self
+        for k in keys:
+            try:
+                namespace = namespace[k]
+            except (KeyError, TypeError):
+                return None
+        return namespace
+
     def assign_fields(self, assignments: List[str]) -> None:
         """Takes a list of C{key=value} strings and assigns them to
         the given metafile. If you want to set nested keys
@@ -423,68 +489,24 @@ class Metafile(dict):
         If just a key name is given (no '='), the field is removed.
 
         """
-        AssignmentGrammar = Grammar(
-            r"""
-            set_str     = keys (eq value)?
-            keys        = (key / complex_key) ((period key) / complex_key)*
-            key         = (simple_key / complex_key)
-            complex_key = lbracket quoted rbracket
-            value       = (number_value / str_value)
-            str_value   = (word / quoted)
-            number_value = ~"[-+][0-9\\.]"
-            simple_key   = ~"[^.[=]*"
-            quoted       = ~'"[^\"]+"'
-            word         = ~r"[-\w]+"
-            eq       = "="
-            period   = "."
-            lbracket = "["
-            rbracket = "]"
-            """
-        )
-
-        # Simple visitor pattern to build keys and values out of the
-        # assignment grammar
-        # pylint: disable=missing-docstring
-        class AssignmentVisitor(NodeVisitor):
-            def __init__(self):
-                self.keys = []
-                self.value = None
-
-            def visit_simple_key(self, node, _):
-                self.keys.append(node.text)
-
-            def visit_complex_key(self, node, _):
-                self.keys.append(node.text[2:-2])
-
-            def visit_number_value(self, node, _):
-                self.value = int(node.text)
-
-            def visit_str_value(self, node, _):
-                self.value = node.text.strip('"')
-
-            def generic_visit(self, *_):
-                pass
-
-        # pylint: enable=missing-docstring
 
         for assignment in assignments:
-            visitor = AssignmentVisitor()
-            visitor.visit(AssignmentGrammar.parse(assignment))
+            keys, value = parse_assignment_string(assignment)
             namespace = self
-            for k in visitor.keys[:-1]:
+            for k in keys[:-1]:
                 k_value = namespace.get(k)
                 if k_value is None:
-                    if visitor.value is None:
+                    if value is None:
                         break
                     if isinstance(k, int):
                         namespace[k] = []
                     else:
                         namespace[k] = {}
                 namespace = namespace[k]
-            if visitor.value is None and visitor.keys[-1] in namespace:
-                del namespace[visitor.keys[-1]]
+            if value is None and keys[-1] in namespace:
+                del namespace[keys[-1]]
             else:
-                namespace[visitor.keys[-1]] = visitor.value
+                namespace[keys[-1]] = value
 
     def add_fast_resume(self, datapath: os.PathLike) -> None:
         """Add fast resume data to a metafile dict."""

@@ -127,9 +127,9 @@ class MetafileLister(ScriptBase):
                             if field in data:
                                 val = data[field]
                             else:
-                                val = dict(torrent)
-                                for key in field.split("."):
-                                    val = val[key]
+                                val = torrent.fetch_field(field)
+                                if val is None:
+                                    raise KeyError()
                         except KeyError:
                             self.log.error("%s: Field %r not found", filename, field)
                             output_values.append(None)
