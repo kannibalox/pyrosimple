@@ -405,13 +405,13 @@ class RtorrentControl(ScriptBaseWithConfig):
             action_group.add_argument(
                 f"--{m}",
                 action=RtorrentInteractiveAction,
-                help=f"{m} item to another directory (implies -i)",
+                help=f"{m} item to another path (implies -i)",
                 metavar="PATH",
             )
             action_group.add_argument(
                 f"--{m}-and-set",
                 action=RtorrentInteractiveAction,
-                help=f"{m} item and set directory (implies -i)",
+                help=f"{m} item and set base directory (implies -i)",
                 metavar="PATH",
             )
         action_group.add_argument(
