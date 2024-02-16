@@ -267,6 +267,7 @@ def load_custom_py():
     log = logging.getLogger(__name__)
     if not settings.CONFIG_PY:
         log.debug("Custom code loading is disabled")
+        return
     if settings.CONFIG_PY_LOADED:
         log.debug("Custom code has already been loaded")
     config_file = Path(settings.CONFIG_PY).expanduser()
