@@ -147,9 +147,9 @@ def test_metafile_size(good_metafile):
     ("key", "expected_path", "data"),
     [
         ("test=a", ["test"], "a"),
-        ("info.padding=5", ["info","padding"], "5"),
-        ("info.padding=+5", ["info","padding"], 5),
-        ('info["padding"]=+5', ["info","padding"], 5),
+        ("info.padding=5", ["info", "padding"], "5"),
+        ("info.padding=+5", ["info", "padding"], 5),
+        ('info["padding"]=+5', ["info", "padding"], 5),
     ],
 )
 def test_metafile_assign(good_metafile, key, expected_path, data):
