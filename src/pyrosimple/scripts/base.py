@@ -78,10 +78,7 @@ class ScriptBase:
         )
 
     def add_bool_option(self, *args, **kwargs):
-        """Add a boolean option.
-
-        @keyword help: Option description.
-        """
+        """Add a boolean option."""
         dest = (
             [o for o in args if o.startswith("--")][0]
             .replace("--", "")
@@ -92,13 +89,7 @@ class ScriptBase:
         )
 
     def add_value_option(self, *args, **kwargs):
-        """Add a value option.
-
-        @keyword dest: Destination attribute, derived from long option name if not given.
-        @keyword action: How to handle the option.
-        @keyword help: Option description.
-        @keyword default: If given, add this value to the help string.
-        """
+        """Add a value option."""
         kwargs["metavar"] = args[-1]
         if "dest" not in kwargs:
             kwargs["dest"] = (
