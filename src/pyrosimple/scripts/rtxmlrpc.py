@@ -169,7 +169,10 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
         """Handle import files or streams passed with '-i'."""
         tmp_import = None
         # Concatenate arguments
-        self.args = [self.options.method] + self.args
+        if self.args is None:
+            self.args = [self.options.method]
+        else:
+            self.args = [self.options.method] + self.args
         try:
             if self.args[0].startswith("@") and self.args[0] != "@-":
                 import_file = os.path.expanduser(self.args[0][1:])

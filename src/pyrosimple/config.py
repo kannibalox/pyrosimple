@@ -208,7 +208,7 @@ def lookup_announce_alias(name: str):
     raise KeyError(f"Unknown alias {name}")
 
 
-def lookup_announce_url(name: str):
+def lookup_announce_url(name: str) -> Tuple[str, List[str]]:
     """Get canonical alias name and announce URL list for the given
     alias.
 

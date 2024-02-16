@@ -688,8 +688,8 @@ class Metafile(dict):
             if not urllib.parse.urlparse(tracker_url).scheme:
                 from pyrosimple import config  # pylint: disable=import-outside-toplevel
 
-                _alias, tracker_url = config.lookup_announce_url(tracker_url)
-                tracker_url = tracker_url[0]
+                _alias, tracker_urls = config.lookup_announce_url(tracker_url)
+                tracker_url = tracker_urls[0]
         except (KeyError, IndexError) as exc:
             raise error.UserError(
                 f"Bad tracker URL {tracker_url!r}, or unknown alias!"

@@ -10,7 +10,7 @@ import re
 import time
 import warnings
 
-from typing import Callable, Dict, Optional, Set, Type, cast
+from typing import Callable, Dict, Generator, Optional, Set, Type, cast
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
@@ -118,7 +118,7 @@ def _interval_sum(
     return sum(result) if result else None
 
 
-def _fmt_duration(duration):
+def _fmt_duration(duration) -> str:
     """Format duration value."""
     return fmt.human_duration(duration, 0, 2, True)
 
@@ -910,7 +910,7 @@ def generate_d_call(name: str) -> Optional[FieldDefinition]:
     )
 
 
-def generate_metafile_field(name: str) -> Optional[FieldDefinition]:
+def generate_metafile_field(name: str) -> Generator[FieldDefinition, None, None]:
     """Dynamically generate fields from the metafile information, as
     scraped by lstor. `__` is used to separate dictionary keys instead
     of `.` The scrape field is memoized, given how expensive this
