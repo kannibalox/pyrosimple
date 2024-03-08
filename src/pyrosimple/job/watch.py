@@ -245,6 +245,7 @@ def main():
     import sys
 
     logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO)
     if len(sys.argv) < 2:
         logger.error("File path required")
         sys.exit(1)
