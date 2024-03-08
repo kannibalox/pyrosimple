@@ -39,6 +39,7 @@ class TreeWatch(BaseJob):
         self.config.setdefault("remove_already_added", False)
         self.config.setdefault("load_mode", "")
         self.config.setdefault("start_immediately", True)
+        self.config.setdefault("preload_fields", [])
         self.config["paths"] = {
             Path(p).expanduser().absolute()
             for p in self.config["path"].split(os.pathsep)
@@ -201,6 +202,18 @@ class TreeWatch(BaseJob):
             except rpc.HashNotFound:
                 name = "NOHASH"
             proxy.log(rpc.NOHASH, f"{self.name}: Loaded	{name} '{str(metapath)}'")
+        # Preload any defined fields after the load, ignoring any exceptions
+        if self.config["preload_fields"]:
+            torrent = rtorrent.RtorrentItem(
+                self.engine, {"hash": torrent_data.info_hash()}
+            )
+            preloaded = {}
+            for f in self.config["preload_fields"]:
+                try:
+                    preloaded[f] = getattr(torrent, f)
+                except rpc.RpcError as exc:
+                    self.log.error("Error preloading field %r: %r", f, exc)
+            self.log.debug("Preloaded fields: %r", preloaded)
 
     def watch_trees(self, paths: Sequence[os.PathLike]):
         """Thread-able inotify watcher"""
