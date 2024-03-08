@@ -276,7 +276,11 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
 
         # Check if we only need to run once
         if self.options.run_once:
-            params = self.jobs[self.options.run_once]
+            try:
+                params = self.jobs[self.options.run_once]
+            except KeyError:
+                self.log.critical("Job %r not found in configuration file!", self.options.run_once)
+                sys.exit(error.EX_SOFTWARE)
             if self.options.dry_run:
                 params["dry_run"] = True
             # Make a copy here to prevent the original handler from
