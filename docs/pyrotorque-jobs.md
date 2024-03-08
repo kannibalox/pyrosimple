@@ -248,6 +248,9 @@ Arguments:
   custom command that will be run when the torrent is loaded. As seen
   in the example, this can be a fully-templated string, with some
   fields being auto-created by the job itself.
+* `preload_fields`: After loading the torrent, this setting can be
+  used to potentially preload other fields, so that expensive
+  calculations (e.g. for `kind`) can happen early
 
 ### Explanation
 

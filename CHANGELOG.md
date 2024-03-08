@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+- `pyrotorque`: Add `preload_fields` to `TreeWatch` job, to allow
+  fetching expensive-but-cacheable fields right after a successfully
+  load.
+
 ## [2.13.0] - 2024-01-29
 
 ### *Breaking changes*
