@@ -784,7 +784,7 @@ class RtorrentControl(ScriptBaseWithConfig):
         # Use validate_sort_fields to pre-validate key names
         rtorrent.validate_sort_fields(",".join(key_names))
         matcher = matching.MatcherBuilder().visit(query_tree)
-        self.log.debug("Matcher is: %s", matcher)
+        self.log.debug("Matcher is: %s", matcher.to_match_string())
 
         # View handling
         if self.options.modify_view:

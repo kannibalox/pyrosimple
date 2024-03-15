@@ -212,6 +212,7 @@ def test_conditions_prefilter(cond, expected):
 )
 def test_matcher(matcher, item):
     m = matching.create_matcher(matcher)
+    assert m.to_match_string()
     assert m.match(item)
 
 
@@ -339,6 +340,7 @@ def test_matcher_prefilter(matcher, item):
         ("size<1G", "size<1.0G"),
         ("is_complete=no", "is_complete=no"),
         ("is_complete=no name=arch", "is_complete=no name=arch"),
+        ("is_complete=no OR name=arch", "is_complete=no OR name=arch"),
     ],
 )
 def test_matcher_representation(matcher, string):
