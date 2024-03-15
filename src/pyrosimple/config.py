@@ -158,7 +158,7 @@ def expand_rc(rcfile: Path) -> List[Tuple[str, str]]:
 
 
 def scgi_url_from_rtorrentrc(rcfile: Union[str, Path]) -> Optional[str]:
-    """Parse a rtorrent.rc file and"""
+    """Parse a rtorrent.rc file and get the SCGI connection information"""
     log = logging.getLogger(__name__)
     log.debug("Loading rtorrent config from '%s'", rcfile)
     scgi_local: str = ""
