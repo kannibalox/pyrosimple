@@ -183,26 +183,26 @@ in an item by the real storage path, but only if they differ.
 
 ``` bash
 # List any differences
-rtcontrol path='*' is_multi_file=y 'directory!={{d.realpath}}' \
+rtcontrol path='*' is_multi_file=y 'directory!={{d.realpath|replace("[","[[]")}}' \
     -qo directory,realpath
-rtcontrol path='*' is_multi_file=n 'directory!={{d.realpath | pathdir}}' \
+rtcontrol path='*' is_multi_file=n 'directory!={{d.realpath|pathdir|replace("[","[[]")}}' \
     -qo directory,realpath.pathdir
 
 # Fix any differences (i.e. resolve all symlinks for good)
-rtcontrol path='*' is_multi_file=y 'directory!={{d.realpath}}' \
+rtcontrol path='*' is_multi_file=y 'directory!={{d.realpath|replace("[","[[]")}}' \
     --exec 'directory_base.set={{item.realpath}}'
-rtcontrol path='*' is_multi_file=n 'directory!={{d.realpath | pathdir}}' \
-    --exec 'directory.set={{item.realpath | pathdir}}'
+rtcontrol path='*' is_multi_file=n 'directory!={{d.realpath|pathdir|replace("[","[[]")}}' \
+    --exec 'directory.set={{item.realpath|pathdir}}'
 ```
 
-As so often, 'multi' and 'single' items need a slighty different
+As so often, 'multi' and 'single' items need a slightly different
 treatment.
 
-Note that `[` characters are escaped to `[[]` after the template
-expansion, so that things like `[2017]` in a filename do not lead to
-unexpected results. `*` and `?` though are kept intact and are used for
-glob matching as normal, because they match their own literal form if
-they appear in the field value (on the right-hand side).
+Note that `[` characters are escaped to `[[]`, so that things like
+`[2017]` in a filename do not lead to unexpected results. `*` and `?`
+though are kept intact and are used for glob matching as normal,
+because they match their own literal form if they appear in the field
+value (on the right-hand side).
 
 # Using 'rtxmlrpc'
 
@@ -376,14 +376,9 @@ Add it to your crontab and run it every few minutes.
 If you want to slow down *rTorrent* to use your available bandwidth on
 foreground tasks like browsing, but usually forget to return the
 throttle settings back to normal, then you can use the provided
-[rt-backseat]() script. It will register a job via `at`, so that command
+`rt-backseat` script. It will register a job via `at`, so that command
 must be installed on the machine for it to work. The default throttle
 speed and timeout can be set at the top of the script.
-
-::: {.literalinclude language="bash"}
-examples/rt-backseat
-:::
-
-::: {#rt-backseat}
-> <https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rt-backseat>
-:::
+```python
+{% include 'examples/rt-backseat' %}
+```
