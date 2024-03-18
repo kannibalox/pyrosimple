@@ -279,7 +279,9 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             try:
                 params = self.jobs[self.options.run_once]
             except KeyError:
-                self.log.critical("Job %r not found in configuration file!", self.options.run_once)
+                self.log.critical(
+                    "Job %r not found in configuration file!", self.options.run_once
+                )
                 sys.exit(error.EX_SOFTWARE)
             if self.options.dry_run:
                 params["dry_run"] = True
