@@ -126,5 +126,5 @@ lstor example.torrent
     full explanation of what each tool can do.
     -   `rtcontrol` in particular has many uses, as seen in
         [rtcontrol's usage page](usage-rtcontrol.md)
--   See [Advanced Usage](advanced.md) for more advanced examples
+-   See [Advanced Usage](tips.md) for more advanced examples
     of the things that can be done with pyrosimple.
