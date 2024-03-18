@@ -1,0 +1,24 @@
+{# Translated to jinja2 from https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/templates/conky/rtorstat.txt  #}
+{% macro color(c,s) %}${color {{c}}}{{s}}${color }{% endmacro -%}
+{% macro header(s) %}{{color('#9bf', s)}}{% endmacro -%}
+{% macro label(s) %}{{color('#66d', s)}}{% endmacro -%}
+{% set pc_cols = ['f00','f33','f63','3c9','3fc'] %}
+{% macro pc_col(f) %}{{ pc_cols[f] }}{% endmacro -%}
+{% set pid = proxy.system.pid() | string -%}
+{% set viewdef = [["T", "main"], ["S", "stopped"], ["I", "incomplete"], ["A", "active"]] -%}
+{% set down_percent = 100 * (proxy.throttle.global_down.rate() / proxy.throttle.global_down.max_rate()) -%}
+{% set up_percent = 100 * (proxy.throttle.global_up.rate() / proxy.throttle.global_up.max_rate()) -%}
+{{header('rTorrent')}}      {{label('VERSION  %CPU %MEM UPTIME')}}
+{{"%-13.13s" % proxy.session.name()}} {{"%-8s" % proxy.system.client_version()}} {{proxy.execute.capture('', "ps", "h", "-o", "%cpu,%mem,etime", "-p", pid)}}
+{{header('Views   ') }}{% for title, name in viewdef%}{{label(title)}}{{"%-5d" % proxy.view.size('', name)}}{%endfor%}
+{{header('Data    ')}}{{label('U')}}{{proxy.throttle.global_up.total()|filesizeformat(binary=True)}}  {{label('D')}}{{proxy.throttle.global_down.total()|filesizeformat(binary=True)}}
+{{label('Upload  ')}} {{"%3.0f" % (up_percent)}}% ${color #0d6}${execgraph "echo {{[100, up_percent]|sort|first|round|int}}"}${color }
+${voffset -20} {{proxy.throttle.global_up.rate()|sz}}/s
+{{label('Download')}} {{"%3.0f" % (down_percent)}}% ${color #d06}${execgraph "echo {{[100, down_percent]|sort|first|round|int}}"}${color }
+${voffset -20} {{proxy.throttle.global_down.rate()|sz}}/s
+{{''}}
+{% for d in matches -%}
+{{ "  " + label(loop.index) }} {{d.name}} {{label('[')}}{{d.alias}}{{label(']')}}
+    {{label('S')}} {{d.size|sz}} {{label('U')}} {{d.uploaded|sz}} {{label('R')}} {{d.ratio}}
+  ${color {{ pc_col((d.done/25)|int) }}}{{"%5.1f" % d.done}}% ${execbar echo {{d.done}}}${color }
+{% endfor -%}
