@@ -415,7 +415,7 @@ class MetafileChanger(ScriptBase):
                             str(filename).replace(".torrent", "-no-resume.torrent")
                         )
                         del torrent["libtorrent_resume"]
-                        self.log.info("Writing '%s'...", filename)
+                        self.log.info("Writing file without libtorrent resume '%s'...", filename)
                         torrent.save(filename)
             else:
                 current_torrent = metafile.Metafile.from_file(filename)
@@ -428,23 +428,14 @@ class MetafileChanger(ScriptBase):
                 self.log.info("Changing %r...", filename)
 
                 if not self.options.dry_run:
-                    # Write to temporary file
-                    tempname = os.path.join(
-                        os.path.dirname(filename),
-                        "." + os.path.basename(filename),
-                    )
-                    self.log.debug("Writing temporary file '%s'...", tempname)
-                    torrent.save(Path(tempname))
-
                     try:
-                        self.log.debug("Replacing file '%s'...", filename)
-                        os.replace(tempname, filename)
+                        self.log.debug("Writing file '%s'...", filename)
+                        torrent.save(Path(filename))
                     except OSError as exc:
-                        # TODO: Try to write directly, keeping a backup!
                         raise error.LoggableError(
-                            "Can't rename tempfile %r to %r (%s)"
-                            % (tempname, filename, exc)
-                        )
+                            "Can't write to file %s (%s)"
+                            % (filename, exc)
+                        ) from exc
 
             changed += 1
 
