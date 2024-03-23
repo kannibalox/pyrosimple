@@ -410,7 +410,9 @@ class MetafileChanger(ScriptBase):
                             str(filename).replace(".torrent", "-no-resume.torrent")
                         )
                         del torrent["libtorrent_resume"]
-                        self.log.info("Writing file without libtorrent resume '%s'...", filename)
+                        self.log.info(
+                            "Writing file without libtorrent resume '%s'...", filename
+                        )
                         torrent.save(filename)
             else:
                 current_torrent = metafile.Metafile.from_file(filename)
@@ -428,8 +430,7 @@ class MetafileChanger(ScriptBase):
                         torrent.save(Path(filename))
                     except OSError as exc:
                         raise error.LoggableError(
-                            "Can't write to file %s (%s)"
-                            % (filename, exc)
+                            "Can't write to file %s (%s)" % (filename, exc)
                         ) from exc
 
             changed += 1
