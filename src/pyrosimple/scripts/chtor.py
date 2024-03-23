@@ -27,19 +27,14 @@ def replace_fields(meta, patterns):
     """Replace patterns in fields."""
     for pattern in patterns:
         try:
-            field, regex, subst, _ = pattern.split(pattern[-1])
-
-            # TODO: Allow numerical indices, and "+" for append
+            assignment, regex, subst, _ = pattern.split(pattern[-1])
+            keypath, _ = metafile.parse_assignment_string(assignment)
             namespace = meta
-            keypath = [
-                i.replace("\0", ".") for i in field.replace("..", "\0").split(".")
-            ]
             for key in keypath[:-1]:
                 namespace = namespace[key]
-
             namespace[keypath[-1]] = re.sub(regex, subst, namespace[keypath[-1]])
         except (KeyError, IndexError, TypeError, ValueError) as exc:
-            raise error.UserError(f"Bad substitution '{pattern}' ({exc})!")
+            raise error.UserError(f"Bad substitution '{pattern}' ({exc})!") from exc
 
     return meta
 

@@ -53,6 +53,7 @@ from pyrosimple.util.metafile import Metafile
             None,
         ),
         (["-s", "info.files=+1", "-V"], ["info", "files"], 1),
+        (["--regex", "announce#example.com.*#example.net/hi#"], ["announce"], "http://example.net/hi")
     ],
 )
 def test_chtor(tmp_path_factory, args, field, expected):
