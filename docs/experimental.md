@@ -94,3 +94,41 @@ Host *
   ControlPath ~/.ssh/sockets/%r@%h-%p
   ControlPersist 600
 ```
+
+## JSON-RPC
+
+!!! Requirements
+
+    Currently JSON-RPC is only supported by jesec-rtorrent: [https://github.com/jesec/rtorrent]().
+    Pyrosimple supports this fork, but it is not maintained by the official rTorrent author (rakshasa).
+
+[JSON-RPC](https://www.jsonrpc.org/specification) is an light-weight
+RPC mechanism that is a nearly drop-in replaceable for XMLRPC, while
+having a much smaller message size and being faster to parse/produce.
+
+Pyrosimple handles converting commands between JSON and XML
+automatically, so enabling JSON-RPC for a given host is as simple as
+appending `?rpc=json` to the URL.
+
+```toml
+[CONNECTIONS]
+socket_json_host = "scgi://localhost:9988?rpc=json"
+http_json_host = "http://localhost:8080/RPC2?rpc=json"
+```
+
+Note that there are some minor differences between command names
+between jesec-rtorrent and vanilla. `rtcontrol` will attempt to handle
+them automatically, while `rtxmlrpc` will not.
+
+!!! warning
+
+    There is only one main limitation to the current JSON-RPC implementation: it cannot handle binary
+    data types, which primarily effects the `load.*.raw` commands. jesec-rtorrent has made it so that
+    the non-raw `load.*` commands can now accept base64-style URLs, which is intended to be a replacement.
+
+    ```toml
+    # XMLRPC
+    rtxmlrpc load.raw_verbose '' <base64 data>
+    # jesec-rtorrent's JSON-RPC
+    rtxmlrpc load.verbose '' data:base64,<base64 data>
+    ```
