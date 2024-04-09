@@ -651,7 +651,6 @@ class RtorrentEngine:
         "d.is_active",
         "d.is_open",
         "d.message",
-        "d.ratio",
         "d.tied_to_file",
         "d.up.rate",
         "d.up.total",
