@@ -631,29 +631,25 @@ class RtorrentEngine:
 
     # rTorrent names of fields that never change
     CONSTANT_FIELDS = BASE_FIELDS | {
-        "d.name",
-        "d.is_private",
         "d.is_multi_file",
-        "d.tracker_size",
+        "d.is_private",
+        "d.name",
         "d.size_bytes",
+        "d.tracker_size",
     }
 
     # rTorrent names of fields that get fetched by default in multi-call
-    PREFETCH_FIELDS = CONSTANT_FIELDS | {
+    PREFETCH_FIELDS = BASE_FIELDS | {
         "d.base_path",
         "d.complete",
         "d.custom=memo_alias",
-        "d.custom=tm_completed",
-        "d.custom=tm_loaded",
-        "d.custom=tm_started",
         "d.down.rate",
-        "d.down.total",
         "d.is_active",
+        "d.is_multi_file",
         "d.is_open",
-        "d.message",
-        "d.tied_to_file",
+        "d.name",
+        "d.size_bytes",
         "d.up.rate",
-        "d.up.total",
     }
 
     def __init__(self, url: Optional[str] = None, auto_open: bool = False):
