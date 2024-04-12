@@ -7,6 +7,11 @@
   fetching expensive-but-cacheable fields right after a successfully
   load.
 
+### Changed
+- The default prefetch fields has been reduced, in particular to no
+  longer use `d.ratio`, which is a relatively expensive call for
+  incomplete items.
+
 ## [2.13.0] - 2024-01-29
 
 ### *Breaking changes*
