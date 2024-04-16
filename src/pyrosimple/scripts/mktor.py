@@ -148,13 +148,31 @@ class MetafileCreator(ScriptBase):
             self.fatal("Error writing magnet-uri metafile %r (%s)", (meta_path, exc))
             raise
 
+    def from_path(self, datapath, **kwargs):
+        """Helper wrapper for the metafile method, to avoid repeating code"""
+        from pyrosimple import config  # pylint: disable=import-outside-toplevel
+        from pyrosimple.util import metafile  # pylint: disable=import-outside-toplevel
+
+        return metafile.Metafile.from_path(
+            datapath,
+            self.args[1],
+            root_name=self.options.root_name,
+            private=self.options.private,
+            created_by="PyroSimple",
+            piece_size=self.options.piece_size,
+            piece_size_min=self.options.piece_size_min,
+            piece_size_max=self.options.piece_size_max,
+            add_padding=self.options.add_padding,
+            ignore=[
+                re.compile(fnmatch.translate(glob))
+                for glob in self.options.exclude + config.settings.MKTOR_IGNORE
+            ],
+            **kwargs,
+        )
+
     def mainloop(self):
         """The main loop."""
-        # pylint: disable=import-outside-toplevel
-        from pyrosimple import config
-        from pyrosimple.util import metafile
-
-        # pylint: enable=import-outside-toplevel
+        from pyrosimple import config  # pylint: disable=import-outside-toplevel
 
         if "=urn:btih:" in self.options.dir_or_file:
             # Handle magnet link
@@ -205,8 +223,8 @@ class MetafileCreator(ScriptBase):
         # pylint: disable=import-outside-toplevel
         from pyrosimple.util.ui import HashProgressBar
 
-        with HashProgressBar() as pb:
-            if self.options.progress == "on":
+        if self.options.progress == "on":
+            with HashProgressBar() as pb:
                 c = pb()
 
                 def pb_tracker(totalhashed, totalsize):
@@ -214,25 +232,13 @@ class MetafileCreator(ScriptBase):
                     c.items_completed = totalhashed
                     c.progress_bar.invalidate()
 
-                progress = pb_tracker
-            else:
-                progress = None
-            # Create a metafile with the first announce as a placeholder
-            torrent = metafile.Metafile.from_path(
+                torrent = self.from_path(
+                    datapath,
+                    progress=pb_tracker,
+                )
+        else:
+            torrent = self.from_path(
                 datapath,
-                self.args[1],
-                progress=progress,
-                root_name=self.options.root_name,
-                private=self.options.private,
-                created_by="PyroSimple",
-                ignore=[
-                    re.compile(fnmatch.translate(glob))
-                    for glob in self.options.exclude + config.settings.MKTOR_IGNORE
-                ],
-                piece_size=self.options.piece_size,
-                piece_size_min=self.options.piece_size_min,
-                piece_size_max=self.options.piece_size_max,
-                add_padding=self.options.add_padding,
             )
         torrent["created by"] = "PyroSimple"
         if self.options.comment:
