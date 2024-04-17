@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+- `mktor`/`lstor`/`chtor`: No longer create the progress bar object at
+  all if not enabled. This should improve the scripting capabilities.
+
 ### Added
 - `pyrotorque`: Add `preload_fields` to `TreeWatch` job, to allow
   fetching expensive-but-cacheable fields right after a successfully

@@ -261,30 +261,41 @@ class MetafileChanger(ScriptBase):
                     continue
 
             if self.options.check_data:
-                # pylint: disable=import-outside-toplevel
-                from pyrosimple.util.metafile import PieceLogger
-                from pyrosimple.util.ui import HashProgressBar, HashProgressBarCounter
-
-                with HashProgressBar() as pb:
-                    if self.options.progress == "on":
-                        progress_callback = cast(
-                            HashProgressBarCounter, pb()
-                        ).progress_callback
-                    else:
-                        progress_callback = None
-
-                    piece_logger = PieceLogger(torrent, self.log)
-
-                    data_correct = torrent.hash_check(
-                        Path(self.options.check_data),
-                        progress_callback=progress_callback,
-                        piece_callback=piece_logger.check_piece,
+                try:
+                    from pyrosimple.util.metafile import (  # pylint: disable=import-outside-toplevel
+                        PieceFailer,
                     )
-                if not data_correct:
+
+                    piece_logger = PieceFailer(torrent, self.log)
+
+                    if self.options.progress == "on":
+                        # pylint: disable=import-outside-toplevel
+                        from pyrosimple.util.ui import (
+                            HashProgressBar,
+                            HashProgressBarCounter,
+                        )
+
+                        with HashProgressBar() as pb:
+                            progress_callback = cast(
+                                HashProgressBarCounter, pb()
+                            ).progress_callback
+
+                            torrent.hash_check(
+                                Path(self.options.check_data),
+                                progress_callback=progress_callback,
+                                piece_callback=piece_logger.check_piece,
+                            )
+                    else:
+                        torrent.hash_check(
+                            Path(self.options.check_data),
+                            piece_callback=piece_logger.check_piece,
+                        )
+                except OSError as exc:
                     self.log.error(
-                        "File %s does match data from %s",
+                        "File %s does match data from %s: %s",
                         filename,
                         self.options.check_data,
+                        exc,
                     )
                     sys.exit(error.EX_DATAERR)
 

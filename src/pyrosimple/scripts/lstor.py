@@ -167,20 +167,24 @@ class MetafileLister(ScriptBase):
                             self.return_code = EX_SOFTWARE
                 if self.options.check_data:
                     # pylint: disable=import-outside-toplevel
+
                     from pyrosimple.util.metafile import PieceFailer
                     from pyrosimple.util.ui import HashProgressBar
 
+                    piece_logger = PieceFailer(torrent, self.log)
                     try:
-                        with HashProgressBar() as pb:
-                            if self.options.progress == "on":
+                        if self.options.progress == "on":
+                            with HashProgressBar() as pb:
                                 progress_callback = pb().progress_callback
-                            else:
-                                progress_callback = None
 
-                            piece_logger = PieceFailer(torrent, self.log)
+                                torrent.hash_check(
+                                    Path(self.options.check_data),
+                                    progress_callback=progress_callback,
+                                    piece_callback=piece_logger.check_piece,
+                                )
+                        else:
                             torrent.hash_check(
                                 Path(self.options.check_data),
-                                progress_callback=progress_callback,
                                 piece_callback=piece_logger.check_piece,
                             )
                     except OSError as exc:
