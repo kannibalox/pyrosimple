@@ -155,7 +155,7 @@ method.set_key = event.download.hash_done, !time_stamp,\
 
 
 # EVENTS: Activation intervals
-method.insert = pyro._activations.append, simple|private,\
+method.insert = pyro._activations.append, simple,\
     "d.custom.set=activations,\"$cat=$d.custom=activations,$argument.0=,$system.time=\" ; d.save_resume="
 method.set_key = event.download.paused, !activations, "pyro._activations.append=P"
 method.set_key = event.download.resumed, !activations, "pyro._activations.append=R"
