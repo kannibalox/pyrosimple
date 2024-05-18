@@ -13,6 +13,14 @@ method.insert = cfg.logfile,  private|const|string, (cat,(cfg.logs),"rtorrent-",
 method.insert = cfg.session,  private|const|string, (cat,(cfg.basedir),".session/")
 method.insert = cfg.watch,    private|const|string, (cat,(cfg.basedir),"watch/")
 
+# Create instance directories
+execute.throw = sh, -c, (cat,\
+    "mkdir -p \"",(cfg.download),"\" ",\
+    "\"",(cfg.logs),"\" ",\
+    "\"",(cfg.session),"\" ",\
+    "\"",(cfg.watch),"/load\" ",\
+    "\"",(cfg.watch),"/start\" ")
+
 session.path.set = (cat, (cfg.session))
 directory.default.set = (cat, (cfg.download))
 network.xmlrpc.size_limit.set = 8M
@@ -23,14 +31,6 @@ execute.nothrow = sh, -c, (cat, "echo >",\
 print = (cat, "Logging to ", (cfg.logfile))
 log.open_file = "log", (cfg.logfile)
 log.add_output = "info", "log"
-
-# Create instance directories
-execute.throw = sh, -c, (cat,\
-    "mkdir -p \"",(cfg.download),"\" ",\
-    "\"",(cfg.logs),"\" ",\
-    "\"",(cfg.session),"\" ",\
-    "\"",(cfg.watch),"/load\" ",\
-    "\"",(cfg.watch),"/start\" ")
 
 # Return path to item data (never empty, unlike `d.base_path`);
 # multi-file items return a path ending with a '/'.
