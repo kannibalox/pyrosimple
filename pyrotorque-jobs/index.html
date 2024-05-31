@@ -1,0 +1,1412 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://kannibalox.github.io/pyrosimple/pyrotorque-jobs/">
+      
+      
+        <link rel="prev" href="../configuration/">
+      
+      
+        <link rel="next" href="../rtorrent-config/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.7">
+    
+    
+      
+        <title>Pyrotorque Jobs - pyrosimple</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.046329b4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CInconsolata:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Inconsolata"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pyrotorque-jobs" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pyrosimple" class="md-header__button md-logo" aria-label="pyrosimple" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M375.7 19.7c-1.5-8-6.9-14.7-14.4-17.8s-16.1-2.2-22.8 2.4L256 61.1 173.5 4.2c-6.7-4.6-15.3-5.5-22.8-2.4s-12.9 9.8-14.4 17.8l-18.1 98.5-98.5 18.2c-8 1.5-14.7 6.9-17.8 14.4s-2.2 16.1 2.4 22.8L61.1 256 4.2 338.5c-4.6 6.7-5.5 15.3-2.4 22.8s9.8 13 17.8 14.4l98.5 18.1 18.1 98.5c1.5 8 6.9 14.7 14.4 17.8s16.1 2.2 22.8-2.4l82.6-56.8 82.5 56.9c6.7 4.6 15.3 5.5 22.8 2.4s12.9-9.8 14.4-17.8l18.1-98.5 98.5-18.1c8-1.5 14.7-6.9 17.8-14.4s2.2-16.1-2.4-22.8L450.9 256l56.9-82.5c4.6-6.7 5.5-15.3 2.4-22.8s-9.8-12.9-17.8-14.4l-98.5-18.1-18.2-98.5zM269.6 110l65.6-45.2 14.4 78.3c1.8 9.8 9.5 17.5 19.3 19.3l78.3 14.4-45.2 65.6c-5.7 8.2-5.7 19 0 27.2l45.2 65.6-78.3 14.4c-9.8 1.8-17.5 9.5-19.3 19.3l-14.4 78.3-65.6-45.2c-8.2-5.7-19-5.7-27.2 0l-65.6 45.2-14.4-78.3c-1.8-9.8-9.5-17.5-19.3-19.3l-78.3-14.4 45.2-65.6c5.7-8.2 5.7-19 0-27.2l-45.2-65.6 78.3-14.4c9.8-1.8 17.5-9.5 19.3-19.3l14.4-78.3 65.6 45.2c8.2 5.7 19 5.7 27.2 0zM256 368a112 112 0 1 0 0-224 112 112 0 1 0 0 224zm-64-112a64 64 0 1 1 128 0 64 64 0 1 1-128 0z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pyrosimple
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Pyrotorque Jobs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_3" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_3">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kannibalox/pyrosimple" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../quickstart/" class="md-tabs__link">
+        
+  
+    
+  
+  Quick Start
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../usage-rtxmlrpc/" class="md-tabs__link">
+          
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../changing-announce/" class="md-tabs__link">
+          
+  
+  How-tos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../rtorrent-config/" class="md-tabs__link">
+          
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pyrosimple" class="md-nav__button md-logo" aria-label="pyrosimple" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M375.7 19.7c-1.5-8-6.9-14.7-14.4-17.8s-16.1-2.2-22.8 2.4L256 61.1 173.5 4.2c-6.7-4.6-15.3-5.5-22.8-2.4s-12.9 9.8-14.4 17.8l-18.1 98.5-98.5 18.2c-8 1.5-14.7 6.9-17.8 14.4s-2.2 16.1 2.4 22.8L61.1 256 4.2 338.5c-4.6 6.7-5.5 15.3-2.4 22.8s9.8 13 17.8 14.4l98.5 18.1 18.1 98.5c1.5 8 6.9 14.7 14.4 17.8s16.1 2.2 22.8-2.4l82.6-56.8 82.5 56.9c6.7 4.6 15.3 5.5 22.8 2.4s12.9-9.8 14.4-17.8l18.1-98.5 98.5-18.1c8-1.5 14.7-6.9 17.8-14.4s2.2-16.1-2.4-22.8L450.9 256l56.9-82.5c4.6-6.7 5.5-15.3 2.4-22.8s-9.8-12.9-17.8-14.4l-98.5-18.1-18.2-98.5zM269.6 110l65.6-45.2 14.4 78.3c1.8 9.8 9.5 17.5 19.3 19.3l78.3 14.4-45.2 65.6c-5.7 8.2-5.7 19 0 27.2l45.2 65.6-78.3 14.4c-9.8 1.8-17.5 9.5-19.3 19.3l-14.4 78.3-65.6-45.2c-8.2-5.7-19-5.7-27.2 0l-65.6 45.2-14.4-78.3c-1.8-9.8-9.5-17.5-19.3-19.3l-78.3-14.4 45.2-65.6c5.7-8.2 5.7-19 0-27.2l-45.2-65.6 78.3-14.4c9.8-1.8 17.5-9.5 19.3-19.3l14.4-78.3 65.6 45.2c8.2 5.7 19 5.7 27.2 0zM256 368a112 112 0 1 0 0-224 112 112 0 1 0 0 224zm-64-112a64 64 0 1 1 128 0 64 64 0 1 1-128 0z"/></svg>
+
+    </a>
+    pyrosimple
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kannibalox/pyrosimple" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quick Start
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage-rtxmlrpc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    rtxmlrpc
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage-rtcontrol/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    rtcontrol
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage-pyrotorque/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pyrotorque
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage-tor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    mktor/lstor/chtor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    How-tos
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            How-tos
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changing-announce/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changing announce URLs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conky/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Integrate with Conky
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance-tasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    General maintenance tasks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pyrotorque-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pyrotorque tutorial
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Torque Jobs
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Torque Jobs
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#command" class="md-nav__link">
+    Command
+  </a>
+  
+    <nav class="md-nav" aria-label="Command">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#item-command" class="md-nav__link">
+    Item Command
+  </a>
+  
+    <nav class="md-nav" aria-label="Item Command">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#action-job" class="md-nav__link">
+    Action Job
+  </a>
+  
+    <nav class="md-nav" aria-label="Action Job">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_2" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queue-manager" class="md-nav__link">
+    Queue Manager
+  </a>
+  
+    <nav class="md-nav" aria-label="Queue Manager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_3" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation" class="md-nav__link">
+    Explanation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tree-watch" class="md-nav__link">
+    Tree Watch
+  </a>
+  
+    <nav class="md-nav" aria-label="Tree Watch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_4" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_1" class="md-nav__link">
+    Explanation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#completion-moving" class="md-nav__link">
+    Completion Moving
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tree-watch-with-sorting" class="md-nav__link">
+    Tree Watch with Sorting
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rtorrent-config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    rTorrent Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../experimental/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Experimental Features
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tips/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tips & Tricks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migrating from pyrocore
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-code/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Custom Code
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="pyrotorque-jobs">Pyrotorque Jobs</h1>
+<h2 id="command">Command</h2>
+<p>This job runs a single untemplated command. While this can also be
+done with straight cron, having it in pyrotorque allows keeping all
+rTorrent changes in one place. It also offers several improvements,
+such as per-second resolution.</p>
+<h3 id="configuration">Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[TORQUE.send_mail]</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">handler</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyrosimple.job.action:Command&quot;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">args</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;echo &#39;pyrotorque is still running!&#39; | mail -s &#39;pyrotorque check&#39;&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">shell</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">schedule</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;hour=*&quot;</span>
+</code></pre></div>
+<p>There are optional parameters <code>shell</code>, <code>cwd</code>, <code>timeout</code>, <code>check</code>, and
+<code>env</code>, all of which correspond to the parameters of
+<a href="https://docs.python.org/3/library/subprocess.html#subprocess.run"><code>subprocess.run()</code></a></p>
+<h2 id="item-command">Item Command</h2>
+<p>This job is very similar to Command, but instead runs a templated
+command against all matching items.</p>
+<h3 id="configuration_1">Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">[TORQUE.log_messaages]</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">handler</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyrosimple.job.action:ItemCommand&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">args</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;echo &#39;{{item.hash}} has message {{item.message}}&#39; &gt;&gt; /var/log/rtorrent/messages.log&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">shell</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">schedule</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;hour=*&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">matcher</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;message=/.+/&quot;</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">view</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+</code></pre></div>
+<p>There are optional parameters <code>shell</code>, <code>cwd</code>, <code>timeout</code>, <code>check</code>, and
+<code>env</code>, all of which correspond to the parameters of
+<a href="https://docs.python.org/3/library/subprocess.html#subprocess.run"><code>subprocess.run()</code></a></p>
+<h2 id="action-job">Action Job</h2>
+<p>This is a simple job, intended to allow access to (almost)
+the same actions as <code>rtcontrol</code>.</p>
+<h3 id="configuration_2">Configuration</h3>
+<p>Example of stopping completed torrents after they reach a &gt;5 ratio:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">[TORQUE.stop_well_seeded]</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">handler</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyrosimple.job.action:Action&quot;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">schedule</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;hour=*&quot;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">matcher</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;is_ignored=no ratio&gt;5.0&quot;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">view</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;complete&quot;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">action</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;stop&quot;</span>
+</code></pre></div>
+<p>Arguments:</p>
+<ul>
+<li><code>action</code>: The action to perform. See <code>rtcontrol --help</code> for a list
+  of actions.</li>
+<li><code>view</code>: The rTorrent view to query</li>
+<li><code>matcher</code>: The query to use when listing torrents</li>
+</ul>
+<h2 id="queue-manager">Queue Manager</h2>
+<h3 id="configuration_3">Configuration</h3>
+<p>The following is a minimal <code>config.toml</code> configuration example, only
+changing a few values from the defaults to demonstrate key features:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">[TORQUE.queue]</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">handler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyrosimple.job.queue:QueueManager&quot;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">schedule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;minute=*&quot;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">sort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;-prio,loaded,name&quot;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">matcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;is_open=no tagged=torqued is_ignored=no done=0 message=&#39;&#39;&quot;</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">downloading_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">downloading_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span>
+</code></pre></div>
+<p>Having a minimal configuration with just your changes is recommended,
+so you get new defaults in later releases automatically.</p>
+<p>Arguments:</p>
+<ul>
+<li><code>matcher</code>/<code>startable</code><br />
+  The query to use to determine which torrents are valid candidates to
+  be started. Defaults to <code>is_complete=no is_ignored=no is_open=no
+  message="" done=0</code>.</li>
+<li><code>sort</code>/<code>sort_fields</code><br />
+  Determines the order in which torrents are started. Defaults to
+  <code>name,hash</code>.</li>
+<li><code>start_at_once</code><br />
+  The maximum number of items to start during a single run. May be
+  overridden by the <code>downloading_min</code> settings. Defaults to <code>1</code>.</li>
+<li><code>downloading</code><br />
+  The query used to determine the number of actively downloading
+  torrents. Defaults to <code>is_active=1 is_complete=0</code></li>
+<li><code>downloading_min</code><br />
+  If the number of actively downloading torrents is less than this
+  number, the job will ignore <code>start_at_once</code> to get to this
+  number. Defaults to <code>0</code> (meaning <code>start_at_once</code> will always be
+  honored).</li>
+<li><code>downloading_max</code><br />
+  If the number of actively downloading torrents is greater than this
+  number, pyrotorque will not start any items. Defaults to <code>20</code>.</li>
+<li><code>intermission</code><br />
+  If any items are started, pyrotorque will wait this many seconds
+  before attempting to start another. This is helpful to avoid
+  potentially starting too many items too quickly. Defaults to <code>120</code>.</li>
+<li><code>max_downloading_traffic</code><br />
+  If set, this setting will skip starting torrents when the torrents
+  in <code>downloading</code> exceed this value.</li>
+<li><code>log_to_client</code><br />
+  Can be set to <code>False</code> to avoid logging messages in rTorrent whenever
+  a torrent is started. Defaults to <code>True</code>.</li>
+</ul>
+<h3 id="explanation">Explanation</h3>
+<p>In the above example for the <code>queue</code> job, <code>downloading_max</code> counts
+started-but-incomplete items including those that ignore
+commands. Only if there are fewer of these items in the client than
+that number, a new item will be started. This is the queue's length
+and thus the most important parameter.</p>
+<p>The queue <em>never</em> stops any items, i.e. <code>downloading_max</code> is not
+enforced and you can manually start more items than that if you want
+to.  That is also the reason items that should be under queue control
+must be loaded in 'normal' mode, i.e. stopped.</p>
+<p>Other queue parameters are the minimum number of items in
+'downloading' state named <code>downloading_min</code>, which trumps
+<code>start_at_once</code>, the maximum number of items to start in one run of
+the job. Both default to <code>1</code>. Since the default schedule is
+<code>second=*/15</code>, that means at most one item would be started every 15
+seconds.</p>
+<p>But that default is changed using the following two lines:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">schedule</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;second=*/5&quot;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">intermission</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span>
+</code></pre></div>
+<p>This makes the queue manager check more often whether there is
+something startable, but prevents it from starting the next batch of
+items when the last start was less than <code>intermission</code> seconds ago.</p>
+<p>The <code>startable</code> condition (repeated below for reference) prevents
+ignored items, ones having a non-empty message, and those with the
+lowest priority from being started. Note that tree watch sets the
+priority of items loaded in 'normal' mode to zero -- that <code>prio&gt;0</code>
+condition then excludes them from being started automatically some
+time later, until you press <code>+</code> to increase that priority. You can
+also delay not-yet-started items using the <code>-</code> key until the item has
+a priority of zero (a/k/a <code>off</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">startable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;&#39;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="s1">        is_ignored=0 message= prio&gt;0</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="s1">        [ prio&gt;2 OR [ NOT [ traits=audio kind_25=jpg,png,tif,bmp ] ] ]</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="s1">&#39;&#39;&#39;</span>
+</code></pre></div>
+<p>This sample condition also adds the extra hurdle that audio downloads
+that don't stay below a 25% threshold regarding contained images are
+<strong>not</strong> started automatically. <em>Unless</em> you raise the priority to 3
+(<code>high</code>) using the <code>+</code> key, then they're fair game for the queue. Go
+do all that with a plain rTorrent watch dir, in one line of
+configuration.</p>
+<p>The parameter <code>sort_fields</code> is used to determinate in what order
+startable items are handled. By default, higher priority items are
+started first, and age is used within each priority class.</p>
+<p>Above, it was mentioned <code>downloading_max</code> counts
+started-but-incomplete items. The exact definition of that
+classification can be changed using the <code>downloading</code> condition. A
+given condition is <em>always</em> extended with <code>is_active=1 is_complete=0</code>,
+i.e. the started-but-incomplete requirement.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">downloading</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;[ prio&gt;1 [ down&gt;3 OR started&lt;2 ] ]&quot;</span>
+</code></pre></div>
+<p>In plain English, this example says we only count items that have a
+normal or high priority, and transfer data or were started in the last
+2 minutes. The priority check means you can 'hide' started items from
+the queue by setting them to <code>low</code>, e.g. because they're awfully slow
+and prevent your full bandwidth from being used.</p>
+<p>The second part automatically ignores stalled items unless just
+started.  This prevents disk trashing when a big item is still
+creating its files and thus has no data transfer -- it looks stalled,
+but we do not want yet another item to be started and increasing disk
+I/O even more, so the manager sees those idle but young items as
+occupying a slot in the queue.</p>
+<h2 id="tree-watch">Tree Watch</h2>
+<p>This job is for loading torrents into rTorrent. While the native tools
+work well enough for simply loading torrents, this job allows for
+additional features like conditional logic and invalid file handling.</p>
+<p>Note that this job uses inotify, which is much lighter-weight but has
+the potential to miss files. See the <code>check_unhandled</code> argument for a
+way to counter this issue.</p>
+<h3 id="configuration_4">Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">[TORQUE.watch]</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">handler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyrocore.job.watch:TreeWatch&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">schedule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;second=*/5&quot;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/var/torrents/watch&quot;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">started</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">check_unhandled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">remove_already_added</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">cmd_label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;&quot;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="s2">{% if &#39;TV&#39; in flags %}d.custom1.set=TV{% endif %}</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s2">&quot;&quot;&quot;</span>
+</code></pre></div>
+<p>Arguments:</p>
+<ul>
+<li><code>path</code>: The path to watch for new files. Multiple paths can be
+  separate with <code>:</code>. Note that the watch is recursive.</li>
+<li><code>started</code>: Controls whether new items are automatically started
+  after adding</li>
+<li><code>check_unhandled</code>: If true, the job will try to find and update any
+  file it may have missed on each <code>schedule</code>. This will also catch any
+  files that were added while pyrotorque wasn't running</li>
+<li><code>remove_already_added</code>: If true, pyrotorque will remove files if the
+  hash already exists in the client. This is mainly useful to prevent
+  errors and files from building up if files are accidentally added to
+  the directory twice.</li>
+<li><code>cmd_*</code>: Any argument starting with this prefix is treated as a
+  custom command that will be run when the torrent is loaded. As seen
+  in the example, this can be a fully-templated string, with some
+  fields being auto-created by the job itself.</li>
+<li><code>preload_fields</code>: After loading the torrent, this setting can be
+  used to potentially preload other fields, so that expensive
+  calculations (e.g. for <code>kind</code>) can happen early</li>
+</ul>
+<h3 id="explanation_1">Explanation</h3>
+<p>As mentioned in <code>QueueManager</code>, commands configured to be executed
+during item loading can be templates. This can be used to support all
+sorts of tricks, the most common ones are explained here, including
+fully dynamic completion moving. If the following explanation of the
+inner workings is too technical and nerdy for you, skip to the <a href="./#tree-watch-examples">tree
+watch examples</a> section below,
+and just adapt one of the prepared use cases to your setup.</p>
+<p>So how does this work? When a <code>.torrent</code> file is notified for loading
+via <code>inotify</code>, it's parsed and contained data is put into variables
+that can be used in the command templates. In order to get an idea
+what variables are available, you can combine the dry-run and debug
+modes.</p>
+<p>Consider this example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/var/torrent/watch
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>$<span class="w"> </span>date<span class="w"> </span>&gt;example.dat
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>$<span class="w"> </span>mktor<span class="w"> </span>-q<span class="w"> </span>example.dat<span class="w"> </span>http://tracker.example.com/
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pyrosimple.job.watch
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="m">2022</span>-11-25<span class="w"> </span><span class="m">11</span>:21:47,588<span class="w">  </span>INFO<span class="w"> </span>job::<span class="w"> </span>Building<span class="w"> </span>template<span class="w"> </span>variables<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="s1">&#39;/var/torrent/watch/example.torrent&#39;</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="m">2022</span>-11-25<span class="w"> </span><span class="m">11</span>:21:47,597<span class="w">  </span>INFO<span class="w"> </span>job::<span class="w"> </span>Available<span class="w"> </span>variables:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;commands&#39;</span>:<span class="w"> </span><span class="o">[]</span>,
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w"> </span><span class="s1">&#39;filetype&#39;</span>:<span class="w"> </span><span class="s1">&#39;.dat&#39;</span>,
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w"> </span><span class="s1">&#39;flags&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;example.torrent&#39;</span>,<span class="w"> </span><span class="s1">&#39;example&#39;</span>,<span class="w"> </span><span class="s1">&#39;var&#39;</span>,<span class="w"> </span><span class="s1">&#39;torrent&#39;</span>,<span class="w"> </span><span class="s1">&#39;watch&#39;</span><span class="o">}</span>,
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w"> </span><span class="s1">&#39;info_hash&#39;</span>:<span class="w"> </span><span class="s1">&#39;96336C9C3A1D8EC99C02FF79115476DDD4474A7A&#39;</span>,
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w"> </span><span class="s1">&#39;info_name&#39;</span>:<span class="w"> </span><span class="s1">&#39;example.dat&#39;</span>,
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w"> </span><span class="s1">&#39;pathname&#39;</span>:<span class="w"> </span><span class="s1">&#39;/var/torrent/watch/example.torrent&#39;</span>,
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w"> </span><span class="s1">&#39;rel_path&#39;</span>:<span class="w"> </span><span class="s1">&#39;example.torrent&#39;</span>,
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w"> </span><span class="s1">&#39;tracker_alias&#39;</span>:<span class="w"> </span><span class="s1">&#39;example.com&#39;</span>,
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w"> </span><span class="s1">&#39;watch_path&#39;</span>:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;/var/torrent/watch/&#39;</span><span class="o">}}</span>
+</code></pre></div>
+<p>Things to take note of:</p>
+<ol>
+<li>
+<p>All kinds of information is made available, like the
+    torrent's info hash and the tracker alias; thus you can write
+    conditional templates based on tracker, or use the tracker name in
+    a completion path.</p>
+</li>
+<li>
+<p>For certain types of downloads, <code>traits</code> provides parsed
+    information to build specific target paths, e.g. for the
+    <code>Pioneer.One.S01E06.720p.x264-VODO</code> TV episode, you'll get this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="na">label</span><span class="o">=</span><span class="s">&#39;tv/mkv&#39;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="na">traits</span><span class="o">=</span><span class="s">Bunch(aspect=None, codec=&#39;x264&#39;, episode=&#39;06&#39;, extension=None, format=&#39;720p&#39;,</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="na">group</span><span class="o">=</span><span class="s">&#39;VODO&#39;, kind=&#39;tv&#39;, pattern=&#39;Normal TV Episodes&#39;, release=None,</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="na">release_tags</span><span class="o">=</span><span class="s">None, season=&#39;01&#39;, show=&#39;Pioneer.One&#39;, sound=None, title=None)</span>
+</code></pre></div>
+</li>
+</ol>
+<h3 id="examples">Examples</h3>
+<h4 id="completion-moving">Completion Moving</h4>
+<p>Since the templating namespace automatically includes the path of a
+loaded <code>.torrent</code> file relative to the watch root (in <code>relpath</code>, see
+above example namespace output and the config example further down),
+you can set the \"move on completion\" target using that value.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="na">cmd_target</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">{</span><span class="c1"># set target path</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="c1">#}d.custom.set=targetdir,/var/torrent/done/{{label}}/{{relpath}}</span>
+</code></pre></div>
+<p>Note that this still needs a typical completion event handler that takes
+the custom variable that is set, and moves the data based on its value.</p>
+<h4 id="tree-watch-with-sorting">Tree Watch with Sorting</h4>
+<p>This example adds a <em>second</em> job for a <code>sorted</code> tree that directly saves
+the data into a path based on the loaded metafile's location.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Tree watch with location</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="na">job.watch-sorted.handler</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s">pyrocore.torrent.watch:TreeWatch</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="na">job.watch-sorted.schedule</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s">hour=*</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="na">job.watch-sorted.active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="na">job.watch-sorted.load_mode</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">normal</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="na">job.watch-sorted.queued</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="na">job.watch-sorted.path</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="s">/var/torrent/sorted/watch</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="na">job.watch-sorted.cmd.setdir</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s">{{</span><span class="c1"># set download path</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="na">}}{{if &#39;/music/&#39; in pathname}}{{# add metafile basename to path</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">        </span><span class="na">}}d.directory_base.set</span><span class="o">=</span><span class="s">&quot;/var/torrent/sorted/{{relpath}}/{{pathname|h.pathname}}&quot;{{</span><span class="c1">#</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="na">}}{{elif traits.kind</span><span class="w"> </span><span class="o">=</span><span class="s">= &#39;tv&#39;}}{{</span><span class="c1"># store TV content into separate show folders</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">        </span><span class="na">}}d.directory.set</span><span class="o">=</span><span class="s">&quot;/var/torrent/sorted/{{relpath}}/{{traits.get(&#39;show&#39;, &#39;_UNKNOWN&#39;).replace(&#39;.&#39;,&#39; &#39;).title()}}&quot;{{</span><span class="c1">#</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">    </span><span class="na">}}{{else}}{{# just use the relative metafile location</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">        </span><span class="na">}}d.directory.set</span><span class="o">=</span><span class="s">&quot;/var/torrent/sorted/{{relpath}}&quot;{{</span><span class="c1">#</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">    </span><span class="na">}}{{endif}}</span>
+</code></pre></div>
+<p>Change the values in the second block to suit your needs. As given, an
+item loaded from <code>…/sorted/watch/movies/*.torrent</code> would end up in the
+<code>…/sorted/movies</code> directory (with the filename coming from inside the
+metafile as usual), and it won't start by itself.</p>
+<p>Also, paths containing <code>music</code> use the metafile's basename as the data
+directory, and metafiles recognized as TV content get separated into
+show directories.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tabs", "toc.integrate"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      
+    
+  </body>
+</html>
