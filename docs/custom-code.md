@@ -30,12 +30,12 @@ def _custom_fields():
     # Add a single field, which is matched like a number,
     # and accessed by performing a single RPC call.
     yield engine.ConstantField(
-        int,
-        "piece_size", # name of the field
+        int, # The type of the field, supported types are: int, str, set, bool, list, untyped
+        "piece_size", # Name of the field
         "Piece size for the item", # The description for --help
-        matcher=matching.FloatFilter, # The type to use when matching the field
-        accessor=lambda o: o.rpc_call("d.size_chunks"), # How to actually access the method
-        requires=["d.size_chunks"], # Optional but speeds up the process
+        matcher=matching.FloatFilter, # The filter type to use when matching the field, see pyrosimple.util.matching for a list of filters
+        accessor=lambda o: o.rpc_call("d.size_chunks"), # How to actually access the method. `o` is a pyrosimple.torrent.RtorrentItem
+        requires=["d.size_chunks"], # Optional, but great speeds any rtcontrol commands by allowing prefetching
     )
 
     # Insert any other custom fields here
