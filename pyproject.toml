@@ -62,7 +62,7 @@ pyroadmin = "pyrosimple.scripts.pyroadmin:run"
 optional = true
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.0.5"
-pylint = "^2.15.7"
+pylint = [{version="^2.17.7", python = "<3.12"},{version="^3.2.2", python = ">=3.12"}]
 pytest = "^7.0.1"
 typing-extensions = "^4.1.1"
 black = "^23.1.0"
