@@ -7,6 +7,7 @@
   all if not enabled. This should improve the scripting capabilities.
 
 ### Added
+- Explicity python 3.12 support
 - `pyrotorque`: Add `preload_fields` to `TreeWatch` job, to allow
   fetching expensive-but-cacheable fields right after a successfully
   load.
