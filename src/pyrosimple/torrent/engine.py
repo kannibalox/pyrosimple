@@ -1098,5 +1098,4 @@ class TorrentView:
                 if self.matcher.match(item):
                     yield item
         else:
-            for item in self._fetch_items():
-                yield item
+            yield from self._fetch_items()

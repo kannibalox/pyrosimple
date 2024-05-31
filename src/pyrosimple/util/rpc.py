@@ -100,6 +100,8 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
             elif self.__rpc_codec == "xml":
                 codec = xmlrpclib
                 headers = [("CONTENT_TYPE", "text/xml")]
+            else:
+                raise ValueError(f"Unknown RPC protocol type {codec}")
             handler = scgi.transport_from_url(url)
             transport = handler(
                 url=self.__url,

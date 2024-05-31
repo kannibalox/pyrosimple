@@ -3,7 +3,7 @@ import time
 
 from collections import abc
 from threading import RLock
-from typing import Any, Dict, Hashable, Optional, Set, Tuple, Union
+from typing import Any, Dict, Optional, Set, Tuple, Union
 
 
 class ExpiringCache(abc.MutableMapping):
@@ -19,7 +19,7 @@ class ExpiringCache(abc.MutableMapping):
         self.expires: float = expires
         # When 3.7 support is dropped, the type can be made more specific:
         # Dict[str, tuple[float, Any]]
-        self.data: Dict[Hashable, tuple] = {}
+        self.data: Dict[abc.Hashable, tuple] = {}
         self.lock = RLock()
         self.static_keys = static_keys or set()
         if items:
@@ -30,11 +30,11 @@ class ExpiringCache(abc.MutableMapping):
                     expire_at = self.expires + time.time()
                 self.data[key] = (expire_at, val)
 
-    def __delitem__(self, key: Hashable):
+    def __delitem__(self, key: abc.Hashable):
         with self.lock:
             del self.data[key]
 
-    def __setitem__(self, key: Hashable, val: Any, expire: Optional[float] = None):
+    def __setitem__(self, key: abc.Hashable, val: Any, expire: Optional[float] = None):
         with self.lock:
             if key in self.static_keys or expire == 0 or self.expires == 0:
                 expire_at = 0.0
@@ -43,7 +43,7 @@ class ExpiringCache(abc.MutableMapping):
             self.data[key] = (expire_at, val)
 
     def __getitem__(
-        self, key: Hashable, with_age: bool = False
+        self, key: abc.Hashable, with_age: bool = False
     ) -> Union[Tuple[Any, float], Any]:
         with self.lock:
             expires_at, item = self.data[key]
