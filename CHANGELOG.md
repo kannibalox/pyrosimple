@@ -2,18 +2,21 @@
 
 ## [Unreleased]
 
+## [2.14.0] - 2024-06-04
+
 ### Fixed
 - `mktor`/`lstor`/`chtor`: No longer create the progress bar object at
-  all if not enabled. This should improve the scripting capabilities.
+  all if not enabled. This should improve non-interactive script
+  usage.
 
 ### Added
-- Explicity python 3.12 support
+- Explicit python 3.12 support
 - `pyrotorque`: Add `preload_fields` to `TreeWatch` job, to allow
   fetching expensive-but-cacheable fields right after a successfully
   load.
 
 ### Changed
-- The default prefetch fields has been reduced, in particular to no
+- The default prefetch fields have been reduced, in particular to no
   longer use `d.ratio`, which is a relatively expensive call for
   incomplete items.
 
@@ -514,7 +517,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.13.0...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.14.0...HEAD
+[2.14.0]: https://github.com/kannibalox/pyrosimple/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/kannibalox/pyrosimple/compare/v2.12.1...v2.13.0
 [2.12.1]: https://github.com/kannibalox/pyrosimple/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/kannibalox/pyrosimple/compare/v2.11.4...v2.12.0
