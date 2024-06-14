@@ -201,7 +201,7 @@ class RtorrentControl(ScriptBaseWithConfig):
 
     For numeric fields, a leading "+" means greater than, a leading "-" means less
     than. For string fields, the value is a glob pattern (*, ?, [a-z], [!a-z]), or
-    a regex match enclosed by slashes. All string comparisons are case-ignoring.
+    a regex match enclosed by slashes. All string comparisons are case sensitive.
     Multiple values separated by a comma indicate several possible choices (OR).
     "!" in front of a filter value negates it (NOT).
 
