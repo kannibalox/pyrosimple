@@ -1,11 +1,11 @@
-FROM python:3 as base
+FROM python:3 AS base
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
     PYTHONUNBUFFERED=1
 
 # Build virtual env
-FROM base as builder
+FROM base AS builder
 
 ENV PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
@@ -27,7 +27,7 @@ COPY . ./
 RUN poetry build && /venv/bin/pip install dist/*.whl
 
 # Install into final image
-FROM base as final
+FROM base AS final
 
 ENV PATH="/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/venv"
