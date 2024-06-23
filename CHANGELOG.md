@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Handle alias configuration with leading or trailing whitespace
+  correctly. [#68](https://github.com/kannibalox/pyrosimple/discussions/68#discussioncomment-9853324)
+
 ## [2.14.0] - 2024-06-04
 
 ### Fixed

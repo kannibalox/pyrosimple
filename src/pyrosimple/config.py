@@ -229,11 +229,12 @@ def lookup_announce_url(name: str) -> Tuple[str, List[str]]:
 def map_announce2alias(url: str) -> str:
     """Get tracker alias for announce URL, and if none is defined, the
     2nd level domain."""
+    url = url.strip()
     if url in settings["ALIASES"].items():
         return url
     # Try to find an exact alias URL match and return its label
     for alias, urls in settings["ALIASES"].items():
-        if any(i == url for i in urls):
+        if any(i.strip() == url for i in urls):
             return str(alias)
 
     # Try to find an alias URL prefix and return its label
@@ -243,7 +244,7 @@ def map_announce2alias(url: str) -> str:
     )
 
     for alias, urls in settings["ALIASES"].items():
-        if any(i.startswith(server) for i in urls):
+        if any(i.strip().startswith(server) for i in urls):
             return str(alias)
 
     # Return 2nd level domain name if no alias found
@@ -251,7 +252,7 @@ def map_announce2alias(url: str) -> str:
         # Try to find based on domain
         domain = ".".join(parts.netloc.split(":")[0].split(".")[-2:])
         for alias, urls in settings["ALIASES"].items():
-            if any(i == domain for i in urls):
+            if any(i.strip() == domain for i in urls):
                 return str(alias)
         return domain
     except IndexError:

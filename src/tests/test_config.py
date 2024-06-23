@@ -33,3 +33,35 @@ def test_rtorrentrc_parse(lines, want, tmpdir):
     rc = tmpdir.join("rtorrrent.rc")
     rc.write(lines)
     assert config.scgi_url_from_rtorrentrc(rc) == want
+
+
+@pytest.mark.parametrize(
+    ("url", "aliases", "want"),
+    [
+        ("http://example.com/announce.php", {}, "example.com"),
+        ("http://example.com/announce.php", {"EX": ["example.com"]}, "EX"),
+        (
+            "http://example.com/announce.php",
+            {"EX": ["http://example.com/xxxxx/announce"]},
+            "EX",
+        ),
+        (
+            "http://example.com/announce.php",
+            {"EX": [" http://example.com/xxxxx/announce"]},
+            "EX",
+        ),
+        (
+            "https://example.com/announce.php",
+            {"EX": [" https://example.com/xxxxx/announce"]},
+            "EX",
+        ),
+        (
+            "https://example.com/announce.php",
+            {"EX": ["https://example.com/xxxxx/announce "]},
+            "EX",
+        ),
+    ],
+)
+def test_aliases(url, aliases, want):
+    config.settings["ALIASES"] = aliases
+    assert config.map_announce2alias.__wrapped__(url) == want
