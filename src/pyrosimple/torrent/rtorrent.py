@@ -482,7 +482,7 @@ class RtorrentItem(engine.TorrentProxy):
         # network.xmlrpc.size_limit but large torrents.
         torrent_path = Path(proxy.session.path(), f"{self.hash}.torrent")
 
-        if self.method_has("d.download_bytes.base64"):
+        if self._engine.has_method("d.download_bytes.base64"):
             b64_data = proxy.d.download_bytes.base64(self.hash)
         else:
             b64_data = proxy.execute.capture(
