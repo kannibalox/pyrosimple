@@ -110,7 +110,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                     val = int(val)
             except (TypeError, ValueError) as exc:
                 raise error.ConfigurationError(
-                    f"Bad param '{param}' in job schedule '{schedule}'"
+                    f"Bad param {param!r} in job schedule {schedule!r}"
                 ) from exc
             result[key] = val
 
@@ -126,7 +126,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
             for key in ("handler", "schedule"):
                 if key not in params:
                     raise error.ConfigurationError(
-                        f"Job '{name}' is missing the required '{key}' parameter"
+                        f"Job {name!r} is missing the required {key!r} parameter"
                     )
             self.jobs[name] = dict(params)
             if self.options.dry_run:
