@@ -481,17 +481,17 @@ class RtorrentItem(engine.TorrentProxy):
         # This might be brittle for systems that have a low
         # network.xmlrpc.size_limit but large torrents.
         torrent_path = Path(proxy.session.path(), f"{self.hash}.torrent")
-        torrent = metafile.Metafile(
-            bencode.decode(
-                base64.b64decode(
-                    proxy.execute.capture(
-                        rpc.NOHASH,
-                        "base64",
-                        str(torrent_path),
-                    )
-                )
+
+        if self.method_has("d.download_bytes.base64"):
+            b64_data = proxy.d.download_bytes.base64(self.hash)
+        else:
+            b64_data = proxy.execute.capture(
+                rpc.NOHASH,
+                "base64",
+                str(torrent_path),
             )
-        )
+
+        torrent = metafile.Metafile(bencode.decode(base64.b64decode(b64_data)))
         try:
             torrent.add_fast_resume(Path(proxy.d.directory_base(self.hash)))
         except (FileNotFoundError, OSError) as e:
