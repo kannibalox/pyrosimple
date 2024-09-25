@@ -11,7 +11,6 @@ import os
 import shlex
 import sys
 import tempfile
-import textwrap
 
 from pprint import pformat
 from xmlrpc import client as xmlrpc_client
@@ -221,6 +220,8 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
     def print_repl_help(self):
         """Short REPL help output"""
+        import textwrap
+
         print(
             textwrap.dedent(
                 r"""\
