@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Fix printing meta size in `lstor`
 - Handle alias configuration with leading or trailing whitespace
   correctly. [#68](https://github.com/kannibalox/pyrosimple/discussions/68#discussioncomment-9853324)
 

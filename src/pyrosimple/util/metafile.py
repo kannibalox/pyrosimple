@@ -770,9 +770,9 @@ class Metafile(dict):
             ),
             "META %s (pieces %s %.1f%%)"
             % (
-                fmt.human_size(self.data_size()).strip(),
+                fmt.human_size(len(self.bencode())).strip(),
                 fmt.human_size(len(info["pieces"])).strip(),
-                100.0 * len(info["pieces"]) / self.data_size(),
+                100.0 * len(info["pieces"]) / len(self.bencode()),
             ),
             f"HASH {infohash.upper()}",
             f"URL  {announce}",
