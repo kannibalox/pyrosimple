@@ -19,7 +19,7 @@ class ByteProgress(formatters.Progress):
         width: int,
     ):
         """Format the counts into human-readable sizes."""
-        return HTML(self.template).format(
+        return self.template.format(
             current=human_size(progress.items_completed),
             total=human_size(progress.total or -1),
         )
