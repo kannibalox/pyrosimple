@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Build `sessionfile` from engine properties instead of using custom method.
+
 ### Fixed
 
 - Fix printing meta size in `lstor`
