@@ -220,7 +220,7 @@ class RtorrentXmlRpc(ScriptBaseWithConfig):
 
     def print_repl_help(self):
         """Short REPL help output"""
-        import textwrap
+        import textwrap  # pylint: disable=import-outside-toplevel
 
         print(
             textwrap.dedent(

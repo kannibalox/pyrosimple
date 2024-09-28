@@ -559,7 +559,9 @@ def core_fields():
         "sessionfile",
         "path to session file",
         matcher=matching.PatternFilter,
-        accessor=lambda o: os.path.expanduser(o._engine.properties["session.path"] + "/" + o.hash),
+        accessor=lambda o: os.path.expanduser(
+            o._engine.properties["session.path"] + "/" + o.hash
+        ),
         requires=["d.hash"],
     )
     yield ConstantField(

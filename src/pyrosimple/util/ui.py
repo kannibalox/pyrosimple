@@ -2,7 +2,6 @@
 deferring the load of prompt_toolkit until it's needed.
 """
 
-from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import ProgressBar, ProgressBarCounter
 from prompt_toolkit.shortcuts.progress_bar import formatters
 
