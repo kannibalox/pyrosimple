@@ -902,8 +902,9 @@ class MatcherBuilder(NodeVisitor):
         return create_filter(key, cond, needle)
 
     def visit_group(self, node, visited_children):
+        real_children = [c for c in visited_children[1:] if c is not None]
         return GroupNode(
-            [c for c in visited_children[1:] if c is not None], visited_children[0]
+            real_children, visited_children[0]
         )
 
     def visit_not(self, node, visited_children):
@@ -930,6 +931,8 @@ class MatcherBuilder(NodeVisitor):
                     children.append(c)
             else:
                 children.append(visited_children[1])
+        if len(children) == 1:
+            return children[0]
         return OrNode(children)
 
     def visit_conds(self, node, visited_children):
@@ -950,7 +953,13 @@ class MatcherBuilder(NodeVisitor):
         return self.generic_visit(node, visited_children)
 
     def visit_query(self, node, visited_children):
-        return self.__pare_children(visited_children, AndNode)
+        real_children = [c for c in visited_children if c is not None]
+        if len(real_children) == 1:
+            return real_children[0]
+        elif type(real_children[1]) == list:
+            return AndNode([real_children[0]] + real_children[1])
+        else:
+            return AndNode([real_children[0]] + real_children[1:])
 
     # Unfortunate but necessary boilerplate methods
 
