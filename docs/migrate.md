@@ -71,6 +71,14 @@ available utilities.
   case-insensitive matching, use a regex with the `i` flag,
   e.g. `name=/UbUnTu.*/i`
 * Relative times (e.g. `2d3m`) are now case-sensitive.
+* Using `,` as an implicit `OR` no longer works. Use an explicit `OR` or a regex instead:
+  ```bash
+  # Old
+  rtcontrol "tracker=*ubuntu.com*,*archlinux.org*"
+  # New
+  rtcontrol [ "tracker=*ubuntu.com*" OR "tracker=*archlinux.org*" ]
+  rtcontrol "tracker=/ubuntu.com|archlinux.org/"
+  ```
 
 ### Templating
 
