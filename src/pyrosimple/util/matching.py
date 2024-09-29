@@ -956,7 +956,7 @@ class MatcherBuilder(NodeVisitor):
         real_children = [c for c in visited_children if c is not None]
         if len(real_children) == 1:
             return real_children[0]
-        elif type(real_children[1]) == list:
+        elif isinstance(real_children[1], list):
             return AndNode([real_children[0]] + real_children[1])
         else:
             return AndNode([real_children[0]] + real_children[1:])
