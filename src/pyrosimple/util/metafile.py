@@ -822,7 +822,7 @@ class Metafile(dict):
                         result.append(f"{' ' * (4 * (idx + 1))}{item}/")
                         oldpaths[idx] = item
                 result.append(
-                    "%-69s%9s"
+                    "%-68s%10s"
                     % (
                         " " * (4 * len(entry_path)) + entry_path[-1],
                         fmt.human_size(entry["length"]),
