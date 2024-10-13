@@ -812,14 +812,18 @@ class Metafile(dict):
         else:
             # Directory structure
             result.append(f"{info['name']}/")
-            oldpaths = [None] * 99
+            oldpaths = []
             for entry in info["files"]:
                 # Remove crap that certain PHP software puts in paths
                 entry_path = [i for i in entry["path"] if i]
-
+                while (len(oldpaths) >= len(entry_path)):
+                    oldpaths.pop()
                 for idx, item in enumerate(entry_path[:-1]):
-                    if item != oldpaths[idx]:
-                        result.append(f"{' ' * (4 * (idx + 1))}{item}/")
+                    if idx >= len(oldpaths):
+                        oldpaths.append(item)
+                        result.append(f"{' ' * (4 * len(oldpaths))}{item}/")
+                    elif item != oldpaths[idx]:
+                        result.append(f"{' ' * (4 * len(oldpaths))}{item}/")
                         oldpaths[idx] = item
                 result.append(
                     "%-68s%10s"
