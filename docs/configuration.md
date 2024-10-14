@@ -141,6 +141,16 @@ This section allows for setting any number of tracker aliases for use
 with `rtcontrol`'s "alias" field, and when creating torrents with
 `mktor`.
 
+!!! note
+    `rtcontrol` will cache alias information inside rTorrent custom keys
+    in order to speed up commands. To clear and then repopulate the cache,
+    run the following commands:
+    
+    ```bash
+    rtcontrol --custom memo_alias= // -o hash # Clear the `memo_alias` custom key
+    rtcontrol // -o alias                     # Force rtcontrol to immediate refill the key
+    ```
+
 
 ### CONNECTIONS
 
