@@ -303,15 +303,20 @@ class Metafile(dict):
                 # Don't scan blacklisted directories
                 for bad in dirnames[:]:
                     if any(pattern.match(bad) for pattern in self.ignore):
+                        self.log.debug("Ignoring directory %r", str(bad))
                         dirnames.remove(bad)
 
                 # Yield all filenames that aren't blacklisted
                 for filename in filenames:
                     if not any(pattern.match(filename) for pattern in self.ignore):
                         yield Path(dirpath, filename)
+                    else:
+                        self.log.debug("Ignoring file %r", filename)
         else:
             if not any(pattern.match(str(datapath)) for pattern in self.ignore):
                 yield Path(datapath)
+            else:
+                self.log.debug("Ignoring file %r", str(datapath))
 
     def _make_info(
         self,
@@ -596,7 +601,11 @@ class Metafile(dict):
             total_size = sum(
                 os.path.getsize(filename) for filename in file_generator(Path(datapath))
             )
+            if total_size == 0:
+                raise ValueError("Total size of all files cannot be 0")
             piece_size_exp = int(math.log(total_size) / math.log(2)) - 9
+            if total_size <= 0:
+                raise ValueError("Total size of all files cannot be 0")
             # Limit it to the min and max
             piece_size = min(piece_size_max, max(piece_size_min, 2**piece_size_exp))
         # Round to the nearest power of two for all use cases
