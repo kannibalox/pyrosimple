@@ -903,9 +903,7 @@ class MatcherBuilder(NodeVisitor):
 
     def visit_group(self, node, visited_children):
         real_children = [c for c in visited_children[1:] if c is not None]
-        return GroupNode(
-            real_children, visited_children[0]
-        )
+        return GroupNode(real_children, visited_children[0])
 
     def visit_not(self, node, visited_children):
         if node.text:

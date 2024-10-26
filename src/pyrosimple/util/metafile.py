@@ -3,7 +3,6 @@
     Copyright (c) 2009, 2010, 2011 The PyroScope Project <pyroscope.project@gmail.com>
 """
 
-
 import copy
 import errno
 import hashlib
@@ -803,9 +802,11 @@ class Metafile(dict):
                 "",
                 "FILE LISTING%s"
                 % (
-                    ""
-                    if not self.is_multi_file
-                    else " [%d file(s)]" % len(info["files"]),
+                    (
+                        ""
+                        if not self.is_multi_file
+                        else " [%d file(s)]" % len(info["files"])
+                    ),
                 ),
             ]
         )
@@ -825,7 +826,7 @@ class Metafile(dict):
             for entry in info["files"]:
                 # Remove crap that certain PHP software puts in paths
                 entry_path = [i for i in entry["path"] if i]
-                while (len(oldpaths) >= len(entry_path)):
+                while len(oldpaths) >= len(entry_path):
                     oldpaths.pop()
                 for idx, item in enumerate(entry_path[:-1]):
                     if idx >= len(oldpaths):
