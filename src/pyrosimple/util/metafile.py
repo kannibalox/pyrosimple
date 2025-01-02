@@ -822,7 +822,7 @@ class Metafile(dict):
         else:
             # Directory structure
             result.append(f"{info['name']}/")
-            oldpaths = []
+            oldpaths: List[str] = []
             for entry in info["files"]:
                 # Remove crap that certain PHP software puts in paths
                 entry_path = [i for i in entry["path"] if i]
