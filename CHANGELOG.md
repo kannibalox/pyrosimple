@@ -2,10 +2,14 @@
 
 ## [Unreleased]
 
+## [2.14.2] - 2025-01-01
+
+### Changed
+- Explicitly support python 3.13
+
 ## [2.14.1] - 2024-10-26
 
 ### Changed
-
 - Build `sessionfile` from engine properties instead of using custom method.
 
 ### Fixed
@@ -529,7 +533,8 @@ If you just want to use the pyrocore tools on python 3 without all the
 new features, you can use the `release-1.X` branch or the 1.X
 releases.
 
-[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.14.1...HEAD
+[Unreleased]: https://github.com/kannibalox/pyrosimple/compare/v2.14.2...HEAD
+[2.14.2]: https://github.com/kannibalox/pyrosimple/compare/v2.14.1...v2.14.2
 [2.14.1]: https://github.com/kannibalox/pyrosimple/compare/v2.14.0...v2.14.1
 [2.14.0]: https://github.com/kannibalox/pyrosimple/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/kannibalox/pyrosimple/compare/v2.12.1...v2.13.0
