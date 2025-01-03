@@ -985,12 +985,12 @@ class TorrentProxy:
         return None
 
     @classmethod
-    def add_field_generator(cls, prefix: str, generator: Callable):
+    def add_field_generator(cls, prefix: str, generator: Callable) -> None:
         """Add a field generator with a given prefix to the registry"""
         FIELD_GENERATOR_REGISTRY[prefix] = generator
 
     @classmethod
-    def add_field(cls, field):
+    def add_field(cls, field) -> None:
         """Add a custom field to the class"""
         setattr(cls, field.name, field)
         FIELD_REGISTRY[field.name] = field
@@ -1055,7 +1055,7 @@ TorrentProxy.add_core_fields()
 class TorrentView:
     """A view on a subset of torrent items."""
 
-    def __init__(self, engine, viewname, matcher=None):
+    def __init__(self, engine, viewname: str, matcher=None):
         """Initialize view on torrent items."""
         self.engine = engine
         self.viewname = viewname or "default"

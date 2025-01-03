@@ -15,7 +15,18 @@ import urllib.parse
 from difflib import get_close_matches
 from functools import lru_cache, partial
 from pathlib import Path
-from typing import Any, Callable, Dict, Generator, List, Optional, Set, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+    Iterable,
+)
 from xmlrpc import client as xmlrpclib
 
 import bencode
@@ -61,7 +72,7 @@ class RtorrentItem(engine.TorrentProxy):
     def __init__(
         self,
         engine_,
-        fields,
+        fields: Dict,
         rpc_fields: Optional[Dict] = None,
         cache_expires: Optional[float] = None,
     ):
@@ -225,7 +236,7 @@ class RtorrentItem(engine.TorrentProxy):
         self._fields[name] = value
         return value
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         return self.fetch(name)
 
     def datapath(self) -> Path:
@@ -240,12 +251,14 @@ class RtorrentItem(engine.TorrentProxy):
             path = Path(self._engine.properties["system.cwd"], path)
         return path.expanduser()
 
-    def announce_urls(self, default=[]):  # pylint: disable=dangerous-default-value
+    def announce_urls(self, default: Optional[List[str]] = None) -> List[str]:
         """Get a list of all announce URLs.
         Returns `default` if no trackers are found at all.
         """
         try:
-            response = self.rpc_call("t.multicall", ["", "t.url=", "t.is_enabled="])
+            response: List[Tuple[str, int]] = self.rpc_call(
+                "t.multicall", ["", "t.url=", "t.is_enabled="]
+            )
         except rpc.ERRORS as exc:
             raise error.EngineError(
                 f"While getting announce URLs for #{self._fields['hash']}: {exc}"
@@ -253,7 +266,9 @@ class RtorrentItem(engine.TorrentProxy):
 
         if response:
             return [i[0] for i in response if i[1]]
-        return default
+        if default:
+            return default
+        return []
 
     def start(self):
         """(Re-)start downloading or seeding."""
@@ -376,19 +391,20 @@ class RtorrentItem(engine.TorrentProxy):
         """Hash check a download."""
         self._make_it_so("hash-checking", ["d.check_hash"])
 
-    def __print_result(self, data, method=None, args=None) -> None:
+    def __print_result(
+        self, data: str, method: str, args: Optional[List] = None
+    ) -> None:
         "Helper to print RPC call results"
         args_list = ""
-        if args:
+        if args is not None:
             args_list = '"' + '","'.join(args) + '"'
         print(f"{self._fields['hash']}\t{data}\t{method.lstrip(':')}={args_list}")
 
-    def execute(self, commands) -> None:
+    def execute(self, commands: Union[str, Iterable]) -> None:
         """Execute RPC command(s)."""
-        try:
+
+        if isinstance(commands, str):
             commands = [i.strip() for i in commands.split(" ; ")]
-        except (TypeError, AttributeError):
-            pass  # assume an iterable
 
         for command in commands:
             try:
@@ -405,7 +421,7 @@ class RtorrentItem(engine.TorrentProxy):
             method = method.lstrip(">")
             self._make_it_so("executing command on", [method], *args, observer=observer)
 
-    def custom_items(self) -> Dict:
+    def custom_items(self) -> Dict[str, Any]:
         """Try using rtorrent-ps commands to list custom keys, otherwise fall back to reading from a session file.
 
         This does *not* include the custom1, custom2, etc. keys"""
@@ -675,11 +691,11 @@ class RtorrentEngine:
         if auto_open:
             self.open()
 
-    def view(self, viewname="default", matcher=None):
+    def view(self, viewname: str = "default", matcher=None) -> engine.TorrentView:
         """Get list of download items."""
         return engine.TorrentView(self, viewname, matcher)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a representation of internal state."""
         name = self.__class__.__name__
         if self.rpc:
@@ -782,7 +798,7 @@ class RtorrentEngine:
         """Log a message in the torrent client."""
         self.open().log(rpc.NOHASH, msg)
 
-    def item(self, infohash: str, prefetch=None):
+    def item(self, infohash: str, prefetch: Optional[Set[str]] = None):
         """Fetch a single item by its info hash."""
         return next(self.items(infohash, prefetch))
 
@@ -899,7 +915,7 @@ class RtorrentEngine:
 
     def show(
         self,
-        items,
+        items: List[RtorrentItem],
         view: str,
         append: bool = False,
         disjoin: bool = False,
@@ -948,7 +964,6 @@ def expand_template(template_path: str, namespace: Dict) -> str:
     """
     template = env.get_template(template_path)
     # Default templating namespace
-    # variables = dict(c=config.custom_template_helpers)
     variables = {}
     # Provided namespace takes precedence
     variables.update(namespace)
@@ -957,7 +972,9 @@ def expand_template(template_path: str, namespace: Dict) -> str:
 
 
 def format_item_str(
-    template_str: str, item: Union[Dict, str, RtorrentItem], defaults=None
+    template_str: str,
+    item: Union[Dict, str, RtorrentItem],
+    defaults: Optional[Dict] = None,
 ) -> str:
     """Simple helper function to format a string with an item"""
     template = env.from_string(template_str)
@@ -967,7 +984,7 @@ def format_item_str(
 def format_item(
     template: jinja2.Template,
     item: Union[Dict, str, RtorrentItem],
-    defaults: Optional[Dict] = None,
+    defaults: Optional[Dict[str, Any]] = None,
 ) -> str:
     """Format an item according to the given output template.
 
