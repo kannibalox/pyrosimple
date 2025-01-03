@@ -638,7 +638,7 @@ class TimeFilter(NumericFilterBase):
             self._invert_operator()
             return
         self._timestamp = self._parse_absolute_timestamp()
-        if self._timestamp is None:
+        if self._timestamp is None and self._timestamp_offset is None:
             raise ValueError(f"Could not parse timestamp {self._condition!r}")
 
     @property
@@ -647,7 +647,6 @@ class TimeFilter(NumericFilterBase):
             return str(time.time() - self._timestamp_offset)
         if self._timestamp is not None:
             return str(self._timestamp)
-        raise ValueError(f"Unset time value from condition {self._condition!r}")
 
     @_value.setter
     def _value(self, _: str) -> None:
@@ -732,7 +731,6 @@ class DurationFilter(TimeFilter):
             return self._timestamp_offset
         if self._timestamp is not None:
             return time.time() - self._timestamp
-        raise ValueError(f"Unset time value from condition {self._condition!r}")
 
     @_value.setter
     def _value(self, _):
@@ -749,7 +747,7 @@ class DurationFilter(TimeFilter):
             self._timestamp_offset = delta
             return
         self._timestamp = self._parse_absolute_timestamp()
-        if self._timestamp is None:
+        if self._timestamp is None and self._timestamp_offset is None:
             raise ValueError(f"Could not parse timestamp {self._condition!r}")
 
     def match(self, item) -> bool:
