@@ -240,8 +240,8 @@ class FieldFilter(MatcherNode):
         """Store field name and filter value for later evaluations."""
         super().__init__([])  # Filters are the leaves of the tree and have no children
         self._name: str = name
-        self._condition: str = value # Stores a copy of the original value
-        self._value: str = value # Must be a string, classes may/use manipulate this but non-strings should be stored in separate field
+        self._condition: str = value  # Stores a copy of the original value
+        self._value: str = value  # Must be a string, classes may/use manipulate this but non-strings should be stored in separate field
         self._op: FilterOperator = op
 
         self.validate()
