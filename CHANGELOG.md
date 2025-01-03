@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- `mktor`/`chtor`: Fix error when removing non-existing key with `-s`
+
 ## [2.14.2] - 2025-01-01
 
 ### Changed

@@ -507,8 +507,9 @@ class Metafile(dict):
                     else:
                         namespace[k] = {}
                 namespace = namespace[k]
-            if value is None and keys[-1] in namespace:
-                del namespace[keys[-1]]
+            if value is None:
+                if keys[-1] in namespace:
+                    del namespace[keys[-1]]
             else:
                 namespace[keys[-1]] = value
 

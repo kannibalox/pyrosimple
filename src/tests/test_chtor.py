@@ -15,6 +15,10 @@ from pyrosimple.util.metafile import Metafile
         (["-p"], ["info", "private"], 1),
         (["-P"], ["info", "private"], None),
         (["-s", "info.test=foo"], ["info", "test"], "foo"),
+        # Remove existing key
+        (["-s", "announce"], ["announce"], None),
+        # Remove non-existing key
+        (["-s", "test"], ["test"], None),
         # Tracker changes
         (
             ["-a", "http://example.com/announce.php/new_test"],
