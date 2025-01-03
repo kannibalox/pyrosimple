@@ -1018,9 +1018,9 @@ class TorrentProxy:
         """Initialize object."""
         self._fields = ExpiringCache()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Make item hashable for Python."""
-        return self.hash
+        return hash(self.hash)
 
     def __eq__(self, other):
         """Compare items based on their infohash."""
