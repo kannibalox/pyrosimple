@@ -240,8 +240,8 @@ class FieldFilter(MatcherNode):
         """Store field name and filter value for later evaluations."""
         super().__init__([])  # Filters are the leaves of the tree and have no children
         self._name: str = name
-        self._condition: str = value
-        self._value: Optional[Any] = value
+        self._condition: str = value # Stores a copy of the original value
+        self._value: str = value # Must be a string, classes may/use manipulate this but non-strings should be stored in separate field
         self._op: FilterOperator = op
 
         self.validate()
@@ -493,29 +493,33 @@ class BoolFilter(FieldFilter):
         """Return rTorrent condition to speed up data transfer."""
         pf = prefilter_field_lookup(self._name)
         if pf is not None:
-            return f'"equal={pf},value={int(self._value)}"'
+            return f'"equal={pf},value={"1" if self._bool_value else "0"}"'
         return ""
 
     def validate(self):
         """Validate filter condition (template method)."""
         super().validate()
 
-        self._value: Optional[bool] = truth(str(self._value), self._condition)
-        self._condition = "yes" if self._value else "no"
+        self._bool_value: bool = truth(str(self._value), self._condition)
+        self._value = str(self._bool_value)
+        self._condition = "yes" if self._bool_value else "no"
 
     def eq(self, item):
         """Return True if filter matches item."""
         val = getattr(item, self._name) or False
-        return bool(val) is self._value
+        return bool(val) is self._bool_value
 
     def to_match_string(self):
         """Turn the node to a valid query string"""
-        val = "yes" if self._value else "no"
+        val = "yes" if self._bool_value else "no"
         return self._name + self._op.query_repr + val
 
 
 class NumericFilterBase(FieldFilter):
-    """Base class for numerical value filters."""
+    """Base class for numerical value filters.
+
+    Subclasses are responsible for making sure that self._value is
+    convertible to a float."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -528,9 +532,7 @@ class NumericFilterBase(FieldFilter):
             return False
         # Grab the function from the native operator module
         op = getattr(operator, self._op.name)
-        if self._value is not None:
-            return bool(op(float(val), float(self._value)))
-        return False
+        return bool(op(float(val), float(self._value)))
 
 
 def prefilter_field_lookup(name: str) -> Optional[str]:
@@ -573,7 +575,7 @@ class FloatFilter(NumericFilterBase):
         super().validate()
 
         try:
-            self._value = float(self._value)
+            float(self._value)
         except (ValueError, TypeError) as exc:
             raise FilterError(
                 f"Bad numerical value {self._value!r} in {self._condition!r} ({exc})"
@@ -599,8 +601,8 @@ class TimeFilter(NumericFilterBase):
     def __init__(self, name: str, op: FilterOperator, value: str):
         # During validate(), one of these two must be set to something
         # non-None
-        self._timestamp_offset = None
-        self._timestamp = None
+        self._timestamp_offset: Optional[int] = None
+        self._timestamp: Optional[int] = None
         super().__init__(name, op, value)
         self.not_null = False
 
@@ -642,11 +644,12 @@ class TimeFilter(NumericFilterBase):
             raise ValueError(f"Could not parse timestamp {self._condition!r}")
 
     @property
-    def _value(self) -> Optional[str]:
+    def _value(self) -> str:
         if self._timestamp_offset is not None:
             return str(time.time() - self._timestamp_offset)
         if self._timestamp is not None:
             return str(self._timestamp)
+        return ""
 
     @_value.setter
     def _value(self, _: str) -> None:
@@ -665,11 +668,11 @@ class TimeFilter(NumericFilterBase):
             self._op = Operators["gt"]
 
     def _parse_delta(self) -> Optional[int]:
-        match = self.TIMEDELTA_RE.match(self._condition)
-        if not match:
+        delta_match = self.TIMEDELTA_RE.match(self._condition)
+        if not delta_match:
             return None
         delta_val = 0
-        for unit, val in match.groupdict().items():
+        for unit, val in delta_match.groupdict().items():
             if val:
                 delta_val = self.TIMEDELTA_UNITS[unit](int(val, 10))
         return delta_val
@@ -816,23 +819,20 @@ class ByteSizeFilter(NumericFilterBase):
         else:
             scale = 1
 
-        # Get float value
+        # Confirm current value is float
         try:
-            self._value = float(self._value)
+            self._value = str(int(float(self._value) * scale))
         except (ValueError, TypeError) as exc:
             raise FilterError(
                 f"Bad numerical value {self._value!r} in {self._condition!r}"
             ) from exc
-
-        # Scale to bytes
-        self._value = self._value * scale
 
     def to_match_string(self):
         """Turn the node to a valid query string"""
         return (
             self._name
             + self._op.query_repr
-            + human_size(self._value).replace(" ", "").replace("iB", "")
+            + human_size(int(self._value)).replace(" ", "").replace("iB", "")
         )
 
 
