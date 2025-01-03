@@ -43,7 +43,9 @@ class HashProgressBar(ProgressBar):
     ]
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, formatters=self.BYTE_FORMATTER, **kwargs)
+        if "formatters" not in kwargs:
+            kwargs["formatters"] = self.BYTE_FORMATTER
+        super().__init__(*args, **kwargs)
 
     def __call__(
         self,
@@ -63,7 +65,7 @@ class HashProgressBar(ProgressBar):
 class HashProgressBarCounter(ProgressBarCounter):
     """Custom progress bar counter to provide methods to match metafile.Metafile's callbacks"""
 
-    def progress_callback(self, totalhashed, totalsize):
+    def progress_callback(self, totalhashed: int, totalsize: int) -> None:
         """Bump the progress for each piece"""
         self.total = totalsize
         self.items_completed = totalhashed
