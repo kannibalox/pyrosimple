@@ -189,7 +189,18 @@ def test_conditions_prefilter(cond, expected):
             ["custom_1=TV", "OR", "[", "ratio=-1", "OR", "seedtime=-1", "]"],
             Box(custom_1="TV", ratio=1.5, seedtime=5),
         ),
-        ( ["is_complete=yes", "[", "is_open=yes", "OR", "is_complete=yes", "]", "fno=1"], Box(is_complete=True, is_open=True, fno=1)),
+        (
+            [
+                "is_complete=yes",
+                "[",
+                "is_open=yes",
+                "OR",
+                "is_complete=yes",
+                "]",
+                "fno=1",
+            ],
+            Box(is_complete=True, is_open=True, fno=1),
+        ),
         # Multiple ORs
         (
             [
@@ -245,7 +256,18 @@ def test_matcher(matcher, item):
             ["[", "ratio=+1", "OR", "seedtime=+8d", "]", "custom_1=TV"],
             Box(custom_1="TV", ratio=0.5, seedtime=5),
         ),
-        ( ["is_complete=yes", "[", "is_open=yes", "OR", "is_complete=yes", "]", "fno=1"], Box(is_complete=False, is_open=False, fno=1)),
+        (
+            [
+                "is_complete=yes",
+                "[",
+                "is_open=yes",
+                "OR",
+                "is_complete=yes",
+                "]",
+                "fno=1",
+            ],
+            Box(is_complete=False, is_open=False, fno=1),
+        ),
         # Multiple ORs
         (
             [
@@ -343,7 +365,10 @@ def test_matcher_prefilter(matcher, item):
         ("is_complete=no", "is_complete=no"),
         ("is_complete=no name=arch", "is_complete=no name=arch"),
         ("is_complete=no OR name=arch", "is_complete=no OR name=arch"),
-        ("is_complete=no [ name=arch ] size<1G", "is_complete=no [ name=arch ] size<1.0G"),
+        (
+            "is_complete=no [ name=arch ] size<1G",
+            "is_complete=no [ name=arch ] size<1.0G",
+        ),
     ],
 )
 def test_matcher_representation(matcher, string):
