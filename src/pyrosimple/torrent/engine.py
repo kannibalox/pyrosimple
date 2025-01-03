@@ -10,7 +10,7 @@ import re
 import time
 import warnings
 
-from typing import Callable, Dict, Generator, Optional, Set, Type, cast
+from typing import Callable, Dict, Generator, List, Optional, Set, Type, cast
 
 from pyrosimple import config, error
 from pyrosimple.util import fmt, matching, metafile, rpc, traits
@@ -1058,14 +1058,14 @@ class TorrentView:
     def __init__(self, engine, viewname: str, matcher=None):
         """Initialize view on torrent items."""
         self.engine = engine
-        self.viewname = viewname or "default"
-        self.matcher = matcher
-        self._items = None
+        self.viewname: str = viewname or "default"
+        self.matcher: matching.MatcherNode = matcher
+        self._items: Optional[List[TorrentProxy]] = None
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[TorrentProxy, None, None]:
         return self.items()
 
-    def _fetch_items(self):
+    def _fetch_items(self) -> List[TorrentProxy]:
         """Fetch to attribute."""
         if self._items is None:
             self._items = list(self.engine.items(self))
@@ -1092,7 +1092,7 @@ class TorrentView:
             return 1
         return int(self.engine.open().view.size(rpc.NOHASH, self.viewname))
 
-    def items(self):
+    def items(self) -> Generator[TorrentProxy, None, None]:
         """Get list of download items."""
         if self.matcher:
             for item in self._fetch_items():

@@ -130,6 +130,10 @@ class MatcherNode:
             result = str([str(c) for c in self.children])
         return result
 
+    def pre_filter(self) -> str:
+        """Return a string that rtorrent can use to pre-filter. All logic is deferred to subclasses."""
+        raise NotImplementedError()
+
 
 class GroupNode(MatcherNode):
     """This simply groups another node, and optionally inverts it (a logical NOT)"""
@@ -235,8 +239,9 @@ class FieldFilter(MatcherNode):
     def __init__(self, name: str, op: FilterOperator, value: str):
         """Store field name and filter value for later evaluations."""
         super().__init__([])  # Filters are the leaves of the tree and have no children
-        self._name = name
-        self._condition = self._value = value
+        self._name: str = name
+        self._condition: str = value
+        self._value: Optional[Any] = value
         self._op: FilterOperator = op
 
         self.validate()
@@ -249,6 +254,7 @@ class FieldFilter(MatcherNode):
 
     def validate(self):
         """Validate filter condition (template method)."""
+        assert self._value is not None
 
     def match(self, item) -> bool:
         """Test if item matches filter.
@@ -308,7 +314,7 @@ class FieldFilter(MatcherNode):
         """Create a prefilter by creating a NOT[name=filter] object and rendering it."""
         if self.pre_filter_eq():
             return GroupNode(
-                [type(self)(self._name, Operators["eq"], self._value)], True
+                [type(self)(self._name, Operators["eq"], str(self._value))], True
             ).pre_filter()
         return ""
 
@@ -328,10 +334,11 @@ class PatternFilter(FieldFilter):
         """Validate filter condition (template method)."""
 
         super().validate()
-        self._value: str = self._value
         self._template = None
         self._flags = 0
         self._matcher: Callable[[str, Any], bool]
+        if not isinstance(self._value, str):
+            raise FilterError("Non-string pattern value: {self.value!r}")
         if (
             self._value == '""'
         ):  # Replace an empty string with a simple truthiness check
@@ -371,7 +378,7 @@ class PatternFilter(FieldFilter):
                 self._matcher = lambda _, __: True
             else:
                 self._matcher = (
-                    lambda val, _: fnmatch.fnmatchcase(val, self._value)
+                    lambda val, _: fnmatch.fnmatchcase(val, self._value or "")
                     or val == self._value
                 )
 
@@ -456,7 +463,11 @@ class TaggedAsFilter(FieldFilter):
     def validate(self):
         """Validate filter condition (template method)."""
         super().validate()
-        self._value = self._value.lower()
+        self.value: Optional[str]
+        if isinstance(self._value, str):
+            self._value = self._value.lower()
+        else:
+            raise FilterError(f"Non-string tag filter {self._value!r}")
 
         # If the tag starts with ':', test for exact equality (just this tag, no others)
         if self._value.startswith(":"):
@@ -468,7 +479,7 @@ class TaggedAsFilter(FieldFilter):
     def eq(self, item) -> bool:
         """Return True if filter matches item."""
         tags = getattr(item, self._name) or []
-        if self._exact:
+        if self._exact and self._value is not None:
             # Exact equality check
             return set(self._value) == set(tags)
         # Is given tag in list?
@@ -489,7 +500,7 @@ class BoolFilter(FieldFilter):
         """Validate filter condition (template method)."""
         super().validate()
 
-        self._value = truth(str(self._value), self._condition)
+        self._value: Optional[bool] = truth(str(self._value), self._condition)
         self._condition = "yes" if self._value else "no"
 
     def eq(self, item):
@@ -517,7 +528,9 @@ class NumericFilterBase(FieldFilter):
             return False
         # Grab the function from the native operator module
         op = getattr(operator, self._op.name)
-        return bool(op(float(val), float(self._value)))
+        if self._value is not None:
+            return bool(op(float(val), float(self._value)))
+        return False
 
 
 def prefilter_field_lookup(name: str) -> Optional[str]:
@@ -602,7 +615,7 @@ class TimeFilter(NumericFilterBase):
         time_fuzz = 60 * 60 * 24
         timestamp = 0
         cmp_ = ""
-        if pf is None:
+        if pf is None or self._value is None:
             return ""
         if self._op.name in ["gt", "ge"]:
             timestamp = int(float(self._value)) - time_fuzz
@@ -629,7 +642,7 @@ class TimeFilter(NumericFilterBase):
             raise ValueError(f"Could not parse timestamp {self._condition!r}")
 
     @property
-    def _value(self) -> str:
+    def _value(self) -> Optional[str]:
         if self._timestamp_offset is not None:
             return str(time.time() - self._timestamp_offset)
         if self._timestamp is not None:
@@ -785,7 +798,7 @@ class ByteSizeFilter(NumericFilterBase):
             "eq": "equal",
         }
         pf = prefilter_field_lookup(self._name)
-        if pf is not None and self._op.name in comparers:
+        if pf is not None and self._value is not None and self._op.name in comparers:
             return '"{}={},value={}"'.format(
                 comparers[self._op.name],
                 pf,
@@ -884,7 +897,7 @@ class KeyNameVisitor(NodeVisitor):
         return []
 
 
-def create_filter(name: str, op: str, value: str):
+def create_filter(name: str, op: FilterOperator, value: str):
     """Generates a filter class with the given name, operation and value"""
     field = torrent.engine.field_lookup(name)
     if field is None:

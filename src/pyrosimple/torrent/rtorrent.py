@@ -20,12 +20,12 @@ from typing import (
     Callable,
     Dict,
     Generator,
+    Iterable,
     List,
     Optional,
     Set,
     Tuple,
     Union,
-    Iterable,
 )
 from xmlrpc import client as xmlrpclib
 
