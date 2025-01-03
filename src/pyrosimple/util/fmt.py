@@ -94,16 +94,17 @@ def fmt_strip(val: str) -> str:
     return str(val).strip()
 
 
-def fmt_subst(val, regex, subst):
+def fmt_subst(val: str, regex: str, subst: str) -> str:
     """Replace regex with string."""
     return re.sub(regex, subst, val)
 
 
 def fmt_mtime(val: str) -> float:
     """Modification time of a path."""
-    p = Path(str(val))
-    if p.exists():
-        return p.stat().st_mtime
+    try:
+        return Path(str(val)).stat().st_mtime
+    except FileNotFoundError:
+        pass
     return 0.0
 
 
