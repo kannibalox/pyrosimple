@@ -726,14 +726,18 @@ class DurationFilter(TimeFilter):
         super().__init__(*args, **kwargs)
         self.not_null = True
 
-    @property
-    def _value(self):
+    def _int_value(self) -> int:
         if self._condition == "0":
             return 0
         if self._timestamp_offset is not None:
             return self._timestamp_offset
         if self._timestamp is not None:
-            return time.time() - self._timestamp
+            return int(time.time()) - self._timestamp
+        return 0
+
+    @property
+    def _value(self) -> str:
+        return str(self._int_value())
 
     @_value.setter
     def _value(self, _):
@@ -757,14 +761,14 @@ class DurationFilter(TimeFilter):
         """Return True if filter matches item."""
         if getattr(item, self._name) is None:
             # Never match "N/A" items, except when "-0" was specified
-            return not bool(self._value)
+            return not bool(self._int_value())
         return super().match(item)
 
     def pre_filter(self) -> str:
         """Return rTorrent condition to speed up data transfer."""
         # A "0" might indicate just that, or possibly an empty
         # custom value.
-        if self._value == 0:
+        if self._int_value == 0:
             return ""
         pf = prefilter_field_lookup(self._name)
         time_fuzz = (
@@ -775,10 +779,10 @@ class DurationFilter(TimeFilter):
         if pf is None:
             return ""
         if self._op.name in ["gt", "ge"]:
-            timestamp = self._value + time_fuzz
+            timestamp = self._int_value() + time_fuzz
             cmp_ = "greater"
         elif self._op.name in ["lt", "le"]:
-            timestamp = self._value - time_fuzz
+            timestamp = self._int_value() - time_fuzz
             cmp_ = "less"
 
         if timestamp and cmp_:
