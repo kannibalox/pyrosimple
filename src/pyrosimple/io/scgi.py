@@ -6,6 +6,7 @@ import shlex
 import socket
 import subprocess
 import sys
+import gzip
 
 from typing import Dict, List, Optional, Tuple, Type
 from urllib import parse as urlparse
@@ -119,6 +120,8 @@ class HTTPTransport(RTorrentTransport):
         request_counter.inc()
         request_size_counter.inc(len(request_body))
         headers = {k.replace("_", "-"): v for k, v in dict(self._headers).items()}
+        if "Accept-Encoding" not in headers:
+            headers["Accept-Encoding"] = "gzip"
         with response_time_summary.time():
             req = requests.post(
                 self.url, headers=headers, data=request_body, timeout=60
@@ -265,5 +268,9 @@ def _parse_response(resp: bytes) -> Tuple[bytes, Dict[str, str]]:
     if clen is not None:
         # Check length, just in case the transport is bogus
         assert len(payload) == int(clen)
-
+    encoding = parsed_headers.get("Content-Encoding")
+    if encoding is not None:
+        if encoding != "gzip":
+            raise SCGIException(f"Unknown 'Content-Type' header value {encoding!r}")
+        payload = gzip.decompress(payload)
     return payload, parsed_headers
