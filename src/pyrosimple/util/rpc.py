@@ -96,7 +96,7 @@ class RTorrentProxy(xmlrpclib.ServerProxy):
         if transport is None:
             if self.__rpc_codec == "json":
                 codec = json
-                headers = [("CONTENT_TYPE", "application/json")]
+                headers = [("CONTENT_TYPE", "application/json"), ("ACCEPT_ENCODING", "gzip")]
             elif self.__rpc_codec == "xml":
                 codec = xmlrpclib
                 headers = [("CONTENT_TYPE", "text/xml")]
