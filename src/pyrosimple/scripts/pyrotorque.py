@@ -218,7 +218,7 @@ class RtorrentQueueManager(ScriptBaseWithConfig):
                 or config.settings.TORQUE._settings.get(
                     "pid_file", Path(self.RUNTIME_DIR, "pyrotorque.pid")
                 )
-            )
+            ).expanduser()
         )
         log_file = self.options.log_file or config.settings.TORQUE._settings.get(
             "log_file", None
