@@ -768,7 +768,7 @@ class DurationFilter(TimeFilter):
         """Return rTorrent condition to speed up data transfer."""
         # A "0" might indicate just that, or possibly an empty
         # custom value.
-        if self._int_value == 0:
+        if self._int_value() == 0:
             return ""
         pf = prefilter_field_lookup(self._name)
         time_fuzz = (
