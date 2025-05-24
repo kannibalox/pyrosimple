@@ -549,8 +549,11 @@ class RtorrentControl(ScriptBaseWithConfig):
         if set_to_target:
             was_started = item.is_active
             item.stop()
-        if move_type in ["copy", "move"]:
+        if move_type == "copy":
             item.move(target, move_func=lambda _, s, d: shutil.copy2(s, d))
+        elif move_type =="move":
+            item.move(target, move_func=lambda _, s, d: shutil.move(s, d))
+
         elif move_type == "hardlink":
 
             def hardlink(_, s, d):
